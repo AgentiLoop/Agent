@@ -219,9 +219,9 @@ final class ScriptTab: Identifiable {
         }
     }
 
-    /// Max chars to keep in activityLog — trimmed only on app relaunch (250K).
+    /// Max chars to keep in activityLog — trimmed only on app relaunch (50K).
     /// During session, full history is preserved; render cap handles display performance.
-    static let maxLogChars = 250_000
+    static let maxLogChars = 50_000
 
     /// Trim a log string to the relaunch cap, snapping to the next newline.
     static func trimForRelaunch(_ log: String) -> String {
