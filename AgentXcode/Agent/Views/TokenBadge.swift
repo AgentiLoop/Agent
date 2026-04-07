@@ -141,11 +141,11 @@ private struct TokenDetailView: View {
             }
 
             // Daily chart
-            let recent = store.recentDays(30)
+            let recent = store.recentDays(7)
             if !recent.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
                     Divider()
-                    Text("Daily Usage (30 days) — tokens are est.")
+                    Text("Daily Usage (7 days) — tokens are est.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .padding(.horizontal)
