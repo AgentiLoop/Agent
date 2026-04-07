@@ -649,17 +649,21 @@ extension AgentViewModel {
             }
 
         case "update":
-            let stepNum: Int
+            let rawStep: Int
             if let n = input["step"] as? Int {
-                stepNum = n
+                rawStep = n
             } else if let s = input["step"] as? String, let n = Int(s) {
-                stepNum = n
+                rawStep = n
             } else {
                 return "Error: step number is required for plan_mode update"
             }
-            guard stepNum > 0 else {
-                return "Error: step number must be > 0 (steps are 1-indexed)"
+            // Be permissive about step indexing. Steps are 1-based, but LLMs frequently
+            // send 0 (zero-indexed thinking). Treat 0 as 1 instead of erroring out.
+            // Negative numbers still error.
+            guard rawStep >= 0 else {
+                return "Error: step number must be ≥ 0 (steps are 1-based; 0 is accepted as a synonym for 1)"
             }
+            let stepNum = max(1, rawStep)
             guard let status = input["status"] as? String else {
                 return "Error: status is required for plan_mode update (in_progress, completed, failed)"
             }
