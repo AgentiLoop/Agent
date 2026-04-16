@@ -204,10 +204,24 @@ extension AgentViewModel {
             return defaultOpenAIModels
         }
 
+        // Accept any chat/reasoning model: `gpt…`, `chatgpt…`, or `o<digit>…`
+        // (with or without a trailing dash — catches `o3`, `o3-mini`, `o5`,
+        // `gpt-5`, future families without code changes). Drop non-chat models
+        // (embeddings, tts, whisper, dall-e, moderation, image) via a blocklist.
+        let keepRegex = try? NSRegularExpression(pattern: "^(gpt|chatgpt|o\\d+)(-|$|\\.)", options: [])
+        let blockedSubstrings = [
+            "embed", "embedding", "tts", "whisper", "dall-e", "dalle",
+            "moderation", "image-", "audio-", "realtime", "transcribe",
+            "search-preview", "computer-use"
+        ]
         let filtered = modelsArray
             .filter { model in
-                let id = model["id"] as? String ?? ""
-                return id.hasPrefix("gpt-") || id.hasPrefix("chatgpt-") || id.hasPrefix("o1-") || id.hasPrefix("o3-") || id.hasPrefix("o4-")
+                let id = (model["id"] as? String ?? "").lowercased()
+                guard !id.isEmpty else { return false }
+                if blockedSubstrings.contains(where: { id.contains($0) }) { return false }
+                guard let rx = keepRegex else { return id.hasPrefix("gpt") || id.hasPrefix("chatgpt") }
+                let range = NSRange(id.startIndex..., in: id)
+                return rx.firstMatch(in: id, range: range) != nil
             }
             .compactMap { model -> OpenAIModelInfo? in
                 guard let id = model["id"] as? String else { return nil }
