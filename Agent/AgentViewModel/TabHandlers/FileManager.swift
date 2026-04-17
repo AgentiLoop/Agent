@@ -24,19 +24,11 @@ extension AgentViewModel {
             let limit = input["limit"] as? Int
             tab.appendLog("📖 Read: \(filePath)")
             let output = await Self.offMain { CodingService.readFile(path: filePath, offset: offset, limit: limit) }
-            // Cap file output at 50K chars for LLM context — matches main task path.
-            // Eliminates chunked re-read storms on Swift source files.
-            let capped = LogLimits.trim(
-                output,
-                cap: LogLimits.readFileChars,
-                lineCount: output.components(separatedBy: "\n").count,
-                suffix: "Use offset/limit to read specific sections."
-            )
             let lang = Self.langFromPath(filePath)
             tab.appendLog(Self.codeFence(Self.preview(output, lines: readFilePreviewLines), language: lang))
             tab.flush()
             return TabToolResult(
-                toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": capped],
+                toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": output],
                 isComplete: false
             )
 

@@ -49,17 +49,9 @@ extension AgentViewModel {
                 return true
             }
 
-            // Cap file output at 50K chars for LLM context. 50K covers ~95% of Swift source files in one read — eliminates the chunked re-read storm where the LLM repeatedly calls read_file
-            // with offset/limit just to see the whole file. Each chunked read is a different cache key, so the dedup cache can't help; raising the cap is what actually reduces redundant reads.
-            let capped = LogLimits.trim(
-                output,
-                cap: LogLimits.readFileChars,
-                lineCount: output.components(separatedBy: "\n").count,
-                suffix: "Use offset/limit to read specific sections."
-            )
             let lang = Self.langFromPath(filePath)
             appendLog(Self.codeFence(Self.preview(output, lines: readFilePreviewLines), language: lang))
-            toolResults.append(["type": "tool_result", "tool_use_id": toolId, "content": capped])
+            toolResults.append(["type": "tool_result", "tool_use_id": toolId, "content": output])
             return true
 
         // MARK: write_file

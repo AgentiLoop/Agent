@@ -5,9 +5,6 @@ enum LogLimits {
 
     // MARK: - Named caps
 
-    /// File content cap — covers ~95% of Swift files in one read.
-    static let readFileChars = 50_000
-
     /// Per-tool-result cap when packaging results into a user message.
     /// The smaller cap that protects context budget.
     static let toolResultChars = 8_000
