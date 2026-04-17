@@ -5,9 +5,26 @@ Agent! accepts two credential types in the **Claude API** settings field:
 | Paste this | Billed against |
 |---|---|
 | `sk-ant-api03-…` (API key) | Your Anthropic Console account, per-token |
-| `sk-ant-oat01-…` (OAuth token) | Your **Claude Pro / Max / Team / Enterprise subscription** |
+| `sk-ant-oat01-…` (OAuth token) | The **$200/mo "extra usage for third-party apps" pool** on your Claude subscription |
 
-The OAuth path bills against a subscription you already pay for — no separate API credits required. Agent! detects the token prefix and sends the correct auth headers automatically.
+Agent! detects the token prefix and sends the correct auth headers automatically.
+
+> ## ⚠️ You MUST enable "Extra Usage" first
+>
+> OAuth tokens minted by `claude setup-token` come from your Claude Pro / Max / Team subscription — but when the token is used **anywhere other than Claude Code itself**, Anthropic bills it from a separate **"extra usage for third-party apps"** pool. That pool is **opt-in and disabled by default**. Every request will be rate-limited / rejected until you enable it.
+>
+> **Enable it once:**
+>
+> 1. Open Claude Code (any session).
+> 2. Run the slash command:
+>    ```
+>    /extra-usage
+>    ```
+> 3. Follow the prompt to enable the $200/month third-party allowance.
+>
+> Agent! starts working immediately — no re-paste, no restart.
+>
+> Verify at any time by running `/usage` in Claude Code and looking for the "$200 in extra usage for third-party apps" line. If it reads "Extra usage not enabled", Agent! will rate-limit. If it shows a used/available breakdown, you're good.
 
 ---
 
@@ -123,7 +140,8 @@ Just paste a `sk-ant-api…` key over the OAuth token. The **OAuth (subscription
 | 401 "OAuth token has expired" | Token is past its 365-day lifetime | Re-run `claude setup-token`, paste the new token |
 | 401 "Invalid bearer token" | Token revoked at claude.ai, or malformed paste (missing chars) | Re-run `claude setup-token` |
 | 403 "Insufficient scope" | Minted with a different flow (e.g. `claude auth login`) | Re-mint with `claude setup-token` specifically — that's the inference-only path |
-| 429 rate limit | Subscription quota hit | Wait for the `Retry-After` period; Agent! back-off is automatic |
+| 429 rate limit (immediately, not after heavy use) | **"Extra usage" not enabled** — third-party pool is off | Run `/extra-usage` in Claude Code to enable the $200/month third-party pool. See the banner at the top of this doc. |
+| 429 rate limit (after heavy use) | Third-party pool drained for the month, or per-hour quota hit | Wait for the `Retry-After` period; Agent! back-off is automatic. Monthly pool resets on subscription anniversary. |
 | No capsule shows up after paste | Token prefix isn't `sk-ant-oat01-` | Confirm you copied the full token; API keys starting with `sk-ant-api` use the `x-api-key` path instead — that's fine if intended |
 
 ---
