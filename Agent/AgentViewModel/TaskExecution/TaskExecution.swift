@@ -4,6 +4,7 @@ import AgentTools
 import AgentMCP
 import AgentD1F
 import AgentSwift
+import AgentAccess
 import Cocoa
 
 
@@ -115,8 +116,13 @@ extension AgentViewModel {
         let mediator = AppleIntelligenceMediator.shared
         var appleAIAnnotations: [AppleIntelligenceMediator.Annotation] = []
 
-        // ! or !apple prefix bypasses Apple AI triage — sends prompt straight to cloud LLM
-        let appleBypass = rawPrompt.hasPrefix("\u{F8FF}") || rawPrompt.lowercased().hasPrefix("!apple ")
+        // ! or !apple prefix bypasses Apple AI triage — sends prompt straight to cloud LLM.
+        // Also skip Apple triage entirely when Agent! lacks Accessibility permission —
+        // Apple AI's only meaningful tool call here is the accessibility dispatch,
+        // which will fail without the right. Fall straight through to the cloud LLM.
+        let appleBypass = rawPrompt.hasPrefix("\u{F8FF}")
+            || rawPrompt.lowercased().hasPrefix("!apple ")
+            || !AccessibilityService.hasAccessibilityPermission()
         if appleBypass {
             appendLog("⏭ Apple AI bypassed")
             appendLog(cloudModelLogLine)
