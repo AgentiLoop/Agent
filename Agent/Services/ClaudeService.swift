@@ -140,10 +140,10 @@ final class ClaudeService {
         guard isLocalEndpoint || !apiKey.isEmpty else { throw AgentError.noAPIKey }
         await Self.enforceRateLimit()
 
-        // Use structured system prompt with cache_control for prompt caching
-        let systemBlock: Any = isLocalEndpoint ? systemPrompt : [
-            ["type": "text", "text": systemPrompt, "cache_control": ["type": "ephemeral"]]
-        ]
+        let systemBlock: Any = isLocalEndpoint ? systemPrompt : Self.buildSystemBlock(
+            systemPrompt: systemPrompt,
+            credential: apiKey
+        )
 
         var body: [String: Any] = [
             "model": model,
@@ -191,6 +191,32 @@ final class ClaudeService {
     /// start with `sk-ant-oat01-`; API keys start with `sk-ant-api…`.
     nonisolated static func isOAuthToken(_ credential: String) -> Bool {
         sanitizedCredential(credential).hasPrefix("sk-ant-oat01-")
+    }
+
+    /// Claude Code's identity system prompt. OAuth tokens minted by
+    /// `claude setup-token` are gated at the API to requests whose first
+    /// system block is this string; anything else 429s immediately with a
+    /// bare `"message":"Error"` body (no Retry-After). API-key requests
+    /// skip this block — only Agent's own prompt goes through.
+    nonisolated static let claudeCodeIdentityPrompt =
+        "You are Claude Code, Anthropic's official CLI for Claude."
+
+    /// Build the `system` array. For OAuth credentials, prepend the Claude
+    /// Code identity block so the request passes Anthropic's OAuth gate.
+    /// Agent's real system prompt follows, still marked for prompt caching.
+    nonisolated static func buildSystemBlock(
+        systemPrompt: String,
+        credential: String
+    ) -> [[String: Any]] {
+        if isOAuthToken(credential) {
+            return [
+                ["type": "text", "text": claudeCodeIdentityPrompt],
+                ["type": "text", "text": systemPrompt, "cache_control": ["type": "ephemeral"]]
+            ]
+        }
+        return [
+            ["type": "text", "text": systemPrompt, "cache_control": ["type": "ephemeral"]]
+        ]
     }
 
     /// Apply the correct auth headers for either an API key or an OAuth token.
@@ -272,9 +298,10 @@ final class ClaudeService {
         guard isLocalEndpoint || !apiKey.isEmpty else { throw AgentError.noAPIKey }
         await Self.enforceRateLimit()
 
-        let systemBlock: Any = isLocalEndpoint ? systemPrompt : [
-            ["type": "text", "text": systemPrompt, "cache_control": ["type": "ephemeral"]]
-        ]
+        let systemBlock: Any = isLocalEndpoint ? systemPrompt : Self.buildSystemBlock(
+            systemPrompt: systemPrompt,
+            credential: apiKey
+        )
 
         var body: [String: Any] = [
             "model": model,
