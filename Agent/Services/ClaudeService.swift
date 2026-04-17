@@ -172,11 +172,25 @@ final class ClaudeService {
         )
     }
 
+    /// Strip every whitespace / control character from a pasted credential.
+    /// Terminals visually wrap long OAuth tokens across multiple lines; depending
+    /// on the emulator and copy method, the paste can include `\n`, `\r`, spaces,
+    /// or tabs. A bearer credential with any of those embedded breaks the
+    /// `Authorization` header (Anthropic rejects with 401, and rapid rejections
+    /// can cascade into 429 rate-limit responses per IP / account).
+    nonisolated static func sanitizedCredential(_ raw: String) -> String {
+        raw.unicodeScalars
+            .filter { !CharacterSet.whitespacesAndNewlines.contains($0)
+                    && !CharacterSet.controlCharacters.contains($0) }
+            .map { String($0) }
+            .joined()
+    }
+
     /// True when `credential` is a Claude Code OAuth token (from
     /// `claude setup-token`) rather than a standard API key. OAuth tokens
     /// start with `sk-ant-oat01-`; API keys start with `sk-ant-api…`.
     nonisolated static func isOAuthToken(_ credential: String) -> Bool {
-        credential.hasPrefix("sk-ant-oat01-")
+        sanitizedCredential(credential).hasPrefix("sk-ant-oat01-")
     }
 
     /// Apply the correct auth headers for either an API key or an OAuth token.
@@ -187,10 +201,11 @@ final class ClaudeService {
         credential: String,
         apiVersion: String
     ) {
+        let clean = sanitizedCredential(credential)
         request.setValue(apiVersion, forHTTPHeaderField: "anthropic-version")
         request.setValue("application/json", forHTTPHeaderField: "content-type")
-        if isOAuthToken(credential) {
-            request.setValue("Bearer \(credential)", forHTTPHeaderField: "Authorization")
+        if clean.hasPrefix("sk-ant-oat01-") {
+            request.setValue("Bearer \(clean)", forHTTPHeaderField: "Authorization")
             // Both beta flags — OAuth auth AND prompt caching — in a single
             // comma-separated header value.
             request.setValue(
@@ -198,7 +213,7 @@ final class ClaudeService {
                 forHTTPHeaderField: "anthropic-beta"
             )
         } else {
-            request.setValue(credential, forHTTPHeaderField: "x-api-key")
+            request.setValue(clean, forHTTPHeaderField: "x-api-key")
             request.setValue("prompt-caching-2024-07-31", forHTTPHeaderField: "anthropic-beta")
         }
     }
