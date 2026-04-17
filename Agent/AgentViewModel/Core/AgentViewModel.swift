@@ -354,10 +354,7 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(codestralModel, forKey: "codestralModel") }
     }
 
-    var codestralModels: [OpenAIModelInfo] = [
-        OpenAIModelInfo(id: "codestral-latest", name: "Codestral Latest"),
-        OpenAIModelInfo(id: "codestral-2508", name: "Codestral 25.08"),
-    ]
+    var codestralModels: [OpenAIModelInfo] = []
     var isFetchingCodestralModels = false
 
     // MARK: - Mistral Vibe (api.mistral.ai with Vibe key, Devstral models)
@@ -370,10 +367,7 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(vibeModel, forKey: "vibeModel") }
     }
 
-    var vibeModels: [OpenAIModelInfo] = [
-        OpenAIModelInfo(id: "devstral-latest", name: "Devstral Latest"),
-        OpenAIModelInfo(id: "devstral-medium-latest", name: "Devstral Medium Latest"),
-    ]
+    var vibeModels: [OpenAIModelInfo] = []
     var isFetchingVibeModels = false
 
     var maxHistoryBeforeSummary: Int = UserDefaults.standard.object(forKey: "agentMaxHistory") as? Int ?? 10 {
