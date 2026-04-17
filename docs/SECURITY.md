@@ -48,20 +48,31 @@ Protected macOS APIs require user approval. Agent handles TCC correctly:
 
 ## XPC Sandboxing
 
-All privileged operations go through XPC (Inter-Process Communication):
+Shell execution goes through two XPC services (Inter-Process Communication):
 
 ```
 Agent.app (SwiftUI)
     |
-    |-- UserService (XPC) → Agent.app.toddbruss.user    (LaunchAgent, runs as user)
-    |-- HelperService (XPC) → Agent.app.toddbruss.helper  (LaunchDaemon, runs as root)
+    |-- UserService (XPC) → Agent.app.toddbruss.user    (LaunchAgent, runs as current user — not privileged)
+    |-- HelperService (XPC) → Agent.app.toddbruss.helper  (LaunchDaemon, runs as root — privileged)
 ```
 
 The XPC boundary ensures:
-- The main app runs with minimal privileges
-- Root operations are isolated to the daemon
+- The Launch Agent handles everyday shell tasks as the current user (no elevated privileges)
+- Root operations are isolated to the Launch Daemon
 - Each XPC call is a discrete, auditable transaction
 - File permissions are restored to the user after root operations
+
+## SMAppService — OS-Level Code Signature Enforcement
+
+Agent! registers its Launch Agent and Launch Daemon via Apple's **SMAppService** framework (macOS 13+). This provides OS-enforced security that makes manual XPC audit token validation redundant:
+
+- **Code Signature Chain**: macOS requires the Launch Agent and Launch Daemon to be **embedded inside the signed app bundle** and share the **same Team ID** (469UCUB275). The OS validates this at registration time — unsigned or differently-signed helpers are rejected by launchd before they can run.
+- **User Approval**: SMAppService routes through **System Settings → Login Items & Extensions**, giving the user explicit control over which helpers are active.
+- **Lifecycle Management**: launchd owns the helper lifecycle. The helpers can only be registered/unregistered through the SMAppService API, not by dropping arbitrary plists.
+- **No Manual Audit Token Checks Needed**: Because the OS enforces that only code signed by the same developer can register and communicate through the Mach service, the `shouldAcceptNewConnection` callback does not need to re-verify what the OS has already guaranteed. An unauthorized process cannot connect to the XPC service in the first place.
+
+Agent! wraps SMAppService via `SafeSMAppService` and `SafeSMAppServiceDaemon`, which add plist validation safety checks before calling the framework methods.
 
 ## Action Verification (action_not_performed)
 
