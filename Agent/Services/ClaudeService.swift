@@ -172,16 +172,44 @@ final class ClaudeService {
         )
     }
 
+    /// True when `credential` is a Claude Code OAuth token (from
+    /// `claude setup-token`) rather than a standard API key. OAuth tokens
+    /// start with `sk-ant-oat01-`; API keys start with `sk-ant-api…`.
+    nonisolated static func isOAuthToken(_ credential: String) -> Bool {
+        credential.hasPrefix("sk-ant-oat01-")
+    }
+
+    /// Apply the correct auth headers for either an API key or an OAuth token.
+    /// OAuth tokens use `Authorization: Bearer` + the `oauth-2025-04-20` beta
+    /// header (alongside prompt-caching); API keys use `x-api-key`.
+    nonisolated private static func applyAuthHeaders(
+        on request: inout URLRequest,
+        credential: String,
+        apiVersion: String
+    ) {
+        request.setValue(apiVersion, forHTTPHeaderField: "anthropic-version")
+        request.setValue("application/json", forHTTPHeaderField: "content-type")
+        if isOAuthToken(credential) {
+            request.setValue("Bearer \(credential)", forHTTPHeaderField: "Authorization")
+            // Both beta flags — OAuth auth AND prompt caching — in a single
+            // comma-separated header value.
+            request.setValue(
+                "oauth-2025-04-20,prompt-caching-2024-07-31",
+                forHTTPHeaderField: "anthropic-beta"
+            )
+        } else {
+            request.setValue(credential, forHTTPHeaderField: "x-api-key")
+            request.setValue("prompt-caching-2024-07-31", forHTTPHeaderField: "anthropic-beta")
+        }
+    }
+
     /// Network I/O and response parsing off the main thread
     nonisolated private static func performRequest(
         bodyData: Data, apiKey: String, apiVersion: String, url: URL
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
-        request.setValue(apiVersion, forHTTPHeaderField: "anthropic-version")
-        request.setValue("prompt-caching-2024-07-31", forHTTPHeaderField: "anthropic-beta")
-        request.setValue("application/json", forHTTPHeaderField: "content-type")
+        applyAuthHeaders(on: &request, credential: apiKey, apiVersion: apiVersion)
         request.httpBody = bodyData
         request.timeoutInterval = llmAPITimeout
 
@@ -265,10 +293,7 @@ final class ClaudeService {
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
-        request.setValue(apiVersion, forHTTPHeaderField: "anthropic-version")
-        request.setValue("prompt-caching-2024-07-31", forHTTPHeaderField: "anthropic-beta")
-        request.setValue("application/json", forHTTPHeaderField: "content-type")
+        applyAuthHeaders(on: &request, credential: apiKey, apiVersion: apiVersion)
         request.httpBody = bodyData
         request.timeoutInterval = llmAPITimeout
 

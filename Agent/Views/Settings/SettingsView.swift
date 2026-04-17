@@ -59,8 +59,21 @@ struct SettingsView: View {
                         .font(.headline)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKey, placeholder: "sk-ant-...", lockKey: "lock.claudeAPIKey")
+                        HStack(spacing: 6) {
+                            Text("API Key or OAuth Token").font(.caption).foregroundStyle(.secondary)
+                            if ClaudeService.isOAuthToken(viewModel.apiKey) {
+                                Text("OAuth (subscription)")
+                                    .font(.caption2).bold()
+                                    .padding(.horizontal, 6).padding(.vertical, 1)
+                                    .background(Color.accentColor.opacity(0.15))
+                                    .clipShape(Capsule())
+                            }
+                        }
+                        LockedSecureField(text: $viewModel.apiKey, placeholder: "sk-ant-api… (key) or sk-ant-oat01… (OAuth)", lockKey: "lock.claudeAPIKey")
+                        Text("Paste `sk-ant-api…` for pay-per-token billing, or run `claude setup-token` in Claude Code and paste the resulting `sk-ant-oat01…` to bill against your Claude subscription.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
