@@ -155,9 +155,7 @@ extension AgentViewModel {
         SessionStore.shared.appendMessage(assistantMsg)
 
         if hasToolUse && !toolResults.isEmpty {
-            // Truncate large tool results to save tokens (cap at 8K chars each)
-            let capped = Self.truncateToolResults(toolResults)
-            let userMsg: [String: Any] = ["role": "user", "content": capped]
+            let userMsg: [String: Any] = ["role": "user", "content": toolResults]
             messages.append(userMsg)
             SessionStore.shared.appendMessage(userMsg)
             return false

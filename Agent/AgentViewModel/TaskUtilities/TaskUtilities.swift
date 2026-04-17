@@ -175,39 +175,9 @@ extension AgentViewModel {
         while text.hasSuffix("\n\n") { text = String(text.dropLast()) }
     }
 
+    @available(*, deprecated, message: "Removed — tool results now flow through uncapped.")
     static func truncateToolResults(_ results: [[String: Any]]) -> [[String: Any]] {
-        // Step 1: truncate individual results
-        var truncated = results.map { result -> [String: Any] in
-            guard var content = result["content"] as? String,
-                  content.count > LogLimits.toolResultChars else { return result }
-            let keepChars = LogLimits.toolResultChars / 2
-            let head = String(content.prefix(keepChars))
-            let tail = String(content.suffix(keepChars))
-            let trimmed = content.count - LogLimits.toolResultChars
-            content = head + "\n\n... (\(trimmed) chars truncated) ...\n\n" + tail
-            var updated = result
-            updated["content"] = content
-            return updated
-        }
-        // Step 2: enforce per-message budget — drop largest results first
-        var totalChars = truncated.reduce(0) { $0 + ((($1["content"] as? String)?.count) ?? 0) }
-        while totalChars > LogLimits.toolResultsPerMessageChars && truncated.count > 1 {
-            // Find largest result and truncate it further
-            if let maxIdx = truncated.enumerated()
-                .max(by: { (($0.element["content"] as? String)?.count ?? 0) < (($1.element["content"] as? String)?.count ?? 0) })?.offset
-            {
-                let content = truncated[maxIdx]["content"] as? String ?? ""
-                truncated[maxIdx]["content"] = LogLimits.trim(
-                    content,
-                    cap: 2000,
-                    suffix: "Budget-truncated from \(content.count) chars."
-                )
-                totalChars = truncated.reduce(0) { $0 + ((($1["content"] as? String)?.count) ?? 0) }
-            } else {
-                break
-            }
-        }
-        return truncated
+        return results
     }
 
     // MARK: - Message Pruning

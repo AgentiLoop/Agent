@@ -339,8 +339,7 @@ extension AgentViewModel {
                     tab.llmMessages = messages
 
                     if hasToolUse && !toolResults.isEmpty {
-                        let capped = Self.truncateToolResults(toolResults)
-                        messages.append(["role": "user", "content": capped])
+                        messages.append(["role": "user", "content": toolResults])
                         tab.llmMessages = messages
                     } else if !hasToolUse {
                         // Check if model wrote task_complete as text instead of a tool call

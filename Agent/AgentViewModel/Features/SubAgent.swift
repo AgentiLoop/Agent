@@ -247,8 +247,7 @@ extension AgentViewModel {
                 }
 
                 if hasToolUse && !toolResults.isEmpty {
-                    let capped = Self.truncateToolResults(toolResults)
-                    messages.append(["role": "user", "content": capped])
+                    messages.append(["role": "user", "content": toolResults])
                 } else if !hasToolUse {
                     break // Text-only response = done
                 }

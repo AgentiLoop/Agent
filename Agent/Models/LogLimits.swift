@@ -5,13 +5,6 @@ enum LogLimits {
 
     // MARK: - Named caps
 
-    /// Per-tool-result cap when packaging results into a user message.
-    /// The smaller cap that protects context budget.
-    static let toolResultChars = 8_000
-
-    /// Total per-message budget across all tool results.
-    static let toolResultsPerMessageChars = 50_000
-
     /// Batch shell command aggregate output cap.
     static let batchOutputChars = 50_000
 
