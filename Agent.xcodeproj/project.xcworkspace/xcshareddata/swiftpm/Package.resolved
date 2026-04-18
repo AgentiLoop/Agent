@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/macOS26/AgentColorSyntax.git",
       "state" : {
-        "revision" : "8d3f253180e08077b2fe2c7e22290966e3fbdf2d",
-        "version" : "1.2.0"
+        "revision" : "dfa4f6844f19d42bc27ce7a75423879e427e0c6e",
+        "version" : "1.2.1"
       }
     },
     {
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/macOS26/AgentTools.git",
       "state" : {
-        "revision" : "3bc47d2f73cc0c44ead9c15c43cceb88c155c174",
-        "version" : "2.51.3"
+        "revision" : "5f5e43142dbb71292af3809c14dae1443c7aa25a",
+        "version" : "2.51.5"
       }
     },
     {

@@ -79,10 +79,10 @@ extension AgentViewModel {
             maxTokens: mt
         )
 
-        // Start fresh — no prior conversation context to avoid corrupted messages
-        var messages: [[String: Any]] = []
-
-        // No agent name injection — avoid message format issues with some APIs
+        // Carry over prior-task messages so the session continues across Escape/new-prompt boundaries.
+        // Sanitizer drops orphaned tool_use blocks and trailing assistant turns so Anthropic accepts the request.
+        var messages: [[String: Any]] = Self.sanitizeMessagesForContinuation(lastTaskMessages)
+        defer { lastTaskMessages = messages }
 
         let effectivePrompt = Self.newTaskPrefix(projectFolder: projectFolder, prompt: prompt) + prompt
 
@@ -124,7 +124,6 @@ extension AgentViewModel {
             || rawPrompt.lowercased().hasPrefix("!apple ")
             || !AccessibilityService.hasAccessibilityPermission()
         if appleBypass {
-            appendLog("⏭ Apple AI bypassed")
             appendLog(cloudModelLogLine)
             flushLog()
         } else {
@@ -231,6 +230,15 @@ extension AgentViewModel {
                         }
                     }
 
+                } else if let codex = services.codex {
+                    let r = try await codex.sendStreaming(messages: sendMessages, activeGroups: activeGroups) { [weak self] delta in
+                        Task { @MainActor in
+                            self?.isThinking = false
+                            self?.appendStreamDelta(delta)
+                        }
+                    }
+                    response = (r.content, r.stopReason, r.inputTokens, r.outputTokens)
+
                 } else if let openAICompatible = services.openAICompatible {
                     let r = try await openAICompatible
                         .sendStreaming(messages: sendMessages, activeGroups: activeGroups) { [weak self] delta in
@@ -317,10 +325,12 @@ extension AgentViewModel {
                                         "i found the", "i read the file", "i checked the", "i listed"]
                     if actionClaims.contains(where: { lower.contains($0) }) {
                         appendLog("⚠️ action not performed — LLM claimed action without a tool call")
+                        // NOTE: must be a `text` block, not a synthetic `tool_result`.
+                        // Anthropic rejects `tool_result` blocks whose `tool_use_id` has no
+                        // matching `tool_use` in the prior assistant message.
                         toolResults.append([
-                            "type": "tool_result",
-                            "tool_use_id": "action_not_performed",
-                            "content": "action not performed — you claimed to perform an action but made no tool call. Use the appropriate tool or say you cannot do it."
+                            "type": "text",
+                            "text": "action not performed — you claimed to perform an action but made no tool call. Use the appropriate tool or say you cannot do it."
                         ])
                     }
                 }
@@ -347,10 +357,12 @@ extension AgentViewModel {
                     break
                 }
                 if budgetTracker.shouldNudge && !toolResults.isEmpty {
+                    // NOTE: must be a `text` block, not a synthetic `tool_result`.
+                    // Anthropic rejects `tool_result` blocks whose `tool_use_id` has no
+                    // matching `tool_use` in the prior assistant message.
                     toolResults.append([
-                        "type": "tool_result",
-                        "tool_use_id": "budget_nudge",
-                        "content": """
+                        "type": "text",
+                        "text": """
                             ⚠️ Approaching token budget limit \
                             (\(budgetTracker.statusDescription)). \
                             Wrap up your current work and call \
@@ -383,11 +395,9 @@ extension AgentViewModel {
                 // Collect completed sub-agent notifications and inject into tool results
                 let subAgentNotifs = collectSubAgentNotifications()
                 for notif in subAgentNotifs {
-                    toolResults.append([
-                        "type": "tool_result",
-                        "tool_use_id": "subagent_notification",
-                        "content": notif
-                    ])
+                    // Anthropic rejects `tool_result` blocks whose `tool_use_id` has no
+                    // matching `tool_use` in the prior assistant message — use `text` instead.
+                    toolResults.append(["type": "text", "text": notif])
                 }
 
                 let finalizeShouldBreak = finalizeTurnAndDetectCompletion(
@@ -402,6 +412,8 @@ extension AgentViewModel {
                 let activeService: ActiveLLMService
                 if services.claude != nil {
                     activeService = .claude
+                } else if services.codex != nil {
+                    activeService = .codex
                 } else if services.openAICompatible != nil {
                     activeService = .openAICompatible
                 } else if services.ollama != nil {

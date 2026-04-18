@@ -88,6 +88,11 @@ struct NewMainTabSheet: View {
             }
             .labelsHidden()
 
+        case .codex:
+            TextField("gpt-5", text: $selectedModelId)
+                .textFieldStyle(.roundedBorder)
+                .labelsHidden()
+
         case .openAI:
             modelPickerWithFetch(
                 models: viewModel.openAIModels,
@@ -285,6 +290,7 @@ struct NewMainTabSheet: View {
     private func defaultModelId(for provider: APIProvider) -> String {
         switch provider {
         case .claude: return viewModel.selectedModel
+        case .codex: return viewModel.codexModel
         case .openAI: return viewModel.openAIModel
         case .deepSeek: return viewModel.deepSeekModel
         case .huggingFace: return viewModel.huggingFaceModel

@@ -632,12 +632,18 @@ final class AppleIntelligenceMediator: ObservableObject {
         }
 
         let runAgentTool = RunAgentAppleTool { args in
-            tracker.markCalled()
             await appendLog("🍎 run_agent(name: \(args.name), args: \(args.arguments ?? "–"))")
             let result = await runAgent(args)
-            tracker.recordOutput(result)
             await appendLog("🍎 → \(String(result.prefix(300)))")
             let lower = result.lowercased()
+            // "action not performed" = the tool's pre-flight refused to dispatch
+            // (script doesn't exist). Don't mark the run as a real tool call —
+            // let Apple AI continue or triage fall through to the cloud LLM.
+            if lower.hasPrefix("action not performed") {
+                return result
+            }
+            tracker.markCalled()
+            tracker.recordOutput(result)
             if lower.contains("not found") || lower.contains("error") || lower.contains("failed") {
                 tracker.markFailed()
             }
@@ -933,6 +939,33 @@ struct RunAgentAppleTool: FoundationModels.Tool {
     let dispatch: @Sendable (RunAgentArgs) async -> String
 
     func call(arguments: RunAgentArgs) async throws -> String {
+        // Verify the script exists BEFORE dispatching. If Apple AI hallucinated
+        // a script name that doesn't exist, return a sentinel string that the
+        // mediator treats as "no tool call" so triage falls through to the
+        // cloud LLM instead of surfacing a misleading "agent not found" error
+        // as if Apple AI had successfully handled the task.
+        let requested = arguments.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !requested.isEmpty else {
+            return "action not performed — empty agent name"
+        }
+
+        // Match by numeric index (1-based) OR by case-insensitive name (with/without .swift).
+        let available = ScriptService().listScripts()
+        let byIndex: Bool = {
+            if let idx = Int(requested), idx >= 1, idx <= available.count { return true }
+            return false
+        }()
+        let wantedBase = requested.hasSuffix(".swift")
+            ? String(requested.dropLast(6))
+            : requested
+        let existsByName = available.contains { info in
+            info.name.compare(wantedBase, options: .caseInsensitive) == .orderedSame
+        }
+
+        if !byIndex && !existsByName {
+            return "action not performed — no agent script named '\(requested)'"
+        }
+
         return await dispatch(arguments)
     }
 }

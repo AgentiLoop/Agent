@@ -7,7 +7,7 @@ enum LLMProviderSetup {
 
     static func registerAllProviders() {
         LLMRegistry.shared.registerAll([
-            claude, openAI, gemini, grok, mistral, codestral, vibe, deepSeek, huggingFace, miniMax, zAI, bigModel, qwen,
+            claude, codex, openAI, gemini, grok, mistral, codestral, vibe, deepSeek, huggingFace, miniMax, zAI, bigModel, qwen,
             ollama, localOllama, vLLM, lmStudio, appleIntelligence
         ])
     }
@@ -36,6 +36,21 @@ enum LLMProviderSetup {
         ),
         capabilities: [.streaming, .tools, .vision, .systemPrompt]
     )
+
+    /// Codex — ChatGPT-authenticated Responses API used by the Codex CLI.
+    /// Requires OAuth (JWT bearer token) to chatgpt.com/backend-api/codex.
+    /// API protocol is `.custom` because the /v1/responses shape differs from
+    /// the standard /v1/chat/completions OpenAI shape — CodexService handles it.
+    static let codex = LLMProviderConfig(
+        id: "codex", displayName: "Codex",
+        kind: .cloudAPI, apiProtocol: .custom,
+        endpoint: LLMEndpoint(
+            chatURL: "https://chatgpt.com/backend-api/codex/responses",
+            modelsURL: "https://chatgpt.com/backend-api/codex/models"
+        ),
+        capabilities: [.streaming, .tools, .vision, .systemPrompt, .thinking]
+    )
+
 
     static let deepSeek = LLMProviderConfig(
         id: "deepSeek", displayName: "DeepSeek",

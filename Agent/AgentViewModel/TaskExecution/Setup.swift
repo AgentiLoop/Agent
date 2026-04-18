@@ -14,6 +14,7 @@ extension AgentViewModel {
     /// `buildLLMServices` returns / (matching the original inline closure's invariant).
     struct LLMServiceBundle {
         var claude: ClaudeService?
+        var codex: CodexService?
         var openAICompatible: OpenAICompatibleService?
         var ollama: OllamaService?
         var foundationModel: FoundationModelService?
@@ -29,6 +30,9 @@ extension AgentViewModel {
         case .claude:
             modelName = selectedModel
             isVision = true // Claude Sonnet/Opus/Haiku all support vision
+        case .codex:
+            modelName = codexModel
+            isVision = true // GPT-5 codex supports vision via input_image blocks
         case .openAI:
             modelName = openAIModel
             isVision = true // GPT-4o, GPT-4 Turbo support vision
@@ -95,9 +99,19 @@ extension AgentViewModel {
         maxTokens mt: Int
     ) -> LLMServiceBundle {
         var claude: ClaudeService?
+        var codex: CodexService?
         var openAICompatible: OpenAICompatibleService?
         var ollama: OllamaService?
         var foundationModelService: FoundationModelService?
+
+        if provider == .codex {
+            codex = CodexService(
+                model: modelName,
+                historyContext: historyContext,
+                projectFolder: projectFolder,
+                maxTokens: mt
+            )
+        }
 
         if provider == .claude {
             claude = ClaudeService(
@@ -117,7 +131,7 @@ extension AgentViewModel {
         }
         // OpenAI-compatible service — URLs from LLMRegistry (single source of truth)
         switch provider {
-        case .claude, .ollama, .localOllama, .foundationModel:
+        case .claude, .codex, .ollama, .localOllama, .foundationModel:
             openAICompatible = nil
         case .lmStudio where lmStudioProtocol == .anthropic:
             openAICompatible = nil
@@ -168,11 +182,13 @@ extension AgentViewModel {
 
         // Set temperature per provider
         claude?.temperature = temperatureForProvider(provider == .claude ? .claude : provider)
+        codex?.temperature = temperatureForProvider(provider)
         ollama?.temperature = temperatureForProvider(provider)
         openAICompatible?.temperature = temperatureForProvider(provider)
 
         return LLMServiceBundle(
             claude: claude,
+            codex: codex,
             openAICompatible: openAICompatible,
             ollama: ollama,
             foundationModel: foundationModelService

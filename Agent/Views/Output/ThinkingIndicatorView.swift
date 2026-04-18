@@ -125,6 +125,13 @@ struct ThinkingIndicatorView: View {
         }
         switch provider {
         case .claude: return 1_000_000
+        case .codex:
+            // Real context window from the live /models response; fall back
+            // to gpt-5.2's published 272K if we haven't fetched yet.
+            if let ctx = viewModel.codexContextWindows[viewModel.codexModel], ctx > 0 {
+                return ctx
+            }
+            return 272_000
         case .openAI: return 272_000
         case .deepSeek: return 128_000
         case .gemini: return 2_000_000

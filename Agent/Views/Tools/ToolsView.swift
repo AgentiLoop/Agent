@@ -135,6 +135,7 @@ struct ToolsView: View {
     private var modelBinding: Binding<String> {
         switch selectedProvider {
         case .claude: return $viewModel.selectedModel
+        case .codex: return $viewModel.codexModel
         case .openAI: return $viewModel.openAIModel
         case .deepSeek: return $viewModel.deepSeekModel
         case .huggingFace: return $viewModel.huggingFaceModel
@@ -168,6 +169,8 @@ struct ToolsView: View {
         case .claude:
             let models = viewModel.availableClaudeModels.isEmpty ? AgentViewModel.defaultClaudeModels : viewModel.availableClaudeModels
             return models.map { ($0.id, $0.formattedDisplayName) }
+        case .codex:
+            return viewModel.codexModels.map { ($0.id, $0.name) }
         case .openAI: return oai(viewModel.openAIModels, AgentViewModel.defaultOpenAIModels)
         case .deepSeek: return oai(viewModel.deepSeekModels, AgentViewModel.defaultDeepSeekModels)
         case .huggingFace: return oai(viewModel.huggingFaceModels, AgentViewModel.defaultHuggingFaceModels)

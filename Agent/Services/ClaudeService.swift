@@ -107,6 +107,49 @@ final class ClaudeService {
         return t
     }
 
+    /// Strip orphan `tool_result` blocks (no matching `tool_use` in the prior
+    /// assistant message). Anthropic returns 400 on these. Also drop user messages
+    /// that become empty after stripping. Mirrors the logic in MessageSanitizer
+    /// but runs at the request boundary so stale state can't reach the API.
+    private func stripOrphanToolResults(_ messages: [[String: Any]]) -> [[String: Any]] {
+        var result = messages
+        var i = 0
+        while i < result.count {
+            guard (result[i]["role"] as? String) == "user",
+                  var blocks = result[i]["content"] as? [[String: Any]]
+            else { i += 1; continue }
+
+            var validIds = Set<String>()
+            if i > 0,
+               (result[i - 1]["role"] as? String) == "assistant",
+               let prev = result[i - 1]["content"] as? [[String: Any]]
+            {
+                for block in prev where (block["type"] as? String) == "tool_use" {
+                    if let id = block["id"] as? String { validIds.insert(id) }
+                }
+            }
+
+            var changed = false
+            blocks.removeAll { block in
+                guard (block["type"] as? String) == "tool_result",
+                      let id = block["tool_use_id"] as? String
+                else { return false }
+                if validIds.contains(id) { return false }
+                changed = true
+                return true
+            }
+            if changed {
+                if blocks.isEmpty {
+                    result.remove(at: i)
+                    continue
+                }
+                result[i]["content"] = blocks
+            }
+            i += 1
+        }
+        return result
+    }
+
     /// Prepend project folder to the last user message so it's always visible in context.
     private func withFolderPrefix(_ messages: [[String: Any]]) -> [[String: Any]] {
         guard !projectFolder.isEmpty else { return messages }
@@ -150,7 +193,7 @@ final class ClaudeService {
             "max_tokens": maxTokens > 0 ? maxTokens : 16384,
             "temperature": temperature,
             "system": systemBlock,
-            "messages": withFolderPrefix(messages)
+            "messages": withFolderPrefix(stripOrphanToolResults(messages))
         ]
         // Only include tools for real Anthropic API
         if !isLocalEndpoint {
@@ -307,7 +350,7 @@ final class ClaudeService {
             "model": model,
             "max_tokens": maxTokens > 0 ? maxTokens : 16384,
             "system": systemBlock,
-            "messages": withFolderPrefix(messages),
+            "messages": withFolderPrefix(stripOrphanToolResults(messages)),
             "stream": true
         ]
         if !isLocalEndpoint {

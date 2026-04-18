@@ -51,6 +51,7 @@
 		AA10000000000000000032 /* AgentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001C /* AgentViewModel.swift */; };
 		AA10000000000000000033 /* HelperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001D /* HelperService.swift */; };
 		AA10000000000000000034 /* ClaudeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001E /* ClaudeService.swift */; };
+		AA10000000000000002002 /* CodexService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000002001 /* CodexService.swift */; };
 		AA10000000000000000035 /* HelperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001F /* HelperProtocol.swift */; };
 		AA10000000000000000036 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000000020 /* Models.swift */; };
 		AA10000000000000000037 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA10000000000000000021 /* Assets.xcassets */; };
@@ -302,6 +303,7 @@
 		AA1000000000000000001C /* AgentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentViewModel.swift; sourceTree = "<group>"; };
 		AA1000000000000000001D /* HelperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperService.swift; sourceTree = "<group>"; };
 		AA1000000000000000001E /* ClaudeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeService.swift; sourceTree = "<group>"; };
+		AA10000000000000002001 /* CodexService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexService.swift; sourceTree = "<group>"; };
 		AA1000000000000000001F /* HelperProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperProtocol.swift; sourceTree = "<group>"; };
 		AA10000000000000000020 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		AA10000000000000000021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -637,6 +639,7 @@
 				AA1000000000000000001D /* HelperService.swift */,
 				AA10000000000000000025 /* UserService.swift */,
 				AA1000000000000000001E /* ClaudeService.swift */,
+				AA10000000000000002001 /* CodexService.swift */,
 				AA10000000000000000028 /* OllamaService.swift */,
 				AA100000000000000000BA /* OpenAICompatibleService.swift */,
 				AA10000000000000000029 /* ScriptService.swift */,
@@ -1014,6 +1017,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA10000000000000000091 /* Build configuration list for PBXNativeTarget "Agent!" */;
 			buildPhases = (
+				AA10000000000000003001 /* Validate SDEFs */,
 				AA10000000000000000050 /* Sources */,
 				AA10000000000000000051 /* Resources */,
 				AA10000000000000000052 /* Frameworks */,
@@ -1157,6 +1161,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		AA10000000000000003001 /* Validate SDEFs */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Validate SDEFs";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nDIR=\"${SRCROOT}/Agent/SDEFs\"\nif [ ! -d \"$DIR\" ]; then exit 0; fi\nBAD=$(find \"$DIR\" -mindepth 1 -maxdepth 1 ! -name '*.json')\nif [ -n \"$BAD\" ]; then\n  echo \"error: non-JSON entries in $DIR will be silently copied into the app bundle via the SDEFs folder reference. Remove these:\" >&2\n  echo \"$BAD\" >&2\n  exit 1\nfi\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1170,6 +1193,7 @@
 				AA10000000000000000033 /* HelperService.swift in Sources */,
 				AA10000000000000000038 /* UserService.swift in Sources */,
 				AA10000000000000000034 /* ClaudeService.swift in Sources */,
+				AA10000000000000002002 /* CodexService.swift in Sources */,
 				AA10000000000000000035 /* HelperProtocol.swift in Sources */,
 				AA10000000000000000039 /* UserProtocol.swift in Sources */,
 				AA1000000000000000003A /* OllamaService.swift in Sources */,

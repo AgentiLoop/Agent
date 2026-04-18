@@ -8,6 +8,7 @@ struct SettingsView: View {
     private var llmTemperatureBinding: Binding<Double> {
         switch viewModel.selectedProvider {
         case .claude: return $viewModel.claudeTemperature
+        case .codex: return $viewModel.openAITemperature
         case .ollama: return $viewModel.ollamaTemperature
         case .openAI: return $viewModel.openAITemperature
         case .deepSeek: return $viewModel.deepSeekTemperature
@@ -739,6 +740,92 @@ struct SettingsView: View {
                             .controlSize(.small)
                             .disabled(viewModel.isFetchingVLLMModels)
                             .help("Fetch available models")
+                        }
+                    }
+                }
+            } else if viewModel.selectedProvider == .codex {
+                // Codex — ChatGPT subscription OAuth via ~/.codex/auth.json
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 6) {
+                        Text("Codex")
+                            .font(.headline)
+                        Text("OAuth (ChatGPT subscription)")
+                            .font(.caption2).bold()
+                            .padding(.horizontal, 6).padding(.vertical, 1)
+                            .background(Color.accentColor.opacity(0.15))
+                            .clipShape(Capsule())
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Authentication").font(.caption).foregroundStyle(.secondary)
+                        if let auth = CodexAuthFile.load() {
+                            HStack(spacing: 6) {
+                                Image(systemName: "checkmark.seal.fill").foregroundStyle(.green)
+                                Text("Signed in")
+                                Spacer()
+                                if let exp = CodexJWT.expiry(auth.accessToken) {
+                                    let mins = Int(exp.timeIntervalSinceNow / 60)
+                                    Text(mins > 0 ? "expires in \(mins)m" : "expired")
+                                        .font(.caption2)
+                                        .foregroundStyle(mins > 0 ? Color.secondary : Color.red)
+                                }
+                            }
+                            HStack(spacing: 8) {
+                                Button("Refresh Token") {
+                                    Task.detached {
+                                        _ = try? await CodexAuthRefresher.refresh(auth)
+                                    }
+                                }
+                                .controlSize(.small)
+                                Button("Sign In Again") {
+                                    CodexLoginLauncher.launch()
+                                }
+                                .controlSize(.small)
+                                Spacer()
+                            }
+                        } else {
+                            HStack(spacing: 6) {
+                                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                                Text("Not signed in")
+                                Spacer()
+                                Button("Sign In via Codex CLI") {
+                                    CodexLoginLauncher.launch()
+                                }
+                                .controlSize(.small)
+                            }
+                        }
+                        Text("Codex uses your ChatGPT Plus/Pro/Business/Edu/Enterprise subscription for billing. Sign In launches `codex login` in Terminal — complete the browser OAuth flow, then return here. Agent! reads `~/.codex/auth.json`; tokens refresh automatically.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Model").font(.caption).foregroundStyle(.secondary)
+                        HStack {
+                            if viewModel.codexModels.isEmpty {
+                                TextField("Model id (e.g. gpt-5)", text: $viewModel.codexModel)
+                                    .textFieldStyle(.roundedBorder)
+                            } else {
+                                Picker("Model", selection: $viewModel.codexModel) {
+                                    ForEach(viewModel.codexModels) { model in
+                                        Text(model.name).tag(model.id)
+                                    }
+                                }
+                                .labelsHidden()
+                            }
+                            Button {
+                                viewModel.fetchModelsIfNeeded(for: .codex, force: true)
+                            } label: {
+                                if viewModel.isFetchingCodexModels {
+                                    ProgressView().controlSize(.small)
+                                } else {
+                                    Image(systemName: "arrow.clockwise")
+                                }
+                            }
+                            .controlSize(.small)
+                            .disabled(viewModel.isFetchingCodexModels)
+                            .help("Fetch available models from Codex")
                         }
                     }
                 }

@@ -141,6 +141,30 @@ extension AgentViewModel {
         }
     }
 
+    /// Fetch Codex models via ChatGPT OAuth. Falls back silently to an empty
+    /// list if not signed in (user should run `codex login` or click Sign In).
+    func fetchCodexModels() {
+        guard CodexAuthFile.load() != nil else {
+            codexModels = []
+            return
+        }
+        isFetchingCodexModels = true
+        Task {
+            defer { isFetchingCodexModels = false }
+            do {
+                let models = try await CodexService.fetchModels()
+                codexModels = models.map { OpenAIModelInfo(id: $0.id, name: $0.display) }
+                codexContextWindows = Dictionary(uniqueKeysWithValues: models.map { ($0.id, $0.contextWindow) })
+                let ids = models.map(\.id)
+                if codexModel.isEmpty || (!ids.isEmpty && !ids.contains(codexModel)) {
+                    codexModel = ids.first ?? "gpt-5"
+                }
+            } catch {
+                appendLog("Failed to fetch Codex models: \(error.localizedDescription)")
+            }
+        }
+    }
+
     func fetchDeepSeekModels() {
         guard !deepSeekAPIKey.isEmpty else {
             deepSeekModels = Self.defaultDeepSeekModels
@@ -791,6 +815,7 @@ extension AgentViewModel {
     func fetchModelsIfNeeded(for provider: APIProvider, force: Bool = false) {
         switch provider {
         case .claude: if force || availableClaudeModels.isEmpty { Task { await fetchClaudeModels() } }
+        case .codex: if force || codexModels.isEmpty { fetchCodexModels() }
         case .openAI: if force || openAIModels.isEmpty { fetchOpenAIModels() }
         case .ollama: if force || ollamaModels.isEmpty { fetchOllamaModels() }
         case .localOllama: if force || localOllamaModels.isEmpty { fetchLocalOllamaModels() }

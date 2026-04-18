@@ -53,7 +53,9 @@ extension AgentViewModel {
                 write_file to overwrite the whole file is \
                 a valid last resort.
                 """
-                toolResults.append(["type": "tool_result", "tool_use_id": "stuck_guard_3", "content": nudge])
+                // Use `text` block — Anthropic rejects `tool_result` blocks whose
+                // `tool_use_id` has no matching `tool_use` in the prior assistant message.
+                toolResults.append(["type": "text", "text": nudge])
                 tab.appendLog("⚠️ Stuck nudge: 3 failures on \((path as NSString).lastPathComponent)")
                 tab.flush()
             }

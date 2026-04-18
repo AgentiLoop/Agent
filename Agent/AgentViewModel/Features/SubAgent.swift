@@ -121,7 +121,7 @@ extension AgentViewModel {
         }
         let openAICompatible: OpenAICompatibleService?
         switch provider {
-        case .claude, .ollama, .localOllama, .foundationModel:
+        case .claude, .codex, .ollama, .localOllama, .foundationModel:
             openAICompatible = nil
         case .lmStudio where lmStudioProtocol == .anthropic:
             openAICompatible = nil
@@ -239,10 +239,11 @@ extension AgentViewModel {
                 if !agent.mailbox.isEmpty {
                     let incoming = agent.mailbox.joined(separator: "\n")
                     agent.mailbox.removeAll()
+                    // Anthropic rejects `tool_result` blocks whose `tool_use_id` has no
+                    // matching `tool_use` in the prior assistant message — use `text` instead.
                     toolResults.append([
-                        "type": "tool_result",
-                        "tool_use_id": "agent_message",
-                        "content": "<message from coordinator>\n\(incoming)\n</message>"
+                        "type": "text",
+                        "text": "<message from coordinator>\n\(incoming)\n</message>"
                     ])
                 }
 

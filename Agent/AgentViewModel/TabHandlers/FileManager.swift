@@ -79,10 +79,9 @@ extension AgentViewModel {
                 let diff = MultiLineDiff.createDiff(source: oldString, destination: newString, includeMetadata: true)
                 let d1f = MultiLineDiff.displayDiff(diff: diff, source: oldString, format: .ai)
                 if !d1f.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    let startLine = (diff.metadata?.sourceStartLine ?? 0) + 1
-                    let numbered = Self.numberDiffLines(d1f, startLine: startLine)
-                    let lang = Self.langFromPath(filePath)
-                    tab.appendLog(Self.codeFence(numbered, language: lang))
+                    // Raw D1F lines — AgentColorSyntax draws per-line ❌/✅/📎 stripes.
+                    // Matches diff_and_apply rendering exactly (no numbering, no fence).
+                    tab.appendLog(d1f)
                 }
             }
             let outLines = output.components(separatedBy: "\n")

@@ -117,10 +117,9 @@ extension AgentViewModel {
                 let diff = MultiLineDiff.createDiff(source: oldString, destination: newString, includeMetadata: true)
                 let d1f = MultiLineDiff.displayDiff(diff: diff, source: oldString, format: .ai)
                 if !d1f.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    let startLine = (diff.metadata?.sourceStartLine ?? 0) + 1
-                    let numbered = Self.numberDiffLines(d1f, startLine: startLine)
-                    let lang = Self.langFromPath(filePath)
-                    appendLog(Self.codeFence(numbered, language: lang))
+                    // Raw D1F lines — AgentColorSyntax draws per-line ❌/✅/📎 stripes.
+                    // Matches diff_and_apply rendering exactly (no numbering, no fence).
+                    appendLog(d1f)
                 }
             }
             let outLines = output.components(separatedBy: "\n")
@@ -412,6 +411,31 @@ extension AgentViewModel {
                 appendLog(err)
                 toolResults.append(["type": "tool_result", "tool_use_id": toolId, "content": err])
             }
+            return true
+
+        // MARK: apply_patch — Codex freeform patch grammar
+        case "apply_patch":
+            let patch = input["patch"] as? String ?? ""
+            guard !patch.isEmpty else {
+                toolResults.append([
+                    "type": "tool_result",
+                    "tool_use_id": toolId,
+                    "content": "Error: apply_patch requires a non-empty `patch` field in the Codex grammar (starts with '*** Begin Patch', ends with '*** End Patch')."
+                ])
+                return true
+            }
+            let base = projectFolder.isEmpty ? NSHomeDirectory() : projectFolder
+            let result = await Self.offMain { CodexPatchApplier.apply(patch: patch, baseFolder: base) }
+            appendLog("📝 apply_patch: \(result.summary)")
+            if !result.files.isEmpty {
+                appendLog("  files: \(result.files.joined(separator: ", "))")
+            }
+            for file in result.files { commandsRun.append("apply_patch: \(file)") }
+            toolResults.append([
+                "type": "tool_result",
+                "tool_use_id": toolId,
+                "content": result.summary + (result.files.isEmpty ? "" : "\nFiles touched: \(result.files.joined(separator: ", "))")
+            ])
             return true
 
         default:

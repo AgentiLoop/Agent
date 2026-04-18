@@ -58,15 +58,12 @@ extension AgentViewModel {
                 if hadEdit { unbuiltEditCount += 1 }
                 if hadBuild { unbuiltEditCount = 0 }
                 if unbuiltEditCount >= 3 {
-                    toolResults.append([
-                        "type": "tool_result",
-                        "tool_use_id": "build_nudge",
-                        "content": """
-                            ⚠️ You've edited \(unbuiltEditCount) times \
-                            without building. Run xc(action:"build") now \
-                            to catch errors early.
-                            """
-                    ])
+                    let nudge = """
+                        ⚠️ You've edited \(unbuiltEditCount) times \
+                        without building. Run xc(action:"build") now \
+                        to catch errors early.
+                        """
+                    appendNudgeToLastToolResult(&toolResults, nudge: nudge)
                 }
             }
 
@@ -118,24 +115,17 @@ extension AgentViewModel {
                         6. If you keep failing, switch tools — write_file to overwrite \
                         the whole file is a valid last resort.
                         """
-                        toolResults.append([
-                            "type": "tool_result",
-                            "tool_use_id": "stuck_guard_3",
-                            "content": nudge
-                        ])
+                        appendNudgeToLastToolResult(&toolResults, nudge: nudge)
                         appendLog("⚠️ Stuck nudge: 3 failures on \((path as NSString).lastPathComponent)")
                         flushLog()
                     } else if count >= 6 {
                         // Second nudge — give up on this file
-                        toolResults.append([
-                            "type": "tool_result",
-                            "tool_use_id": "stuck_guard_6",
-                            "content": """
-                                🛑 6 failures on \(path). Stop trying to edit \
-                                this file. Move on to the next part of your task \
-                                or call done with what you've completed so far.
-                                """
-                        ])
+                        let nudge = """
+                            🛑 6 failures on \(path). Stop trying to edit \
+                            this file. Move on to the next part of your task \
+                            or call done with what you've completed so far.
+                            """
+                        appendNudgeToLastToolResult(&toolResults, nudge: nudge)
                         appendLog("🛑 Stuck-out: 6 failures on \((path as NSString).lastPathComponent)")
                         flushLog()
                         stuckFiles[path] = 0
@@ -146,5 +136,18 @@ extension AgentViewModel {
             }
         }
         return false
+    }
+
+    /// Append a nudge string onto the last tool_result's content so the LLM
+    /// sees it alongside its tool output. Falls back to a `text` block (NOT a
+    /// synthetic `tool_result` — Anthropic rejects `tool_use_id` values that
+    /// have no matching `tool_use` in the prior assistant message).
+    func appendNudgeToLastToolResult(_ toolResults: inout [[String: Any]], nudge: String) {
+        if let lastIdx = toolResults.indices.last {
+            let existing = (toolResults[lastIdx]["content"] as? String) ?? ""
+            toolResults[lastIdx]["content"] = existing.isEmpty ? nudge : existing + "\n\n" + nudge
+        } else {
+            toolResults.append(["type": "text", "text": nudge])
+        }
     }
 }

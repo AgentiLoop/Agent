@@ -31,6 +31,11 @@ final class AgentViewModel {
     /// Tool steps for the current task (main tab) — ToolStep type is declared in AgentViewModel+Types.swift
     var toolSteps: [ToolStep] = []
 
+    /// Raw LLM `messages` array from the most recent main-tab task. Carried over
+    /// into the next task so the model continues the conversation (same behavior
+    /// as ScriptTab.llmMessages). Sanitized on reuse — see MessageSanitizer.
+    @ObservationIgnored var lastTaskMessages: [[String: Any]] = []
+
     // Stored property drives live UI; ChatHistoryStore persists across launches via SwiftData
     var activityLog = ""
     var isRunning = false
@@ -190,6 +195,18 @@ final class AgentViewModel {
 
     var openAIModels: [OpenAIModelInfo] = []
     var isFetchingOpenAIModels = false
+
+    // Codex (ChatGPT OAuth via ~/.codex/auth.json). No API key field — auth is
+    // read from the Codex CLI's auth file at request time.
+    var codexModel: String = UserDefaults.standard.string(forKey: "codexModel") ?? "gpt-5" {
+        didSet { UserDefaults.standard.set(codexModel, forKey: "codexModel") }
+    }
+    var codexModels: [OpenAIModelInfo] = []
+    var isFetchingCodexModels = false
+    /// Context window per Codex model id, populated by `fetchCodexModels`.
+    /// Consulted by the Thinking HUD so it shows the correct token ceiling for
+    /// whichever Codex model is currently selected.
+    var codexContextWindows: [String: Int] = [:]
 
     // DeepSeek settings
     var deepSeekAPIKey: String = KeychainService.shared.getDeepSeekAPIKey() ?? "" {

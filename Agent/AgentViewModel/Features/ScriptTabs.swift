@@ -63,6 +63,7 @@ extension AgentViewModel {
     func globalModelForProvider(_ provider: APIProvider) -> String {
         switch provider {
         case .claude: return selectedModel
+        case .codex: return codexModel
         case .openAI: return openAIModel
         case .deepSeek: return deepSeekModel
         case .huggingFace: return huggingFaceModel
@@ -87,6 +88,7 @@ extension AgentViewModel {
     func apiKeyForProvider(_ provider: APIProvider) -> String {
         switch provider {
         case .claude: return apiKey
+        case .codex: return "" // auth comes from ~/.codex/auth.json, no UI key
         case .openAI: return openAIAPIKey
         case .deepSeek: return deepSeekAPIKey
         case .huggingFace: return huggingFaceAPIKey
@@ -121,6 +123,8 @@ extension AgentViewModel {
         switch provider {
         case .claude:
             return availableClaudeModels.first(where: { $0.id == modelId })?.displayName ?? modelId
+        case .codex:
+            return modelId
         case .openAI:
             return openAIModels.first(where: { $0.id == modelId })?.name
                 ?? Self.defaultOpenAIModels.first(where: { $0.id == modelId })?.name ?? modelId

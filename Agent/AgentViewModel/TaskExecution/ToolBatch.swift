@@ -135,14 +135,16 @@ extension AgentViewModel {
             if hadUIAction {
                 let screenshotResult = await Self.captureVerificationScreenshot()
                 if let imageData = screenshotResult {
-                    // Append screenshot as image content block to tool results
+                    // Use plain text+image blocks rather than a synthetic `tool_result`:
+                    // Anthropic rejects `tool_result` blocks whose `tool_use_id` has no
+                    // matching `tool_use` in the prior assistant message.
                     toolResults.append([
-                        "type": "tool_result",
-                        "tool_use_id": "vision_verify",
-                        "content": [
-                            ["type": "text", "text": "[Auto-screenshot after UI action — verify the action succeeded]"],
-                            ["type": "image", "source": ["type": "base64", "media_type": "image/png", "data": imageData]]
-                        ]
+                        "type": "text",
+                        "text": "[Auto-screenshot after UI action — verify the action succeeded]"
+                    ])
+                    toolResults.append([
+                        "type": "image",
+                        "source": ["type": "base64", "media_type": "image/png", "data": imageData]
                     ])
                     appendLog("📸 Vision: auto-screenshot for verification")
                 }

@@ -151,7 +151,7 @@ extension AgentViewModel {
             services.claude = nil
         }
         switch provider {
-        case .claude, .ollama, .localOllama, .foundationModel:
+        case .claude, .codex, .ollama, .localOllama, .foundationModel:
             services.openAICompatible = nil
         case .lmStudio where lmStudioProtocol == .anthropic:
             services.openAICompatible = nil

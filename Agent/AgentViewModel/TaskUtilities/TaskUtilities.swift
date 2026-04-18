@@ -13,6 +13,62 @@ import Cocoa
 
 extension AgentViewModel {
 
+    /// Prepare prior-task messages for reuse in a new task. Drops orphaned
+    /// `tool_use` blocks (Anthropic rejects tool_use without a matching
+    /// tool_result in the next user turn — happens after Escape mid-turn)
+    /// and trims trailing non-user messages so history ends on a user turn.
+    static func sanitizeMessagesForContinuation(_ source: [[String: Any]]) -> [[String: Any]] {
+        var result = source
+        trimTrailingNonUserMessages(&result)
+
+        var i = 0
+        while i < result.count {
+            guard (result[i]["role"] as? String) == "assistant",
+                  var blocks = result[i]["content"] as? [[String: Any]]
+            else {
+                i += 1
+                continue
+            }
+            let toolUseIds: [String] = blocks.compactMap { block in
+                guard (block["type"] as? String) == "tool_use" else { return nil }
+                return block["id"] as? String
+            }
+            if toolUseIds.isEmpty { i += 1; continue }
+
+            var paired = Set<String>()
+            if i + 1 < result.count,
+               (result[i + 1]["role"] as? String) == "user",
+               let nextBlocks = result[i + 1]["content"] as? [[String: Any]]
+            {
+                for block in nextBlocks where (block["type"] as? String) == "tool_result" {
+                    if let id = block["tool_use_id"] as? String { paired.insert(id) }
+                }
+            }
+            let orphans = toolUseIds.filter { !paired.contains($0) }
+            if orphans.isEmpty { i += 1; continue }
+
+            blocks.removeAll { block in
+                guard (block["type"] as? String) == "tool_use",
+                      let id = block["id"] as? String else { return false }
+                return orphans.contains(id)
+            }
+            if blocks.isEmpty {
+                result.remove(at: i)
+            } else {
+                result[i]["content"] = blocks
+                i += 1
+            }
+        }
+        trimTrailingNonUserMessages(&result)
+        return result
+    }
+
+    private static func trimTrailingNonUserMessages(_ messages: inout [[String: Any]]) {
+        while let last = messages.last, (last["role"] as? String) != "user" {
+            messages.removeLast()
+        }
+    }
+
     /// / Read project-specific instructions from config files in the project folder. / Checks: .agent.md, AGENT.md,
     /// .claude/CLAUDE.md, .claude/rules/*.md / Supports @include directives: @path, @./relative, @~/home, @/absolute
     nonisolated static func readProjectConfig(projectFolder: String) -> String {

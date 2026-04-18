@@ -109,6 +109,7 @@ extension AgentViewModel {
     func temperatureForProvider(_ provider: APIProvider) -> Double {
         switch provider {
         case .claude: return claudeTemperature
+        case .codex: return openAITemperature
         case .ollama: return ollamaTemperature
         case .openAI: return openAITemperature
         case .deepSeek: return deepSeekTemperature

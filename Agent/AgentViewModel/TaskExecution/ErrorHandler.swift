@@ -25,6 +25,7 @@ extension AgentViewModel {
     /// `handleTaskLoopError` which of / claude/openAICompatible/ollama/foundationModelService was active / without having to ship the whole service quartet across the call.
     enum ActiveLLMService {
         case claude
+        case codex
         case openAICompatible
         case ollama
         case foundationModel
@@ -75,6 +76,8 @@ extension AgentViewModel {
         switch activeService {
         case .claude:
             errorSource = "Claude API"
+        case .codex:
+            errorSource = "Codex API"
         case .openAICompatible:
             errorSource = "\(providerDisplayName) API"
         case .ollama:

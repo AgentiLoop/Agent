@@ -233,6 +233,7 @@ struct FallbackChainView: View {
         // Prefer the model the user is actively using for that provider
         switch provider {
         case .claude: if !viewModel.selectedModel.isEmpty { return viewModel.selectedModel }
+        case .codex: if !viewModel.codexModel.isEmpty { return viewModel.codexModel }
         case .openAI: if !viewModel.openAIModel.isEmpty { return viewModel.openAIModel }
         case .ollama: if !viewModel.ollamaModel.isEmpty { return viewModel.ollamaModel }
         case .localOllama: if !viewModel.localOllamaModel.isEmpty { return viewModel.localOllamaModel }

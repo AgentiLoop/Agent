@@ -307,8 +307,11 @@ extension AgentViewModel {
         let cached = snapshotImages(in: message)
         // Multi-line messages (diffs, edit payloads, memory dumps) drop onto
         // their own line so the first content line isn't jammed next to the
-        // timestamp.
-        let formattedMessage = cached.contains("\n")
+        // timestamp — EXCEPT status summaries (✅/❌/⚠️/🛑) which should keep
+        // the status prefix inline with the timestamp for scannability.
+        let keepInlinePattern = #"^(✅|❌|⚠️|🛑|🚫|🍎|🧠|🧹|🔌|⏱|⏭|⏳|📝|📸|🔍|🔄|📎|📍|📊|📋|💭|🔒|🔓|👤|🤖|💬|📖|📁|📂)\s"#
+        let keepInline = cached.range(of: keepInlinePattern, options: .regularExpression) != nil
+        let formattedMessage = (cached.contains("\n") && !keepInline)
             ? "[\(timestamp)]\n\(cached)"
             : "[\(timestamp)] \(cached)"
 
@@ -378,6 +381,7 @@ extension AgentViewModel {
         logPersistTask?.cancel()
         logPersistTask = nil
         activityLog = ""
+        lastTaskMessages = []
         ChatHistoryStore.shared.clearAll()
         // Clear Apple AI conversation context when log is cleared
         AppleIntelligenceMediator.shared.clearContext()
