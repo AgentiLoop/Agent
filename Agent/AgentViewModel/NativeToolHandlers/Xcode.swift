@@ -189,8 +189,8 @@ extension AgentViewModel {
         // batch_tools — run multiple tool calls in one batch
         case "batch_tools":
             let desc = input["description"] as? String ?? "Batch Tasks"
-            guard let tasks = input["tasks"] as? [[String: Any]] else {
-                return "Error: tasks must be an array of {\"tool\": \"name\", \"input\": {...}} objects"
+            guard let tasks = Self.normalizeBatchTasks(input) else {
+                return Self.batchTasksError
             }
             var batchOutput = "● \(desc) (\(tasks.count) tasks)\n"
             var completed = 0

@@ -137,6 +137,50 @@ extension AgentViewModel {
         }
     }
 
+    // MARK: - Batch Task Normalization
+
+    static let batchTasksError = "Error: 'tasks' must be a JSON array like [{\"tool\":\"read_file\",\"input\":{\"file_path\":\"/x\"}}]. Recovery: pass it as an array of objects (not a quoted string); each needs a \"tool\" name and an \"input\" object. Or just call the tools one at a time."
+
+    /// Normalize the `tasks` arg for batch_tools. Tolerates JSON-string payloads,
+    /// alternate keys (tools/calls/steps), and per-task `input` that arrived as a string.
+    static func normalizeBatchTasks(_ input: [String: Any]) -> [[String: Any]]? {
+        guard let raw = input["tasks"] ?? input["tools"] ?? input["calls"] ?? input["steps"] ?? input["items"] else { return nil }
+
+        func decode(_ value: Any) -> Any? {
+            guard let str = value as? String, let data = str.data(using: .utf8) else { return nil }
+            return try? JSONSerialization.jsonObject(with: data)
+        }
+
+        let array: [Any]
+        if let arr = raw as? [Any] { array = arr }
+        else if let decoded = decode(raw) as? [Any] { array = decoded }
+        else if let single = (raw as? [String: Any]) ?? (decode(raw) as? [String: Any]) { array = [single] }
+        else { return nil }
+
+        let tasks: [[String: Any]] = array.compactMap { element in
+            if let dict = element as? [String: Any] { return normalizeTask(dict) }
+            if let dict = decode(element) as? [String: Any] { return normalizeTask(dict) }
+            return nil
+        }
+        return tasks.isEmpty ? nil : tasks
+    }
+
+    /// Accept name/tool_name aliases and decode a JSON-string `input`/arguments.
+    private static func normalizeTask(_ task: [String: Any]) -> [String: Any] {
+        var result = task
+        if result["tool"] == nil {
+            result["tool"] = (result["name"] as? String) ?? (result["tool_name"] as? String)
+        }
+        let rawInput = result["input"] ?? result["arguments"] ?? result["args"] ?? result["parameters"]
+        if let dict = rawInput as? [String: Any] {
+            result["input"] = dict
+        } else if let str = rawInput as? String, let data = str.data(using: .utf8),
+                  let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            result["input"] = dict
+        }
+        return result
+    }
+
     // MARK: - Consolidated Tool Expansion
 
     /// / Expands consolidated CRUDL tool names (git, agent, applescript_tool, javascript_tool) / into legacy tool names
