@@ -280,6 +280,15 @@ final class OpenAICompatibleService {
                         }
                         assistantMsg["tool_calls"] = toolCalls
                     }
+                    // DeepSeek thinking mode requires reasoning_content echoed back on assistant turns.
+                    if provider == .deepSeek {
+                        for block in blocks {
+                            if let rc = block["reasoning_content"] as? String, !rc.isEmpty {
+                                assistantMsg["reasoning_content"] = rc
+                                break
+                            }
+                        }
+                    }
                     chatMessages.append(assistantMsg)
                 }
             }
@@ -507,6 +516,9 @@ final class OpenAICompatibleService {
 
         let finishReason = firstChoice["finish_reason"] as? String ?? "stop"
 
+        // DeepSeek thinking mode returns reasoning_content that must be echoed back next turn.
+        let reasoningContent = (message["reasoning_content"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+
         // Convert to Claude-compatible content blocks
         var contentBlocks: [[String: Any]] = []
         var parsedToolFromText = false
@@ -596,6 +608,8 @@ final class OpenAICompatibleService {
             contentBlocks.append(["type": "text", "text": "(no response)"])
         }
 
+        if let reasoningContent { contentBlocks[0]["reasoning_content"] = reasoningContent }
+
         let hasToolCalls = (message["tool_calls"] != nil) || parsedToolFromText
         let stopReason = hasToolCalls ? "tool_use" :
             (finishReason == "tool_calls" ? "tool_use" : (finishReason == "length" ? "max_tokens" : "end_turn"))
@@ -659,6 +673,7 @@ final class OpenAICompatibleService {
         }
 
         var fullText = ""
+        var reasoningContent = ""
         var finishReason = "stop"
         var streamInputTokens = 0
         var streamOutputTokens = 0
@@ -744,6 +759,9 @@ final class OpenAICompatibleService {
             if thoughtSignature == nil, let sig = delta["thought_signature"] as? String {
                 thoughtSignature = sig
             }
+
+            // DeepSeek thinking mode streams reasoning_content separately from content.
+            if let rc = delta["reasoning_content"] as? String { reasoningContent += rc }
 
             // Tool call deltas (streamed incrementally)
             if let toolCalls = delta["tool_calls"] as? [[String: Any]] {
@@ -892,6 +910,8 @@ final class OpenAICompatibleService {
         if contentBlocks.isEmpty {
             contentBlocks.append(["type": "text", "text": "(no response)"])
         }
+
+        if !reasoningContent.isEmpty { contentBlocks[0]["reasoning_content"] = reasoningContent }
 
         let hasToolCalls = !toolCallAccum.isEmpty || parsedToolFromText
         let stopReason = hasToolCalls ? "tool_use" :
