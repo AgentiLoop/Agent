@@ -81,8 +81,8 @@ extension AgentViewModel {
 
         case "batch_tools":
             let desc = input["description"] as? String ?? "Batch Tasks"
-            guard let tasks = input["tasks"] as? [[String: Any]] else {
-                let err = "Error: tasks must be an array of {\"tool\": \"name\", \"input\": {...}} objects"
+            guard let tasks = Self.normalizeBatchTasks(input) else {
+                let err = Self.batchTasksError
                 tab.appendLog(err); tab.flush()
                 return tabResult(err, toolId: toolId)
             }
