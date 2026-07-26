@@ -32,8 +32,11 @@
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>© 2026 agent@macos26.app</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Agent! needs to control other apps to run automation scripts on your behalf.</string>
 	<key>NSAppleMusicUsageDescription</key>
@@ -60,6 +63,8 @@
 	<string>Agent! needs HealthKit write access for scripts that log workouts or add health samples.</string>
 	<key>NSHomeKitUsageDescription</key>
 	<string>Agent! needs HomeKit access for scripts that control smart home accessories and scenes.</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>© 2026 agent@macos26.app</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Agent! needs local network access for scripts that discover devices on your network.</string>
 	<key>NSLocationUsageDescription</key>
