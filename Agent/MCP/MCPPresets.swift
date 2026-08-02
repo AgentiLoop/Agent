@@ -19,5 +19,11 @@ enum MCPPresets {
                 command: "/Applications/xcf.app/Contents/MacOS/xcf server"
             )
         },
+        MCPPreset(id: "parallel.search", menuLabel: "Parallel Search — Web Search & Fetch") {
+            MCPServerConfig(
+                name: "Parallel Search",
+                url: "https://search.parallel.ai/mcp"
+            )
+        },
     ]
 }
