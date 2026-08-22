@@ -125,35 +125,15 @@ extension AgentViewModel {
         var appleAIAnnotations: [AppleIntelligenceMediator.Annotation] = []
 
         // ! or !apple prefix bypasses Apple AI triage — sends prompt straight to cloud LLM.
-        // Also skip Apple triage entirely when Agent! lacks Accessibility permission —
-        // Apple AI's only meaningful tool call here is the accessibility dispatch,
-        // which will fail without the right. Fall straight through to the cloud LLM.
         let appleBypass = rawPrompt.hasPrefix("\u{F8FF}")
             || rawPrompt.lowercased().hasPrefix("!apple ")
-            || !AccessibilityService.hasAccessibilityPermission()
             || hadAttachments
         if appleBypass {
             appendLog(cloudModelLogLine)
             flushLog()
         } else {
-            // Triage: direct commands, Apple AI conversation, accessibility agent, or pass through to LLM.
-            let triageResult = await mediator.triagePrompt(prompt, axDispatch: { [weak self] args in
-                guard let self else { return "{\"success\":false,\"error\":\"agent deallocated\"}" }
-                var input: [String: Any] = ["action": args.action]
-                if let role = args.role { input["role"] = role }
-                if let title = args.title { input["title"] = title }
-                if let rawApp = args.app {
-                    let resolved = SDEFService.shared.resolveBundleId(name: rawApp) ?? rawApp
-                    input["appBundleId"] = resolved
-                    input["app"] = resolved
-                }
-                if let text = args.text { input["text"] = text }
-                return await self.executeNativeTool("accessibility", input: input)
-            }, runAgent: { [weak self] args in
-                guard let self else { return "error: agent deallocated" }
-                let success = await self.runAgentDirect(name: args.name, arguments: args.arguments ?? "")
-                return success ? "Launched agent '\(args.name)'" : "Agent '\(args.name)' not found"
-            }, appendLog: { [weak self] msg in self?.appendLog(msg) }, projectFolder: projectFolder)
+            // Triage: Apple AI answers greetings on-device, or passes through to the cloud LLM.
+            let triageResult = await mediator.triagePrompt(prompt, appendLog: { [weak self] msg in self?.appendLog(msg) })
             let triageOutcome = await handleTriageOutcome(
                 triageResult,
                 prompt: prompt,

@@ -3,7 +3,6 @@ import SwiftUI
 
 struct AppleIntelligencePopover: View {
     @ObservedObject private var aiMediator = AppleIntelligenceMediator.shared
-    @State private var hasAccessibility = AccessibilityService.hasAccessibilityPermission()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -12,7 +11,6 @@ struct AppleIntelligencePopover: View {
         .padding(16)
         .frame(width: 380)
         .onAppear {
-            hasAccessibility = AccessibilityService.hasAccessibilityPermission()
             // Refresh master toggle — flip off/on so downstream sub-features re-evaluate
             let wasEnabled = aiMediator.isEnabled
             aiMediator.isEnabled = false
@@ -106,27 +104,6 @@ struct AppleIntelligencePopover: View {
                             .tint(aiMediator.tokenCompressionEnabled ? Color.purple : Color.orange)
                     }
 
-                    GridRow {
-                        VStack(alignment: .leading) {
-                            Text("Accessibility intent parsing")
-                                .font(.caption)
-                                .foregroundStyle(hasAccessibility ? .primary : .secondary)
-                            Text(hasAccessibility
-                                ? "Parse \"click the Save button in TextEdit\" locally and dispatch directly to the accessibility tool — skips the cloud LLM round-trip"
-                                : "Requires Accessibility permission (System Settings › Privacy & Security › Accessibility)")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                        Toggle("", isOn: Binding(
-                            get: { hasAccessibility && aiMediator.accessibilityIntentEnabled },
-                            set: { aiMediator.accessibilityIntentEnabled = $0 }
-                        ))
-                            .toggleStyle(.switch)
-                            .controlSize(.mini)
-                            .labelsHidden()
-                            .tint(hasAccessibility && aiMediator.accessibilityIntentEnabled ? Color.indigo : Color.gray)
-                            .disabled(!hasAccessibility)
-                    }
                 }
             }
         }

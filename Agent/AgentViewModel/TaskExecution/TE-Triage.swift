@@ -55,29 +55,6 @@ extension AgentViewModel {
             isRunning = false
             isThinking = false
             return .completed
-        case .accessibilityHandled(let summary):
-            // Apple AI ran accessibility tool(s) and produced a summary. Tool calls went through axDispatch →
-            // executeNativeTool (already logged). Nil result → .passThrough → cloud LLM, so we only reach here on success.
-            // Note: AppleIntelligenceMediator already logged "🍎 ✅ <summary>" — no duplicate log here.
-            rawLLMOutput = summary
-            displayedLLMOutput = summary
-            dripDisplayIndex = summary.count
-            flushLog()
-            completionSummary = String(summary.prefix(200))
-            history.add(
-                TaskRecord(prompt: prompt, summary: completionSummary, commandsRun: ["accessibility (Apple AI)"]),
-                maxBeforeSummary: maxHistoryBeforeSummary,
-                apiKey: apiKey,
-                model: selectedModel
-            )
-            ChatHistoryStore.shared.endCurrentTask(summary: completionSummary)
-            stopProgressUpdates()
-            if agentReplyHandle != nil { sendProgressUpdate(summary) }
-            flushLog()
-            persistLogNow()
-            isRunning = false
-            isThinking = false
-            return .completed
         case .passThrough:
             // Apple AI didn't handle the request — log the cloud LLM model now so the user sees which provider is
             // actually doing the work.
