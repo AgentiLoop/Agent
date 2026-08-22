@@ -51,13 +51,6 @@ final class AppleIntelligenceMediator: ObservableObject {
         }
     }
 
-    /// Parses accessibility commands locally; UI automation requests dispatched on-device — zero cloud tokens.
-    @Published var accessibilityIntentEnabled: Bool = UserDefaults.standard.object(forKey: "appleIntelligenceAccessibilityIntent") as? Bool ?? true {
-        didSet {
-            UserDefaults.standard.set(accessibilityIntentEnabled, forKey: "appleIntelligenceAccessibilityIntent")
-        }
-    }
-
     /// Conversational triage — Apple AI answers greetings / small-talk on-device
     /// before the cloud LLM is invoked. Independent of the accessibility-intent
     /// and annotation features so users can turn triage off while still getting
@@ -83,9 +76,6 @@ final class AppleIntelligenceMediator: ObservableObject {
         if triageEnabled            { colors.append(Color(red: 0.20, green: 0.78, blue: 0.35)) } // system green
         if showAnnotationsToUser    { colors.append(Color(red: 1.00, green: 0.40, blue: 0.75)) } // hot pink
         if tokenCompressionEnabled  { colors.append(Color(red: 0.69, green: 0.32, blue: 0.87)) } // system purple
-        if accessibilityIntentEnabled && AccessibilityService.hasAccessibilityPermission() {
-            colors.append(Color(red: 0.19, green: 0.69, blue: 0.78))                             // system teal
-        }
 
         // Only the master is on → flat blue, no gradient.
         if colors.count == 1 { return AnyShapeStyle(colors[0]) }
@@ -123,35 +113,6 @@ final class AppleIntelligenceMediator: ObservableObject {
     private var conversationSummary: String?
 
     private var session: LanguageModelSession?
-    private var accessibilityAgentSession: LanguageModelSession?
-    private var accessibilityAgentTurnCount = 0
-    private var accessibilityAgentLastMessage: String?
-    private let accessibilityAgentMaxTurns = 7  // Reset after N turns to prevent context bloat
-
-    /// Shared call-state tracker used by the accessibility tool closures. Lives
-    /// on the mediator (not on the stack frame) so that follow-up invocations
-    /// reusing an existing session still point at the same instance. See
-    /// runAccessibilityAgent for the reset-on-entry pattern.
-    final class CallTracker: @unchecked Sendable {
-        private let lock = NSLock()
-        private var _called = false
-        private var _failed = false
-        private var _outputs: [String] = []
-        var called: Bool { lock.lock(); defer { lock.unlock() }; return _called }
-        var failed: Bool { lock.lock(); defer { lock.unlock() }; return _failed }
-        var outputs: [String] { lock.lock(); defer { lock.unlock() }; return _outputs }
-        func markCalled() { lock.lock(); _called = true; lock.unlock() }
-        func markFailed() { lock.lock(); _failed = true; lock.unlock() }
-        func recordOutput(_ s: String) { lock.lock(); _outputs.append(s); lock.unlock() }
-        func reset() {
-            lock.lock()
-            _called = false
-            _failed = false
-            _outputs.removeAll()
-            lock.unlock()
-        }
-    }
-    private let accessibilityTracker = CallTracker()
 
     /// Represents an Apple Intelligence annotation
     struct Annotation {
@@ -274,38 +235,6 @@ final class AppleIntelligenceMediator: ObservableObject {
         )
         session = s
         return s
-    }
-
-    /// Ask Apple AI whether the current prompt is a follow-up to the previous one.
-    /// Returns true only if Apple AI says "yes". On timeout or ambiguity, returns false.
-    private func isFollowUpRequest(previous: String, current: String) async -> Bool {
-        let classifier = LanguageModelSession(
-            model: .default,
-            instructions: Instructions("You classify whether a new user message is a follow-up to a previous one. Reply with exactly 'yes' or 'no'. A follow-up refers to the previous action (e.g. 'do it again', 'take another', 'now click X too', pronouns like 'it'/'that'). An unrelated new task is 'no'.")
-        )
-        let prompt = """
-        Previous: "\(previous)"
-        Current: "\(current)"
-        Is Current a follow-up to Previous? Reply only 'yes' or 'no'.
-        """
-        do {
-            let content: String = try await withThrowingTaskGroup(of: String.self) { group in
-                group.addTask {
-                    let response = try await classifier.respond(to: prompt)
-                    return response.content
-                }
-                group.addTask {
-                    try await Task.sleep(for: .seconds(3))
-                    throw CancellationError()
-                }
-                guard let result = try await group.next() else { throw CancellationError() }
-                group.cancelAll()
-                return result
-            }
-            return content.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("yes")
-        } catch {
-            return false
-        }
     }
 
     /// Wraps a session.respond call with timeout.
@@ -441,7 +370,6 @@ final class AppleIntelligenceMediator: ObservableObject {
     /// Triage result: Apple AI answers, or pass through to the LLM.
     enum TriageResult {
         case answered(String) // Apple AI handled it — show this text and skip LLM
-        case accessibilityHandled(String) // Apple AI ran the accessibility tool — show its summary, skip LLM
         case passThrough // Needs tools/LLM — proceed normally
     }
 
@@ -536,338 +464,17 @@ final class AppleIntelligenceMediator: ObservableObject {
         return false
     }
 
-    // MARK: - Accessibility Intent
-
-    /// Cheap pre-filter: does this prompt look like a UI automation request? False negatives fall through to cloud LLM (no harm).
-    static func looksLikeAccessibilityRequest(_ message: String) -> Bool {
-        let lower = message.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
-        guard lower.count > 3, lower.count < 240 else { return false }
-
-        // "open" followed by path-like or file-like words → LLM territory, not accessibility
-        if lower.hasPrefix("open ") {
-            let arg = String(lower.dropFirst(5)).trimmingCharacters(in: .whitespaces)
-            if arg.hasPrefix(".") || arg.hasPrefix("/") || arg.hasPrefix("~") { return false }
-            let fileWords = ["path", "file", "folder", "directory", "dir ", "dmg", "zip", "app ",
-                             "the path", "the file", "the folder", "the dir", "the dmg",
-                             "build", "export", "output", "log", "project"]
-            if fileWords.contains(where: { arg.hasPrefix($0) }) { return false }
-        }
-
-        // "have the llm" / "have the model" / "use the llm" → user explicitly wants cloud LLM
-        let llmOverrides = ["have the llm", "use the llm", "have the model", "let the llm",
-                            "ask the llm", "have llm", "use llm", "have ai", "not working"]
-        if llmOverrides.contains(where: { lower.contains($0) }) { return false }
-
-        // File paths → coding/shell task, not accessibility
-        if lower.contains("/users/") || lower.contains("/applications/")
-            || lower.contains("/volumes/") || lower.contains("/tmp/")
-            || lower.contains("~/") || message.contains("\"/" )
-        { return false }
-
-        // File/build keywords → coding task
-        let codingWords = ["dmg", ".app", ".swift", ".py", ".js", ".ts", "xcodebuild",
-                           "agent script", "agentscript", "compile", "package", "spm"]
-        if codingWords.contains(where: { lower.contains($0) }) { return false }
-
-        // Shell-like patterns: ls, cd, git, grep, cat, etc.
-        let shellPrefixes = [
-            "ls ", "ls\n", "cd ", "git ", "grep ", "cat ", "find ", "mkdir ",
-            "rm ", "cp ", "mv ", "chmod ", "chown ", "brew ", "npm ", "pip ",
-            "swift ", "xcodebuild ", "xcrun ", "make ", "cargo ", "rustc ",
-        ]
-        if shellPrefixes.contains(where: { lower.hasPrefix($0) }) { return false }
-
-        let verbs = [
-            "click ", "tap ", "press ", "type ", "select ", "scroll ",
-            "open ", "find ", "show me ", "hide ", "activate ", "minimize ",
-            "close ", "switch to ", "focus ", "save ", "quit ",
-            "take ", "launch ", "start ", "stop ", "record ", "play ",
-            "pause ", "send ", "visit ", "go to ", "navigate ", "search ",
-            "check ", "toggle ", "enable ", "disable ", "choose ", "pick ",
-            "use ", "using ", "run ", "drag ", "jump ", "delete ", "edit "
-        ]
-        return verbs.contains { lower.contains($0) }
-    }
-
-    /// Run Apple AI as tool-calling agent with accessibility tool. Returns final text on success, or nil if tool wasn't called/failed/timed out.
-    /// Quick pattern check for "run agent X" style requests — strict match only.
-    /// Only triggers on "run agent {name}" or "run agent {number}" (with optional "the" / quotes).
-    static func looksLikeRunAgentRequest(_ message: String) -> Bool {
-        let lower = message.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
-        // Match: "run agent Foo", "run the agent Foo", "run agent 5", "run the agent 5"
-        // Also: "agent run Foo" variant
-        let runAgentPattern = #"run\s+(?:the\s+)?agent\s+\S+"#
-        let agentRunPattern = #"agent\s+run\s+\S+"#
-        guard let runAgentRegex = try? NSRegularExpression(pattern: runAgentPattern),
-              let agentRunRegex = try? NSRegularExpression(pattern: agentRunPattern)
-        else { return false }
-        let range = NSRange(lower.startIndex..., in: lower)
-        return runAgentRegex.firstMatch(in: lower, range: range) != nil
-            || agentRunRegex.firstMatch(in: lower, range: range) != nil
-    }
-
-    func runAccessibilityAgent(
-        _ message: String,
-        dispatch: @escaping @Sendable (AccessibilityArgs) async -> String,
-        runAgent: @escaping @Sendable (RunAgentArgs) async -> String,
-        appendLog: @escaping @Sendable @MainActor (String) -> Void,
-        projectFolder: String = ""
-    ) async -> String? {
-        // Gated on Accessibility permission — the feature drives UI via AXorcist,
-        // so without the system permission it cannot succeed. Fall through to
-        // the cloud LLM instead of running an Apple-AI turn that will fail.
-        guard isEnabled && accessibilityIntentEnabled && Self.isAvailable,
-              AccessibilityService.hasAccessibilityPermission() else { return nil }
-
-        // One shared tracker lives on `self` (via `accessibilityTracker`) so that
-        // reused follow-up sessions keep pointing at the same instance. A fresh
-        // `CallTracker()` per invocation used to break follow-ups: the previous
-        // session's tool closures captured the DEAD tracker and marked it,
-        // while the new invocation watched a different, unmarked tracker and
-        // logged "⏭ No tool called — forwarding to LLM" after Apple AI had in
-        // fact clicked the button successfully.
-        let tracker = self.accessibilityTracker
-        tracker.reset()
-
-        let tool = AccessibilityAppleTool { args in
-            tracker.markCalled()
-            await appendLog("🍎 accessibility(\(args.action), app: \(args.app ?? "–"), title: \(args.title ?? "–"))")
-            // Destructive-action guard: Apple AI has a tiny context window and has been
-            // observed mis-mapping vague prompts to system-wipe buttons ("Erase All
-            // Content and Settings", etc). Refuse high-risk UI actions here and force a
-            // pass-through to the cloud LLM, which has enough context to sanity-check
-            // the request and can still perform the action under explicit user intent.
-            if let refusal = Self.refuseDestructiveAccessibility(args) {
-                await appendLog("🍎 ⛔ blocked destructive AX action — \(refusal)")
-                tracker.markFailed()
-                return "{\"success\":false,\"error\":\"\(refusal)\"}"
-            }
-            let result = await dispatch(args)
-            tracker.recordOutput(result)
-            await appendLog("🍎 → \(String(result.prefix(300)))")
-            let lower = result.lowercased()
-            let isFindAction = args.action.lowercased().contains("find")
-            if !isFindAction {
-                // A write action (click/type/open/launch) is only treated as a
-                // success when the tool explicitly says so. Previously the
-                // absence of an error marker was read as success, which let
-                // ax_manage_app's app-list response get reported as "opened
-                // Safari" for an open_app call.
-                let explicitSuccess = lower.contains("\"success\":true")
-                    || lower.contains("\"success\": true")
-                    || lower.contains("launched") || lower.contains("activated")
-                    || lower.contains("opened") || lower.contains("clicked")
-                    || lower.contains("typed")   || lower.contains("performed")
-                let explicitFailure = lower.contains("\"success\":false")
-                    || lower.contains("\"success\": false")
-                    || lower.contains("error") || lower.contains("not found")
-                    || lower.contains("no element") || lower.contains("timed out")
-                    || lower.contains("not running")
-                if explicitFailure || !explicitSuccess {
-                    tracker.markFailed()
-                }
-            } else {
-                if lower.contains("not running") || lower.contains("not launched") {
-                    tracker.markFailed()
-                }
-            }
-            return result
-        }
-
-        let runAgentTool = RunAgentAppleTool { args in
-            await appendLog("🍎 run_agent(name: \(args.name), args: \(args.arguments ?? "–"))")
-            let result = await runAgent(args)
-            await appendLog("🍎 → \(String(result.prefix(300)))")
-            let lower = result.lowercased()
-            // "action not performed" = the tool's pre-flight refused to dispatch
-            // (script doesn't exist). Don't mark the run as a real tool call —
-            // let Apple AI continue or triage fall through to the cloud LLM.
-            if lower.hasPrefix("action not performed") {
-                return result
-            }
-            tracker.markCalled()
-            tracker.recordOutput(result)
-            if lower.contains("not found") || lower.contains("error") || lower.contains("failed") {
-                tracker.markFailed()
-            }
-            return result
-        }
-
-        // Explicit "skip" tool — gives Apple AI a clean way to say "not my job"
-        // instead of hallucinating a click target. We mark the run failed so
-        // runAccessibilityAgent returns nil → triage falls through to cloud LLM.
-        let skipTool = SkipAppleTool { args in
-            await appendLog("🍎 ⏭ skip — \(args.reason)")
-            tracker.markCalled()
-            tracker.markFailed()
-            return "skipped"
-        }
-
-        // Apple AI's ~4096-token window requires terse instructions. Known apps from SDEFService; unknowns fall back to NSRunningApplications scan.
-        let knownApps = SDEFService.shared.allInstalledAppNames().joined(separator: ", ")
-        let instructions = Instructions("""
-        You have THREE tools: skip, accessibility, run_agent.
-
-        DEFAULT ACTION IS skip. Only pick another tool when the rules below clearly match.
-
-        TOOL SELECTION — follow these rules IN ORDER:
-        1. ONLY use run_agent when the user LITERALLY says "run agent X", "run the X agent", or "run X agent" — the word "run" must appear with "agent".
-        2. Use accessibility ONLY when ALL of these are true:
-           a) the prompt contains an explicit UI verb: click, tap, press, open, launch, type, fill, select, toggle;
-           b) the prompt names a specific Mac app (from the known list) OR a specific on-screen button/menu/field; and
-           c) the prompt is NOT about code, files, git, xcode, builds, tests, searches, websites, or analyzing screenshots.
-        3. EVERYTHING ELSE → call `skip` with a one-sentence reason. This includes vague prompts, screenshot-based prompts, code tasks, file edits, git, xcode, builds, web/browsing, chat, and anything you're unsure about. When in doubt, skip.
-
-        CRITICAL: "diff_apply", "edit_file", "write_file", "xcode", "git", "search" etc. are CLOUD LLM tools, NOT agent scripts. NEVER pass them to run_agent.
-
-        ACCESSIBILITY RULES:
-        1. App names like "photobooth", "photo booth" → Photo Booth (the app). Match the name to an app in the known list below — normalize spacing/case.
-        2. NEVER put an app name in the `title` field. App goes in `app`, button/menu name goes in `title`.
-        3. To perform an action IN an app: first open_app(app:"<App Name>"), then find_element to discover the real button label, then click_element with the exact label.
-        4. ALWAYS discover button labels first: find_element(app:"<App>", role:"AXButton", title:"<guess>") returns the actual AXTitle/AXDescription. Use the EXACT title returned — buttons often have unexpected labels (e.g. Photo Booth's camera button is "take photo" NOT "Take Picture").
-        5. If click_element fails with "not found", retry with find_element using a PARTIAL title or just the role to list available buttons, then click with the exact label.
-        6. Roles: AXButton, AXTextField, AXLink, AXMenuItem.
-        7. Known apps: \(knownApps)
-
-        After tool calls succeed, reply with 1 sentence describing what happened.
-        """)
-
-        // AppleScript and Shell tools removed — Apple AI handled them poorly (hallucinated
-        // paths like /Users/your_username, wrong directories, malformed scripts). The cloud
-        // LLM handles those reliably. Only accessibility is exposed to Apple AI now.
-
-        // Adaptive context: ask Apple AI itself whether the new prompt is a follow-up to the
-        // previous one. If yes, reuse the session so references like "take another", "do it
-        // again", "also click X" have context. If no, start fresh to keep unrelated tasks
-        // from bloating the 4096-token window.
-        var isFollowUp = false
-        if let prev = accessibilityAgentLastMessage,
-           accessibilityAgentSession != nil,
-           accessibilityAgentTurnCount < accessibilityAgentMaxTurns
-        {
-            isFollowUp = await isFollowUpRequest(previous: prev, current: message)
-        }
-        let session: LanguageModelSession
-        if isFollowUp, let existing = accessibilityAgentSession {
-            session = existing
-            accessibilityAgentTurnCount += 1
-            appendLog("🍎 (follow-up, reusing context)")
-        } else {
-            // Two tools exposed to Apple AI: accessibility (UI automation) and run_agent
-            // (run user-defined scripts). Shell and AppleScript were removed because
-            // Apple AI hallucinated paths and directories.
-            session = LanguageModelSession(model: .default, tools: [skipTool, tool, runAgentTool], instructions: instructions)
-            accessibilityAgentSession = session
-            accessibilityAgentTurnCount = 1
-        }
-        accessibilityAgentLastMessage = message
-
-        // Wrap respond(to:) in task-group timeout. The agent loop runs inside respond(to:), so we need a generous timeout for multiple tool calls.
-        let timeoutSeconds: TimeInterval = 60
-        do {
-            let content: String = try await withThrowingTaskGroup(of: String.self) { group in
-                group.addTask {
-                    let response = try await session.respond(to: message)
-                    return response.content
-                }
-                group.addTask {
-                    try await Task.sleep(for: .seconds(timeoutSeconds))
-                    throw CancellationError()
-                }
-                guard let result = try await group.next() else { throw CancellationError() }
-                group.cancelAll()
-                return result
-            }
-
-            // If Apple AI didn't actually call the tool, it just chatted — fall through to cloud LLM.
-            guard tracker.called else {
-                appendLog("🍎 ⏭ No tool called — forwarding to LLM")
-                return nil
-            }
-            // Multi-step sequences: Apple AI's session.respond() runs an internal
-            // tool loop that may make several calls. Don't blanket-bail on any
-            // single tool_call failure — the LLM often probes/recovers in a
-            // later step. Trust Apple AI's final text response instead (the
-            // refusal-phrase check below catches self-reported failure). But
-            // still require at least ONE successful call's worth of evidence
-            // so we don't accept a response that was only Apple AI apologizing
-            // about failures.
-            let outputs = tracker.outputs
-            let hasSubstantiveOutput = outputs.contains { output in
-                let trimmed = output.trimmingCharacters(in: .whitespacesAndNewlines)
-                if trimmed.isEmpty || trimmed == "(exit 0)" || trimmed.count < 3 { return false }
-                return true
-            }
-            if !hasSubstantiveOutput {
-                appendLog("🍎 ⏭ No substantive tool output — forwarding to LLM")
-                return nil
-            }
-            // If EVERY tool call failed (not just one), bail. One failure in a
-            // multi-step plan is fine; zero successes is not.
-            let anySucceeded = outputs.contains { output in
-                let lower = output.lowercased()
-                return lower.contains("\"success\":true")
-                    || lower.contains("\"success\": true")
-                    || lower.contains("launched") || lower.contains("activated")
-                    || lower.contains("opened") || lower.contains("clicked")
-                    || lower.contains("typed") || lower.contains("performed")
-                    || lower.contains("element found")
-            }
-            if !anySucceeded {
-                appendLog("🍎 ⏭ All tool calls failed — forwarding to LLM")
-                return nil
-            }
-            // If Apple AI's response indicates refusal/inability/uncertainty, fall through.
-            let upper = content.uppercased()
-            let refusalPhrases = [
-                "I'M SORRY", "I'M UNABLE", "I CANNOT", "I CAN'T",
-                "NOT ABLE TO", "UNABLE TO PERFORM", "ERROR WITH",
-                "COULDN'T", "COULD NOT", "I DON'T KNOW", "NOT SURE",
-                "DIDN'T WORK", "FAILED TO", "NO RESULT", "TRY AGAIN"
-            ]
-            if refusalPhrases.contains(where: { upper.contains($0) }) {
-                appendLog("🍎 ⏭ Apple AI gave up — forwarding to LLM")
-                return nil
-            }
-            let trimmed = sanitize(content)
-            guard trimmed.count >= 5 else {
-                appendLog("🍎 ⏭ Empty response — forwarding to LLM")
-                return nil
-            }
-            appendLog("🍎 ✅ \(trimmed)")
-            return trimmed
-        } catch {
-            appendLog("🍎 ⏭ Timeout/error — forwarding to LLM")
-            return nil
-        }
-    }
-
-    /// / Triage a prompt: direct commands → accessibility agent (Apple AI) → conversational patterns. / Falls back to
-    /// .passThrough for anything needing the cloud LLM. / `axDispatch` routes AccessibilityArgs to AgentViewModel.executeNativeTool.
+    /// Triage a prompt: answer greetings / small-talk on-device. Everything
+    /// else — including UI automation — falls through to the cloud LLM, which
+    /// drives the accessibility tools directly.
     func triagePrompt(
         _ message: String,
-        axDispatch: @escaping @Sendable (AccessibilityArgs) async -> String,
-        runAgent: @escaping @Sendable (RunAgentArgs) async -> String,
-        appendLog: @escaping @Sendable @MainActor (String) -> Void,
-        projectFolder: String = ""
+        appendLog: @escaping @Sendable @MainActor (String) -> Void
     ) async -> TriageResult {
-        // Direct command shortcut removed — "run agent X", "list agents", "google for X",
-        // etc. all flow through Apple AI (accessibility) or the cloud LLM's tools now.
         guard isEnabled && Self.isAvailable else {
             if !isEnabled { appendLog("🍎 ⏭ Mediator disabled") }
             else { appendLog("🍎 ⏭ Apple AI unavailable — \(Self.unavailabilityReason)") }
             return .passThrough
-        }
-        // Accessibility agent — let Apple AI try to handle UI automation requests locally with full tool-calling
-        // support. Pre-filter on action verbs so we don't spend an AI call on every user message.
-        if !accessibilityIntentEnabled {
-            // User explicitly turned this off — no need to log it on every task.
-        } else if !AccessibilityService.hasAccessibilityPermission() {
-            appendLog("🍎 ⏭ No Accessibility permission — grant in System Settings → Privacy → Accessibility")
-        } else if !(Self.looksLikeAccessibilityRequest(message) || Self.looksLikeRunAgentRequest(message)) {
-            appendLog("🍎 ⏭ Prompt doesn't look like a UI action (no verb like click/type/open/take/...)")
-        } else if let result = await runAccessibilityAgent(message, dispatch: axDispatch, runAgent: runAgent, appendLog: appendLog, projectFolder: projectFolder) {
-            return .accessibilityHandled(result)
         }
         // Local classification — no AI needed. Triage can be disabled separately
         // from the other Apple-AI features; when off we never spend an on-device
@@ -903,9 +510,6 @@ final class AppleIntelligenceMediator: ObservableObject {
     /// Clear the session and conversation context to start fresh (call when switching contexts or starting a new conversation)
     func resetSession() {
         session = nil
-        accessibilityAgentSession = nil
-        accessibilityAgentTurnCount = 0
-        accessibilityAgentLastMessage = nil
         lastUserPrompt = nil
         lastAppleAIMessage = nil
         lastLLMResponse = nil
@@ -964,151 +568,4 @@ final class AppleIntelligenceMediator: ObservableObject {
         return parts.isEmpty ? "No context stored" : parts.joined(separator: "\n")
     }
 
-    /// Returns a refusal reason when Apple AI tries to invoke a high-risk UI action,
-    /// or nil when the call is safe to dispatch. Triggered only on activating actions
-    /// (clicks, menu-item taps) against known-destructive element titles. Exploratory
-    /// find_element calls and text typing still go through.
-    nonisolated static func refuseDestructiveAccessibility(_ args: AccessibilityArgs) -> String? {
-        let action = args.action.lowercased()
-        let isActivating = action.contains("click") || action.contains("menu") || action.contains("press")
-        guard isActivating else { return nil }
-        guard let rawTitle = args.title, !rawTitle.isEmpty else { return nil }
-        let t = rawTitle.lowercased()
-        let destructive = [
-            "erase all content", "erase all settings", "erase mac",
-            "reset all settings", "reset mac", "factory reset", "factory defaults",
-            "wipe", "destroy", "delete account", "delete user",
-            "remove all data", "empty trash", "shut down", "restart",
-            "log out", "sign out of apple id"
-        ]
-        if destructive.contains(where: { t.contains($0) }) {
-            return "refusing destructive UI action: \(rawTitle)"
-        }
-        return nil
-    }
-}
-
-// MARK: - Accessibility Tool for Apple Intelligence FoundationModels-native tool — framework handles
-// schema/validation/agent loop. We just provide the dispatch closure routing to AgentViewModel.executeNativeTool.
-
-/// / Generable arguments for the accessibility tool. @Generable derives / ConvertibleFromGeneratedContent +
-/// GenerationSchema for Apple AI. / `app` uses natural names (e.g. "Photo Booth"); dispatch resolves via / AccessibilityService.resolveBundleId().
-@Generable
-struct AccessibilityArgs: Sendable {
-    @Guide(description: "The accessibility action: click_element, type_into_element, scroll_to_element, open_app, or find_element")
-    let action: String
-
-    @Guide(description: "AX role like AXButton, AXTextField, AXLink. Optional for open_app.")
-    let role: String?
-
-    @Guide(description: "Element title or label to match (partial, case-insensitive). Optional for open_app.")
-    let title: String?
-
-    @Guide(description: "App name — use the EXACT natural name from the user's request " +
-        "(e.g. 'Calculator', 'Safari', 'TextEdit', 'Mail'). Bundle ID resolution happens " +
-        "automatically. Do NOT substitute a different app than the user named.")
-    let app: String?
-
-    @Guide(description: "Text to type — only for type_into_element.")
-    let text: String?
-}
-
-// ShellAppleTool and AppleScriptAppleTool removed — Apple AI handled them poorly
-// (hallucinated paths, wrong directories). The cloud LLM handles shell/applescript now.
-
-// MARK: - Run Agent Tool for Apple AI
-
-@Generable
-struct RunAgentArgs: Sendable {
-    @Guide(description: "Name of the agent/script to run (e.g. 'ArchiveXcode', 'CreateDmg').")
-    let name: String
-
-    @Guide(description: "Optional arguments to pass to the agent. Empty string if none.")
-    let arguments: String?
-}
-
-struct RunAgentAppleTool: FoundationModels.Tool {
-    typealias Output = String
-    let name = "run_agent"
-    let description = "Run a user-defined agent script by name or number. ONLY invoke when the user's " +
-        "message contains the exact phrase 'run agent' followed by a name or number " +
-        "(e.g. 'run agent ArchiveXcode', 'run agent 3', 'run the agent CreateDmg'). " +
-        "If the user does NOT say 'run agent', do NOT use this tool. " +
-        "Tool names like diff_apply, edit_file, xcode, git, write_file are NOT agent scripts — " +
-        "reply 'action not performed' and the cloud LLM will handle them."
-
-    let dispatch: @Sendable (RunAgentArgs) async -> String
-
-    func call(arguments: RunAgentArgs) async throws -> String {
-        // Verify the script exists BEFORE dispatching. If Apple AI hallucinated
-        // a script name that doesn't exist, return a sentinel string that the
-        // mediator treats as "no tool call" so triage falls through to the
-        // cloud LLM instead of surfacing a misleading "agent not found" error
-        // as if Apple AI had successfully handled the task.
-        let requested = arguments.name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !requested.isEmpty else {
-            return "action not performed — empty agent name"
-        }
-
-        // Match by numeric index (1-based) OR by case-insensitive name (with/without .swift).
-        let available = ScriptService().listScripts()
-        let byIndex: Bool = {
-            if let idx = Int(requested), idx >= 1, idx <= available.count { return true }
-            return false
-        }()
-        let wantedBase = requested.hasSuffix(".swift")
-            ? String(requested.dropLast(6))
-            : requested
-        let existsByName = available.contains { info in
-            info.name.compare(wantedBase, options: .caseInsensitive) == .orderedSame
-        }
-
-        if !byIndex && !existsByName {
-            return "action not performed — no agent script named '\(requested)'"
-        }
-
-        return await dispatch(arguments)
-    }
-}
-
-@Generable
-struct SkipArgs: Sendable {
-    @Guide(description: "One short sentence explaining why this prompt isn't a UI automation or agent-script request.")
-    let reason: String
-}
-
-/// Gives Apple AI a discrete \"this isn't my job\" tool. Without it the model
-/// keeps reaching for `accessibility` even on vision prompts / code tasks,
-/// hallucinating click targets. When called, `runAccessibilityAgent` short-
-/// circuits to .passThrough so the cloud LLM takes over.
-struct SkipAppleTool: FoundationModels.Tool {
-    typealias Output = String
-
-    let name = "skip"
-    let description = "Call this when the user's request does NOT contain an explicit UI verb (click/open/type/launch) " +
-        "naming a specific Mac app or button, OR is a code/file/git/vision task. Always prefer skip over guessing."
-
-    let dispatch: @Sendable (SkipArgs) async -> String
-
-    func call(arguments: SkipArgs) async throws -> String {
-        return await dispatch(arguments)
-    }
-}
-
-struct AccessibilityAppleTool: FoundationModels.Tool {
-    typealias Output = String
-
-    let name = "accessibility"
-    let description = "Click, type, scroll, find, or open Mac UI elements via the macOS Accessibility API. " +
-        "Every action takes role+title+app (use the natural app name the user said, verbatim), never coordinates. " +
-        "DISCOVERY PATTERN: when clicking a button, first use find_element with a partial title guess to discover the " +
-        "real button label (returned as AXTitle/AXDescription), then click_element with the exact label. " +
-        "Button names often differ from user expectations (e.g. Photo Booth's photo button is 'take photo' not 'Take Picture')."
-
-    /// Closure that performs the accessibility action. Injected by the caller so the tool doesn't reference AgentViewModel.
-    let dispatch: @Sendable (AccessibilityArgs) async -> String
-
-    func call(arguments: AccessibilityArgs) async throws -> String {
-        return await dispatch(arguments)
-    }
 }
