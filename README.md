@@ -35,7 +35,7 @@ All of Agent!'s IP is original and open source. Every Swift package dependency a
 ## What's New 🚀
 
 - **🌐 OpenRouter provider:** Full integration with OpenRouter's model catalog — one API key, 200+ models. Smart catalog fetches available models, protocol toggle (OpenAI/Anthropic) routes Claude models through the Anthropic protocol and everything else through OpenAI, and ClaudeService auto-routes when OpenRouter is selected.
-- **Apple AI as a real tool-calling agent:** On-device Apple Intelligence (FoundationModels.Tool) handles UI automation requests like *"take a photo using Photo Booth"* locally — multi-step tool calls, zero cloud LLM tokens, falls through to the cloud LLM only on failure.
+- **LLM-driven UI automation:** UI automation requests like *"take a photo using Photo Booth"* are handled by the main LLM through the `accessibility` tool (AXorcist). On-device Apple Intelligence no longer intercepts these — the cloud model has the full context and toolset to drive any Mac app reliably.
 - **SDEF + runtime app discovery:** Bundle ID resolution is now zero-hardcoded. Apps in `Agent/SDEFs/` plus every `.app` in `/Applications`, `/System/Applications`, `~/Applications` are discovered at runtime — installing a new app extends what the agent can target with no code edit.
 - **Prompt caching for every OpenAI-format provider:** Z.ai, OpenAI, Grok, Mistral, DeepSeek, Qwen, Gemini, BigModel, Hugging Face — `cached_tokens` is parsed from the response and shown in the LLM Usage panel. JSON request bodies use `.sortedKeys` so byte-stable prefixes actually hit the provider's cache.
 - **On-device token compression:** Apple AI summarizes old conversation turns when context exceeds 30K tokens (Tier 1 of `tieredCompact`) — free, private, no API tokens consumed. Toggleable in the brain icon popover.
@@ -166,7 +166,7 @@ The provider picker (LLM Settings, toolbar button #7) shows 17 providers; Apple 
 | **Local Ollama** | Free + hardware | Self-hosted Ollama daemon — fully offline, no account |
 | **vLLM** | Free + hardware | Self-hosted vLLM server with prefix caching |
 | **LM Studio** | Free + hardware | Self-hosted, easiest GUI for local models |
-| **Apple Intelligence** | Free, on-device | Triage, summary, accessibility intent (via brain icon, not the provider picker) |
+| **Apple Intelligence** | Free, on-device | Triage, summary, token compression (via brain icon, not the provider picker) |
 
 > 💡 **Self-hosted "free" providers (Local Ollama, vLLM, LM Studio) are only free in the API-fee sense.** Running a 30B+ model with usable speed needs an M2/M3/M4 Ultra Mac Studio (64-128GB unified memory) or a Linux box with 24GB+ VRAM. If you don't already have that hardware, the cloud paths above (Ollama Cloud, Hugging Face, Z.ai, BigModel, DeepSeek) are dramatically cheaper than buying it.
 
@@ -349,7 +349,7 @@ These are the canonical tool names defined in `AgentTools.Name.*` and exposed to
 | **Read Cache Invalidation** | File read cache is invalidated on both successful edits AND failed edits, so the LLM always gets fresh content on the next read. |
 | **Basename Search** | When `read_file` or `edit_file` gets a wrong path, Agent! searches nearby directories for files with the same name and returns the correct paths inline — the LLM self-corrects in one turn. |
 | **Tool Execution Gating** | The LLM cannot fabricate tool results. All tool calls flow through the app's `dispatchTool()` → actual execution (XPC, shell, in-process) → real output returned as `tool_result`. The LLM only sees and summarizes outputs that actually happened. If a tool fails, the real error is returned — the LLM cannot claim success without a matching execution event. |
-| **action_not_performed** | Three-layer defense against false-action claims: **(1) Prompt** — system prompt instructs the LLM to say "action not performed" if no tool was called. **(2) App** — if the LLM returns text claiming "I searched/opened/clicked" but made zero tool calls that turn, a correction is injected forcing it to use the real tool. **(3) Apple AI** — Apple Intelligence tool outputs are verified for substantive results before claiming success; empty/failed outputs automatically forward to the cloud LLM. Every Apple AI tool call is logged to the activity view with 🍎 prefix. |
+| **action_not_performed** | Two-layer defense against false-action claims: **(1) Prompt** — system prompt instructs the LLM to say "action not performed" if no tool was called. **(2) App** — if the LLM returns text claiming "I searched/opened/clicked" but made zero tool calls that turn, a correction is injected forcing it to use the real tool. |
 
 ---
 
@@ -406,7 +406,7 @@ Type these in the input field and press Return — they execute locally without 
 
 **How much does it cost?** The Agent! app itself is free (MIT License). Cloud AI providers charge for API usage — the cheapest options for serious work are GLM-5/5.1 via Z.ai, BigModel, or Hugging Face (pennies per million tokens), or DeepSeek for budget coding. Self-hosted local models (Ollama, vLLM, LM Studio) have no API fees but only make sense if you already own the hardware to run them — see the hardware note below.
 
-**What Mac do I need?** macOS 26.4.1. Apple Silicon required. For cloud providers, any modern Mac works fine. For self-hosted local models (Ollama, vLLM, LM Studio): a 7B model fits in 16GB unified memory, a 13B model in 24GB, a 30B model needs 64GB+ (M2/M3/M4 Ultra Mac Studio territory). Apple Intelligence (the on-device mediator for triage / accessibility intent / token compression) needs an Apple Silicon Mac with Apple Intelligence enabled in System Settings.
+**What Mac do I need?** macOS 26.4.1. Apple Silicon required. For cloud providers, any modern Mac works fine. For self-hosted local models (Ollama, vLLM, LM Studio): a 7B model fits in 16GB unified memory, a 13B model in 24GB, a 30B model needs 64GB+ (M2/M3/M4 Ultra Mac Studio territory). Apple Intelligence (the on-device mediator for triage / token compression) needs an Apple Silicon Mac with Apple Intelligence enabled in System Settings.
 
 **How is this different from Siri?** Siri answers questions. Agent! *performs actions* -- controls apps, manages files, builds code, automates workflows.
 
@@ -549,7 +549,7 @@ Agent! is a 100% original pure Swift macOS application. It is not a port, fork, 
 | **Accessibility** | None (CLI) | Full macOS AX via AXorcist (25 top-level actions, 30+ AX subtypes via `perform_action`) |
 | **AppleScript** | None | Full NSAppleScript + JXA in-process with TCC |
 | **Xcode Integration** | Via Bash (`xcodebuild`) | Native (build/run/analyze/snippet/add_file/bump_version/code_review — 13 actions) |
-| **Apple Intelligence** | None | FoundationModels on-device — runs as a real `Tool`-calling agent for accessibility intent (e.g. *"take a photo using Photo Booth"* parsed and dispatched locally), task summaries, error explanations, and Tier 1 token compression. Falls through to the cloud LLM only on failure |
+| **Apple Intelligence** | None | FoundationModels on-device — handles greeting/small-talk triage, task summaries, error explanations, and Tier 1 token compression. UI automation is handled by the main LLM via the `accessibility` tool, not Apple AI |
 | **ScriptingBridge** | None | Full SDEF + 51 event bridges (Finder, Mail, Music, Safari, Calendar, etc.) |
 | **Vision** | Image input via API | Image input via API |
 | **Auto-screenshots** | None (no UI) | Opt-in auto-verification after UI actions (default OFF — see `visionAutoScreenshotEnabled`) |
