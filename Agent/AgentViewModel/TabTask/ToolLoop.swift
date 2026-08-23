@@ -24,7 +24,10 @@ extension AgentViewModel {
         commandsRun: inout [String],
         stuckFiles: inout [String: Int],
         filesEditedThisTask: inout Set<String>,
-        completionSummary: inout String
+        completionSummary: inout String,
+        consecutiveReadOnlyCount: inout Int,
+        unbuiltEditCount: inout Int,
+        consecutiveBuildFailures: inout Int
     ) async -> TabToolProcessingOutcome {
         var toolResults: [[String: Any]] = []
         var hasToolUse = false
@@ -96,6 +99,23 @@ extension AgentViewModel {
                         stuckFiles: &stuckFiles,
                         toolResults: &toolResults
                     )
+                    // Overnight coding guards — the same battery the main loop runs
+                    // (Guards.swift). Tab tasks previously had NO build enforcement,
+                    // no edit-cycle detection, and no failure budget.
+                    let guardShouldBreak = runOvernightCodingGuards(
+                        pendingTools: [(toolId: toolId, name: name, input: input)],
+                        toolResults: &toolResults,
+                        consecutiveReadOnlyCount: &consecutiveReadOnlyCount,
+                        unbuiltEditCount: &unbuiltEditCount,
+                        consecutiveBuildFailures: &consecutiveBuildFailures,
+                        stuckFiles: &stuckFiles,
+                        isXcode: FileManager.default.fileExists(atPath: tab.projectFolder + "/Agent.xcodeproj")
+                    )
+                    if guardShouldBreak {
+                        tab.appendLog("🛑 Guard: error budget exceeded — stopping tab task")
+                        tab.flush()
+                        return .complete(summary: "Stopped: error budget exceeded")
+                    }
                 }
             }
         }

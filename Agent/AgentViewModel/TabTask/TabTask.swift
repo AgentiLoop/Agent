@@ -117,6 +117,11 @@ extension AgentViewModel {
 
         var commandsRun: [String] = []
         var completionSummary = ""
+        // Guard counters — shared with the main loop's overnight-coding battery
+        // (Guards.swift) so tab tasks get the same nudges and failure budget.
+        var consecutiveReadOnlyCount = 0
+        var consecutiveBuildFailures = 0
+        var unbuiltEditCount = 0
 
         // Clear LLM Output for new task — show blinking cursor
         tab.dripTask?.cancel(); tab.dripTask = nil
@@ -314,7 +319,10 @@ extension AgentViewModel {
                     commandsRun: &commandsRun,
                     stuckFiles: &stuckFiles,
                     filesEditedThisTask: &filesEditedThisTask,
-                    completionSummary: &completionSummary
+                    completionSummary: &completionSummary,
+                    consecutiveReadOnlyCount: &consecutiveReadOnlyCount,
+                    unbuiltEditCount: &unbuiltEditCount,
+                    consecutiveBuildFailures: &consecutiveBuildFailures
                 )
 
                 switch outcome {
