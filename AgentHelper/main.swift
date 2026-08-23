@@ -25,7 +25,16 @@ final class HelperCommandHandler: NSObject, HelperToolProtocol, @unchecked Senda
 }
 
 final class HelperDelegate: NSObject, NSXPCListenerDelegate {
+    /// Only binaries signed by this Development Team may drive the daemon.
+    /// Without this requirement ANY local process could connect to the mach
+    /// service and execute arbitrary commands as root. (Ad-hoc builds never
+    /// register the daemon — SMAppService needs a valid team ID — so this
+    /// cannot lock out the no-account build path.)
+    static let clientRequirement =
+        "anchor apple generic and certificate leaf[subject.OU] = \"469UCUB275\""
+
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection connection: NSXPCConnection) -> Bool {
+        connection.setCodeSigningRequirement(Self.clientRequirement)
         let handler = HelperCommandHandler()
         handler.connection = connection
         connection.exportedInterface = NSXPCInterface(with: HelperToolProtocol.self)
