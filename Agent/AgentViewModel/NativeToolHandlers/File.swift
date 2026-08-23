@@ -173,7 +173,7 @@ extension AgentViewModel {
             let content = input["content"] as? String ?? ""
             guard !content.isEmpty else { return "Error: content is required for write_file (empty content would truncate the file). Recovery: pass content:\"...\"." }
             let tabID = selectedTabId ?? Self.mainTabID
-            FileBackupService.shared.backup(filePath: path, tabID: tabID)
+            FileBackupService.shared.snapshot(filePath: (path as NSString).expandingTildeInPath, tabID: tabID)
             Self.recordFileEdit(tabID: tabID, filePath: (path as NSString).expandingTildeInPath)
             let url = URL(fileURLWithPath: path)
             try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
