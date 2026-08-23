@@ -66,6 +66,10 @@ extension AgentViewModel {
                         if blocks[j]["type"] as? String == "tool_result",
                            let content = blocks[j]["content"] as? String, content.count > 200
                         {
+                            // Spill before truncating so the full text stays recoverable
+                            // via restore_tool_result instead of being lost for good.
+                            ToolResultCache.spill(
+                                toolUseID: blocks[j]["tool_use_id"] as? String, content: content)
                             let key = cacheKey(content)
                             if let cached = _summaryCache[key] {
                                 blocks[j]["content"] = cached
@@ -241,6 +245,11 @@ extension AgentViewModel {
         for k in 0..<clearCount {
             let (i, j) = toolResultIndices[k]
             if var blocks = messages[i]["content"] as? [[String: Any]] {
+                // Spill before clearing — otherwise this content is unrecoverable.
+                if let content = blocks[j]["content"] as? String {
+                    ToolResultCache.spill(
+                        toolUseID: blocks[j]["tool_use_id"] as? String, content: content)
+                }
                 blocks[j]["content"] = "[cleared]"
                 messages[i]["content"] = blocks
             }
