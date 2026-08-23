@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import FoundationModels
 
@@ -65,7 +66,7 @@ extension AgentViewModel {
                         if blocks[j]["type"] as? String == "tool_result",
                            let content = blocks[j]["content"] as? String, content.count > 200
                         {
-                            let key = content.hashValue
+                            let key = cacheKey(content)
                             if let cached = _summaryCache[key] {
                                 blocks[j]["content"] = cached
                             } else {
@@ -98,7 +99,7 @@ extension AgentViewModel {
 
     /// Use Apple AI to summarize long text, fall back to truncation if unavailable.
     private static func summarizeOrTruncate(_ text: String) -> String {
-        let key = text.hashValue
+        let key = cacheKey(text)
         if let cached = _summaryCache[key] { return cached }
 
         // Fallback: truncate (Apple AI summary happens async via compressMessagesAsync)
@@ -108,7 +109,14 @@ extension AgentViewModel {
     }
 
     /// Cache summaries so we don't re-summarize the same content.
-    nonisolated(unsafe) private static var _summaryCache: [Int: String] = [:]
+    /// Keyed by SHA-256 of the content — `hashValue` is per-process seeded and
+    /// collision-prone, and a collision would serve another tool result's summary.
+    nonisolated(unsafe) private static var _summaryCache: [String: String] = [:]
+
+    /// Stable content-addressed cache key.
+    private static func cacheKey(_ text: String) -> String {
+        SHA256.hash(data: Data(text.utf8)).map { String(format: "%02x", $0) }.joined()
+    }
 
     /// Async version: summarize old messages using Apple AI before sending.
     /// Call this before compressMessages for best results.
@@ -132,7 +140,7 @@ extension AgentViewModel {
                     var changed = false
                     for j in 0..<blocks.count {
                         if let content = blocks[j]["content"] as? String, content.count > 300 {
-                            let key = content.hashValue
+                            let key = cacheKey(content)
                             if _summaryCache[key] == nil {
                                 let input = LogLimits.trim(content, cap: LogLimits.summaryChars)
                                 if let resp = try? await session.respond(to: input) {
@@ -147,7 +155,7 @@ extension AgentViewModel {
                     }
                     if changed { messages[i]["content"] = blocks }
                 } else if let text = messages[i]["content"] as? String, text.count > 300 {
-                    let key = text.hashValue
+                    let key = cacheKey(text)
                     if _summaryCache[key] == nil {
                         let input = LogLimits.trim(text, cap: LogLimits.summaryChars)
                         if let resp = try? await session.respond(to: input) {
