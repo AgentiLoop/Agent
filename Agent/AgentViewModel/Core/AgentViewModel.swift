@@ -694,6 +694,10 @@ final class AgentViewModel {
     var logPersistTask: Task<Void, Never>?
     var streamLineCount = 0
     var streamTruncated = false
+    /// Output that executeViaUserAgent already streamed live into the log for the
+    /// tool currently being dispatched. Handlers that log their return value check
+    /// this so the same text isn't shown twice (streamed, then re-logged).
+    var lastStreamedOutput = ""
     var maxOutputLines: Int = UserDefaults.standard.object(forKey: "agentMaxOutputLines") as? Int ?? 1000 {
         didSet { UserDefaults.standard.set(maxOutputLines, forKey: "agentMaxOutputLines") }
     }
