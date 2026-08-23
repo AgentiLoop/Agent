@@ -85,6 +85,7 @@ final class ClaudeService {
             prompt += historyContext
         }
         prompt += MemoryStore.shared.contextBlock
+        prompt += GoalStateStore.shared.promptBlock
         return prompt
     }
 
@@ -123,6 +124,8 @@ final class ClaudeService {
                 "name": "web_search"
             ])
         }
+        // Persistent goal state + self-verification (app-local tool).
+        t.append(contentsOf: AgentTools.localToolSchemas())
         return t
     }
 

@@ -233,9 +233,30 @@ extension AgentViewModel {
             let message = input["message"] as? String ?? ""
             guard !to.isEmpty && !message.isEmpty else { return "Error: 'to' and 'message' are required." }
             return sendMessageToAgent(name: to, message: message)
+        // Persistent goal state — set/read/mark/clear verification criteria
+        case "goal_state":
+            return handleGoalState(input: input)
         // Task complete — signal via NativeToolContext so the task loop can detect it
         case "task_complete":
             let summary = input["summary"] as? String ?? "Done"
+
+            // Goal gate: every verification criterion must be marked done
+            if let goal = GoalStateStore.shared.current, !goal.allCriteriaDone {
+                let open = goal.openCriteria
+                    .enumerated()
+                    .map { "\($0.offset + 1). \($0.element.text)" }
+                    .joined(separator: "\n")
+                appendLog("🎯 Goal gate: \(goal.openCriteria.count) unverified criteria — blocking completion")
+                flushLog()
+                return """
+                    CANNOT COMPLETE — the active goal still has unverified criteria:
+
+                    \(open)
+
+                    Verify each with a tool call (build, grep, read, etc.), then mark it done \
+                    via goal_state(action: "mark") and call task_complete again.
+                    """
+            }
 
             // Verification gate: if Xcode project + auto-verify + edits were made,
             // build must pass before task_complete is allowed
@@ -269,6 +290,44 @@ extension AgentViewModel {
             return "Task complete: \(summary)"
         default:
             return nil
+        }
+    }
+
+    /// goal_state — read/update the persistent goal + verification criteria.
+    private func handleGoalState(input: [String: Any]) -> String {
+        let store = GoalStateStore.shared
+        let action = input["action"] as? String ?? "get"
+        switch action {
+        case "set":
+            let goal = input["goal"] as? String ?? ""
+            guard !goal.isEmpty else { return "Error: 'goal' is required for action=set." }
+            let criteria = input["criteria"] as? [String] ?? []
+            let state = store.set(goal: goal, criteria: criteria)
+            appendLog("🎯 Goal set: \(state.goal) (\(state.criteria.count) criteria)")
+            flushLog()
+            return "Goal recorded with \(state.criteria.count) criteria. Complete each one and mark it done before calling task_complete."
+        case "get":
+            guard store.current != nil else { return "No active goal." }
+            return store.promptBlock.trimmingCharacters(in: .whitespacesAndNewlines)
+        case "mark":
+            let text = input["criterion"] as? String ?? ""
+            guard !text.isEmpty else { return "Error: 'criterion' is required for action=mark." }
+            let done = input["done"] as? Bool ?? true
+            guard let state = store.setCriterion(text: text, done: done) else {
+                return "No criterion matching '\(text)'. Use goal_state(action: \"get\") to list them."
+            }
+            appendLog("🎯 Criterion '\(text.prefix(60))' marked \(done ? "done" : "open")")
+            flushLog()
+            return state.allCriteriaDone
+                ? "All criteria verified. You may call task_complete."
+                : "\(state.openCriteria.count) criteria still open."
+        case "clear":
+            store.clear()
+            appendLog("🎯 Goal cleared")
+            flushLog()
+            return "Goal cleared."
+        default:
+            return "Unknown action. Use: set, get, mark, clear."
         }
     }
 }
