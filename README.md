@@ -1,8 +1,11 @@
+# Tic Tac Toe
+<img width="1320" height="852" alt="image" src="https://github.com/user-attachments/assets/ad5b3ce3-6a62-4d49-8393-1339f55874b1" />
+
+# Chess
 <img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
 
 # 🦾 Agent! for macOS 26.4.1 or later
 
-<img width="1320" height="852" alt="image" src="https://github.com/user-attachments/assets/ad5b3ce3-6a62-4d49-8393-1339f55874b1" />
 
 ## **Agentic AI for your  Mac Desktop**
 ## Open Source alternative to Claude Code, Cursor and Open Claw
