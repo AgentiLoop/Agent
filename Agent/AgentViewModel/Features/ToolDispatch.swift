@@ -1,5 +1,6 @@
 import Foundation
 import AgentTools
+import AgentAudit
 
 /// Context passed to every tool handler during task execution.
 struct ToolContext {
@@ -146,6 +147,11 @@ extension AgentViewModel {
             ?? ""
         let detail = (rawDetail as NSString).lastPathComponent.isEmpty ? rawDetail : (rawDetail as NSString).lastPathComponent
         let stepId = recordToolStep(name: name, detail: detail)
+
+        // Every tool call — native, MCP, or consolidated — flows through here,
+        // so this single line gives Console.app a complete action trail
+        // (subsystem Agent.app.toddbruss.audit, category Tool).
+        AuditLog.log(.tool, Self.formatToolCallForLog(rawName: name, rawInput: input))
 
         /// Helper to complete step on every exit path.
         /// Also runs post-tool hooks against the result this tool just appended.

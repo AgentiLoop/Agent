@@ -1,5 +1,6 @@
 import Foundation
 import Security
+import AgentAudit
 
 /// Client authentication for the XPC listeners. SMAppService only gates who
 /// may INSTALL/register a helper — once the mach service is up, launchd lets
@@ -41,10 +42,11 @@ enum XPCClientTrust {
     /// launchd in that configuration) — a warning is logged instead.
     static func harden(_ connection: NSXPCConnection, label: String) -> Bool {
         guard let requirement = sameTeamRequirement() else {
-            NSLog("%@: no team identifier on own signature — accepting connection WITHOUT code-signing requirement (ad-hoc/dev build)", label)
+            AuditLog.denied(.permission, "\(label): no team identifier on own signature — accepting connection WITHOUT code-signing requirement (ad-hoc/dev build)")
             return true
         }
         connection.setCodeSigningRequirement(requirement)
+        AuditLog.log(.permission, "\(label): connection accepted with same-team code-signing requirement")
         return true
     }
 }
