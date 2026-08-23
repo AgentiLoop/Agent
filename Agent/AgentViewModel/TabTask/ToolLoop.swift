@@ -87,7 +87,15 @@ extension AgentViewModel {
                 if result.isComplete {
                     return .complete(summary: completionSummary)
                 }
-                if let toolResult = result.toolResult {
+                if var toolResult = result.toolResult {
+                    // Typed error annotation — same classifier the main loop's
+                    // recordToolOutcomes applies (ToolErrorClassifier): stable
+                    // [error_code: ...] + recovery hint on failing results.
+                    if let output = toolResult["content"] as? String,
+                       Self.isToolFailure(output: output),
+                       let note = ToolErrorClassifier.annotation(tool: name, output: output) {
+                        toolResult["content"] = output + note
+                    }
                     toolResults.append(toolResult)
                     // Stuck-file nudge: if this was an edit tool and the result looks like a failure, increment the
                     // per-file failure count. At 3 failures, append an actionable recovery nudge.
