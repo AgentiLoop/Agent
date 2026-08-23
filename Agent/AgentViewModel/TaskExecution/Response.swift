@@ -268,7 +268,8 @@ extension AgentViewModel {
         responseContent: [[String: Any]],
         hasToolUse: Bool,
         toolResults: [[String: Any]],
-        messages: inout [[String: Any]]
+        messages: inout [[String: Any]],
+        textOnlyNudges: inout Int
     ) -> Bool {
         // Add assistant response to conversation
         // Guard against empty content — Ollama rejects assistant messages with no content or tool_calls
@@ -304,6 +305,29 @@ extension AgentViewModel {
             flushLog()
             return true
         case .completeTextOnly(let summary):
+            // A tool-less turn with no completion signal is ambiguous: the model
+            // may be done, or it may have narrated its plan / dropped a malformed
+            // tool call / been truncated mid-stream. Ending the task here silently
+            // marks that as success. Nudge once and give it another turn; if the
+            // next turn is also tool-less, accept the completion.
+            if textOnlyNudges == 0 {
+                textOnlyNudges += 1
+                let nudge: [String: Any] = [
+                    "role": "user",
+                    "content": """
+                        You ended your turn without calling a tool.
+
+                        If the task is genuinely finished, call task_complete with a \
+                        summary. If work remains, continue with the next tool call — \
+                        do not narrate what you are about to do, just do it.
+                        """
+                ]
+                messages.append(nudge)
+                SessionStore.shared.appendMessage(nudge)
+                appendLog("↩️ No tool call — asking the model to confirm or continue")
+                flushLog()
+                return false
+            }
             if rawLLMOutput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 rawLLMOutput = responseText
             }
