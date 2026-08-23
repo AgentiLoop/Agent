@@ -252,6 +252,27 @@ final class FileBackupService {
         }.sorted().joined(separator: "\n")
     }
 
+    /// Every file path snapshotted during the current task.
+    func snapshottedFiles() -> [String] {
+        taskSnapshots.keys.sorted()
+    }
+
+    /// Roll every file touched this task back to its earliest snapshot —
+    /// undoing a failed multi-file attempt as a unit.
+    /// Returns (restored paths, failed paths).
+    func rewindTask() -> (restored: [String], failed: [String]) {
+        var restored: [String] = []
+        var failed: [String] = []
+        for path in snapshottedFiles() {
+            if rollback(filePath: path, toVersion: 1) {
+                restored.append(path)
+            } else {
+                failed.append(path)
+            }
+        }
+        return (restored, failed)
+    }
+
     /// Clear task snapshots (call at task start).
     func clearTaskSnapshots() {
         taskSnapshots.removeAll()

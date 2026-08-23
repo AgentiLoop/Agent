@@ -433,6 +433,23 @@ extension AgentViewModel {
                     : "No backups found for \(fileName)."
             }
             return backups.map { "\(($0.backup as NSString).lastPathComponent)  (\($0.date))" }.joined(separator: "\n")
+        // rewind_task — undo EVERY file this task touched, as a unit
+        case "rewind_task":
+            let (restored, failed) = FileBackupService.shared.rewindTask()
+            if restored.isEmpty && failed.isEmpty {
+                return "No files were edited in this task — nothing to rewind."
+            }
+            var out = "Rewound \(restored.count) file(s) to their pre-task state:\n"
+            out += restored.map { "  ✓ \($0)" }.joined(separator: "\n")
+            if !failed.isEmpty {
+                out += "\n\nFailed to rewind \(failed.count):\n"
+                out += failed.map { "  ✗ \($0)" }.joined(separator: "\n")
+                out += "\nRecovery: call file(action:\"list_file_backups\") and restore individually."
+            }
+            return out
+        // task_edits — which files this task has mutated, with version counts
+        case "task_edits":
+            return FileBackupService.shared.taskEditSummary()
         // diff_and_apply
         case "diff_and_apply":
             let fp = input["file_path"] as? String ?? ""
