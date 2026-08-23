@@ -77,6 +77,7 @@ final class OllamaService {
         }
         prompt += MemoryStore.shared.contextBlock
         prompt += GoalStateStore.shared.promptBlock
+        prompt += ToolOutcomeStore.shared.promptBlock
         return prompt
     }
 

@@ -482,6 +482,7 @@ final class CodexService {
         if !historyContext.isEmpty { s += historyContext }
         s += MemoryStore.shared.contextBlock
         s += GoalStateStore.shared.promptBlock
+        s += ToolOutcomeStore.shared.promptBlock
         return s
     }
 
