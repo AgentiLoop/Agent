@@ -114,7 +114,6 @@ struct ThinkingIndicatorView: View {
         return max(real, streamEstimate)
     }
     private var toolSteps: [AgentViewModel.ToolStep] { tab?.toolSteps ?? viewModel.toolSteps }
-
     /// Approximate context window for the current provider/model
     private var contextWindow: Int {
         let provider: APIProvider
@@ -123,35 +122,11 @@ struct ThinkingIndicatorView: View {
         } else {
             provider = viewModel.selectedProvider
         }
-        switch provider {
-        case .claude: return 1_000_000
-        case .codex:
-            // Real context window from the live /models response; fall back
-            // to gpt-5.2's published 272K if we haven't fetched yet.
-            if let ctx = viewModel.codexContextWindows[viewModel.codexModel], ctx > 0 {
-                return ctx
-            }
-            return 272_000
-        case .openAI: return 272_000
-        case .deepSeek: return 128_000
-        case .gemini: return 2_000_000
-        case .grok: return 2_000_000
-        case .zAI: return 128_000
-        case .bigModel: return 128_000
-        case .miniMax: return 1_000_000
-        case .openRouter: return 200_000
-        case .qwen: return 131_072
-        case .mistral: return 256_000
-        case .codestral: return 256_000
-        case .vibe: return 128_000
-        case .huggingFace: return 32_000
-        case .ollama, .localOllama: return viewModel.localOllamaContextSize > 0 ? viewModel.localOllamaContextSize : 32_000
-        case .vLLM, .lmStudio: return 32_000
-        case .foundationModel: return 4_096
-        }
+        return viewModel.contextWindow(for: provider)
     }
 
     var body: some View {
+
         VStack(alignment: .leading, spacing: 0) {
             Button {
                 withAnimation(.easeInOut(duration: 0.2)) {

@@ -187,7 +187,7 @@ extension AgentViewModel {
         var textOnlyCount = 0
         var timeoutRetryCount = 0
         var stopRouteRetries = 0
-        var compactionState = CompactionState()
+        var compactionState = CompactionState(contextWindow: contextWindow(for: provider))
         var stuckFiles: [String: Int] = [:] // Edit failure count per file (for nudge)
         var repeatedCalls: [String: Int] = [:] // Identical tool-call fingerprint counts (broken-record guard)
         // Plan-mode enforcement state

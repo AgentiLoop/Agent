@@ -1,3 +1,4 @@
+import AgentTools
 import CryptoKit
 import Foundation
 import FoundationModels
@@ -15,12 +16,14 @@ struct CompactionState {
 
     /// Max consecutive failures before circuit breaker trips.
     static let maxFailures = 3
-    /// Compact when accumulated messages exceed this token estimate.
-    /// Lower = more aggressive compaction = fewer input tokens wasted.
-    static let defaultThreshold = 30_000
 
     init(contextWindow: Int = 200_000) {
-        self.compactThreshold = Self.defaultThreshold
+        // Compact once the transcript passes ~55% of the model's real context
+        // window, leaving headroom for the system prompt, tool schemas and the
+        // response. Previously this argument was ignored and every model — 4K
+        // Foundation Models or 1M Claude — compacted at a hardcoded 30K.
+        let target = Int(Double(contextWindow) * 0.55)
+        self.compactThreshold = max(2_000, min(target, 400_000))
     }
 
     /// True if we should attempt compaction for the given estimated token count.
@@ -45,6 +48,38 @@ struct CompactionState {
 }
 
 extension AgentViewModel {
+    // MARK: - Context Window
+
+    /// Approximate context window for a provider/model. Single source of truth for
+    /// both the token meter in ThinkingIndicatorView and the compaction threshold
+    /// in CompactionState.
+    func contextWindow(for provider: APIProvider) -> Int {
+        switch provider {
+        case .claude: return 1_000_000
+        case .codex:
+            // Real context window from the live /models response; fall back
+            // to gpt-5.2's published 272K if we haven't fetched yet.
+            if let ctx = codexContextWindows[codexModel], ctx > 0 { return ctx }
+            return 272_000
+        case .openAI: return 272_000
+        case .deepSeek: return 128_000
+        case .gemini: return 2_000_000
+        case .grok: return 2_000_000
+        case .zAI: return 128_000
+        case .bigModel: return 128_000
+        case .miniMax: return 1_000_000
+        case .openRouter: return 200_000
+        case .qwen: return 131_072
+        case .mistral: return 256_000
+        case .codestral: return 256_000
+        case .vibe: return 128_000
+        case .huggingFace: return 32_000
+        case .ollama, .localOllama: return localOllamaContextSize > 0 ? localOllamaContextSize : 32_000
+        case .vLLM, .lmStudio: return 32_000
+        case .foundationModel: return 4_096
+        }
+    }
+
     // MARK: - Message History Compression
 
     // NOTE: the old per-turn compressMessages sliding window is gone on purpose.
