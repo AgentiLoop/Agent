@@ -4,7 +4,7 @@
 
 # 🦾 Agent! for macOS 26.4.1 or later
 
-<img width="1326" height="1428" alt="image" src="https://github.com/user-attachments/assets/9616193e-ab81-456b-ae8f-6fc182d0d6b0" />
+<img width="1320" height="852" alt="image" src="https://github.com/user-attachments/assets/ad5b3ce3-6a62-4d49-8393-1339f55874b1" />
 
 ## **Agentic AI for your  Mac Desktop**
 ## Open Source alternative to Claude Code, Cursor and Open Claw
