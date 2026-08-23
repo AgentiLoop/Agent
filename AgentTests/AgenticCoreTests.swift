@@ -115,6 +115,7 @@ struct GoalStateStoreTests {
 
 // MARK: - StuckGuard fingerprinting
 
+@MainActor
 struct StuckGuardFingerprintTests {
     @Test("identical calls produce an identical fingerprint")
     func identicalCallsMatch() {

@@ -31,17 +31,17 @@ import AgentD1F
 
     @Test("Scenario 1: create_diff + apply_diff with line range and UUID")
     func createThenApplyWithUUID() throws {
-        let dir = makeTempDir()
+        let dir = try makeTempDir()
         defer { cleanup(dir) }
         let file = "\(dir)/scenario1.swift"
-        writeFile(file, "import Foundation\n\nfunc hello() {\n    print(\"Hello\")\n}\n\nfunc goodbye() {\n    print(\"Bye\")\n}\n")
+        try writeFile(file, "import Foundation\n\nfunc hello() {\n    print(\"Hello\")\n}\n\nfunc goodbye() {\n    print(\"Bye\")\n}\n")
 
         // === AI calls create_diff ===
         // AI sees lines 3-5 are the hello function, wants to change the print
         let destination = "func hello() {\n    print(\"Hello, World!\")\n}"
 
         // Simulate handler: read file, extract lines 3-5, create diff, store UUID
-        let fullText = readFile(file)
+        let fullText = try readFile(file)
         let lines = fullText.components(separatedBy: "\n")
         let s = 2 // line 3, 0-indexed
         let e = 5 // line 5, exclusive
@@ -63,7 +63,7 @@ import AgentD1F
         #expect(DiffStore.shared.retrieve(diffId) != nil, "Diff should be stored by UUID")
 
         // === AI calls apply_diff with the diff_id ===
-        let currentSource = readFile(file)
+        let currentSource = try readFile(file)
         let stored = DiffStore.shared.retrieve(diffId)!
         let patched = try MultiLineDiff.applyDiff(to: currentSource, diff: stored.diff)
 
@@ -82,7 +82,7 @@ import AgentD1F
         #expect(!display.isEmpty, "Verification preview should not be empty")
 
         // Check file on disk
-        let final = readFile(file)
+        let final = try readFile(file)
         #expect(final.contains("Hello, World!"), "File should have the new print")
         #expect(final.contains("func goodbye()"), "Untouched code should remain")
         #expect(final.contains("import Foundation"), "Header should remain")
@@ -92,11 +92,11 @@ import AgentD1F
 
     @Test("Scenario 2: diff_and_apply with line range — same steps as create+apply")
     func diffAndApplyLineRange() throws {
-        let dir = makeTempDir()
+        let dir = try makeTempDir()
         defer { cleanup(dir) }
         let file = "\(dir)/scenario2.html"
         let original = "<html>\n<head>\n<title>Old Title</title>\n</head>\n<body>\n<h1>Hello</h1>\n<p>Content here</p>\n</body>\n</html>\n"
-        writeFile(file, original)
+        try writeFile(file, original)
 
         // AI wants to change lines 3 (title) — sends only the replacement
         let destination = "<title>New Title</title>"
@@ -104,7 +104,7 @@ import AgentD1F
         let endLine = 3
 
         // Simulate handler: read file, extract section, create diff, apply, splice, write
-        let fullText = readFile(file)
+        let fullText = try readFile(file)
         let allLines = fullText.components(separatedBy: "\n")
         let s2 = max(startLine - 1, 0)
         let e2 = min(endLine, allLines.count)
@@ -139,7 +139,7 @@ import AgentD1F
         #expect(verified, "Verification should pass")
         #expect(!display.isEmpty, "D1F preview should be shown")
 
-        let final = readFile(file)
+        let final = try readFile(file)
         #expect(final.contains("New Title"), "Title should be changed")
         #expect(final.contains("<h1>Hello</h1>"), "Body should be untouched")
         #expect(final.contains("</html>"), "Footer should remain")
@@ -149,15 +149,15 @@ import AgentD1F
 
     @Test("Scenario 3: undo_edit by diff_id using D1F createUndoDiff")
     func undoByDiffId() throws {
-        let dir = makeTempDir()
+        let dir = try makeTempDir()
         defer { cleanup(dir) }
         let file = "\(dir)/scenario3.txt"
         let original = "line1\nline2\nline3\nline4\nline5\n"
-        writeFile(file, original)
+        try writeFile(file, original)
 
         // AI does diff_and_apply on lines 2-3
         let destination = "LINE2_CHANGED\nLINE3_CHANGED"
-        let fullText = readFile(file)
+        let fullText = try readFile(file)
         let allLines = fullText.components(separatedBy: "\n")
         let source = allLines[1..<3].joined(separator: "\n")
 
@@ -171,35 +171,35 @@ import AgentD1F
         try edited.write(toFile: file, atomically: true, encoding: .utf8)
         DiffStore.shared.recordApply(diffId: diffId, filePath: file, originalContent: fullText)
 
-        #expect(readFile(file).contains("LINE2_CHANGED"), "Edit should be applied")
+        #expect(try readFile(file).contains("LINE2_CHANGED"), "Edit should be applied")
 
         // === AI calls undo_edit with diff_id ===
         let stored = DiffStore.shared.retrieve(diffId)!
         let undoDiff = MultiLineDiff.createUndoDiff(from: stored.diff)
         #expect(undoDiff != nil, "D1F should create undo diff from metadata")
 
-        let current = readFile(file)
+        let current = try readFile(file)
         let restored = try MultiLineDiff.applyDiff(to: current, diff: undoDiff!)
         try restored.write(toFile: file, atomically: true, encoding: .utf8)
         DiffStore.shared.popLastApplied(for: file)
 
         let display = MultiLineDiff.displayDiff(diff: undoDiff!, source: current, format: .ai)
         #expect(!display.isEmpty, "Undo should show D1F preview")
-        #expect(readFile(file) == original, "File should be restored to original")
+        #expect(try readFile(file) == original, "File should be restored to original")
     }
 
     // MARK: - Scenario 4: AI makes multiple edits, undoes the last one
 
     @Test("Scenario 4: two diff_and_apply edits, undo last one")
     func multipleEditsUndoLast() throws {
-        let dir = makeTempDir()
+        let dir = try makeTempDir()
         defer { cleanup(dir) }
         let file = "\(dir)/scenario4.css"
         let original = "body {\n  color: black;\n  margin: 0;\n  padding: 0;\n}\n"
-        writeFile(file, original)
+        try writeFile(file, original)
 
         // Edit 1: change color on line 2
-        let full1 = readFile(file)
+        let full1 = try readFile(file)
         let lines1 = full1.components(separatedBy: "\n")
         let src1 = lines1[1]
         let dst1 = "  color: red;"
@@ -212,10 +212,10 @@ import AgentD1F
         try content1.write(toFile: file, atomically: true, encoding: .utf8)
         DiffStore.shared.recordApply(diffId: id1, filePath: file, originalContent: full1)
 
-        #expect(readFile(file).contains("color: red"), "First edit applied")
+        #expect(try readFile(file).contains("color: red"), "First edit applied")
 
         // Edit 2: change padding on line 4
-        let full2 = readFile(file)
+        let full2 = try readFile(file)
         let lines2 = full2.components(separatedBy: "\n")
         let src2 = lines2[3]
         let dst2 = "  padding: 10px;"
@@ -228,17 +228,17 @@ import AgentD1F
         try content2.write(toFile: file, atomically: true, encoding: .utf8)
         DiffStore.shared.recordApply(diffId: id2, filePath: file, originalContent: full2)
 
-        #expect(readFile(file).contains("padding: 10px"), "Second edit applied")
+        #expect(try readFile(file).contains("padding: 10px"), "Second edit applied")
 
         // Undo edit 2 by UUID
         let stored2 = DiffStore.shared.retrieve(id2)!
         let undo2 = MultiLineDiff.createUndoDiff(from: stored2.diff)!
-        let current = readFile(file)
+        let current = try readFile(file)
         let afterUndo = try MultiLineDiff.applyDiff(to: current, diff: undo2)
         try afterUndo.write(toFile: file, atomically: true, encoding: .utf8)
         DiffStore.shared.popLastApplied(for: file)
 
-        let final = readFile(file)
+        let final = try readFile(file)
         #expect(final.contains("color: red"), "First edit should still be there")
         #expect(final.contains("padding: 0"), "Second edit should be undone")
     }
@@ -247,17 +247,17 @@ import AgentD1F
 
     @Test("Scenario 5: apply_diff rejects diff that would truncate file")
     func truncationSafetyCheck() throws {
-        let dir = makeTempDir()
+        let dir = try makeTempDir()
         defer { cleanup(dir) }
         let file = "\(dir)/scenario5.txt"
         // Create a file > 200 chars
         let original = (1...50).map { "line number \($0) with some content" }.joined(separator: "\n") + "\n"
-        writeFile(file, original)
+        try writeFile(file, original)
         #expect(original.count > 200)
 
         // Create a bad diff that would replace the whole file with 1 line
         let badDest = "just one line"
-        let source = readFile(file)
+        let source = try readFile(file)
         let diff = MultiLineDiff.createDiff(source: source, destination: badDest, includeMetadata: true)
         let diffId = DiffStore.shared.store(diff: diff, source: source)
 
@@ -268,21 +268,21 @@ import AgentD1F
 
         #expect(rejected, "Should reject diff that shrinks file by >50%")
         // File should NOT have been modified (handler would return before writing)
-        #expect(readFile(file) == original, "File should remain unchanged")
+        #expect(try readFile(file) == original, "File should remain unchanged")
     }
 
     // MARK: - Scenario 6: diff_and_apply inserting more lines than replaced
 
     @Test("Scenario 6: diff_and_apply replaces 1 line with 3 lines")
     func diffAndApplyInsertLines() throws {
-        let dir = makeTempDir()
+        let dir = try makeTempDir()
         defer { cleanup(dir) }
         let file = "\(dir)/scenario6.swift"
-        writeFile(file, "import Foundation\n\nclass Foo {\n}\n")
+        try writeFile(file, "import Foundation\n\nclass Foo {\n}\n")
 
         // Replace line 3 ("class Foo {") with 3 lines
         let destination = "class Foo {\n    var name: String = \"\"\n    var age: Int = 0"
-        let fullText = readFile(file)
+        let fullText = try readFile(file)
         let allLines = fullText.components(separatedBy: "\n")
         let source = allLines[2] // line 3
 
@@ -296,7 +296,7 @@ import AgentD1F
         try finalContent.write(toFile: file, atomically: true, encoding: .utf8)
         DiffStore.shared.recordApply(diffId: diffId, filePath: file, originalContent: fullText)
 
-        let final = readFile(file)
+        let final = try readFile(file)
         #expect(final.contains("var name: String"), "New property should be inserted")
         #expect(final.contains("var age: Int"), "Second new property should be inserted")
         #expect(final.contains("import Foundation"), "Header intact")
@@ -307,10 +307,10 @@ import AgentD1F
 
     @Test("Scenario 7: all tools produce D1F ASCII preview")
     func allToolsShowPreview() throws {
-        let dir = makeTempDir()
+        let dir = try makeTempDir()
         defer { cleanup(dir) }
         let file = "\(dir)/scenario7.txt"
-        writeFile(file, "aaa\nbbb\nccc\n")
+        try writeFile(file, "aaa\nbbb\nccc\n")
 
         // create_diff preview
         let source1 = "bbb"
@@ -322,9 +322,9 @@ import AgentD1F
         // apply_diff verification preview
         let diffId = DiffStore.shared.store(diff: diff1, source: source1)
         let stored = DiffStore.shared.retrieve(diffId)!
-        let patched = try MultiLineDiff.applyDiff(to: readFile(file), diff: stored.diff)
-        let verifyDiff = MultiLineDiff.createDiff(source: readFile(file), destination: patched, includeMetadata: true)
-        let preview2 = MultiLineDiff.displayDiff(diff: verifyDiff, source: readFile(file), format: .ai)
+        let patched = try MultiLineDiff.applyDiff(to: try readFile(file), diff: stored.diff)
+        let verifyDiff = MultiLineDiff.createDiff(source: try readFile(file), destination: patched, includeMetadata: true)
+        let preview2 = MultiLineDiff.displayDiff(diff: verifyDiff, source: try readFile(file), format: .ai)
         #expect(!preview2.isEmpty, "apply_diff should produce verification preview")
 
         // undo preview
@@ -337,11 +337,11 @@ import AgentD1F
     // MARK: - Scenario 8: DiffStore UUID lifecycle
 
     @Test("Scenario 8: DiffStore stores, retrieves, tracks applies, and clears")
-    func diffStoreLifecycle() {
-        let dir = makeTempDir()
+    func diffStoreLifecycle() throws {
+        let dir = try makeTempDir()
         defer { cleanup(dir) }
         let file = "\(dir)/scenario8.txt"
-        writeFile(file, "original\n")
+        try writeFile(file, "original\n")
 
         let diff = MultiLineDiff.createDiff(source: "original", destination: "changed", includeMetadata: true)
 
@@ -368,13 +368,13 @@ import AgentD1F
 
     @Test("Scenario 9: diff_and_apply without line range replaces entire file")
     func diffAndApplyFullFile() throws {
-        let dir = makeTempDir()
+        let dir = try makeTempDir()
         defer { cleanup(dir) }
         let file = "\(dir)/scenario9.txt"
-        writeFile(file, "old content\nmore old\n")
+        try writeFile(file, "old content\nmore old\n")
 
         let destination = "new content\nmore new\nextra line\n"
-        let fullText = readFile(file)
+        let fullText = try readFile(file)
         let source = fullText
 
         let diff = MultiLineDiff.createDiff(source: source, destination: destination, includeMetadata: true)
@@ -384,7 +384,7 @@ import AgentD1F
         try patched.write(toFile: file, atomically: true, encoding: .utf8)
         DiffStore.shared.recordApply(diffId: diffId, filePath: file, originalContent: fullText)
 
-        #expect(readFile(file) == destination)
+        #expect(try readFile(file) == destination)
 
         // Verify
         let verified = MultiLineDiff.verifyDiff(MultiLineDiff.createDiff(source: source, destination: patched, includeMetadata: true))
