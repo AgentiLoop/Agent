@@ -32,29 +32,20 @@ All of Agent!'s IP is original and open source. Every Swift package dependency a
 
 ## What's New 🚀
 
-### v1.0.92 (186) — The Self-Verifying Autonomy Release
-[Full release notes →](https://github.com/macOS26/Agent/releases/tag/v1.0.92.186)
+**v1.0.92 (186) — The Self-Verifying Autonomy Release** · [Full release notes →](https://github.com/macOS26/Agent/releases/tag/v1.0.92.186)
 
-- **🎯 Persistent goal state + self-verifying autonomy loop:** New `goal_state` tool (set/get/mark/clear) backed by a file-based `GoalStateStore` that survives restarts. `task_complete` bounces back while success criteria remain unverified — and marking a criterion done now **requires evidence** (the tool result that proves it). Injected into every provider's system prompt: Claude, OpenAI-compatible, Ollama, and Codex.
-- **🧠 Extended thinking for Claude + reasoning effort:** New Reasoning setting (off/low/medium/high) maps to an extended-thinking budget (2K/8K/16K) with interleaved thinking across tool turns. OpenAI-compatible providers get `reasoning_effort` pass-through.
-- **⚡️ Prompt-cache-stable context:** Messages are append-only between compaction events — the per-turn sliding window that defeated prompt caching is gone. Turn-over-turn cache hits on every provider, locked in by byte-identical-prefix tests. Loop control now routes on the API-reported `stop_reason`: malformed tool calls re-issue, truncation continues instead of falsely completing.
-- **📏 Context-aware compaction:** The compaction threshold now scales to the model's real context window (~55%, clamped 2K–400K) instead of a hardcoded 30K — right-sized for everything from 4K Foundation Models sessions to 1M-token Claude. Structural compaction always runs; the toggle gates only on-device AI summarization.
-- **💾 Recoverable compaction + `restore_tool_result`:** Full tool results spill to disk (`.agent/toolcache/`) before truncation. The model can restore any truncated result by `tool_use_id` instead of re-reading files.
-- **🔬 Critic review gate (opt-in):** A one-shot LLM reviewer inspects `git diff HEAD` before `task_complete` and blocks completion once with found issues. Toggle in Coding Preferences.
-- **🩺 Typed tool errors + outcome learning:** Failing tool results carry stable `[error_code: ...]` annotations with recovery hints (old_string_not_found, build_failed, timeout, …). Per-project tool outcome tracking injects in-task advisories after repeated failures and flags chronically failing tools in the system prompt.
-- **🤖 Sub-agent upgrades:** Per-agent model override (run cheap/fast models for search agents), file-based results that survive truncation (`.agent/subagents/`), and tiered concurrency — 3 write-capable agents, up to 6 read-only research agents.
-- **⏪ Task-scoped rewind + hooks:** Every file touched in a task can be rolled back as a unit (`rewind_task`), auto-offered after 3 consecutive build failures. Event hooks (`taskStart`, `taskComplete`, `buildFailure`, post-tool) are now fully wired — react to tool results and broken builds without spending model tokens.
-- **✅ Hardened guards + test suite:** Fixed false-positive stuck nudges on successful edits, id-matched guard attribution on batched turns, a generic broken-record guard for repeated tool calls, Xcode build status verification (no more phantom "Build succeeded"), and 57 passing tests across 6 suites — including a 32-test eval suite for the harness guards.
+- 🎯 **Goal state:** new `goal_state` tool — task can't complete until success criteria are verified with evidence
+- 🧠 **Extended thinking** for Claude (off/low/medium/high) + `reasoning_effort` for OpenAI-compatible providers
+- ⚡️ **Prompt-cache-stable context** — append-only messages between compactions, `stop_reason`-driven loop control
+- 📏 **Compaction scales to the model's context window** (~55%) instead of a hardcoded 30K
+- 💾 **Recoverable compaction** — full tool results spill to disk; `restore_tool_result` brings them back
+- 🔬 **Critic review gate** (opt-in) — one-shot LLM diff review before task completion
+- 🩺 **Typed tool errors** with recovery hints + per-project tool-outcome learning
+- 🤖 **Sub-agent upgrades:** per-agent model override, file-based results, up to 6 read-only research agents
+- ⏪ **Task-scoped rewind** (`rewind_task`) + fully wired event hooks (taskStart/taskComplete/buildFailure/post-tool)
+- ✅ **Hardened guards** + 57 passing tests across 6 suites
 
-### Previously shipped
-
-- **🌐 OpenRouter provider:** Full integration with OpenRouter's model catalog — one API key, 200+ models. Smart catalog fetches available models, protocol toggle (OpenAI/Anthropic) routes Claude models through the Anthropic protocol and everything else through OpenAI, and ClaudeService auto-routes when OpenRouter is selected.
-- **LLM-driven UI automation:** UI automation requests like *"take a photo using Photo Booth"* are handled by the main LLM through the `accessibility` tool (AXorcist). On-device Apple Intelligence no longer intercepts these — the cloud model has the full context and toolset to drive any Mac app reliably.
-- **SDEF + runtime app discovery:** Bundle ID resolution is now zero-hardcoded. Apps in `Agent/SDEFs/` plus every `.app` in `/Applications`, `/System/Applications`, `~/Applications` are discovered at runtime — installing a new app extends what the agent can target with no code edit.
-- **Prompt caching for every OpenAI-format provider:** Z.ai, OpenAI, Grok, Mistral, DeepSeek, Qwen, Gemini, BigModel, Hugging Face — `cached_tokens` is parsed from the response and shown in the LLM Usage panel. JSON request bodies use `.sortedKeys` so byte-stable prefixes actually hit the provider's cache.
-- **On-device token compression:** Apple AI summarizes old conversation turns when context exceeds the threshold (Tier 1 of `tieredCompact`) — free, private, no API tokens consumed. Toggleable in the brain icon popover.
-- **Anti-hallucination prompt rule:** Every system prompt now includes explicit guidance against fabricating findings from incomplete tool reads. The 10-consecutive-reads guard pushes the model toward "narrow or call done()" instead of "guess".
-- **Autonomous task loop, Xcode integration, AXorcist desktop automation, privileged daemon, multi-tab LLM config, Ollama pre-warming via `LLMRegistry`** — all the previously-shipped fundamentals are still there.
+Previously shipped: OpenRouter provider (200+ models, one key), LLM-driven UI automation via `accessibility`, zero-hardcoded SDEF + runtime app discovery, prompt caching for every OpenAI-format provider, on-device token compression, anti-hallucination prompt rules.
 
 **One app. Any AI. Total command over your Mac.**
 
@@ -121,7 +112,7 @@ Just type what you want. Agent! figures out how and makes it happen.
 ## Key Features
 
 ### 🧠 Agentic AI Framework
-Built-in autonomous task loop that reasons, executes, and self-corrects. Agent! doesn't just run code; it observes the results, debugs errors, and iterates until the task is complete.
+Built-in autonomous task loop that reasons, executes, and self-corrects. Agent! doesn't just run code; it observes the results, debugs errors, and iterates until the task is complete. Goal state with evidence-verified success criteria means a task can't declare itself done until it proves it.
 
 ### 🛠 Agentic Coding
 Full coding environment built in. Reads codebases, edits files with precision, runs shell commands, builds Xcode projects, manages git, and auto-enables coding mode to focus the AI on development tools. Replaces Claude Code, Cursor, and Cline -- no terminal, no IDE plugins, no monthly fee. Features **Time Machine-style backups** for every file change, letting you revert any edit instantly.
@@ -292,6 +283,8 @@ These are the canonical tool names defined in `AgentTools.Name.*` and exposed to
 | **chat** | `write` / `transform` / `fix` / `about` | Write prose, transform/fix text, describe Agent capabilities |
 | **memory** | `read` / `write` / `append` / `clear` | Persistent user preferences. "remember X" → `append` |
 | **plan** | `create` / `update` / `read` / `list` / `delete` | Multi-plan CRUD with per-step status tracking |
+| **goal_state** | `set` / `get` / `mark` / `clear` | Persistent goal + success criteria; marking done requires evidence |
+| **restore_tool_result** | `tool_use_id` | Recover the full text of a tool result truncated by compaction |
 | **directory** | `get` / `set` / `home` / `documents` / `library` / `none` / `cd` | Project folder for the current tab |
 | **fetch** | `url` | Fetch URL, strip HTML, cap 8K chars |
 | **skill** | `list` / `invoke` / `save` / `delete` | Reusable prompt templates |
@@ -304,7 +297,7 @@ These are the canonical tool names defined in `AgentTools.Name.*` and exposed to
 | **file** | `read` / `write` / `edit` / `create` / `apply` / `undo` / `diff_apply` / `list` / `search` / `read_dir` / `mkdir` / `cd` / `if_to_switch` / `extract_function` | All file operations. `edit` = single-string replace. `diff_apply` = preferred for multi-line code edits |
 | **git** | `status` / `diff` / `log` / `commit` / `diff_patch` / `branch` / `worktree` | Git operations — use this instead of shell git |
 | **xcode** | `build` / `run` / `list_projects` / `select_project` / `add_file` / `remove_file` / `grant_permission` / `analyze` / `snippet` / `code_review` / `get_version` / `bump_version` / `bump_build` | Native Xcode integration. Errors in the activity log are clickable |
-| **agent_script** | `list` / `read` / `create` / `update` / `run` / `delete` / `combine` | Swift dylib scripts in `~/Documents/AgentScript/agents/` with full TCC |
+| **agent_script** | `list` / `read` / `create` / `update` / `edit` / `run` / `delete` / `combine` / `restore` / `pull` / `list_backups` | Swift dylib scripts in `~/Documents/AgentScript/agents/` with full TCC |
 
 #### Shell / privilege tiers
 
@@ -336,7 +329,7 @@ These are the canonical tool names defined in `AgentTools.Name.*` and exposed to
 
 | Tool | Args | What it does |
 |---|---|---|
-| **spawn_agent** | `name`, `prompt`, `tools`, `max_iterations` | Spawn isolated sub-agent. Max 3 concurrent. Independent message history + mailbox |
+| **spawn_agent** | `name`, `prompt`, `tools`, `model`, `max_iterations` | Spawn isolated sub-agent. 3 concurrent (up to 6 read-only). Optional model override + file-based results |
 | **tell_agent** | `to`, `message` | Send a message to a running sub-agent's mailbox |
 
 > 💡 **Note:** The on-device app filters this list per-provider — toggle individual tools in the **Tools** popover (button #6 in the toolbar above). Apple Intelligence has its own minimal default set because of its small context window. MCP tools are appended at runtime as `mcp_<server>_<tool>` and listed under "--- MCP Tools ---" by `list_tools`.
@@ -571,7 +564,7 @@ Agent! is a 100% original pure Swift macOS application. It is not a port, fork, 
 | **Voice** | None | Hotword-anchored dictation via SFSpeechRecognizer |
 | **CRT effect** | None | Optional SwiftUI Canvas scanline overlay (toggle via HUD button) |
 | **Privilege Model** | User sandbox | XPC Launch Agent (user) + Launch Daemon (root) |
-| **Sub-agents** | Task tool (publicly documented; implementation details not stated by Anthropic) | Up to 3 concurrent isolated agents with mailbox messaging |
+| **Sub-agents** | Task tool (publicly documented; implementation details not stated by Anthropic) | Up to 3 concurrent (6 read-only) isolated agents with mailbox messaging and per-agent model override |
 | **MCP** | Node.js stdio/SSE | Swift AgentMCP package |
 | **Scripts** | None | Swift dylib compilation at runtime, dlopen'd in-process with full TCC |
 | **Prompt caching** | Anthropic `cache_control` ephemeral | Anthropic `cache_control` ephemeral + automatic prefix-cache hit tracking for OpenAI/Z.ai/Grok/Mistral/Gemini/Qwen/DeepSeek; Ollama `keep_alive: 30m` |
