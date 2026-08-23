@@ -105,6 +105,7 @@ final class OpenAICompatibleService {
         prompt += MemoryStore.shared.contextBlock
         prompt += GoalStateStore.shared.promptBlock
         prompt += ToolOutcomeStore.shared.promptBlock
+        prompt += PlanStateStore.promptBlock(projectFolder: projectFolder)
         return prompt
     }
 
@@ -145,6 +146,7 @@ final class OpenAICompatibleService {
         prompt += MemoryStore.shared.contextBlock
         prompt += GoalStateStore.shared.promptBlock
         prompt += ToolOutcomeStore.shared.promptBlock
+        prompt += PlanStateStore.promptBlock(projectFolder: projectFolder)
         return prompt
     }
 
