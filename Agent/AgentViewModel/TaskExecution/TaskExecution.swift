@@ -117,6 +117,7 @@ extension AgentViewModel {
 
         commandsRun = []
         var completionSummary = ""
+        var stopRouteRetries = 0
         var timeoutRetryCount = 0
         let maxTimeoutRetries = maxRetries
 
@@ -207,7 +208,10 @@ extension AgentViewModel {
                 // must respect the user's manual dismiss (Cmd+B during a running task).
                 if iterations == 1 { thinkingDismissed = false }
 
-                let sendMessages = iterations > 1 ? Self.compressMessages(messages) : messages
+                // Append-only between compaction events — per-turn rewriting broke
+                // provider prompt-cache prefix stability. tieredCompact (above) is the
+                // only place messages mutate, and only past the token threshold.
+                let sendMessages = messages
 
                 let response: (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int)
                 flushLog()
@@ -301,23 +305,34 @@ extension AgentViewModel {
                 let hasToolUse = parseResult.hasToolUse
                 let pendingTools = parseResult.pendingTools
 
-                // App-layer action verification: if the LLM returned text claiming
-                // it performed actions but made zero tool calls, inject a correction.
-                if !hasToolUse && pendingTools.isEmpty {
-                    let llmText = (response.content.compactMap { $0["text"] as? String }).joined()
-                    let lower = llmText.lowercased()
-                    let actionClaims = ["i searched", "i opened", "i clicked", "i ran ", "i executed",
-                                        "i found the", "i read the file", "i checked the", "i listed"]
-                    if actionClaims.contains(where: { lower.contains($0) }) {
-                        appendLog("⚠️ action not performed — LLM claimed action without a tool call")
-                        // NOTE: must be a `text` block, not a synthetic `tool_result`.
-                        // Anthropic rejects `tool_result` blocks whose `tool_use_id` has no
-                        // matching `tool_use` in the prior assistant message.
-                        toolResults.append([
-                            "type": "text",
-                            "text": "action not performed — you claimed to perform an action but made no tool call. Use the appropriate tool or say you cannot do it."
-                        ])
-                    }
+                // stop_reason-driven loop control: malformed tool calls, max_tokens
+                // truncation, and premature end_turn get one corrective bounce
+                // instead of silently completing. (The old phrase-match heuristic
+                // appended its correction to toolResults, which finalize ignored
+                // for text-only turns — the task completed anyway.)
+                let routeText = (response.content.compactMap { $0["text"] as? String }).joined()
+                let route = Self.routeStopReason(
+                    stopReason: response.stopReason,
+                    hasToolUse: hasToolUse,
+                    hasPendingTools: !pendingTools.isEmpty,
+                    responseText: routeText,
+                    openCriteria: GoalStateStore.shared.current?.openCriteria.map(\.text) ?? [],
+                    retriesUsed: stopRouteRetries
+                )
+                if case .retry(let correction, let logLine) = route {
+                    stopRouteRetries += 1
+                    appendLog(logLine)
+                    flushLog()
+                    // Keep only text blocks — appending unparsable tool_use blocks
+                    // without matching tool_results would 400 at the API.
+                    let textBlocks = response.content.filter { ($0["type"] as? String) == "text" }
+                    let assistantMsg: [String: Any] = [
+                        "role": "assistant",
+                        "content": textBlocks.isEmpty ? "(empty response)" : textBlocks
+                    ]
+                    messages.append(assistantMsg)
+                    messages.append(["role": "user", "content": correction])
+                    continue taskLoop
                 }
 
                 // Execute pending tools — partition into read/write batches

@@ -172,21 +172,32 @@ final class ClaudeService {
         return result
     }
 
-    /// Prepend project folder to the last user message so it's always visible in context.
-    private func withFolderPrefix(_ messages: [[String: Any]]) -> [[String: Any]] {
-        guard !projectFolder.isEmpty else { return messages }
-        let prefix = "PROJECT FOLDER: \(projectFolder)\n"
+    // The old withFolderPrefix mutated the newest user message per-request, which
+    // changed already-sent message bytes on the next turn and defeated incremental
+    // prompt caching. The folder is already in the system prompt and in the task's
+    // first user message via newTaskPrefix, so no per-request mutation is needed.
+
+    /// Mark the last content block of the newest user message with cache_control
+    /// so the conversation body caches turn-over-turn (system prompt and tools
+    /// carry their own breakpoints; Anthropic allows 4 total). Standard Anthropic
+    /// multi-turn pattern — the marker moves forward each turn without
+    /// invalidating prior-prefix cache hits.
+    private func withMessageCacheBreakpoint(_ messages: [[String: Any]]) -> [[String: Any]] {
+        guard !isLocalhostEndpoint else { return messages }
         var result = messages
         for i in stride(from: result.count - 1, through: 0, by: -1) {
             guard result[i]["role"] as? String == "user" else { continue }
             if let text = result[i]["content"] as? String {
-                result[i]["content"] = prefix + text
-            } else if var blocks = result[i]["content"] as? [[String: Any]],
-                      let first = blocks.first, first["type"] as? String == "text",
-                      let existing = first["text"] as? String
-            {
-                blocks[0]["text"] = prefix + existing
-                result[i]["content"] = blocks
+                result[i]["content"] = [
+                    ["type": "text", "text": text, "cache_control": ["type": "ephemeral"]]
+                ]
+            } else if var blocks = result[i]["content"] as? [[String: Any]], !blocks.isEmpty {
+                let last = blocks.count - 1
+                let type = blocks[last]["type"] as? String ?? ""
+                if type == "text" || type == "tool_result" || type == "image" {
+                    blocks[last]["cache_control"] = ["type": "ephemeral"]
+                    result[i]["content"] = blocks
+                }
             }
             break
         }
@@ -215,7 +226,7 @@ final class ClaudeService {
             "max_tokens": maxTokens > 0 ? maxTokens : 16384,
             "temperature": temperature,
             "system": systemBlock,
-            "messages": withFolderPrefix(stripOrphanToolResults(messages))
+            "messages": withMessageCacheBreakpoint(stripOrphanToolResults(messages))
         ]
         // Skip tools only for actual localhost servers (LM Studio's Claude-compat
         // mode often mis-handles native Anthropic tool format). Remote
@@ -352,6 +363,13 @@ final class ClaudeService {
         let usage = json["usage"] as? [String: Any]
         let inputTokens = usage?["input_tokens"] as? Int ?? 0
         let outputTokens = usage?["output_tokens"] as? Int ?? 0
+        let cacheRead = usage?["cache_read_input_tokens"] as? Int ?? 0
+        let cacheCreation = usage?["cache_creation_input_tokens"] as? Int ?? 0
+        if cacheRead > 0 || cacheCreation > 0 {
+            Task { @MainActor in
+                TokenUsageStore.shared.recordCacheMetrics(read: cacheRead, creation: cacheCreation)
+            }
+        }
 
         return (content, stopReason, inputTokens, outputTokens)
     }
@@ -375,7 +393,7 @@ final class ClaudeService {
             "model": model,
             "max_tokens": maxTokens > 0 ? maxTokens : 16384,
             "system": systemBlock,
-            "messages": withFolderPrefix(stripOrphanToolResults(messages)),
+            "messages": withMessageCacheBreakpoint(stripOrphanToolResults(messages)),
             "stream": true
         ]
         if !isLocalhostEndpoint {

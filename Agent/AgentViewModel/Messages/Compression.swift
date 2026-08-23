@@ -47,70 +47,13 @@ struct CompactionState {
 extension AgentViewModel {
     // MARK: - Message History Compression
 
-    /// Compress old tool results — use Apple AI summary if cached, otherwise first 3 lines.
-    /// Last 4 messages keep full content. Tool calls (assistant) stay intact.
-    static func compressMessages(_ messages: [[String: Any]], keepRecent: Int = 4) -> [[String: Any]] {
-        guard AppleIntelligenceMediator.shared.tokenCompressionEnabled else { return messages }
-        guard messages.count > keepRecent + 1 else { return messages }
-
-        var result: [[String: Any]] = []
-        let middleEnd = messages.count - keepRecent
-
-        for i in 0..<middleEnd {
-            var msg = messages[i]
-            let role = msg["role"] as? String ?? ""
-
-            if role == "user" {
-                if var blocks = msg["content"] as? [[String: Any]] {
-                    for j in 0..<blocks.count {
-                        if blocks[j]["type"] as? String == "tool_result",
-                           let content = blocks[j]["content"] as? String, content.count > 200
-                        {
-                            // Spill before truncating so the full text stays recoverable
-                            // via restore_tool_result instead of being lost for good.
-                            ToolResultCache.spill(
-                                toolUseID: blocks[j]["tool_use_id"] as? String, content: content)
-                            let key = cacheKey(content)
-                            if let cached = _summaryCache[key] {
-                                blocks[j]["content"] = cached
-                            } else {
-                                let preview = content.components(separatedBy: "\n").prefix(3).joined(separator: "\n")
-                                blocks[j]["content"] = preview + "\n(... already processed)"
-                            }
-                        }
-                    }
-                    msg["content"] = blocks
-                }
-            } else if role == "assistant" {
-                // Compress old assistant text (keep tool_use blocks intact)
-                if var blocks = msg["content"] as? [[String: Any]] {
-                    for j in 0..<blocks.count {
-                        if blocks[j]["type"] as? String == "text",
-                           let text = blocks[j]["text"] as? String, text.count > 150
-                        {
-                            blocks[j]["text"] = String(text.prefix(100)) + "..."
-                        }
-                    }
-                    msg["content"] = blocks
-                }
-            }
-            result.append(msg)
-        }
-
-        result.append(contentsOf: messages.suffix(keepRecent))
-        return result
-    }
-
-    /// Use Apple AI to summarize long text, fall back to truncation if unavailable.
-    private static func summarizeOrTruncate(_ text: String) -> String {
-        let key = cacheKey(text)
-        if let cached = _summaryCache[key] { return cached }
-
-        // Fallback: truncate (Apple AI summary happens async via compressMessagesAsync)
-        let truncated = String(text.prefix(150)) + "...(truncated \(text.count) chars)"
-        _summaryCache[key] = truncated
-        return truncated
-    }
+    // NOTE: the old per-turn compressMessages sliding window is gone on purpose.
+    // Rewriting the conversation middle on every request changed the serialized
+    // prefix every turn, so provider prompt caches (Anthropic cache_control and
+    // the automatic prefix caches on OpenAI-compatible providers) missed on the
+    // whole conversation body each iteration. All truncation now happens inside
+    // tieredCompact, which only fires past the token threshold — messages are
+    // append-only between compaction events.
 
     /// Cache summaries so we don't re-summarize the same content.
     /// Keyed by SHA-256 of the content — `hashValue` is per-process seeded and

@@ -2,7 +2,7 @@ import Foundation
 
 /// Disk spill for tool results that compaction is about to destroy.
 ///
-/// `compressMessages` and `microcompact` rewrite old `tool_result` blocks to a
+/// `tieredCompact` and `microcompact` rewrite old `tool_result` blocks to a
 /// 3-line preview or `[cleared]`. That makes compaction *lossy* — the agent's own
 /// earlier reads vanish mid-task and it re-reads the same files. This cache writes
 /// the full text to `{project}/.agent/toolcache/<tool_use_id>.txt` **before** the
