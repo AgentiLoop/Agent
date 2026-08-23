@@ -105,7 +105,7 @@ extension AgentViewModel {
 
             // 3. Error budget — track consecutive build failures (Xcode only)
             for tool in pendingTools where isXcode && buildTools.contains(tool.name) {
-                let buildOutput = toolResults.last?["content"] as? String ?? ""
+                let buildOutput = resultContent(for: tool.toolId, in: toolResults)
                 if buildOutput.contains("BUILD FAILED") || buildOutput.contains("error:") {
                     consecutiveBuildFailures += 1
                     // Offer the task-scoped rewind once, at 3 failures. The model
@@ -121,7 +121,7 @@ extension AgentViewModel {
                                 touched to its pre-task state and start over with a \
                                 different approach. Otherwise fix the specific error above.
                                 """
-                            appendNudgeToLastToolResult(&toolResults, nudge: nudge)
+                            appendNudge(&toolResults, toolId: tool.toolId, nudge: nudge)
                             appendLog("🔄 Offered task rewind after 3 build failures")
                             flushLog()
                         }
@@ -140,7 +140,7 @@ extension AgentViewModel {
             // Stuck detection — track edit failures per file. Nudge at 2, give up at 4.
             for tool in pendingTools where editTools.contains(tool.name) {
                 guard let path = tool.input["file_path"] as? String ?? tool.input["path"] as? String else { continue }
-                let output = toolResults.last?["content"] as? String ?? ""
+                let output = resultContent(for: tool.toolId, in: toolResults)
                 // Shared with StuckGuard — see AgentViewModel.isToolFailure.
                 let isFailure = Self.isToolFailure(output: output)
                 if isFailure {
@@ -168,7 +168,7 @@ extension AgentViewModel {
                         6. If you keep failing, switch tools — write_file to overwrite \
                         the whole file is a valid last resort.
                         """
-                        appendNudgeToLastToolResult(&toolResults, nudge: nudge)
+                        appendNudge(&toolResults, toolId: tool.toolId, nudge: nudge)
                         appendLog("⚠️ Stuck nudge: 2 failures on \((path as NSString).lastPathComponent)")
                         flushLog()
                     } else if count >= 4 {
@@ -178,7 +178,7 @@ extension AgentViewModel {
                             this file. Move on to the next part of your task \
                             or call done with what you've completed so far.
                             """
-                        appendNudgeToLastToolResult(&toolResults, nudge: nudge)
+                        appendNudge(&toolResults, toolId: tool.toolId, nudge: nudge)
                         appendLog("🛑 Stuck-out: 4 failures on \((path as NSString).lastPathComponent)")
                         flushLog()
                         stuckFiles[path] = 0
@@ -187,7 +187,7 @@ extension AgentViewModel {
                     stuckFiles[path] = 0
                     // Cycle detection: track successful edits per file
                     Self.detectEditCycle(filePath: path, toolResults: &toolResults) { nudge, results in
-                        appendNudgeToLastToolResult(&results, nudge: nudge)
+                        appendNudge(&results, toolId: tool.toolId, nudge: nudge)
                         appendLog("🔄 Edit cycle detected")
                         flushLog()
                     }
@@ -195,6 +195,28 @@ extension AgentViewModel {
             }
         }
         return false
+    }
+
+    /// Content of the tool_result matching `toolId`. Guards must look results up
+    /// by tool_use_id, not `toolResults.last` — on a batched turn (read_file +
+    /// edit_file in one response) the last result belongs to a different tool and
+    /// the guard would score the wrong output. Mirrors the id-matching in
+    /// `recordToolOutcomes`.
+    func resultContent(for toolId: String, in toolResults: [[String: Any]]) -> String {
+        guard let match = toolResults.first(where: { $0["tool_use_id"] as? String == toolId }) else { return "" }
+        return match["content"] as? String ?? ""
+    }
+
+    /// Append a nudge onto the tool_result for `toolId` so the guidance lands next
+    /// to the output that triggered it. Falls back to the last result when the id
+    /// isn't present (pre-executed batches, synthesized results).
+    func appendNudge(_ toolResults: inout [[String: Any]], toolId: String, nudge: String) {
+        guard let idx = toolResults.firstIndex(where: { $0["tool_use_id"] as? String == toolId }) else {
+            appendNudgeToLastToolResult(&toolResults, nudge: nudge)
+            return
+        }
+        let existing = (toolResults[idx]["content"] as? String) ?? ""
+        toolResults[idx]["content"] = existing.isEmpty ? nudge : existing + "\n\n" + nudge
     }
 
     /// Append a nudge string onto the last tool_result's content so the LLM
