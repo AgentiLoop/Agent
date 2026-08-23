@@ -26,6 +26,10 @@ final class OpenAICompatibleService {
     let supportsVision: Bool
     let provider: APIProvider
     var temperature: Double = 0.2
+    /// Passed through as `reasoning_effort` when non-empty ("low"/"medium"/"high").
+    /// Opt-in via the Reasoning setting — providers that reject the param surface
+    /// the error and the user turns it off.
+    var reasoningEffort: String = ""
     var compactTools: Bool = false
     /// Key name for the messages array in the request body.
     /// OpenAI uses "messages", LM Studio Native uses "input".
@@ -424,6 +428,7 @@ final class OpenAICompatibleService {
         ]
         if !isNativeFormat {
             if maxTokens > 0 { body["max_tokens"] = maxTokens }
+            if !reasoningEffort.isEmpty { body["reasoning_effort"] = reasoningEffort }
             let toolDefs = toolsForIteration(messages, activeGroups: activeGroups)
             if !toolDefs.isEmpty {
                 body["tools"] = toolDefs
@@ -458,6 +463,7 @@ final class OpenAICompatibleService {
         ]
         if !isNativeFormat {
             if maxTokens > 0 { body["max_tokens"] = maxTokens }
+            if !reasoningEffort.isEmpty { body["reasoning_effort"] = reasoningEffort }
             let toolDefs = toolsForIteration(messages, activeGroups: activeGroups)
             if !toolDefs.isEmpty {
                 body["tools"] = toolDefs

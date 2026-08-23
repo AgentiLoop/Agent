@@ -218,6 +218,10 @@ extension AgentViewModel {
         services.claude?.temperature = temperatureForProvider(.claude)
         services.ollama?.temperature = temperatureForProvider(provider)
         services.openAICompatible?.temperature = temperatureForProvider(provider)
+        services.claude?.thinkingBudget = ClaudeService.thinkingBudget(forEffort: reasoningEffort)
+        if reasoningEffort != "off" && !reasoningEffort.isEmpty {
+            services.openAICompatible?.reasoningEffort = reasoningEffort
+        }
         return services
     }
 }

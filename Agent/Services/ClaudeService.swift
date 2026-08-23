@@ -206,6 +206,29 @@ final class ClaudeService {
 
     var temperature: Double = 0.2
     var compactTools: Bool = false
+    /// Extended-thinking budget in tokens. 0 = disabled. When enabled the API
+    /// requires temperature unset and max_tokens greater than the budget.
+    var thinkingBudget: Int = 0
+
+    /// Effort → budget mapping shared by every construction site.
+    nonisolated static func thinkingBudget(forEffort effort: String) -> Int {
+        switch effort {
+        case "low": return 2048
+        case "medium": return 8192
+        case "high": return 16384
+        default: return 0
+        }
+    }
+
+    /// Apply thinking to a request body: budget, temperature removal, and a
+    /// max_tokens floor above the budget.
+    private func applyThinking(to body: inout [String: Any]) {
+        guard thinkingBudget > 0, !isLocalhostEndpoint else { return }
+        body["thinking"] = ["type": "enabled", "budget_tokens": thinkingBudget]
+        body.removeValue(forKey: "temperature")
+        let mt = body["max_tokens"] as? Int ?? 16384
+        body["max_tokens"] = max(mt, thinkingBudget + 8192)
+    }
 
     func send(
         messages: [[String: Any]],
@@ -239,6 +262,7 @@ final class ClaudeService {
             }
             body["tools"] = toolDefs
         }
+        applyThinking(to: &body)
 
         // Serialize on main actor, then offload network I/O + parsing. .sortedKeys produces byte-stable JSON regardless of dict iteration order — required for prefix caching to hit.
         let bodyData = try JSONSerialization.data(withJSONObject: body, options: [.sortedKeys])
@@ -246,7 +270,8 @@ final class ClaudeService {
             bodyData: bodyData,
             apiKey: apiKey,
             apiVersion: Self.apiVersion,
-            url: endpointURL
+            url: endpointURL,
+            thinkingEnabled: thinkingBudget > 0 && !isLocalhostEndpoint
         )
     }
 
@@ -303,17 +328,19 @@ final class ClaudeService {
     nonisolated private static func applyAuthHeaders(
         on request: inout URLRequest,
         credential: String,
-        apiVersion: String
+        apiVersion: String,
+        thinkingEnabled: Bool = false
     ) {
         let clean = sanitizedCredential(credential)
         request.setValue(apiVersion, forHTTPHeaderField: "anthropic-version")
         request.setValue("application/json", forHTTPHeaderField: "content-type")
+        // Interleaved thinking lets Claude 4+ models think between tool calls.
+        let thinkingFlag = thinkingEnabled ? ",interleaved-thinking-2025-05-14" : ""
         if clean.hasPrefix("sk-ant-oat01-") {
             request.setValue("Bearer \(clean)", forHTTPHeaderField: "Authorization")
-            // Both beta flags — OAuth auth AND prompt caching — in a single
-            // comma-separated header value.
+            // All beta flags in a single comma-separated header value.
             request.setValue(
-                "oauth-2025-04-20,prompt-caching-2024-07-31",
+                "oauth-2025-04-20,prompt-caching-2024-07-31" + thinkingFlag,
                 forHTTPHeaderField: "anthropic-beta"
             )
         } else if clean.hasPrefix("sk-or-") {
@@ -321,17 +348,17 @@ final class ClaudeService {
             request.setValue("Bearer \(clean)", forHTTPHeaderField: "Authorization")
         } else {
             request.setValue(clean, forHTTPHeaderField: "x-api-key")
-            request.setValue("prompt-caching-2024-07-31", forHTTPHeaderField: "anthropic-beta")
+            request.setValue("prompt-caching-2024-07-31" + thinkingFlag, forHTTPHeaderField: "anthropic-beta")
         }
     }
 
     /// Network I/O and response parsing off the main thread
     nonisolated private static func performRequest(
-        bodyData: Data, apiKey: String, apiVersion: String, url: URL
+        bodyData: Data, apiKey: String, apiVersion: String, url: URL, thinkingEnabled: Bool = false
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        applyAuthHeaders(on: &request, credential: apiKey, apiVersion: apiVersion)
+        applyAuthHeaders(on: &request, credential: apiKey, apiVersion: apiVersion, thinkingEnabled: thinkingEnabled)
         request.httpBody = bodyData
         request.timeoutInterval = llmAPITimeout
 
@@ -403,6 +430,7 @@ final class ClaudeService {
             }
             body["tools"] = toolDefs
         }
+        applyThinking(to: &body)
 
         // .sortedKeys for byte-stable prefix caching — see send() for rationale.
         let bodyData = try JSONSerialization.data(withJSONObject: body, options: [.sortedKeys])
@@ -411,17 +439,19 @@ final class ClaudeService {
             apiKey: apiKey,
             apiVersion: Self.apiVersion,
             url: endpointURL,
+            thinkingEnabled: thinkingBudget > 0 && !isLocalhostEndpoint,
             onTextDelta: onTextDelta
         )
     }
 
     nonisolated private static func performStreamingRequest(
         bodyData: Data, apiKey: String, apiVersion: String, url: URL,
+        thinkingEnabled: Bool = false,
         onTextDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        applyAuthHeaders(on: &request, credential: apiKey, apiVersion: apiVersion)
+        applyAuthHeaders(on: &request, credential: apiKey, apiVersion: apiVersion, thinkingEnabled: thinkingEnabled)
         request.httpBody = bodyData
         request.timeoutInterval = llmAPITimeout
 
@@ -452,9 +482,12 @@ final class ClaudeService {
         var currentToolId = ""
         var currentToolName = ""
         var currentToolJson = ""
+        var currentThinking = ""
+        var currentThinkingSignature = ""
         var stopReason = ""
         var inToolUse = false
         var inServerToolUse = false
+        var inThinking = false
         var pendingServerResult: [String: Any]?
         var inputTokens = 0
         var outputTokens = 0
@@ -490,6 +523,15 @@ final class ClaudeService {
                         currentTextBlock = ""
                         inToolUse = false
                         inServerToolUse = false
+                    } else if blockType == "thinking" {
+                        currentThinking = ""
+                        currentThinkingSignature = ""
+                        inThinking = true
+                        inToolUse = false
+                        inServerToolUse = false
+                    } else if blockType == "redacted_thinking" {
+                        // Arrives complete — must be passed back unmodified.
+                        contentBlocks.append(block)
                     } else if blockType == "tool_use" {
                         currentToolId = block["id"] as? String ?? ""
                         currentToolName = block["name"] as? String ?? ""
@@ -516,11 +558,26 @@ final class ClaudeService {
                         onTextDelta(text)
                     } else if deltaType == "input_json_delta", let json = delta["partial_json"] as? String {
                         currentToolJson += json
+                    } else if deltaType == "thinking_delta", let text = delta["thinking"] as? String {
+                        currentThinking += text
+                    } else if deltaType == "signature_delta", let sig = delta["signature"] as? String {
+                        currentThinkingSignature += sig
                     }
                 }
 
             case "content_block_stop":
-                if inToolUse {
+                if inThinking {
+                    // Signature must ride along — the API verifies it when the
+                    // block is passed back on the next turn.
+                    contentBlocks.append([
+                        "type": "thinking",
+                        "thinking": currentThinking,
+                        "signature": currentThinkingSignature
+                    ])
+                    currentThinking = ""
+                    currentThinkingSignature = ""
+                    inThinking = false
+                } else if inToolUse {
                     let input: [String: Any]
                     if let parsed = try? JSONSerialization.jsonObject(with: Data(currentToolJson.utf8)) as? [String: Any] {
                         input = parsed

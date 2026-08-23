@@ -198,6 +198,14 @@ extension AgentViewModel {
         ollama?.temperature = temperatureForProvider(provider)
         openAICompatible?.temperature = temperatureForProvider(provider)
 
+        // Reasoning effort — thinking budget for Claude, reasoning_effort pass-through
+        // for OpenAI-compatible. "off" leaves each service's default untouched.
+        claude?.thinkingBudget = ClaudeService.thinkingBudget(forEffort: reasoningEffort)
+        if reasoningEffort != "off" && !reasoningEffort.isEmpty {
+            codex?.reasoningEffort = reasoningEffort
+            openAICompatible?.reasoningEffort = reasoningEffort
+        }
+
         return LLMServiceBundle(
             claude: claude,
             codex: codex,
