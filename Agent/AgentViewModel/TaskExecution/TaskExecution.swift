@@ -153,7 +153,7 @@ extension AgentViewModel {
         // Token budget tracker — detects diminishing returns and prevents runaway costs
         var budgetTracker = TokenBudgetTracker(ceiling: tokenBudgetCeiling)
         // Context compaction state — token-aware triggers with circuit breaker
-        var compactionState = CompactionState()
+        var compactionState = CompactionState(contextWindow: contextWindow(for: selectedProvider))
         // Overnight coding guards
         var consecutiveReadOnlyCount = 0 // read guard — force stop after 10
         var unbuiltEditCount = 0 // build enforcement — nudge after edit without build
