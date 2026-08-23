@@ -467,6 +467,19 @@ final class CodexService {
 
     /// Full `instructions` string sent to /responses. Starts with the
     /// Codex identity line (required by the OAuth gate), then Agent!'s
+
+    /// Snapshot of the dynamic state blocks (memory / goal / tool outcomes /
+    /// plan), taken on first use and frozen for this service's lifetime —
+    /// services are rebuilt at task start and on provider fallback. Reading
+    /// the live stores per request changed the system-prompt bytes mid-task
+    /// (every goal tick, plan update, or memory append), invalidating the
+    /// provider's prompt cache; mid-task changes still reach the model
+    /// through those tools' own results.
+    private lazy var stateBlocks: String = MemoryStore.shared.contextBlock
+        + GoalStateStore.shared.promptBlock
+        + ToolOutcomeStore.shared.promptBlock
+        + PlanStateStore.promptBlock(projectFolder: projectFolder)
+
     /// base system prompt, then optional project folder and history.
     var instructions: String {
         var s = Self.codexIdentityPrompt + "\n\n"
@@ -480,10 +493,7 @@ final class CodexService {
             s = "CURRENT PROJECT FOLDER: \(projectFolder)\n\n" + s
         }
         if !historyContext.isEmpty { s += historyContext }
-        s += MemoryStore.shared.contextBlock
-        s += GoalStateStore.shared.promptBlock
-        s += ToolOutcomeStore.shared.promptBlock
-        s += PlanStateStore.promptBlock(projectFolder: projectFolder)
+        s += stateBlocks
         return s
     }
 

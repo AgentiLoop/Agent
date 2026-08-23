@@ -247,6 +247,13 @@ extension AgentViewModel {
             // dispatch path — can run the exact same checks.
             if let blocker = await completionGateBlocker() { return blocker }
 
+            // Gates passed → the goal is verified; retire it so it can't block
+            // the next task's completion (mirrors parseLLMResponseContent).
+            if GoalStateStore.shared.current != nil {
+                GoalStateStore.shared.clear()
+                appendLog("🎯 Goal verified — cleared")
+            }
+
             let touched = FileBackupService.shared.snapshottedFiles()
 
             NativeToolContext.taskCompleteSummary = summary

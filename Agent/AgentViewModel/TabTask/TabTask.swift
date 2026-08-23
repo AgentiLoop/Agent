@@ -114,6 +114,9 @@ extension AgentViewModel {
         tab.thinkingDismissed = false
         // Reset fallback chain so this run starts on the primary provider
         FallbackChainService.shared.reset()
+        if let stale = GoalStateStore.shared.clearIfStale() {
+            tab.appendLog("🎯 Cleared stale goal (untouched >24h): \(stale.prefix(60))")
+        }
         await HooksService.shared.runEventHooks(.taskStart, context: [
             "prompt": prompt,
             "tab": tab.displayTitle,
@@ -455,6 +458,9 @@ extension AgentViewModel {
                 case .fallbackRequested(let fbProvider, let fbModel, _):
                     provider = fbProvider
                     modelId = fbModel
+                    // Rescale the compaction threshold to the fallback provider's
+                    // real context window (see the main loop's fallback path).
+                    compactionState = CompactionState(contextWindow: contextWindow(for: fbProvider))
                     services = buildTabLLMServices(
                         provider: provider,
                         modelId: modelId,

@@ -120,6 +120,18 @@ final class GoalStateStore {
         write(nil)
     }
 
+    /// Retire a goal nobody has touched in `maxAge` — it belongs to an
+    /// abandoned task (cancelled, iteration-capped, or crashed before
+    /// clearing) and would otherwise block every future task_complete via
+    /// the completion gates. Returns the cleared goal's text, or nil.
+    @discardableResult
+    func clearIfStale(maxAge: TimeInterval = 86_400) -> String? {
+        guard let state = read(),
+              Date().timeIntervalSince(state.updatedAt) > maxAge else { return nil }
+        clear()
+        return state.goal
+    }
+
     /// True when every criterion has been verified — the gate condition.
     var isVerified: Bool { read()?.allCriteriaDone ?? true }
 
