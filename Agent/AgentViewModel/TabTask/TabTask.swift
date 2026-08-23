@@ -114,6 +114,11 @@ extension AgentViewModel {
         tab.thinkingDismissed = false
         // Reset fallback chain so this run starts on the primary provider
         FallbackChainService.shared.reset()
+        await HooksService.shared.runEventHooks(.taskStart, context: [
+            "prompt": prompt,
+            "tab": tab.displayTitle,
+            "projectFolder": projectFolder
+        ])
 
         var commandsRun: [String] = []
         var completionSummary = ""
@@ -341,6 +346,12 @@ extension AgentViewModel {
                     )
                     tab.isLLMRunning = false
                     tab.isLLMThinking = false
+                    await HooksService.shared.runEventHooks(.taskComplete, context: [
+                        "prompt": prompt,
+                        "summary": completionSummary,
+                        "tab": tab.displayTitle,
+                        "projectFolder": projectFolder
+                    ])
                     return
                 case .normal(let hasToolUse, let toolResults):
                     messages.append(["role": "assistant", "content": response.content])
