@@ -34,18 +34,7 @@ All of Agent!'s IP is original and open source. Every Swift package dependency a
 
 **v1.0.92 (186) — The Self-Verifying Autonomy Release** · [Full release notes →](https://github.com/macOS26/Agent/releases/tag/v1.0.92.186)
 
-- 🎯 **Goal state:** new `goal_state` tool — task can't complete until success criteria are verified with evidence
-- 🧠 **Extended thinking** for Claude (off/low/medium/high) + `reasoning_effort` for OpenAI-compatible providers
-- ⚡️ **Prompt-cache-stable context** — append-only messages between compactions, `stop_reason`-driven loop control
-- 📏 **Compaction scales to the model's context window** (~55%) instead of a hardcoded 30K
-- 💾 **Recoverable compaction** — full tool results spill to disk; `restore_tool_result` brings them back
-- 🔬 **Critic review gate** (opt-in) — one-shot LLM diff review before task completion
-- 🩺 **Typed tool errors** with recovery hints + per-project tool-outcome learning
-- 🤖 **Sub-agent upgrades:** per-agent model override, file-based results, up to 6 read-only research agents
-- ⏪ **Task-scoped rewind** (`rewind_task`) + fully wired event hooks (taskStart/taskComplete/buildFailure/post-tool)
-- ✅ **Hardened guards** + 57 passing tests across 6 suites
-
-Previously shipped: OpenRouter provider (200+ models, one key), LLM-driven UI automation via `accessibility`, zero-hardcoded SDEF + runtime app discovery, prompt caching for every OpenAI-format provider, on-device token compression, anti-hallucination prompt rules.
+Agent! now proves its work. A task can't declare itself done until its success criteria are verified with evidence (`goal_state`), an opt-in critic reviews the diff before completion, and every file touched can be rolled back in one shot (`rewind_task`). Extended thinking for Claude, `reasoning_effort` for OpenAI-compatible providers, and a prompt-cache-stable context that compacts to each model's real window — recoverably, with full tool results spilled to disk. Typed tool errors carry recovery hints, sub-agents run their own models (up to 6 read-only researchers), event hooks are fully wired, and 57 passing tests keep it honest.
 
 **One app. Any AI. Total command over your Mac.**
 
