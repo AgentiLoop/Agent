@@ -206,6 +206,7 @@
 		WEB1000000000000000003 /* WebAutomationService+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000004 /* WebAutomationService+Navigation.swift */; };
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
+		C1DD1E30D7BE7F635978E929 /* ToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176D0F01E4553C80C7E38FB2 /* ToolResultCache.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -470,6 +471,7 @@
 		WEB1000000000000000004 /* WebAutomationService+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Navigation.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
+		176D0F01E4553C80C7E38FB2 /* ToolResultCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolResultCache.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -914,7 +916,8 @@
 				AA10000000000000000102 /* RecentFoldersService.swift */,
 				IDX0000000000000000004 /* ProjectIndexService.swift */,
 				APP0000000000000000002 /* AgentProjectPaths.swift */,
-			);
+							176D0F01E4553C80C7E38FB2 /* ToolResultCache.swift */,
+);
 			path = Services;
 			sourceTree = "<group>";
 		};
@@ -1359,7 +1362,8 @@
 				5B4FF75EF80575390F59DEE4 /* FileChangeJournal.swift in Sources */,
 				5B5006F0F90686401060EFF5 /* TaskQueueStore.swift in Sources */,
 				5B7228F2FB0898623282F117 /* FallbackChainService.swift in Sources */,
-			);
+							C1DD1E30D7BE7F635978E929 /* ToolResultCache.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BB10000000000000000050 /* Sources */ = {
