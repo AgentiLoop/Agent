@@ -113,6 +113,70 @@ struct GoalStateStoreTests {
     }
 }
 
+// MARK: - Tool failure detection
+
+/// Regression coverage for AgentViewModel.isToolFailure(output:).
+///
+/// This logic has been wrong TWICE: it originally lowercased the entire tool
+/// output and searched for "error:" / "failed" / "not found" anywhere in it.
+/// A successful edit_file echoes a preview of the file's new content, so
+/// editing any file whose SOURCE contains those words (XcodeService.swift,
+/// Guards.swift) reported phantom failures and fired the stuck guards.
+@MainActor
+struct ToolFailureDetectionTests {
+    @Test("a successful edit whose body contains failure words is NOT a failure")
+    func successfulEditWithFailureWordsInBody() {
+        // The exact shape that caused the bug: success status line, echoed
+        // source code below it containing every trigger word.
+        let output = """
+        Replaced 1 occurrence in /path/XcodeService.swift [verified: true]
+
+        📎
+        let isFailure = lower.contains("error:") || lower.contains("failed")
+        if buildResult == "not found" { return "rejected" }
+        """
+        #expect(AgentViewModel.isToolFailure(output: output) == false)
+    }
+
+    @Test("a write whose content mentions errors is NOT a failure")
+    func successfulWriteWithErrorText() {
+        let output = "Wrote 181 lines to /tmp/x.swift\n\nerror: this is file content, not a status"
+        #expect(AgentViewModel.isToolFailure(output: output) == false)
+    }
+
+    @Test("real failures are still detected from the status line")
+    func realFailuresDetected() {
+        #expect(AgentViewModel.isToolFailure(output: "Error: file not writable"))
+        #expect(AgentViewModel.isToolFailure(output: "error: no such file"))
+        #expect(AgentViewModel.isToolFailure(output: "❌ edit rejected"))
+        #expect(AgentViewModel.isToolFailure(output: "warning: nothing matched"))
+        #expect(AgentViewModel.isToolFailure(output: "String not found in file"))
+        #expect(AgentViewModel.isToolFailure(output: "Edit rejected — ambiguous match"))
+        #expect(AgentViewModel.isToolFailure(output: "No changes made to the file"))
+    }
+
+    @Test("detection is case-insensitive and ignores leading whitespace")
+    func detectionNormalizesStatusLine() {
+        #expect(AgentViewModel.isToolFailure(output: "   ERROR: boom"))
+        #expect(AgentViewModel.isToolFailure(output: "  Not Found  "))
+    }
+
+    @Test("ordinary success output is not a failure")
+    func plainSuccessIsNotFailure() {
+        #expect(AgentViewModel.isToolFailure(output: "Build succeeded") == false)
+        #expect(AgentViewModel.isToolFailure(output: "Applied diff to /tmp/a.swift") == false)
+        #expect(AgentViewModel.isToolFailure(output: "") == false)
+    }
+
+    @Test("the bare word 'failed' in a status line does not trigger detection")
+    func bareFailedIsNotATrigger() {
+        // "failed" was dropped as a trigger precisely because it matches
+        // ordinary prose and source text. Build failures are caught by the
+        // separate consecutiveBuildFailures counter, not this helper.
+        #expect(AgentViewModel.isToolFailure(output: "3 tests failed in DiffToolsTests") == false)
+    }
+}
+
 // MARK: - StuckGuard fingerprinting
 
 @MainActor
