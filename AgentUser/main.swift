@@ -25,7 +25,14 @@ final class UserCommandHandler: NSObject, UserToolProtocol, @unchecked Sendable 
 }
 
 final class UserDelegate: NSObject, NSXPCListenerDelegate {
+    /// Same-team gate as the root daemon — the user agent runs arbitrary
+    /// shell as the logged-in user, which is not something any random local
+    /// process should be able to drive over XPC.
+    static let clientRequirement =
+        "anchor apple generic and certificate leaf[subject.OU] = \"469UCUB275\""
+
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection connection: NSXPCConnection) -> Bool {
+        connection.setCodeSigningRequirement(Self.clientRequirement)
         let handler = UserCommandHandler()
         handler.connection = connection
         connection.exportedInterface = NSXPCInterface(with: UserToolProtocol.self)
