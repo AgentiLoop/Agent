@@ -117,6 +117,7 @@ extension AgentViewModel {
         }
 
         commandsRun = []
+        criticReviewDone = false
         var completionSummary = ""
         var stopRouteRetries = 0
         var timeoutRetryCount = 0

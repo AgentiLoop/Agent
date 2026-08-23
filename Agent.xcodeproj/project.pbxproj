@@ -215,6 +215,7 @@
 		FA10000000000000000105 /* LoopReplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000104 /* LoopReplayTests.swift */; };
 		8694EEF8CDF9D987CE3D1E2A /* PlanStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5A29F2E735D900C78C575E /* PlanStateStore.swift */; };
 		B73A9A6EBE2A1C13B66EB81E /* ToolErrorClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B73CC1C22C23AAC6CD8E7BD5 /* ToolErrorClassifier.swift */; };
+		1DCD8313ABDDD50E52BDA2E0 /* CriticGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F212F6A04076958DD46FD1E4 /* CriticGate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -488,6 +489,7 @@
 		FA10000000000000000104 /* LoopReplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoopReplayTests.swift"; sourceTree = "<group>"; };
 		BB5A29F2E735D900C78C575E /* PlanStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlanStateStore.swift"; sourceTree = "<group>"; };
 		B73CC1C22C23AAC6CD8E7BD5 /* ToolErrorClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolErrorClassifier.swift"; sourceTree = "<group>"; };
+		F212F6A04076958DD46FD1E4 /* CriticGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CriticGate.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -690,7 +692,8 @@
 				5D8FE3C1065B23B9424ED23C /* TE-Selenium.swift */,
 				AA100000000000000000C3 /* ShellTools.swift */,
 				87F1A988F00C4E7050FED023 /* WebTools.swift */,
-			);
+							F212F6A04076958DD46FD1E4 /* CriticGate.swift */,
+);
 			path = TaskExecution;
 			sourceTree = "<group>";
 		};
@@ -1392,6 +1395,7 @@
 				0BCD82BC9C5723C7F775D244 /* GoalStateStore.swift in Sources */,
 				8694EEF8CDF9D987CE3D1E2A /* PlanStateStore.swift in Sources */,
 				B73A9A6EBE2A1C13B66EB81E /* ToolErrorClassifier.swift in Sources */,
+				1DCD8313ABDDD50E52BDA2E0 /* CriticGate.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

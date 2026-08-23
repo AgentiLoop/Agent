@@ -31,6 +31,20 @@ struct CodingPreferencesView: View {
 
             row {
                 VStack(alignment: .leading, spacing: 2) {
+                    Text("Critic Review").font(.subheadline)
+                    Text("LLM reviews the task's diff before task_complete is accepted")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
+                Spacer()
+                Toggle("", isOn: $viewModel.criticReviewEnabled)
+                    .toggleStyle(.switch)
+                    .controlSize(.mini)
+                    .labelsHidden()
+            }
+
+            row {
+                VStack(alignment: .leading, spacing: 2) {
                     Text("Visual Tests").font(.subheadline)
                     Text("LLM can define click/verify UI assertions")
                         .font(.caption2)

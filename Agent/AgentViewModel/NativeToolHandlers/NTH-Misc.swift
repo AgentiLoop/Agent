@@ -354,6 +354,9 @@ extension AgentViewModel {
                 """
         }
 
+        // Critic gate (opt-in, one-shot): LLM review of the task's diff.
+        if let criticBlock = await criticReviewBlocker() { return criticBlock }
+
         return nil
     }
 

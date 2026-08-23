@@ -121,6 +121,7 @@ extension AgentViewModel {
         ])
 
         var commandsRun: [String] = []
+        criticReviewDone = false
         var completionSummary = ""
         // Guard counters — shared with the main loop's overnight-coding battery
         // (Guards.swift) so tab tasks get the same nudges and failure budget.
