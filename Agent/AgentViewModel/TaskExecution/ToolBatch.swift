@@ -167,12 +167,19 @@ extension AgentViewModel {
     ) {
         var advisories: [String] = []
         for tool in pendingTools {
-            guard let result = toolResults.first(where: {
+            guard let idx = toolResults.firstIndex(where: {
                 ($0["type"] as? String) == "tool_result" && ($0["tool_use_id"] as? String) == tool.toolId
-            }), let output = result["content"] as? String else { continue }
+            }), let output = toolResults[idx]["content"] as? String else { continue }
+            let isFailure = Self.isToolFailure(output: output)
+            // Typed error annotation — append a stable error_code + recovery
+            // hint directly onto the failing result so the model gets
+            // structure instead of a bare string.
+            if isFailure, let note = ToolErrorClassifier.annotation(tool: tool.name, output: output) {
+                toolResults[idx]["content"] = output + note
+            }
             ToolOutcomeStore.shared.record(
                 tool: tool.name, output: output,
-                isFailure: Self.isToolFailure(output: output)
+                isFailure: isFailure
             )
             if let advisory = ToolOutcomeStore.shared.advisory(for: tool.name) {
                 advisories.append(advisory)
