@@ -154,6 +154,35 @@ extension AgentViewModel {
                     }
                 }
             }
+            recordToolOutcomes(pendingTools: pendingTools, toolResults: &toolResults)
+        }
+    }
+
+    /// Classify each executed tool's result and inject a one-shot advisory when
+    /// a tool keeps failing this task, so the LLM changes approach instead of
+    /// hammering the same broken call.
+    func recordToolOutcomes(
+        pendingTools: [(toolId: String, name: String, input: [String: Any])],
+        toolResults: inout [[String: Any]]
+    ) {
+        var advisories: [String] = []
+        for tool in pendingTools {
+            guard let result = toolResults.first(where: {
+                ($0["type"] as? String) == "tool_result" && ($0["tool_use_id"] as? String) == tool.toolId
+            }), let output = result["content"] as? String else { continue }
+            ToolOutcomeStore.shared.record(
+                tool: tool.name, output: output,
+                isFailure: Self.isToolFailure(output: output)
+            )
+            if let advisory = ToolOutcomeStore.shared.advisory(for: tool.name) {
+                advisories.append(advisory)
+                appendLog(advisory)
+            }
+        }
+        // Plain text blocks — synthetic tool_results without a matching
+        // tool_use would 400 at the API.
+        for advisory in advisories {
+            toolResults.append(["type": "text", "text": advisory])
         }
     }
 

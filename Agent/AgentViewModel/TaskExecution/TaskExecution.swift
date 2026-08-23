@@ -57,6 +57,7 @@ extension AgentViewModel {
         TokenUsageStore.shared.resetTaskMetrics()
         SessionStore.shared.newSession()
         FallbackChainService.shared.reset()
+        ToolOutcomeStore.shared.startTask(projectFolder: projectFolder)
         Self.clearToolCache()
         // No mode filtering — send every user-enabled tool on every turn.
         // The LLM picks what it needs; ToolPreferencesService is the only filter.
