@@ -8,10 +8,10 @@
 extension AgentViewModel {
 
     /// Detect consecutive edit failures on the same file and append a
-    /// recovery nudge (at 2 failures) or give-up nudge (at 6 failures).
+    /// recovery nudge (at 2 failures) or give-up nudge (at 4 failures).
     /// Mirrors the stuck-file block in runOvernightCodingGuards but
-    /// for the tab-task path. Thresholds are unified: nudge at 2,
-    /// give up at 6.
+    /// for the tab-task path. Thresholds match Guards.swift: nudge at 2,
+    /// give up at 4.
     func appendStuckFileNudgeIfNeeded(
         tab: ScriptTab,
         name: String,
@@ -46,14 +46,14 @@ extension AgentViewModel {
                 toolResults.append(["type": "text", "text": nudge])
                 tab.appendLog("⚠️ Stuck nudge: 2 failures on \((path as NSString).lastPathComponent)")
                 tab.flush()
-            } else if count >= 6 {
+            } else if count >= 4 {
                 let nudge = """
-                    🛑 6 failures on \(path). Stop trying to edit \
+                    🛑 4 failures on \(path). Stop trying to edit \
                     this file. Move on to the next part of your task \
                     or call done with what you've completed so far.
                     """
                 toolResults.append(["type": "text", "text": nudge])
-                tab.appendLog("🛑 Stuck-out: 6 failures on \((path as NSString).lastPathComponent)")
+                tab.appendLog("🛑 Stuck-out: 4 failures on \((path as NSString).lastPathComponent)")
                 tab.flush()
                 stuckFiles[path] = 0
             }
