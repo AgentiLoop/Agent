@@ -34,11 +34,27 @@ All of Agent!'s IP is original and open source. Every Swift package dependency a
 
 ## What's New 🚀
 
+### v1.0.92 (186) — The Self-Verifying Autonomy Release
+[Full release notes →](https://github.com/macOS26/Agent/releases/tag/v1.0.92.186)
+
+- **🎯 Persistent goal state + self-verifying autonomy loop:** New `goal_state` tool (set/get/mark/clear) backed by a file-based `GoalStateStore` that survives restarts. `task_complete` bounces back while success criteria remain unverified — and marking a criterion done now **requires evidence** (the tool result that proves it). Injected into every provider's system prompt: Claude, OpenAI-compatible, Ollama, and Codex.
+- **🧠 Extended thinking for Claude + reasoning effort:** New Reasoning setting (off/low/medium/high) maps to an extended-thinking budget (2K/8K/16K) with interleaved thinking across tool turns. OpenAI-compatible providers get `reasoning_effort` pass-through.
+- **⚡️ Prompt-cache-stable context:** Messages are append-only between compaction events — the per-turn sliding window that defeated prompt caching is gone. Turn-over-turn cache hits on every provider, locked in by byte-identical-prefix tests. Loop control now routes on the API-reported `stop_reason`: malformed tool calls re-issue, truncation continues instead of falsely completing.
+- **📏 Context-aware compaction:** The compaction threshold now scales to the model's real context window (~55%, clamped 2K–400K) instead of a hardcoded 30K — right-sized for everything from 4K Foundation Models sessions to 1M-token Claude. Structural compaction always runs; the toggle gates only on-device AI summarization.
+- **💾 Recoverable compaction + `restore_tool_result`:** Full tool results spill to disk (`.agent/toolcache/`) before truncation. The model can restore any truncated result by `tool_use_id` instead of re-reading files.
+- **🔬 Critic review gate (opt-in):** A one-shot LLM reviewer inspects `git diff HEAD` before `task_complete` and blocks completion once with found issues. Toggle in Coding Preferences.
+- **🩺 Typed tool errors + outcome learning:** Failing tool results carry stable `[error_code: ...]` annotations with recovery hints (old_string_not_found, build_failed, timeout, …). Per-project tool outcome tracking injects in-task advisories after repeated failures and flags chronically failing tools in the system prompt.
+- **🤖 Sub-agent upgrades:** Per-agent model override (run cheap/fast models for search agents), file-based results that survive truncation (`.agent/subagents/`), and tiered concurrency — 3 write-capable agents, up to 6 read-only research agents.
+- **⏪ Task-scoped rewind + hooks:** Every file touched in a task can be rolled back as a unit (`rewind_task`), auto-offered after 3 consecutive build failures. Event hooks (`taskStart`, `taskComplete`, `buildFailure`, post-tool) are now fully wired — react to tool results and broken builds without spending model tokens.
+- **✅ Hardened guards + test suite:** Fixed false-positive stuck nudges on successful edits, id-matched guard attribution on batched turns, a generic broken-record guard for repeated tool calls, Xcode build status verification (no more phantom "Build succeeded"), and 57 passing tests across 6 suites — including a 32-test eval suite for the harness guards.
+
+### Previously shipped
+
 - **🌐 OpenRouter provider:** Full integration with OpenRouter's model catalog — one API key, 200+ models. Smart catalog fetches available models, protocol toggle (OpenAI/Anthropic) routes Claude models through the Anthropic protocol and everything else through OpenAI, and ClaudeService auto-routes when OpenRouter is selected.
 - **LLM-driven UI automation:** UI automation requests like *"take a photo using Photo Booth"* are handled by the main LLM through the `accessibility` tool (AXorcist). On-device Apple Intelligence no longer intercepts these — the cloud model has the full context and toolset to drive any Mac app reliably.
 - **SDEF + runtime app discovery:** Bundle ID resolution is now zero-hardcoded. Apps in `Agent/SDEFs/` plus every `.app` in `/Applications`, `/System/Applications`, `~/Applications` are discovered at runtime — installing a new app extends what the agent can target with no code edit.
 - **Prompt caching for every OpenAI-format provider:** Z.ai, OpenAI, Grok, Mistral, DeepSeek, Qwen, Gemini, BigModel, Hugging Face — `cached_tokens` is parsed from the response and shown in the LLM Usage panel. JSON request bodies use `.sortedKeys` so byte-stable prefixes actually hit the provider's cache.
-- **On-device token compression:** Apple AI summarizes old conversation turns when context exceeds 30K tokens (Tier 1 of `tieredCompact`) — free, private, no API tokens consumed. Toggleable in the brain icon popover.
+- **On-device token compression:** Apple AI summarizes old conversation turns when context exceeds the threshold (Tier 1 of `tieredCompact`) — free, private, no API tokens consumed. Toggleable in the brain icon popover.
 - **Anti-hallucination prompt rule:** Every system prompt now includes explicit guidance against fabricating findings from incomplete tool reads. The 10-consecutive-reads guard pushes the model toward "narrow or call done()" instead of "guess".
 - **Autonomous task loop, Xcode integration, AXorcist desktop automation, privileged daemon, multi-tab LLM config, Ollama pre-warming via `LLMRegistry`** — all the previously-shipped fundamentals are still there.
 
@@ -561,7 +577,7 @@ Agent! is a 100% original pure Swift macOS application. It is not a port, fork, 
 | **MCP** | Node.js stdio/SSE | Swift AgentMCP package |
 | **Scripts** | None | Swift dylib compilation at runtime, dlopen'd in-process with full TCC |
 | **Prompt caching** | Anthropic `cache_control` ephemeral | Anthropic `cache_control` ephemeral + automatic prefix-cache hit tracking for OpenAI/Z.ai/Grok/Mistral/Gemini/Qwen/DeepSeek; Ollama `keep_alive: 30m` |
-| **Context compaction** | Cloud Claude (paid tokens; conversation re-sent to Anthropic) | Tiered: Tier 1 = on-device Apple Intelligence summarization (free, private, no API tokens). Tier 2 = aggressive prune if Apple AI unavailable. Triggers at 30K est. tokens, summaries memoized, 3-failure circuit breaker |
+| **Context compaction** | Cloud Claude (paid tokens; conversation re-sent to Anthropic) | Tiered: Tier 1 = on-device Apple Intelligence summarization (free, private, no API tokens). Tier 2 = aggressive prune if Apple AI unavailable. Threshold scales to the model's context window (~55%, 2K–400K), summaries memoized, 3-failure circuit breaker, full tool results spilled to disk before truncation |
 
 ---
 
