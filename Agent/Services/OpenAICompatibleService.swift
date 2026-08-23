@@ -99,6 +99,7 @@ final class OpenAICompatibleService {
             prompt += historyContext
         }
         prompt += MemoryStore.shared.contextBlock
+        prompt += GoalStateStore.shared.promptBlock
         return prompt
     }
 
@@ -137,6 +138,7 @@ final class OpenAICompatibleService {
             prompt += "\nPROJECT FOLDER: \(projectFolder)"
         }
         prompt += MemoryStore.shared.contextBlock
+        prompt += GoalStateStore.shared.promptBlock
         return prompt
     }
 
