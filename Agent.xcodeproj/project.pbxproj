@@ -207,6 +207,7 @@
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
 		C1DD1E30D7BE7F635978E929 /* ToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176D0F01E4553C80C7E38FB2 /* ToolResultCache.swift */; };
+		0BCD82BC9C5723C7F775D244 /* GoalStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -472,6 +473,7 @@
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
 		176D0F01E4553C80C7E38FB2 /* ToolResultCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolResultCache.swift"; sourceTree = "<group>"; };
+		30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoalStateStore.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -917,6 +919,7 @@
 				IDX0000000000000000004 /* ProjectIndexService.swift */,
 				APP0000000000000000002 /* AgentProjectPaths.swift */,
 							176D0F01E4553C80C7E38FB2 /* ToolResultCache.swift */,
+				30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */,
 );
 			path = Services;
 			sourceTree = "<group>";
@@ -1363,6 +1366,7 @@
 				5B5006F0F90686401060EFF5 /* TaskQueueStore.swift in Sources */,
 				5B7228F2FB0898623282F117 /* FallbackChainService.swift in Sources */,
 							C1DD1E30D7BE7F635978E929 /* ToolResultCache.swift in Sources */,
+				0BCD82BC9C5723C7F775D244 /* GoalStateStore.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

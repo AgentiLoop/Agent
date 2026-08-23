@@ -78,4 +78,49 @@ extension AgentTools {
 
     /// Backward-compat alias.
     @MainActor static var ollamaFormat: [[String: Any]] { ollamaTools(for: .ollama) }
+
+    /// Local tool (schema in-app, not in the AgentTools package) in OpenAI/Ollama
+    /// function format: `goal_state`.
+    @MainActor static func localOllamaTool() -> [[String: Any]] {
+        localToolSchemas().map { schema in
+            [
+                "type": "function",
+                "function": [
+                    "name": schema["name"] as? String ?? "",
+                    "description": schema["description"] as? String ?? "",
+                    "parameters": schema["input_schema"] as? [String: Any] ?? ["type": "object", "properties": [:] as [String: Any]]
+                ] as [String: Any]
+            ]
+        }
+    }
+
+    /// Local tool whose schema lives in the app (not the AgentTools package):
+    /// `goal_state` — view/update the persistent goal + verification criteria.
+    @MainActor static func localToolSchemas() -> [[String: Any]] {
+        [
+            [
+                "name": "goal_state",
+                "description": "Read or update the persistent goal state. Set the goal and its verifiable success criteria when starting a non-trivial task; mark criteria done as you verify them; clear when the task is finished.",
+                "input_schema": [
+                    "type": "object",
+                    "properties": [
+                        "action": [
+                            "type": "string",
+                            "enum": ["set", "get", "mark", "clear"],
+                            "description": "set = record goal + criteria; get = read current state; mark = mark a criterion done/open; clear = wipe the goal."
+                        ],
+                        "goal": ["type": "string", "description": "The task goal (action: set)."],
+                        "criteria": [
+                            "type": "array",
+                            "items": ["type": "string"],
+                            "description": "Verifiable success criteria (action: set). Each should be checkable with a tool call."
+                        ],
+                        "criterion": ["type": "string", "description": "Criterion text to mark (action: mark)."],
+                        "done": ["type": "boolean", "description": "Mark done (true) or still open (false). Default true."]
+                    ],
+                    "required": ["action"]
+                ] as [String: Any]
+            ]
+        ]
+    }
 }
