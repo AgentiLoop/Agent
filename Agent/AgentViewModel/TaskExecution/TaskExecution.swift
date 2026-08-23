@@ -303,6 +303,15 @@ extension AgentViewModel {
                     completionSummary: &completionSummary
                 )
                 if parseResult.taskCompleted { return }
+                // Completion gates refused this task_complete — hand the refusal back
+                // as its tool_result so the model fixes the gap and tries again.
+                if let blocked = parseResult.blockedCompletion {
+                    toolResults.append([
+                        "type": "tool_result",
+                        "tool_use_id": blocked.toolId,
+                        "content": blocked.message
+                    ])
+                }
                 let hasToolUse = parseResult.hasToolUse
                 let pendingTools = parseResult.pendingTools
 

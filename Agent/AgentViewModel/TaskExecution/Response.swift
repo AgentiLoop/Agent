@@ -16,6 +16,9 @@ extension AgentViewModel {
         var hasToolUse: Bool
         var pendingTools: [(toolId: String, name: String, input: [String: Any])]
         var taskCompleted: Bool
+        /// Set when task_complete was refused by the completion gates. The loop must
+        /// feed this back as the tool_result for `toolId` and keep going.
+        var blockedCompletion: (toolId: String, message: String)?
     }
 
     /// / Walks the LLM response content blocks, logging server-side web search / activity, collecting tool_use calls
@@ -30,6 +33,7 @@ extension AgentViewModel {
     ) async -> ResponseParseResult {
         var hasToolUse = false
         var pendingTools: [(toolId: String, name: String, input: [String: Any])] = []
+        var blockedCompletion: (toolId: String, message: String)?
 
         for block in responseContent {
             guard let type = block["type"] as? String else { continue }
@@ -82,6 +86,15 @@ extension AgentViewModel {
                 }
 
                 if name == "task_complete" {
+                    // Completion gates (goal / build / evidence / physical files).
+                    // The main loop handles task_complete here instead of routing it
+                    // through dispatchTool, so run the same gates the dispatch path
+                    // runs. Blocked → feed the refusal back as this tool's result and
+                    // keep looping instead of ending the task.
+                    if blockedCompletion == nil, let blocker = await completionGateBlocker() {
+                        blockedCompletion = (toolId: toolId, message: blocker)
+                        continue
+                    }
                     var summary = input["summary"] as? String ?? "Done"
                     let stripped = summary.trimmingCharacters(in: CharacterSet(charactersIn: ". "))
                     if stripped.isEmpty || summary == "..." {
@@ -144,7 +157,12 @@ extension AgentViewModel {
             }
         }
 
-        return ResponseParseResult(hasToolUse: hasToolUse, pendingTools: pendingTools, taskCompleted: false)
+        return ResponseParseResult(
+            hasToolUse: hasToolUse,
+            pendingTools: pendingTools,
+            taskCompleted: false,
+            blockedCompletion: blockedCompletion
+        )
     }
 
     /// Format a tool call for the activity log in the same shape Apple AI uses:

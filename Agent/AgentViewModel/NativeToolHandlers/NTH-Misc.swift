@@ -241,92 +241,13 @@ extension AgentViewModel {
         case "task_complete":
             let summary = input["summary"] as? String ?? "Done"
 
-            // Goal gate: every verification criterion must be marked done
-            if let goal = GoalStateStore.shared.current, !goal.allCriteriaDone {
-                let open = goal.openCriteria
-                    .enumerated()
-                    .map { "\($0.offset + 1). \($0.element.text)" }
-                    .joined(separator: "\n")
-                appendLog("🎯 Goal gate: \(goal.openCriteria.count) unverified criteria — blocking completion")
-                flushLog()
-                return """
-                    CANNOT COMPLETE — the active goal still has unverified criteria:
+            // All four completion gates (goal / build / evidence / physical files)
+            // live in completionGateBlocker() so the main task loop — which handles
+            // task_complete inline in parseLLMResponseContent and never reaches this
+            // dispatch path — can run the exact same checks.
+            if let blocker = await completionGateBlocker() { return blocker }
 
-                    \(open)
-
-                    Verify each with a tool call (build, grep, read, etc.), then mark it done \
-                    via goal_state(action: "mark") and call task_complete again.
-                    """
-            }
-
-            // Verification gate: if Xcode project + auto-verify + edits were made,
-            // build must pass before task_complete is allowed
-            let editCommands = commandsRun.filter { $0.hasPrefix("write_file") || $0.hasPrefix("edit_file") || $0.hasPrefix("diff_apply") }
-            if autoVerifyEnabled && Self.isXcodeProject(projectFolder) && !editCommands.isEmpty {
-                appendLog("🔍 Verify gate: building before allowing completion...")
-                flushLog()
-                let buildResult = await Self.offMain { XcodeService.shared.buildProject(projectPath: "") }
-                if buildResult.contains("BUILD FAILED") || buildResult.contains("error:") {
-                    // Extract first 5 errors
-                    let errors = buildResult.components(separatedBy: "\n")
-                        .filter { $0.contains("error:") }
-                        .prefix(5)
-                        .joined(separator: "\n")
-                    appendLog("❌ Verify gate: build failed — sending errors back to LLM")
-                    flushLog()
-                    return """
-                        CANNOT COMPLETE — build failed. \
-                        Fix these errors first:
-
-                        \(errors)
-
-                        After fixing, call task_complete again.
-                        """
-                }
-                appendLog("✅ Verify gate: build passed")
-                flushLog()
-            }
-
-            // Criteria marked done but with no evidence cited are self-reported,
-            // not verified. Block completion the same way open criteria do.
-            let unevidenced = GoalStateStore.shared.unevidencedCriteria
-            if !unevidenced.isEmpty {
-                appendLog("❌ Verify gate: \(unevidenced.count) criterion/criteria marked done without evidence")
-                flushLog()
-                return """
-                    CANNOT COMPLETE — these criteria are marked done but cite no evidence:
-
-                    \(unevidenced.map { "  ? \($0.text)" }.joined(separator: "\n"))
-
-                    Re-mark each with goal_state(action: "mark", criterion: "...", \
-                    evidence: "<the tool result that proves it>") after verifying it \
-                    with an actual tool call.
-                    """
-            }
-            // Physical-evidence pass: every file this task edited must still exist
-            // and be non-empty. Catches truncated writes and deleted-by-accident files.
             let touched = FileBackupService.shared.snapshottedFiles()
-            var brokenFiles: [String] = []
-            for path in touched {
-                let attrs = try? FileManager.default.attributesOfItem(atPath: path)
-                guard let attrs, let size = attrs[.size] as? Int, size > 0 else {
-                    brokenFiles.append(path)
-                    continue
-                }
-            }
-            if !brokenFiles.isEmpty {
-                appendLog("❌ Verify gate: \(brokenFiles.count) edited file(s) missing or empty")
-                flushLog()
-                return """
-                    CANNOT COMPLETE — these files were edited this task but are now \
-                    missing or empty:
-
-                    \(brokenFiles.map { "  ✗ \($0)" }.joined(separator: "\n"))
-
-                    Restore them with file(action: "rewind") or rewrite them, then \
-                    call task_complete again.
-                    """
-            }
 
             NativeToolContext.taskCompleteSummary = summary
             // Surface which files the task actually mutated so the user sees the
@@ -340,6 +261,102 @@ extension AgentViewModel {
             return nil
         }
     }
+
+    /// The four completion gates. Returns a `CANNOT COMPLETE — ...` string when the
+    /// task must NOT be allowed to finish, or nil when completion is permitted.
+    /// Called from both the `task_complete` dispatch path and the main task loop's
+    /// inline handler in `parseLLMResponseContent`.
+    func completionGateBlocker() async -> String? {
+        // Goal gate: every verification criterion must be marked done
+        if let goal = GoalStateStore.shared.current, !goal.allCriteriaDone {
+            let open = goal.openCriteria
+                .enumerated()
+                .map { "\($0.offset + 1). \($0.element.text)" }
+                .joined(separator: "\n")
+            appendLog("🎯 Goal gate: \(goal.openCriteria.count) unverified criteria — blocking completion")
+            flushLog()
+            return """
+                CANNOT COMPLETE — the active goal still has unverified criteria:
+
+                \(open)
+
+                Verify each with a tool call (build, grep, read, etc.), then mark it done \
+                via goal_state(action: "mark") and call task_complete again.
+                """
+        }
+
+        // Verification gate: if Xcode project + auto-verify + edits were made,
+        // build must pass before task_complete is allowed
+        let editCommands = commandsRun.filter { $0.hasPrefix("write_file") || $0.hasPrefix("edit_file") || $0.hasPrefix("diff_apply") }
+        if autoVerifyEnabled && Self.isXcodeProject(projectFolder) && !editCommands.isEmpty {
+            appendLog("🔍 Verify gate: building before allowing completion...")
+            flushLog()
+            let buildResult = await Self.offMain { XcodeService.shared.buildProject(projectPath: "") }
+            if buildResult.contains("BUILD FAILED") || buildResult.contains("error:") {
+                // Extract first 5 errors
+                let errors = buildResult.components(separatedBy: "\n")
+                    .filter { $0.contains("error:") }
+                    .prefix(5)
+                    .joined(separator: "\n")
+                appendLog("❌ Verify gate: build failed — sending errors back to LLM")
+                flushLog()
+                return """
+                    CANNOT COMPLETE — build failed. \
+                    Fix these errors first:
+
+                    \(errors)
+
+                    After fixing, call task_complete again.
+                    """
+            }
+            appendLog("✅ Verify gate: build passed")
+            flushLog()
+        }
+
+        // Criteria marked done but with no evidence cited are self-reported,
+        // not verified. Block completion the same way open criteria do.
+        let unevidenced = GoalStateStore.shared.unevidencedCriteria
+        if !unevidenced.isEmpty {
+            appendLog("❌ Verify gate: \(unevidenced.count) criterion/criteria marked done without evidence")
+            flushLog()
+            return """
+                CANNOT COMPLETE — these criteria are marked done but cite no evidence:
+
+                \(unevidenced.map { "  ? \($0.text)" }.joined(separator: "\n"))
+
+                Re-mark each with goal_state(action: "mark", criterion: "...", \
+                evidence: "<the tool result that proves it>") after verifying it \
+                with an actual tool call.
+                """
+        }
+
+        // Physical-evidence pass: every file this task edited must still exist
+        // and be non-empty. Catches truncated writes and deleted-by-accident files.
+        var brokenFiles: [String] = []
+        for path in FileBackupService.shared.snapshottedFiles() {
+            let attrs = try? FileManager.default.attributesOfItem(atPath: path)
+            guard let attrs, let size = attrs[.size] as? Int, size > 0 else {
+                brokenFiles.append(path)
+                continue
+            }
+        }
+        if !brokenFiles.isEmpty {
+            appendLog("❌ Verify gate: \(brokenFiles.count) edited file(s) missing or empty")
+            flushLog()
+            return """
+                CANNOT COMPLETE — these files were edited this task but are now \
+                missing or empty:
+
+                \(brokenFiles.map { "  ✗ \($0)" }.joined(separator: "\n"))
+
+                Restore them with file(action: "rewind") or rewrite them, then \
+                call task_complete again.
+                """
+        }
+
+        return nil
+    }
+
 
     /// goal_state — read/update the persistent goal + verification criteria.
     private func handleGoalState(input: [String: Any]) -> String {
