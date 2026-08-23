@@ -511,6 +511,13 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(maxTokens, forKey: "maxTokens") }
     }
 
+    /// Reasoning effort: "off" (default), "low", "medium", "high".
+    /// Claude providers get an extended-thinking budget scaled from this;
+    /// OpenAI-compatible providers get reasoning_effort passed through.
+    var reasoningEffort: String = UserDefaults.standard.string(forKey: "agentReasoningEffort") ?? "off" {
+        didSet { UserDefaults.standard.set(reasoningEffort, forKey: "agentReasoningEffort") }
+    }
+
     /// Per-task token budget ceiling (input+output). 0 = unlimited (default).
     /// When set, the task loop will nudge the LLM at 90% and auto-stop at 100% or on diminishing returns.
     var tokenBudgetCeiling: Int = UserDefaults.standard.object(forKey: "tokenBudgetCeiling") as? Int ?? 0 {

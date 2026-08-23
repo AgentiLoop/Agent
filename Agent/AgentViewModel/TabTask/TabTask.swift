@@ -367,7 +367,8 @@ extension AgentViewModel {
                         stopRouteRetries += 1
                         tab.appendLog(logLine)
                         tab.flush()
-                        let textBlocks = response.content.filter { ($0["type"] as? String) == "text" }
+                        let keepTypes: Set<String> = ["text", "thinking", "redacted_thinking"]
+                        let textBlocks = response.content.filter { keepTypes.contains($0["type"] as? String ?? "") }
                         messages.append([
                             "role": "assistant",
                             "content": textBlocks.isEmpty ? "(empty response)" : textBlocks

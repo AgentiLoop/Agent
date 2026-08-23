@@ -997,6 +997,35 @@ struct SettingsView: View {
                 }
             }
 
+            // Reasoning effort — extended thinking for Claude, reasoning_effort
+            // pass-through for OpenAI-compatible providers
+            if viewModel.selectedProvider != .localOllama && viewModel.selectedProvider != .foundationModel {
+                Divider()
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Reasoning").font(.caption).foregroundStyle(.secondary)
+                    HStack {
+                        Picker("", selection: Binding(
+                            get: { viewModel.reasoningEffort },
+                            set: { viewModel.reasoningEffort = $0 }
+                        )) {
+                            Text("Off").tag("off")
+                            Text("Low").tag("low")
+                            Text("Medium").tag("medium")
+                            Text("High").tag("high")
+                        }
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
+                        .frame(width: 260)
+
+                        Text(viewModel.reasoningEffort == "off"
+                             ? "No extended thinking"
+                             : "Thinking between tool calls")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
             // Temperature — lives with the LLM since it's a per-provider setting
             Divider()
             VStack(alignment: .leading, spacing: 4) {

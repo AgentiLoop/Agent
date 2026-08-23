@@ -323,9 +323,11 @@ extension AgentViewModel {
                     stopRouteRetries += 1
                     appendLog(logLine)
                     flushLog()
-                    // Keep only text blocks — appending unparsable tool_use blocks
-                    // without matching tool_results would 400 at the API.
-                    let textBlocks = response.content.filter { ($0["type"] as? String) == "text" }
+                    // Keep text + thinking blocks — appending unparsable tool_use
+                    // blocks without matching tool_results would 400 at the API,
+                    // and thinking blocks must pass back unmodified.
+                    let keepTypes: Set<String> = ["text", "thinking", "redacted_thinking"]
+                    let textBlocks = response.content.filter { keepTypes.contains($0["type"] as? String ?? "") }
                     let assistantMsg: [String: Any] = [
                         "role": "assistant",
                         "content": textBlocks.isEmpty ? "(empty response)" : textBlocks
