@@ -216,6 +216,7 @@
 		8694EEF8CDF9D987CE3D1E2A /* PlanStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5A29F2E735D900C78C575E /* PlanStateStore.swift */; };
 		B73A9A6EBE2A1C13B66EB81E /* ToolErrorClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B73CC1C22C23AAC6CD8E7BD5 /* ToolErrorClassifier.swift */; };
 		1DCD8313ABDDD50E52BDA2E0 /* CriticGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F212F6A04076958DD46FD1E4 /* CriticGate.swift */; };
+		D3A4F795003DE4CF29105DB6 /* HarnessGuardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1677C7175A16F2731420499 /* HarnessGuardTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -490,6 +491,7 @@
 		BB5A29F2E735D900C78C575E /* PlanStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlanStateStore.swift"; sourceTree = "<group>"; };
 		B73CC1C22C23AAC6CD8E7BD5 /* ToolErrorClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolErrorClassifier.swift"; sourceTree = "<group>"; };
 		F212F6A04076958DD46FD1E4 /* CriticGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CriticGate.swift"; sourceTree = "<group>"; };
+		C1677C7175A16F2731420499 /* HarnessGuardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HarnessGuardTests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -877,6 +879,7 @@
 							ABBDF459529494A3928D101A /* AgenticCoreTests.swift */,
 							FA10000000000000000102 /* PrefixStabilityTests.swift */,
 							FA10000000000000000104 /* LoopReplayTests.swift */,
+				C1677C7175A16F2731420499 /* HarnessGuardTests.swift */,
 );
 			path = AgentTests;
 			sourceTree = "<group>";
@@ -1429,6 +1432,7 @@
 				FA10000000000000000105 /* LoopReplayTests.swift in Sources */,
 				FF20000000000000000004 /* DiffToolsTests.swift in Sources */,
 				FF20000000000000000006 /* ExaSearchTests.swift in Sources */,
+				D3A4F795003DE4CF29105DB6 /* HarnessGuardTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
