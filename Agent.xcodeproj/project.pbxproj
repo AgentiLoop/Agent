@@ -211,6 +211,7 @@
 		0BCD82BC9C5723C7F775D244 /* GoalStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */; };
 		3A2D86472E205A0DA0CB5D69 /* AgenticCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBDF459529494A3928D101A /* AgenticCoreTests.swift */; };
 		FA10000000000000000103 /* PrefixStabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000102 /* PrefixStabilityTests.swift */; };
+		FA10000000000000000105 /* LoopReplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000104 /* LoopReplayTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -480,6 +481,7 @@
 		30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoalStateStore.swift"; sourceTree = "<group>"; };
 		ABBDF459529494A3928D101A /* AgenticCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgenticCoreTests.swift"; sourceTree = "<group>"; };
 		FA10000000000000000102 /* PrefixStabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PrefixStabilityTests.swift"; sourceTree = "<group>"; };
+		FA10000000000000000104 /* LoopReplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoopReplayTests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -865,6 +867,7 @@
 				FF20000000000000000005 /* ExaSearchTests.swift */,
 							ABBDF459529494A3928D101A /* AgenticCoreTests.swift */,
 							FA10000000000000000102 /* PrefixStabilityTests.swift */,
+							FA10000000000000000104 /* LoopReplayTests.swift */,
 );
 			path = AgentTests;
 			sourceTree = "<group>";
@@ -1407,6 +1410,7 @@
 				FF20000000000000000002 /* SafariWebAutomationTests.swift in Sources */,
 				3A2D86472E205A0DA0CB5D69 /* AgenticCoreTests.swift in Sources */,
 				FA10000000000000000103 /* PrefixStabilityTests.swift in Sources */,
+				FA10000000000000000105 /* LoopReplayTests.swift in Sources */,
 				FF20000000000000000004 /* DiffToolsTests.swift in Sources */,
 				FF20000000000000000006 /* ExaSearchTests.swift in Sources */,
 			);

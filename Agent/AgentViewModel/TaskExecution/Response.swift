@@ -175,6 +175,75 @@ extension AgentViewModel {
         }
     }
 
+    /// Pure completion decision for one turn — extracted so fixture-replay
+    /// tests can drive the loop's decision layer without UI or stores.
+    enum TurnDecision: Equatable {
+        case continueLoop
+        /// Model wrote task_complete/done as free text instead of a tool call.
+        case completeTextCommand(summary: String)
+        /// Model signaled completion via natural language.
+        case completeDoneSignal(summary: String)
+        /// Text-only response with no completion signal — complete immediately.
+        case completeTextOnly(summary: String)
+        /// Stop-phrase while tools ran — complete without a log line.
+        case completeStopPhrase
+    }
+
+    nonisolated static func turnDecision(
+        responseText: String,
+        hasToolUse: Bool,
+        hasToolResults: Bool
+    ) -> TurnDecision {
+        if hasToolUse && hasToolResults { return .continueLoop }
+        if !hasToolUse {
+            if responseText.contains("task_complete") || responseText.contains("done(summary") {
+                var summary = ""
+                if let match = responseText.range(
+                    of: #"(?:task_complete|done)\(summary[=:]\s*"([^"]+)""#,
+                    options: .regularExpression
+                ) {
+                    let raw = String(responseText[match])
+                    summary = raw.replacingOccurrences(
+                        of: #"(?:task_complete|done)\(summary[=:]\s*""#,
+                        with: "",
+                        options: .regularExpression
+                    ).replacingOccurrences(of: "\"", with: "")
+                }
+                return .completeTextCommand(summary: summary)
+            }
+            let lower = responseText.lowercased()
+            let doneSignals = [
+                "conclude this task",
+                "i'll conclude",
+                "task is complete",
+                "no further action",
+                "nothing more to do",
+                "no more content"
+            ]
+            if doneSignals.contains(where: { lower.contains($0) }) {
+                return .completeDoneSignal(summary: String(responseText.prefix(300)))
+            }
+            return .completeTextOnly(summary: String(responseText.prefix(300)))
+        }
+        // Tool calls happened but no results made it back — check stop phrases.
+        let allText = responseText.lowercased()
+        let stopPhrases = [
+            "no more content",
+            "no further action",
+            "task is complete",
+            "nothing more to do",
+            "task_complete",
+            "conclude this task",
+            "i'll conclude",
+            "feel free to ask",
+            "let me know if"
+        ]
+        if stopPhrases.contains(where: { allText.contains($0) }) {
+            return .completeStopPhrase
+        }
+        return .continueLoop
+    }
+
     /// / Post-tool-dispatch handling: append the assistant turn to the / conversation, append tool results on the user
     /// turn, and detect whether / the model implicitly signaled completion via free-text. Returns `true` / if the outer task loop should `break`.
     func finalizeTurnAndDetectCompletion(
@@ -192,77 +261,41 @@ extension AgentViewModel {
         messages.append(assistantMsg)
         SessionStore.shared.appendMessage(assistantMsg)
 
-        if hasToolUse && !toolResults.isEmpty {
-            let userMsg: [String: Any] = ["role": "user", "content": toolResults]
-            messages.append(userMsg)
-            SessionStore.shared.appendMessage(userMsg)
+        let responseText = responseContent.compactMap { $0["text"] as? String }.joined()
+        switch Self.turnDecision(
+            responseText: responseText,
+            hasToolUse: hasToolUse,
+            hasToolResults: !toolResults.isEmpty
+        ) {
+        case .continueLoop:
+            if hasToolUse && !toolResults.isEmpty {
+                let userMsg: [String: Any] = ["role": "user", "content": toolResults]
+                messages.append(userMsg)
+                SessionStore.shared.appendMessage(userMsg)
+            }
             return false
-        } else if !hasToolUse {
-            // Check if model wrote task_complete/done as text instead of a tool call
-            let responseText = responseContent.compactMap { $0["text"] as? String }.joined()
-            if responseText.contains("task_complete") || responseText.contains("done(summary") {
-                if let match = responseText.range(
-                    of: #"(?:task_complete|done)\(summary[=:]\s*"([^"]+)""#,
-                    options: .regularExpression
-                ) {
-                    let raw = String(responseText[match])
-                    let summary = raw.replacingOccurrences(
-                        of: #"(?:task_complete|done)\(summary[=:]\s*""#,
-                        with: "",
-                        options: .regularExpression
-                    ).replacingOccurrences(of: "\"", with: "")
-                    appendLog("✅ Completed: \(summary)")
-                }
-                flushLog()
-                return true
-            }
-            // Check if model signaled completion via natural language
-            let lower = responseText.lowercased()
-            let doneSignals = [
-                "conclude this task",
-                "i'll conclude",
-                "task is complete",
-                "no further action",
-                "nothing more to do",
-                "no more content"
-            ]
-            if doneSignals.contains(where: { lower.contains($0) }) {
-                // Ensure LLM Output shows the response
-                displayedLLMOutput = rawLLMOutput
-                dripDisplayIndex = rawLLMOutput.count
-                let summary = String(responseText.prefix(300))
-                appendLog("✅ Completed: \(summary)")
-                flushLog()
-                return true
-            }
-            // Text-only response (no tool calls) — complete immediately
+        case .completeTextCommand(let summary):
+            if !summary.isEmpty { appendLog("✅ Completed: \(summary)") }
+            flushLog()
+            return true
+        case .completeDoneSignal(let summary):
+            // Ensure LLM Output shows the response
+            displayedLLMOutput = rawLLMOutput
+            dripDisplayIndex = rawLLMOutput.count
+            appendLog("✅ Completed: \(summary)")
+            flushLog()
+            return true
+        case .completeTextOnly(let summary):
             if rawLLMOutput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 rawLLMOutput = responseText
             }
             displayedLLMOutput = rawLLMOutput
             dripDisplayIndex = rawLLMOutput.count
-            let summary = String(responseText.prefix(300))
             appendLog("✅ Completed: \(summary)")
             flushLog()
             return true
-        } else {
-            // Check if LLM signaled it's done via text even though it made tool calls
-            let allText = responseContent.compactMap { $0["text"] as? String }.joined().lowercased()
-            let stopPhrases = [
-                "no more content",
-                "no further action",
-                "task is complete",
-                "nothing more to do",
-                "task_complete",
-                "conclude this task",
-                "i'll conclude",
-                "feel free to ask",
-                "let me know if"
-            ]
-            if stopPhrases.contains(where: { allText.contains($0) }) {
-                return true
-            }
-            return false
+        case .completeStopPhrase:
+            return true
         }
     }
 }
