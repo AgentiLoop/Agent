@@ -159,6 +159,7 @@ extension AgentViewModel {
         var unbuiltEditCount = 0 // build enforcement — nudge after edit without build
         var consecutiveBuildFailures = 0 // error budget — stop after 5
         var stuckFiles: [String: Int] = [:] // stuck detection — skip after 5 failures per file
+        var textOnlyNudges = 0 // silent-completion guard — nudge once before accepting a tool-less turn
         // Full system prompt + full tool descriptions on every turn. The earlier condensed-prompt + compactTools
         // optimization saved ~4K tokens/turn but the user prefers the LLM having maximum context every iteration over the savings.
         let userName = NSFullUserName()
@@ -416,7 +417,9 @@ extension AgentViewModel {
                     responseContent: response.content,
                     hasToolUse: hasToolUse,
                     toolResults: toolResults,
-                    messages: &messages
+                    messages: &messages,
+                    textOnlyNudges: &textOnlyNudges
+
                 )
                 if finalizeShouldBreak { break taskLoop }
 
