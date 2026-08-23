@@ -286,8 +286,41 @@ extension AgentViewModel {
                 flushLog()
             }
 
+            // Self-verification pass: the goal gate above only checks that criteria
+            // were *marked* done — and the model marks them itself. This re-checks
+            // the physical evidence: every file this task edited must still exist
+            // and be non-empty. Catches truncated writes and deleted-by-accident files.
+            let touched = FileBackupService.shared.snapshottedFiles()
+            var brokenFiles: [String] = []
+            for path in touched {
+                let attrs = try? FileManager.default.attributesOfItem(atPath: path)
+                guard let attrs, let size = attrs[.size] as? Int, size > 0 else {
+                    brokenFiles.append(path)
+                    continue
+                }
+            }
+            if !brokenFiles.isEmpty {
+                appendLog("❌ Verify gate: \(brokenFiles.count) edited file(s) missing or empty")
+                flushLog()
+                return """
+                    CANNOT COMPLETE — these files were edited this task but are now \
+                    missing or empty:
+
+                    \(brokenFiles.map { "  ✗ \($0)" }.joined(separator: "\n"))
+
+                    Restore them with file(action: "rewind") or rewrite them, then \
+                    call task_complete again.
+                    """
+            }
+
             NativeToolContext.taskCompleteSummary = summary
-            return "Task complete: \(summary)"
+            // Surface which files the task actually mutated so the user sees the
+            // blast radius without having to ask.
+            let editSummary = FileBackupService.shared.taskEditSummary()
+            if touched.isEmpty {
+                return "Task complete: \(summary)"
+            }
+            return "Task complete: \(summary)\n\n\(editSummary)"
         default:
             return nil
         }
