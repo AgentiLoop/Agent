@@ -42,6 +42,20 @@ extension AgentViewModel {
         // providers; we run it locally rather than server-side.
         case "memory":
             return handleMemoryTool(input: input)
+        // Recover a tool result that compaction truncated. ToolResultCache spills
+        // the full text to .agent/toolcache before the truncation happens.
+        case "restore_tool_result":
+            let id = input["tool_use_id"] as? String ?? ""
+            guard !id.isEmpty else { return "Error: 'tool_use_id' is required." }
+            if let restored = ToolResultCache.restore(toolUseID: id) {
+                return restored
+            }
+            let available = ToolResultCache.availableIDs()
+            if available.isEmpty {
+                return "No spilled tool result for '\(id)'. Nothing has been compacted yet."
+            }
+            return "No spilled tool result for '\(id)'. Available ids:\n"
+                + available.joined(separator: "\n")
         // Skills — reusable prompt templates
         case "invoke_skill":
             let action = input["action"] as? String ?? "invoke"
