@@ -186,6 +186,8 @@ extension AgentViewModel {
         var iterations = 0
         var textOnlyCount = 0
         var timeoutRetryCount = 0
+        var stopRouteRetries = 0
+        var compactionState = CompactionState()
         var stuckFiles: [String: Int] = [:] // Edit failure count per file (for nudge)
         var repeatedCalls: [String: Int] = [:] // Identical tool-call fingerprint counts (broken-record guard)
         // Plan-mode enforcement state
@@ -219,16 +221,13 @@ extension AgentViewModel {
             // Mode auto-switching removed: every user-enabled tool is available on
             // every turn. ToolPreferencesService UI toggles are the only filter.
 
-            // Prune old messages every 4 iterations to save tokens
-            if iterations > 1 && iterations % 4 == 0 && messages.count > 10 {
-                Self.pruneMessages(&messages)
-            }
-            if iterations > 2 { Self.stripOldImages(&messages) }
-            // Drop oldest messages after 25 iterations
-            if iterations >= 25 && messages.count > 12 {
-                let keep = 8
-                let drop = messages.count - keep
-                if drop > 1 { messages.removeSubrange(1..<(1 + drop)) }
+            // Token-aware compaction — mutations happen only at threshold events so
+            // the request prefix stays byte-stable and provider prompt caches hit.
+            if iterations > 1 {
+                _ = await Self.tieredCompact(&messages, state: &compactionState) { [weak tab] msg in
+                    tab?.appendLog(msg)
+                    tab?.flush()
+                }
             }
 
             do {
@@ -237,11 +236,8 @@ extension AgentViewModel {
                 if iterations == 1 { tab.thinkingDismissed = false }
                 let response: (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int)
                 let streamStart = CFAbsoluteTimeGetCurrent()
-                // Summarize old messages every 10 iterations
-                if iterations > 0 && iterations % 10 == 0 {
-                    await Self.summarizeOldMessages(&messages)
-                }
-                let sendMessages = iterations > 1 ? Self.compressMessages(messages) : messages
+                // Append-only between compaction events — see tieredCompact above.
+                let sendMessages = messages
                 if let claude = services.claude {
                     response = try await claude.sendStreaming(messages: sendMessages, activeGroups: activeGroups) { [weak tab] delta in
                         Task { @MainActor in
@@ -356,6 +352,31 @@ extension AgentViewModel {
                     ])
                     return
                 case .normal(let hasToolUse, let toolResults):
+                    // stop_reason-driven loop control — same routing as the main
+                    // loop. Goal criteria are main-task-scoped, so pass none here.
+                    let routeText = response.content.compactMap { $0["text"] as? String }.joined()
+                    let route = Self.routeStopReason(
+                        stopReason: response.stopReason,
+                        hasToolUse: hasToolUse,
+                        hasPendingTools: !toolResults.isEmpty,
+                        responseText: routeText,
+                        openCriteria: [],
+                        retriesUsed: stopRouteRetries
+                    )
+                    if case .retry(let correction, let logLine) = route {
+                        stopRouteRetries += 1
+                        tab.appendLog(logLine)
+                        tab.flush()
+                        let textBlocks = response.content.filter { ($0["type"] as? String) == "text" }
+                        messages.append([
+                            "role": "assistant",
+                            "content": textBlocks.isEmpty ? "(empty response)" : textBlocks
+                        ])
+                        messages.append(["role": "user", "content": correction])
+                        tab.llmMessages = messages
+                        continue mainLoop
+                    }
+
                     messages.append(["role": "assistant", "content": response.content])
                     tab.llmMessages = messages
 
