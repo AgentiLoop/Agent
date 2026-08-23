@@ -1,4 +1,5 @@
 import AgentAudit
+import AppKit
 import Foundation
 import ScriptingBridge
 import XcodeScriptingBridge
@@ -79,12 +80,28 @@ final class XcodeService: @unchecked Sendable {
                 + "project. Must be .xcodeproj or .xcworkspace."
         }
 
+        guard isXcodeRunning() else {
+            return
+                "Error: Xcode is not running. Open \(resolvedPath) in Xcode first, "
+                + "then retry xcode (action: build)."
+        }
+
         guard let xcode = xcodeApp() else {
             return "Error: Failed to connect to Xcode"
         }
 
         guard let workspace = xcode.open?(resolvedPath as Any) as? XcodeWorkspaceDocument else {
             return "Error: Could not open workspace at \(resolvedPath)"
+        }
+
+        // Wait for the workspace to finish loading — building an unloaded workspace
+        // returns a result that never leaves notYetStarted, which used to read as success.
+        let loadDeadline = Date().addingTimeInterval(120)
+        while !(workspace.loaded ?? false) {
+            if Date() > loadDeadline {
+                return "Error: Workspace at \(resolvedPath) did not finish loading after 2 minutes"
+            }
+            Thread.sleep(forTimeInterval: 0.5)
         }
 
         guard let buildResult = workspace.build?() else {
@@ -95,7 +112,8 @@ final class XcodeService: @unchecked Sendable {
         let deadline = Date().addingTimeInterval(600)
         while !(buildResult.completed ?? false) {
             if Date() > deadline {
-                return "Error: Build timed out after 10 minutes"
+                let status = statusDescription(buildResult.status)
+                return "Error: Build timed out after 10 minutes (status: \(status))"
             }
             Thread.sleep(forTimeInterval: 0.5)
         }
@@ -116,7 +134,40 @@ final class XcodeService: @unchecked Sendable {
             collectIssues(testFailures, type: "TestFailure", into: &output)
         }
 
+        // Never report success on a status the build system didn't call succeeded.
+        // A cancelled/failed/errored build can finish with zero collectible issues.
+        let status = buildResult.status ?? .notYetStarted
+        guard status == .succeeded else {
+            var failure = "Build \(statusDescription(status))"
+            if let message = buildResult.errorMessage, !message.isEmpty {
+                failure += ": \(message)"
+            }
+            if !output.isEmpty {
+                failure += "\n\(output)"
+            }
+            return failure
+        }
+
         return output.isEmpty ? "Build succeeded" : output
+    }
+
+    /// True when Xcode is actually launched. Prevents ScriptingBridge from silently
+    /// cold-launching Xcode mid-build and returning a half-initialized workspace.
+    private nonisolated func isXcodeRunning() -> Bool {
+        !NSRunningApplication.runningApplications(withBundleIdentifier: Self.xcodeBundleID).isEmpty
+    }
+
+    private nonisolated func statusDescription(_ status: XcodeSchemeActionResultStatus?) -> String {
+        switch status {
+        case .notYetStarted: return "not yet started"
+        case .running: return "still running"
+        case .cancelled: return "cancelled"
+        case .failed: return "failed"
+        case .errorOccurred: return "failed with an error"
+        case .succeeded: return "succeeded"
+        case .none: return "unknown"
+        @unknown default: return "unknown"
+        }
     }
 
     // MARK: - Run
