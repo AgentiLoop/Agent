@@ -31,11 +31,12 @@ extension AgentViewModel {
 
             for batch in batches {
                 if batch.parallel && batch.tools.count > 1 {
-                    // Parallel batch: pre-execute shell tools off MainActor
-                    // read_file is intentionally absent — must route through
-                    // handleFileTool (FileTools.swift) so the dedup/sha256
-                    // guards run. Adding it here re-opens the bypass.
-                    let shellTools: Set<String> = [
+                    // Parallel batch: pre-execute read-only tools off MainActor —
+                    // INCLUDING read_file, which routes through the same lock-protected
+                    // dedup/sha256 statics (dedupRead / recordReadEmission) that
+                    // handleFileTool uses, so the read guards still run per-read.
+                    let parallelTools: Set<String> = [
+                        "read_file",
                         "list_files",
                         "search_files",
                         "read_dir",
@@ -44,53 +45,102 @@ extension AgentViewModel {
                         "git_log",
                         "git_diff_patch"
                     ]
-                    let shellBatch = batch.tools.filter { shellTools.contains($0.name) }
-                    if shellBatch.count > 1 {
+                    let parallelBatch = batch.tools.filter { parallelTools.contains($0.name) }
+                    if parallelBatch.count > 1 {
                         let capturedPF = projectFolder
-                        let cmds = shellBatch.map { (
-                            $0.toolId,
-                            Self.buildReadOnlyCommand(name: $0.name, input: $0.input, projectFolder: capturedPF)
-                        ) }
+                        let capturedTabID = selectedTabId ?? Self.mainTabID
+                        let workDir = capturedPF.isEmpty ? NSHomeDirectory() : capturedPF
+                        // Extract Sendable payloads on the main actor — the child
+                        // task must not capture the non-Sendable [String: Any] input.
+                        let payloads: [(toolId: String, readFile: (filePath: String, expanded: String, offset: Int?, limit: Int?)?, shellCmd: String?)] = parallelBatch.map { tool in
+                            if tool.name == "read_file" {
+                                let filePath = tool.input["file_path"] as? String ?? ""
+                                return (
+                                    tool.toolId,
+                                    (
+                                        filePath,
+                                        (filePath as NSString).expandingTildeInPath,
+                                        tool.input["offset"] as? Int,
+                                        tool.input["limit"] as? Int
+                                    ),
+                                    nil
+                                )
+                            }
+                            return (
+                                tool.toolId,
+                                nil,
+                                Self.buildReadOnlyCommand(name: tool.name, input: tool.input, projectFolder: capturedPF)
+                            )
+                        }
                         var preResults: [String: String] = [:]
                         await withTaskGroup(of: (String, String).self) { group in
-                            for (i, (id, cmd)) in cmds.enumerated() where i < maxConcurrency {
-                                let cid = id; let ccmd = cmd
-                                let workDir = capturedPF.isEmpty ? NSHomeDirectory() : capturedPF
+                            for (i, payload) in payloads.enumerated() where i < maxConcurrency {
+                                let toolId = payload.toolId
+                                let rf = payload.readFile
+                                let cmd = payload.shellCmd
+                                let tabID = capturedTabID
+                                let workDirLocal = workDir
                                 group.addTask {
-                                    guard !ccmd.isEmpty else { return (cid, "") }
+                                    if let rf = rf {
+                                        // Same guard sequence as handleFileTool's serial path.
+                                        if let dedup = Self.dedupRead(
+                                            tabID: tabID, expandedPath: rf.expanded,
+                                            offset: rf.offset, limit: rf.limit)
+                                        {
+                                            return (toolId, dedup)
+                                        }
+                                        let out = CodingService.readFile(
+                                            path: rf.filePath, offset: rf.offset, limit: rf.limit)
+                                        Self.recordReadEmission(
+                                            tabID: tabID, expandedPath: rf.expanded,
+                                            offset: rf.offset, limit: rf.limit)
+                                        return (toolId, out)
+                                    }
+                                    guard let cmd = cmd, !cmd.isEmpty else { return (toolId, "") }
                                     let pipe = Pipe(); let p = Process()
                                     p.executableURL = URL(fileURLWithPath: "/bin/zsh")
-                                    p.arguments = ["-c", ccmd]
-                                    p.currentDirectoryURL = URL(fileURLWithPath: workDir)
+                                    p.arguments = ["-c", cmd]
+                                    p.currentDirectoryURL = URL(fileURLWithPath: workDirLocal)
                                     var env = ProcessInfo.processInfo.environment
                                     env["HOME"] = NSHomeDirectory()
                                     // Match the AGENT_PROJECT_FOLDER contract used by every other
-                                    // shell-execution path (executeTCC, UserService, HelperService).
-                                    env["AGENT_PROJECT_FOLDER"] = workDir
+                                    // shell-execution path (executeTCC, UserService, HelperToolService).
+                                    env["AGENT_PROJECT_FOLDER"] = workDirLocal
                                     env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:" +
                                         (env["PATH"] ?? "")
                                     p.environment = env; p.standardOutput = pipe; p.standardError = pipe
                                     try? p.run(); p.waitUntilExit()
                                     return (
-                                        cid,
+                                        toolId,
                                         String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
                                     )
                                 }
                             }
                             for await (id, result) in group { preResults[id] = result }
                         }
-                        Self.precomputedResults = preResults
+                        // Consume the pre-executed results directly instead of
+                        // re-running every tool through dispatchTool (the old code
+                        // stashed them but never read the stash — every parallel
+                        // batch executed twice).
+                        for tool in batch.tools {
+                            if let pre = preResults[tool.toolId] {
+                                appendLog("⚡ \(tool.name) (parallel pre-exec)")
+                                toolResults.append([
+                                    "type": "tool_result",
+                                    "tool_use_id": tool.toolId,
+                                    "content": pre
+                                ])
+                                continue
+                            }
+                            let ctx = ToolContext(
+                                toolId: tool.toolId,
+                                projectFolder: projectFolder,
+                                selectedProvider: selectedProvider,
+                                tavilyAPIKey: tavilyAPIKey
+                            )
+                            _ = await dispatchTool(name: tool.name, input: tool.input, ctx: ctx, toolResults: &toolResults)
+                        }
                     }
-                    for tool in batch.tools {
-                        let ctx = ToolContext(
-                            toolId: tool.toolId,
-                            projectFolder: projectFolder,
-                            selectedProvider: selectedProvider,
-                            tavilyAPIKey: tavilyAPIKey
-                        )
-                        _ = await dispatchTool(name: tool.name, input: tool.input, ctx: ctx, toolResults: &toolResults)
-                    }
-                    Self.precomputedResults = nil
                 } else {
                     // Serial batch: execute one by one
                     for tool in batch.tools {

@@ -46,7 +46,7 @@ extension AgentViewModel {
     }
 
     /// Single lock guarding the read-dedup cache below.
-    private static let _readCountLock = NSLock()
+    private nonisolated static let _readCountLock = NSLock()
 
     /// Called by every successful write/edit/apply_diff/diff_and_apply/apply_patch
     /// path in FileTools.swift. Drops all dedup slots for this file — content has
@@ -71,13 +71,15 @@ extension AgentViewModel {
     /// are allowed (lines 1–10 then lines 2–20 is fine, each can be read once),
     /// but the SAME range repeated on an unchanged file is blocked. The rule:
     /// ONE read per (file, range) while the data is unchanged.
-    static var _lastReadEmissions: [String: LastReadEmission] = [:]
+    /// nonisolated(unsafe): guarded by _readCountLock, callable off-actor from
+    /// ToolBatch's parallel read group.
+    nonisolated(unsafe) static var _lastReadEmissions: [String: LastReadEmission] = [:]
 
-    static func dedupKey(tabID: UUID, expandedPath: String, offset: Int?, limit: Int?) -> String {
+    nonisolated static func dedupKey(tabID: UUID, expandedPath: String, offset: Int?, limit: Int?) -> String {
         "\(tabID.uuidString):\(expandedPath):\(offset ?? -1):\(limit ?? -1)"
     }
 
-    static func fileStat(_ path: String) -> (mtime: Date, size: Int64)? {
+    nonisolated static func fileStat(_ path: String) -> (mtime: Date, size: Int64)? {
         guard let attrs = try? FileManager.default.attributesOfItem(atPath: path),
               let mtime = attrs[.modificationDate] as? Date,
               let size = attrs[.size] as? NSNumber
@@ -89,7 +91,7 @@ extension AgentViewModel {
     /// This is the authoritative "data is exactly the same" check — mtime can
     /// be touched without content changing, but a hash match means the bytes
     /// are byte-for-byte identical.
-    static func computeFileHash(path: String) -> String? {
+    nonisolated static func computeFileHash(path: String) -> String? {
         guard let data = FileManager.default.contents(atPath: path) else { return nil }
         let digest = SHA256.hash(data: data)
         return digest.map { String(format: "%02x", $0) }.joined()
@@ -100,7 +102,7 @@ extension AgentViewModel {
     /// with an explicit message citing the rule and the hash match. Returns nil
     /// on first read of this range or if the file has changed.
     /// Does NOT consume a read-count slot — blocks are no-ops.
-    static func dedupRead(tabID: UUID, expandedPath: String, offset: Int?, limit: Int?) -> String? {
+    static nonisolated func dedupRead(tabID: UUID, expandedPath: String, offset: Int?, limit: Int?) -> String? {
         _readCountLock.lock()
         defer { _readCountLock.unlock() }
         let key = dedupKey(tabID: tabID, expandedPath: expandedPath, offset: offset, limit: limit)
@@ -135,7 +137,7 @@ extension AgentViewModel {
     /// Record a successful read so the next read of the same (path, range) on an
     /// unchanged file is blocked. Captures mtime, size, and the sha256 of the
     /// raw file bytes at read time.
-    static func recordReadEmission(tabID: UUID, expandedPath: String, offset: Int?, limit: Int?) {
+    static nonisolated func recordReadEmission(tabID: UUID, expandedPath: String, offset: Int?, limit: Int?) {
         _readCountLock.lock()
         defer { _readCountLock.unlock() }
         guard let stat = fileStat(expandedPath),
