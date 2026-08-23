@@ -208,6 +208,7 @@
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
 		C1DD1E30D7BE7F635978E929 /* ToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176D0F01E4553C80C7E38FB2 /* ToolResultCache.swift */; };
 		0BCD82BC9C5723C7F775D244 /* GoalStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */; };
+		3A2D86472E205A0DA0CB5D69 /* AgenticCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBDF459529494A3928D101A /* AgenticCoreTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -474,6 +475,7 @@
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
 		176D0F01E4553C80C7E38FB2 /* ToolResultCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolResultCache.swift"; sourceTree = "<group>"; };
 		30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoalStateStore.swift"; sourceTree = "<group>"; };
+		ABBDF459529494A3928D101A /* AgenticCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgenticCoreTests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -856,7 +858,8 @@
 				FF20000000000000000001 /* SafariWebAutomationTests.swift */,
 				FF20000000000000000003 /* DiffToolsTests.swift */,
 				FF20000000000000000005 /* ExaSearchTests.swift */,
-			);
+							ABBDF459529494A3928D101A /* AgenticCoreTests.swift */,
+);
 			path = AgentTests;
 			sourceTree = "<group>";
 		};
@@ -1395,6 +1398,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF20000000000000000002 /* SafariWebAutomationTests.swift in Sources */,
+				3A2D86472E205A0DA0CB5D69 /* AgenticCoreTests.swift in Sources */,
 				FF20000000000000000004 /* DiffToolsTests.swift in Sources */,
 				FF20000000000000000006 /* ExaSearchTests.swift in Sources */,
 			);
