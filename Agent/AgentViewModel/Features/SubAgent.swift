@@ -13,6 +13,15 @@ final class SubAgent: Identifiable {
     let projectFolder: String
     var toolGroups: Set<String>? // nil = default (Core+Work+Code)
     var maxIterations: Int = 15
+    /// Optional model id for this agent (from the active provider's model
+    /// list) — lets a cheap/fast model run search agents while the parent
+    /// keeps its own model. nil = parent's model.
+    var modelOverride: String?
+    /// Whether the agent's tool groups can mutate state (Code/Auto/User/Root).
+    var isWriteCapable: Bool = true
+    /// Full findings written to {project}/.agent/subagents/<id>.md when the
+    /// result exceeds the notification cap.
+    var resultFilePath: String?
     var status: Status = .running
     var result: String = ""
     var task: Task<String, Never>?
@@ -38,12 +47,15 @@ final class SubAgent: Identifiable {
 
     /// XML notification for parent context.
     var notification: String {
-        """
+        let fileLine = resultFilePath.map {
+            "\n  <full-result-file>\($0) — read_file for the complete findings</full-result-file>"
+        } ?? ""
+        return """
         <task-notification>
           <task-id>\(id.uuidString.prefix(8))</task-id>
           <name>\(name)</name>
           <status>\(status.rawValue)</status>
-          <result>\(LogLimits.trim(result, cap: LogLimits.summaryChars))</result>
+          <result>\(LogLimits.trim(result, cap: LogLimits.summaryChars))</result>\(fileLine)
           <usage>
             <input_tokens>\(inputTokens)</input_tokens>
             <output_tokens>\(outputTokens)</output_tokens>
@@ -58,6 +70,9 @@ extension AgentViewModel {
 
     /// Maximum concurrent sub-agents per task.
     static let maxSubAgents = 3
+    /// Read-only agents (no write-capable tool groups) get a higher cap —
+    /// parallel research fans out without risking concurrent mutations.
+    static let maxTotalSubAgents = 6
 
     /// Active sub-agents for the current task.
     var activeSubAgents: [SubAgent] {
@@ -66,14 +81,27 @@ extension AgentViewModel {
 
     /// Spawn an isolated sub-agent that runs concurrently with the parent task.
     /// Returns immediately with the agent ID. Results arrive via notification.
-    func spawnSubAgent(name: String, prompt: String, toolGroups: Set<String>? = nil, maxIterations: Int = 15) -> String {
-        guard activeSubAgents.count < Self.maxSubAgents else {
-            return "Error: Maximum \(Self.maxSubAgents) concurrent sub-agents reached. Wait for one to complete."
+    func spawnSubAgent(
+        name: String, prompt: String, toolGroups: Set<String>? = nil,
+        maxIterations: Int = 15, model: String? = nil
+    ) -> String {
+        // Write-capable agents stay capped at 3 to avoid concurrent mutations;
+        // pure read/research agents fan out up to the total cap.
+        let requestedGroups = toolGroups ?? [Tool.Group.core, Tool.Group.work, Tool.Group.code]
+        let writeGroups: Set<String> = [Tool.Group.code, Tool.Group.auto, Tool.Group.user, Tool.Group.root, Tool.Group.subAgents]
+        let writeCapable = !requestedGroups.isDisjoint(with: writeGroups)
+        let activeWrite = activeSubAgents.filter { $0.isWriteCapable }.count
+        if activeSubAgents.count >= Self.maxTotalSubAgents
+            || (writeCapable && activeWrite >= Self.maxSubAgents)
+        {
+            return "Error: sub-agent limit reached (\(writeCapable ? "\(Self.maxSubAgents) write-capable" : "\(Self.maxTotalSubAgents) total")). Wait for a <task-notification>, then spawn again — or pass tools: \"Core,Work\" for a read-only agent."
         }
 
         let agent = SubAgent(name: name, prompt: prompt, projectFolder: projectFolder)
         agent.toolGroups = toolGroups
         agent.maxIterations = maxIterations
+        agent.modelOverride = model
+        agent.isWriteCapable = writeCapable
         subAgents.append(agent)
         appendLog("🔀 Sub-agent '\(name)' spawned [\(agent.id.uuidString.prefix(8))]")
         flushLog()
@@ -93,7 +121,7 @@ extension AgentViewModel {
     /// Execute a sub-agent's task in isolation using the current provider/model.
     private func executeSubAgent(_ agent: SubAgent) async -> String {
         let provider = selectedProvider
-        let modelName = globalModelForProvider(provider)
+        let modelName = agent.modelOverride ?? globalModelForProvider(provider)
         let mt = maxTokens
 
         // Build a minimal service for this sub-agent
@@ -102,7 +130,7 @@ extension AgentViewModel {
         if provider == .claude {
             claude = ClaudeService(
                 apiKey: apiKey,
-                model: selectedModel,
+                model: modelName,
                 historyContext: historyContext,
                 projectFolder: agent.projectFolder,
                 maxTokens: mt
@@ -110,7 +138,7 @@ extension AgentViewModel {
         } else if provider == .lmStudio && lmStudioProtocol == .anthropic {
             claude = ClaudeService(
                 apiKey: lmStudioAPIKey,
-                model: lmStudioModel,
+                model: modelName,
                 historyContext: historyContext,
                 projectFolder: agent.projectFolder,
                 baseURL: lmStudioEndpoint,
@@ -156,13 +184,13 @@ extension AgentViewModel {
         switch provider {
         case .ollama:
             ollama = OllamaService(
-                apiKey: ollamaAPIKey, model: ollamaModel,
+                apiKey: ollamaAPIKey, model: modelName,
                 endpoint: ollamaEndpoint, historyContext: historyContext,
                 projectFolder: agent.projectFolder, provider: .ollama
             )
         case .localOllama:
             ollama = OllamaService(
-                apiKey: "", model: localOllamaModel,
+                apiKey: "", model: modelName,
                 endpoint: localOllamaEndpoint, historyContext: historyContext,
                 projectFolder: agent.projectFolder, provider: .localOllama,
                 contextSize: localOllamaContextSize
@@ -274,6 +302,17 @@ extension AgentViewModel {
         }
 
         agent.status = .completed
+        // Spill full findings to disk when they exceed the notification cap so
+        // long research isn't lost to truncation — the parent reads the file.
+        if !agent.projectFolder.isEmpty, finalResult.count > LogLimits.summaryChars {
+            let dir = URL(fileURLWithPath: agent.projectFolder)
+                .appendingPathComponent(".agent/subagents")
+            try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            let url = dir.appendingPathComponent("\(agent.id.uuidString.prefix(8)).md")
+            if (try? finalResult.write(to: url, atomically: true, encoding: .utf8)) != nil {
+                agent.resultFilePath = url.path
+            }
+        }
         agent.result = LogLimits.trim(finalResult, cap: LogLimits.summaryChars)
         appendLog(
             "🔀 Sub-agent '\(agent.name)' completed "
