@@ -61,4 +61,69 @@ extension AgentViewModel {
             stuckFiles[path] = 0
         }
     }
+
+    /// Tools where an identical repeat call is legitimate (polling, waiting,
+    /// user dialog) and must NOT be flagged as a broken record.
+    static let repeatExemptTools: Set<String> = [
+        "task_complete",
+        "send_message",
+        "ask_user",
+        "wait_for_element",
+        "wait_adaptive",
+        "find_element",
+        "get_focused_element",
+        "read_focused",
+        "get_children",
+        "list_windows",
+        "screenshot",
+        "get_properties"
+    ]
+
+    /// Deterministic fingerprint for a tool call: name + sorted-key JSON of the input.
+    static func toolCallFingerprint(name: String, input: [String: Any]) -> String {
+        let encoded: String
+        if JSONSerialization.isValidJSONObject(input),
+           let data = try? JSONSerialization.data(withJSONObject: input, options: [.sortedKeys]),
+           let str = String(data: data, encoding: .utf8) {
+            encoded = str
+        } else {
+            encoded = input.keys.sorted().map { "\($0)=\(String(describing: input[$0]!))" }.joined(separator: "&")
+        }
+        return "\(name)|\(encoded)"
+    }
+
+    /// Broken-record guard: the system prompt forbids repeating an identical tool
+    /// call, but nothing enforced it for non-file tools (greps, builds, AppleScript).
+    /// Fingerprints every call and nudges on the 2nd identical invocation, hard-stops
+    /// nudging on the 3rd+.
+    func appendRepeatedCallNudgeIfNeeded(
+        tab: ScriptTab,
+        name: String,
+        input: [String: Any],
+        repeatedCalls: inout [String: Int],
+        toolResults: inout [[String: Any]]
+    ) {
+        guard !Self.repeatExemptTools.contains(name) else { return }
+        let key = Self.toolCallFingerprint(name: name, input: input)
+        repeatedCalls[key, default: 0] += 1
+        let count = repeatedCalls[key]!
+        guard count >= 2 else { return }
+        let nudge: String
+        if count == 2 {
+            nudge = """
+            🔁 BROKEN RECORD: you just called `\(name)` with the EXACT same input as a \
+            previous call this task. The result will not change. Use the result you \
+            already have in context, or change the input. Do NOT issue this call again.
+            """
+        } else {
+            nudge = """
+            🛑 `\(name)` has now been called \(count) times with identical input. You are \
+            looping. Take a DIFFERENT action: make an edit, try a different tool, or call \
+            task_complete and report what is still unknown.
+            """
+        }
+        toolResults.append(["type": "text", "text": nudge])
+        tab.appendLog("🔁 Repeat guard: \(name) ×\(count)")
+        tab.flush()
+    }
 }

@@ -23,6 +23,7 @@ extension AgentViewModel {
         content: [[String: Any]],
         commandsRun: inout [String],
         stuckFiles: inout [String: Int],
+        repeatedCalls: inout [String: Int],
         filesEditedThisTask: inout Set<String>,
         completionSummary: inout String,
         consecutiveReadOnlyCount: inout Int,
@@ -97,6 +98,16 @@ extension AgentViewModel {
                         toolResult: toolResult,
                         editTools: editTools,
                         stuckFiles: &stuckFiles,
+                        toolResults: &toolResults
+                    )
+                    // Broken-record guard: identical tool call + identical input twice
+                    // in one task. Enforces the system-prompt rule for ALL tools, not
+                    // just repeated file reads.
+                    appendRepeatedCallNudgeIfNeeded(
+                        tab: tab,
+                        name: name,
+                        input: input,
+                        repeatedCalls: &repeatedCalls,
                         toolResults: &toolResults
                     )
                     // Overnight coding guards — the same battery the main loop runs

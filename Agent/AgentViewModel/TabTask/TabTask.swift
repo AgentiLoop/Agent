@@ -187,6 +187,7 @@ extension AgentViewModel {
         var textOnlyCount = 0
         var timeoutRetryCount = 0
         var stuckFiles: [String: Int] = [:] // Edit failure count per file (for nudge)
+        var repeatedCalls: [String: Int] = [:] // Identical tool-call fingerprint counts (broken-record guard)
         // Plan-mode enforcement state
         var filesEditedThisTask: Set<String> = []
         // Full system prompt + full tool descriptions on every turn — no condensed prompt, no compactTools, no mode
@@ -323,6 +324,7 @@ extension AgentViewModel {
                     content: response.content,
                     commandsRun: &commandsRun,
                     stuckFiles: &stuckFiles,
+                    repeatedCalls: &repeatedCalls,
                     filesEditedThisTask: &filesEditedThisTask,
                     completionSummary: &completionSummary,
                     consecutiveReadOnlyCount: &consecutiveReadOnlyCount,
