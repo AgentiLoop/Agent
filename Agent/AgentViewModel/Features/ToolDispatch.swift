@@ -144,17 +144,27 @@ extension AgentViewModel {
         let detail = (rawDetail as NSString).lastPathComponent.isEmpty ? rawDetail : (rawDetail as NSString).lastPathComponent
         let stepId = recordToolStep(name: name, detail: detail)
 
-        /// Helper to complete step on every exit path
-        func finishStep(_ status: ToolStep.Status = .success) {
+        /// Helper to complete step on every exit path.
+        /// Also runs post-tool hooks against the result this tool just appended.
+        func finishStep(_ status: ToolStep.Status = .success) async {
+            if let last = toolResults.indices.last,
+               toolResults[last]["tool_use_id"] as? String == ctx.toolId,
+               let content = toolResults[last]["content"] as? String,
+               let transformed = await HooksService.shared.runPostToolHooks(
+                   toolName: name, input: input, output: content
+               ) {
+                toolResults[last]["content"] = transformed
+            }
             completeToolStep(id: stepId, status: status)
         }
+
 
         // Pre-tool hook — can block tool execution
         let hookDecision = await HooksService.shared.runPreToolHooks(toolName: name, input: input)
         if hookDecision.decision == .block {
             let msg = hookDecision.message ?? "Blocked by hook"
             toolResults.append(["type": "tool_result", "tool_use_id": ctx.toolId, "content": msg])
-            finishStep(.error)
+            await finishStep(.error)
             return .alreadyAppended
         }
 
@@ -166,7 +176,7 @@ extension AgentViewModel {
                 flushLog: { @MainActor [weak self] in self?.flushLog() },
                 toolResults: &toolResults
             ) {
-                finishStep()
+                await finishStep()
                 return .alreadyAppended
             }
         }
@@ -178,7 +188,7 @@ extension AgentViewModel {
             appendRawOutput: { [weak self] msg in Task { @MainActor in self?.appendLog(msg) } },
             toolResults: &toolResults
         ) {
-            finishStep()
+            await finishStep()
             return .alreadyAppended
         }
 
@@ -188,7 +198,7 @@ extension AgentViewModel {
             appendLog(String(webResult.prefix(500)))
             flushLog()
             toolResults.append(["type": "tool_result", "tool_use_id": ctx.toolId, "content": webResult])
-            finishStep()
+            await finishStep()
             return .alreadyAppended
         }
 
@@ -198,13 +208,13 @@ extension AgentViewModel {
             switch result {
             case .handled(let output):
                 toolResults.append(["type": "tool_result", "tool_use_id": ctx.toolId, "content": output])
-                finishStep()
+                await finishStep()
             case .taskComplete:
-                finishStep()
+                await finishStep()
             case .alreadyAppended:
-                finishStep()
+                await finishStep()
             case .notHandled:
-                finishStep(.error)
+                await finishStep(.error)
             }
             return result
         }
@@ -219,7 +229,7 @@ extension AgentViewModel {
         flushLog()
         toolResults.append(["type": "tool_result", "tool_use_id": ctx.toolId, "content": output])
 
-        finishStep()
+        await finishStep()
         return .handled(output)
     }
 
