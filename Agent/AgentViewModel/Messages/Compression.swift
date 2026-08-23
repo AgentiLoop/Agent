@@ -262,26 +262,18 @@ extension AgentViewModel {
         max(1, chars / 4)
     }
 
-    /// Count input tokens from message array.
-    static func estimateTokens(messages: [[String: Any]]) -> Int {
-        var chars = 0
-        for msg in messages {
-            if let text = msg["content"] as? String {
-                chars += text.count
-            } else if let blocks = msg["content"] as? [[String: Any]] {
-                for block in blocks {
-                    if let text = block["text"] as? String { chars += text.count }
-                    else if let text = block["content"] as? String { chars += text.count }
-                }
-            }
-        }
-        return estimateTokensFallback(chars: chars)
-    }
+    /// Flat token cost per attached image. Base64 length is NOT token length —
+    /// the API bills a screenshot at roughly this much regardless of encoding.
+    static let imageTokenEstimate = 1_600
 
-    /// Precise async token count using Apple Intelligence when available.
-    @MainActor
-    static func preciseTokenCount(messages: [[String: Any]]) async -> Int {
+    /// Walk a message array collecting countable text (including tool_use
+    /// input JSON, which a write_file call can fill with an entire file) and
+    /// the number of image blocks. Both counters previously skipped images
+    /// and tool inputs, so vision-heavy and edit-heavy conversations
+    /// undercounted badly and compaction/budget guards fired late or never.
+    private static func countableContent(_ messages: [[String: Any]]) -> (text: String, imageTokens: Int) {
         var allText = ""
+        var imageTokens = 0
         for msg in messages {
             if let text = msg["content"] as? String {
                 allText += text
@@ -289,10 +281,29 @@ extension AgentViewModel {
                 for block in blocks {
                     if let text = block["text"] as? String { allText += text }
                     else if let text = block["content"] as? String { allText += text }
+                    if block["type"] as? String == "image" { imageTokens += imageTokenEstimate }
+                    if let input = block["input"] as? [String: Any],
+                       let data = try? JSONSerialization.data(withJSONObject: input)
+                    {
+                        allText += String(decoding: data, as: UTF8.self)
+                    }
                 }
             }
         }
-        return await countTokens(for: allText)
+        return (allText, imageTokens)
+    }
+
+    /// Count input tokens from message array.
+    static func estimateTokens(messages: [[String: Any]]) -> Int {
+        let (text, imageTokens) = countableContent(messages)
+        return estimateTokensFallback(chars: text.count) + imageTokens
+    }
+
+    /// Precise async token count using Apple Intelligence when available.
+    @MainActor
+    static func preciseTokenCount(messages: [[String: Any]]) async -> Int {
+        let (text, imageTokens) = countableContent(messages)
+        return await countTokens(for: text) + imageTokens
     }
 
     /// Count output tokens from response content blocks.

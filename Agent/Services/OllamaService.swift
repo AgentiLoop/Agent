@@ -58,6 +58,18 @@ final class OllamaService {
 
     var overrideSystemPrompt: String?
 
+    /// Snapshot of the dynamic state blocks (memory / goal / tool outcomes /
+    /// plan), taken on first use and frozen for this service's lifetime —
+    /// services are rebuilt at task start and on provider fallback. Reading
+    /// the live stores per request changed the system-prompt bytes mid-task
+    /// (every goal tick, plan update, or memory append), invalidating the
+    /// provider's prompt cache; mid-task changes still reach the model
+    /// through those tools' own results.
+    private lazy var stateBlocks: String = MemoryStore.shared.contextBlock
+        + GoalStateStore.shared.promptBlock
+        + ToolOutcomeStore.shared.promptBlock
+        + PlanStateStore.promptBlock(projectFolder: projectFolder)
+
     var systemPrompt: String {
         if let override = overrideSystemPrompt { return override }
         var prompt = SystemPromptService.shared.prompt(for: provider, userName: userName, userHome: userHome, projectFolder: projectFolder)
@@ -75,10 +87,7 @@ final class OllamaService {
         if !historyContext.isEmpty {
             prompt += historyContext
         }
-        prompt += MemoryStore.shared.contextBlock
-        prompt += GoalStateStore.shared.promptBlock
-        prompt += ToolOutcomeStore.shared.promptBlock
-        prompt += PlanStateStore.promptBlock(projectFolder: projectFolder)
+        prompt += stateBlocks
         return prompt
     }
 

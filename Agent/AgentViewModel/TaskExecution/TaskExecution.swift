@@ -58,6 +58,9 @@ extension AgentViewModel {
         SessionStore.shared.newSession()
         FallbackChainService.shared.reset()
         ToolOutcomeStore.shared.startTask(projectFolder: projectFolder)
+        if let stale = GoalStateStore.shared.clearIfStale() {
+            appendLog("🎯 Cleared stale goal (untouched >24h): \(stale.prefix(60))")
+        }
         Self.clearToolCache()
         // No mode filtering — send every user-enabled tool on every turn.
         // The LLM picks what it needs; ToolPreferencesService is the only filter.
@@ -154,7 +157,7 @@ extension AgentViewModel {
         // Token budget tracker — detects diminishing returns and prevents runaway costs
         var budgetTracker = TokenBudgetTracker(ceiling: tokenBudgetCeiling)
         // Context compaction state — token-aware triggers with circuit breaker
-        var compactionState = CompactionState(contextWindow: contextWindow(for: selectedProvider))
+        var compactionState = CompactionState(contextWindow: contextWindow(for: provider))
         // Overnight coding guards
         var consecutiveReadOnlyCount = 0 // read guard — force stop after 10
         var unbuiltEditCount = 0 // build enforcement — nudge after edit without build
@@ -456,6 +459,11 @@ extension AgentViewModel {
                     provider = newProvider
                     modelName = newModel
                     isVision = newIsVision
+                    // Falling back can shrink the context window drastically
+                    // (Claude 1M → local 32K); keep the old threshold and the
+                    // new provider rejects the transcript before compaction
+                    // ever fires.
+                    compactionState = CompactionState(contextWindow: contextWindow(for: newProvider))
                     services = buildLLMServiceBundle(
                         provider: provider,
                         modelName: modelName,

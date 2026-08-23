@@ -102,6 +102,13 @@ extension AgentViewModel {
                         if !lastText.isEmpty { summary = String(lastText.prefix(300)) }
                     }
                     completionSummary = summary
+                    // The gates passed, so every criterion is verified — retire
+                    // the goal so it can't leak into the next task and block an
+                    // unrelated task_complete.
+                    if GoalStateStore.shared.current != nil {
+                        GoalStateStore.shared.clear()
+                        appendLog("🎯 Goal verified — cleared")
+                    }
                     // Show task complete in the LLM Output HUD so the user sees the result. Append to rawLLMOutput and
                     // let the drip task pick up the new chars naturally — DO NOT sync displayedLLMOutput, that would skip the drip.
                     let trimmedRaw = rawLLMOutput.trimmingCharacters(in: .whitespacesAndNewlines)

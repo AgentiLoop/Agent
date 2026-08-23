@@ -74,6 +74,18 @@ final class OpenAICompatibleService {
 
     var overrideSystemPrompt: String?
 
+    /// Snapshot of the dynamic state blocks (memory / goal / tool outcomes /
+    /// plan), taken on first use and frozen for this service's lifetime —
+    /// services are rebuilt at task start and on provider fallback. Reading
+    /// the live stores per request changed the system-prompt bytes mid-task
+    /// (every goal tick, plan update, or memory append), invalidating the
+    /// provider's prompt cache; mid-task changes still reach the model
+    /// through those tools' own results.
+    private lazy var stateBlocks: String = MemoryStore.shared.contextBlock
+        + GoalStateStore.shared.promptBlock
+        + ToolOutcomeStore.shared.promptBlock
+        + PlanStateStore.promptBlock(projectFolder: projectFolder)
+
     var systemPrompt: String {
         if let override = overrideSystemPrompt { return override }
         if isLMStudio {
@@ -102,10 +114,7 @@ final class OpenAICompatibleService {
         if !historyContext.isEmpty {
             prompt += historyContext
         }
-        prompt += MemoryStore.shared.contextBlock
-        prompt += GoalStateStore.shared.promptBlock
-        prompt += ToolOutcomeStore.shared.promptBlock
-        prompt += PlanStateStore.promptBlock(projectFolder: projectFolder)
+        prompt += stateBlocks
         return prompt
     }
 
@@ -135,19 +144,6 @@ final class OpenAICompatibleService {
             break
         }
         return result
-    }
-
-    /// Short system prompt for subsequent iterations — LLM already has the full prompt cached.
-    private var shortSystemPrompt: String {
-        var prompt = "Continue the task. Use tools as needed. ALWAYS call task_complete when finished."
-        if !projectFolder.isEmpty {
-            prompt += "\nPROJECT FOLDER: \(projectFolder)"
-        }
-        prompt += MemoryStore.shared.contextBlock
-        prompt += GoalStateStore.shared.promptBlock
-        prompt += ToolOutcomeStore.shared.promptBlock
-        prompt += PlanStateStore.promptBlock(projectFolder: projectFolder)
-        return prompt
     }
 
     /// All tools every iteration — compact descriptions in coding mode.
