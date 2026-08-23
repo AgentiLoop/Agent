@@ -108,6 +108,24 @@ extension AgentViewModel {
                 let buildOutput = toolResults.last?["content"] as? String ?? ""
                 if buildOutput.contains("BUILD FAILED") || buildOutput.contains("error:") {
                     consecutiveBuildFailures += 1
+                    // Offer the task-scoped rewind once, at 3 failures. The model
+                    // has snapshots of every file it edited this task, so it can
+                    // undo the whole failed attempt instead of patching blindly.
+                    if consecutiveBuildFailures == 3 {
+                        let touched = FileBackupService.shared.snapshottedFiles()
+                        if !touched.isEmpty {
+                            let nudge = """
+                                🔄 3 consecutive build failures across \(touched.count) \
+                                edited file(s). If the current approach isn't converging, \
+                                call file(action:"rewind") to restore EVERY file this task \
+                                touched to its pre-task state and start over with a \
+                                different approach. Otherwise fix the specific error above.
+                                """
+                            appendNudgeToLastToolResult(&toolResults, nudge: nudge)
+                            appendLog("🔄 Offered task rewind after 3 build failures")
+                            flushLog()
+                        }
+                    }
                     if consecutiveBuildFailures >= 5 {
                         appendLog("⚠️ Auto-stopping: 5 consecutive build failures")
                         flushLog()
