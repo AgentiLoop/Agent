@@ -141,20 +141,8 @@ extension AgentViewModel {
             for tool in pendingTools where editTools.contains(tool.name) {
                 guard let path = tool.input["file_path"] as? String ?? tool.input["path"] as? String else { continue }
                 let output = toolResults.last?["content"] as? String ?? ""
-                // Only the STATUS LINE decides success/failure. Scanning the whole
-                // output produced false positives: a SUCCESSFUL edit echoes a preview
-                // of the file's new content, so editing any file whose source contains
-                // "failed", "error:" or "not found" (e.g. XcodeService.swift) tripped
-                // this guard. Mirrors StuckGuard.appendStuckFileNudgeIfNeeded.
-                let status = (output.components(separatedBy: "\n").first ?? output)
-                    .trimmingCharacters(in: .whitespaces)
-                    .lowercased()
-                let isFailure = status.hasPrefix("error")
-                    || status.hasPrefix("warning:")
-                    || status.hasPrefix("❌")
-                    || status.contains("not found")
-                    || status.contains("rejected")
-                    || status.contains("no changes")
+                // Shared with StuckGuard — see AgentViewModel.isToolFailure.
+                let isFailure = Self.isToolFailure(output: output)
                 if isFailure {
                     stuckFiles[path, default: 0] += 1
                     let count = stuckFiles[path]!
