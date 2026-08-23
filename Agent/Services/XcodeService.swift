@@ -396,6 +396,42 @@ final class XcodeService: @unchecked Sendable {
         return id
     }
 
+    /// Find the PBXSourcesBuildPhase ID belonging to the target that owns `filePath`.
+    ///
+    /// Matches the file's parent directory name against each PBXNativeTarget's name
+    /// (e.g. `AgentTests/Foo.swift` -> the `AgentTests` target), then reads that
+    /// target's `buildPhases` list and returns the Sources phase ID. Returns nil
+    /// when no target matches, so the caller can fall back to the first phase.
+    nonisolated func sourcesPhaseID(for filePath: String, in content: String) -> String? {
+        let dirName = ((filePath as NSString).deletingLastPathComponent as NSString).lastPathComponent
+        guard !dirName.isEmpty else { return nil }
+
+        // Collect every "<id> /* <name> */ = { isa = PBXNativeTarget ... }" block
+        // and pick the one whose target name matches the containing directory.
+        let targetPattern = #"([A-F0-9]{24}) /\* (.+?) \*/ = \{\n\t\t\tisa = PBXNativeTarget;"#
+        guard let regex = try? NSRegularExpression(pattern: targetPattern) else { return nil }
+        let ns = content as NSString
+        let matches = regex.matches(in: content, range: NSRange(location: 0, length: ns.length))
+
+        for match in matches where match.numberOfRanges >= 3 {
+            let targetName = ns.substring(with: match.range(at: 2))
+            guard targetName.caseInsensitiveCompare(dirName) == .orderedSame else { continue }
+
+            // Scan this target's block for its Sources build phase reference.
+            let blockStart = match.range.location
+            let searchRange = NSRange(
+                location: blockStart,
+                length: min(2000, ns.length - blockStart)
+            )
+            let phasePattern = #"([A-F0-9]{24}) /\* Sources \*/"#
+            guard let phaseRegex = try? NSRegularExpression(pattern: phasePattern),
+                  let phaseMatch = phaseRegex.firstMatch(in: content, range: searchRange),
+                  phaseMatch.numberOfRanges >= 2 else { return nil }
+            return ns.substring(with: phaseMatch.range(at: 1))
+        }
+        return nil
+    }
+
     /// Add a source file to the Xcode project's pbxproj.
     nonisolated func addFileToProject(filePath: String) -> String {
         guard let projectPath = autoSelectProject() else {
@@ -436,15 +472,30 @@ final class XcodeService: @unchecked Sendable {
                 content.insert(contentsOf: buildFile, at: bfEnd.lowerBound)
             }
 
-            // 3. Add to PBXSourcesBuildPhase files list
-            if let sourcesStart = content.range(of: "/* Begin PBXSourcesBuildPhase section */") {
-                let after = content[sourcesStart.upperBound...]
-                if let filesStart = after.range(of: "files = ("),
-                   let filesEnd = after.range(of: ");", range: filesStart.upperBound..<after.endIndex)
-                {
-                    let entry = "\t\t\t\t\(buildFileID) /* \(fileName) in Sources */,\n"
-                    content.insert(contentsOf: entry, at: filesEnd.lowerBound)
-                }
+            // 3. Add to the PBXSourcesBuildPhase of the target this file belongs to.
+            // Picking the first Sources phase blindly drops test files into the app
+            // target, which then fails with "unable to resolve module dependency:
+            // 'Testing'". Infer the target from the file's path instead.
+            let entry = "\t\t\t\t\(buildFileID) /* \(fileName) in Sources */,\n"
+            let phaseID = sourcesPhaseID(for: filePath, in: content)
+            var inserted = false
+            if let phaseID,
+               let phaseStart = content.range(of: "\t\t\(phaseID) /*"),
+               let filesStart = content.range(
+                   of: "files = (", range: phaseStart.upperBound..<content.endIndex),
+               let filesEnd = content.range(
+                   of: ");", range: filesStart.upperBound..<content.endIndex)
+            {
+                content.insert(contentsOf: entry, at: filesEnd.lowerBound)
+                inserted = true
+            }
+            if !inserted, let sourcesStart = content.range(of: "/* Begin PBXSourcesBuildPhase section */"),
+               let filesStart = content.range(
+                   of: "files = (", range: sourcesStart.upperBound..<content.endIndex),
+               let filesEnd = content.range(
+                   of: ");", range: filesStart.upperBound..<content.endIndex)
+            {
+                content.insert(contentsOf: entry, at: filesEnd.lowerBound)
             }
         }
 
