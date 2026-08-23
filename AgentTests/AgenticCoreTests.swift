@@ -111,9 +111,45 @@ struct GoalStateStoreTests {
         #expect(done.contains("1. [x] builds"))
         #expect(!done.contains("may NOT call task_complete"))
     }
-}
+    @Test("criteria marked done without evidence are reported as unevidenced")
+    func unevidencedCriteriaAreTracked() {
+        let store = makeStore()
+        store.set(goal: "G", criteria: ["builds", "tests pass"])
+        store.setCriterion(text: "builds", done: true)
+        store.setCriterion(text: "tests pass", done: true, evidence: "26 tests passed")
 
-// MARK: - Tool failure detection
+        let unevidenced = store.unevidencedCriteria
+        #expect(unevidenced.count == 1)
+        #expect(unevidenced.first?.text == "builds")
+    }
+
+    @Test("re-opening a criterion clears its evidence")
+    func reopeningClearsEvidence() {
+        let store = makeStore()
+        store.set(goal: "G", criteria: ["builds"])
+        store.setCriterion(text: "builds", done: true, evidence: "xcode build succeeded")
+        #expect(store.unevidencedCriteria.isEmpty)
+
+        store.setCriterion(text: "builds", done: false)
+        #expect(store.current?.criteria.first?.evidence == nil)
+    }
+
+    @Test("whitespace-only evidence does not count as evidence")
+    func blankEvidenceIsRejected() {
+        let store = makeStore()
+        store.set(goal: "G", criteria: ["builds"])
+        store.setCriterion(text: "builds", done: true, evidence: "   \n  ")
+        #expect(store.unevidencedCriteria.count == 1)
+    }
+
+    @Test("promptBlock renders evidence for verified criteria")
+    func promptBlockShowsEvidence() {
+        let store = makeStore()
+        store.set(goal: "G", criteria: ["builds"])
+        store.setCriterion(text: "builds", done: true, evidence: "xcode build succeeded")
+        #expect(store.promptBlock.contains("evidence: xcode build succeeded"))
+    }
+}
 
 /// Regression coverage for AgentViewModel.isToolFailure(output:).
 ///
