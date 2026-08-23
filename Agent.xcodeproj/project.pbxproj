@@ -182,6 +182,8 @@
 		EAE1E7152F7BF6880079432C /* AgentSwift in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7142F7BF6880079432C /* AgentSwift */; };
 		EAE1E7182F7BF6E70079432C /* XcodeScriptingBridge in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7172F7BF6E70079432C /* XcodeScriptingBridge */; };
 		EAE1E71B2F7BF7000079432C /* AgentAudit in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E71A2F7BF7000079432C /* AgentAudit */; };
+		FA1000000000000000010C /* AgentAudit in Frameworks */ = {isa = PBXBuildFile; productRef = FA1000000000000000010B /* AgentAudit */; };
+		FA1000000000000000010E /* AgentAudit in Frameworks */ = {isa = PBXBuildFile; productRef = FA1000000000000000010D /* AgentAudit */; };
 		EAE1E7222F7C00000079432C /* AgentLLM in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7212F7C00000079432C /* AgentLLM */; };
 		EAE1E7242F7C01000079432C /* LLMProviderSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE1E7232F7C01000079432C /* LLMProviderSetup.swift */; };
 		EAE1E7262F7C02000079432C /* AgentAccess in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7252F7C02000079432C /* AgentAccess */; };
@@ -521,6 +523,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA1000000000000000010C /* AgentAudit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -528,6 +531,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA1000000000000000010E /* AgentAudit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1105,6 +1109,9 @@
 			dependencies = (
 			);
 			name = AgentHelper;
+			packageProductDependencies = (
+				FA1000000000000000010B /* AgentAudit */,
+			);
 			productName = AgentHelper;
 			productReference = BB1000000000000000001C /* AgentHelper */;
 			productType = "com.apple.product-type.tool";
@@ -1121,6 +1128,9 @@
 			dependencies = (
 			);
 			name = AgentUser;
+			packageProductDependencies = (
+				FA1000000000000000010D /* AgentAudit */,
+			);
 			productName = AgentUser;
 			productReference = CC1000000000000000001C /* AgentUser */;
 			productType = "com.apple.product-type.tool";
@@ -1980,6 +1990,16 @@
 			productName = XcodeScriptingBridge;
 		};
 		EAE1E71A2F7BF7000079432C /* AgentAudit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EAE1E7192F7BF7000079432C /* XCRemoteSwiftPackageReference "AgentAudit" */;
+			productName = AgentAudit;
+		};
+		FA1000000000000000010B /* AgentAudit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EAE1E7192F7BF7000079432C /* XCRemoteSwiftPackageReference "AgentAudit" */;
+			productName = AgentAudit;
+		};
+		FA1000000000000000010D /* AgentAudit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = EAE1E7192F7BF7000079432C /* XCRemoteSwiftPackageReference "AgentAudit" */;
 			productName = AgentAudit;

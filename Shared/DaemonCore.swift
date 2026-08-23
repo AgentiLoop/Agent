@@ -1,4 +1,5 @@
 import Foundation
+import AgentAudit
 
 /// Shared output context for streaming command output via XPC.
 final class OutputContext: @unchecked Sendable {
@@ -17,6 +18,11 @@ enum DaemonCore {
     nonisolated(unsafe) static var runningProcesses: [String: Process] = [:]
     static let lock = NSLock()
 
+    /// Console category for this process — .launchDaemon in AgentHelper (root),
+    /// .launchAgent in AgentUser. Set once at startup in each main.swift so
+    /// every executed command is attributable in Console.app.
+    nonisolated(unsafe) static var auditCategory: AuditLog.Category = .launchDaemon
+
     static func execute(
         script: String,
         instanceID: String,
@@ -31,6 +37,8 @@ enum DaemonCore {
         }
         runningProcesses[instanceID] = nil
         lock.unlock()
+
+        AuditLog.log(auditCategory, "exec [\(instanceID)]\(workingDirectory.isEmpty ? "" : " cwd=\(workingDirectory)"): \(script.prefix(500))")
 
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
@@ -77,6 +85,7 @@ enum DaemonCore {
             try process.run()
             process.waitUntilExit()
         } catch {
+            AuditLog.denied(auditCategory, "exec [\(instanceID)] failed to launch: \(error.localizedDescription)")
             reply(-1, error.localizedDescription)
             return
         }
@@ -95,6 +104,7 @@ enum DaemonCore {
         let output = ctx.output
         ctx.outputLock.unlock()
 
+        AuditLog.log(auditCategory, "exec [\(instanceID)] exited \(process.terminationStatus) (\(output.count) bytes)")
         reply(process.terminationStatus, output)
 
         lock.lock()
@@ -103,6 +113,7 @@ enum DaemonCore {
     }
 
     static func cancel(instanceID: String) {
+        AuditLog.log(auditCategory, "cancel [\(instanceID)]")
         lock.lock()
         if let process = runningProcesses[instanceID], process.isRunning {
             process.terminate()

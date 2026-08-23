@@ -1,4 +1,5 @@
 import Foundation
+import AgentAudit
 
 final class UserCommandHandler: NSObject, UserToolProtocol, @unchecked Sendable {
     weak var connection: NSXPCConnection?
@@ -39,6 +40,8 @@ final class UserDelegate: NSObject, NSXPCListenerDelegate {
     }
 }
 
+DaemonCore.auditCategory = .launchAgent
+AuditLog.log(.launchAgent, "AgentUser agent started (uid \(getuid()))")
 let delegate = UserDelegate()
 let listener = NSXPCListener(machServiceName: "Agent.app.toddbruss.user")
 listener.delegate = delegate
