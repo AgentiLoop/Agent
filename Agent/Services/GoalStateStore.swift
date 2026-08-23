@@ -11,6 +11,10 @@ struct GoalCriterion: Codable, Identifiable, Equatable {
     var id: UUID = UUID()
     var text: String
     var done: Bool = false
+    /// How this criterion was verified — the tool call or observation that
+    /// proves it. Marking done without evidence is self-reporting, which is
+    /// exactly what the verification loop exists to prevent.
+    var evidence: String?
 }
 
 /// The persistent goal state for the autonomous loop.
@@ -80,10 +84,11 @@ final class GoalStateStore {
 
     /// Mark one criterion done/open by id.
     @discardableResult
-    func setCriterion(id: UUID, done: Bool) -> GoalState? {
+    func setCriterion(id: UUID, done: Bool, evidence: String? = nil) -> GoalState? {
         guard var state = read(),
               let index = state.criteria.firstIndex(where: { $0.id == id }) else { return nil }
         state.criteria[index].done = done
+        state.criteria[index].evidence = done ? evidence : nil
         state.updatedAt = Date()
         write(state)
         return state
@@ -91,15 +96,23 @@ final class GoalStateStore {
 
     /// Mark the first criterion matching `text` (case-insensitive contains).
     @discardableResult
-    func setCriterion(text: String, done: Bool) -> GoalState? {
+    func setCriterion(text: String, done: Bool, evidence: String? = nil) -> GoalState? {
         guard var state = read(),
               let index = state.criteria.firstIndex(where: {
                   $0.text.localizedCaseInsensitiveContains(text)
               }) else { return nil }
         state.criteria[index].done = done
+        state.criteria[index].evidence = done ? evidence : nil
         state.updatedAt = Date()
         write(state)
         return state
+    }
+
+    /// Criteria marked done with no evidence cited — self-reported, unproven.
+    var unevidencedCriteria: [GoalCriterion] {
+        (read()?.criteria ?? []).filter {
+            $0.done && ($0.evidence?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+        }
     }
 
     /// Clear the goal (task fully complete).
@@ -120,9 +133,12 @@ final class GoalStateStore {
             block += "VERIFICATION CRITERIA (all must be checked before task_complete is accepted):\n"
             for (i, c) in state.criteria.enumerated() {
                 block += "\(i + 1). [\(c.done ? "x" : " ")] \(c.text)\n"
+                if c.done, let ev = c.evidence, !ev.isEmpty {
+                    block += "     ↳ evidence: \(ev)\n"
+                }
             }
             if !state.allCriteriaDone {
-                block += "You may NOT call task_complete until every criterion above is [x]. Verify each with a tool call (build, grep, read) and mark it via goal_state before finishing.\n"
+                block += "You may NOT call task_complete until every criterion above is [x]. Verify each with a tool call (build, grep, read) and mark it via goal_state, passing `evidence` describing the tool result that proves it.\n"
             }
         }
         return block

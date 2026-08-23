@@ -116,6 +116,7 @@ extension AgentTools {
                             "description": "Verifiable success criteria (action: set). Each should be checkable with a tool call."
                         ],
                         "criterion": ["type": "string", "description": "Criterion text to mark (action: mark)."],
+                        "evidence": ["type": "string", "description": "REQUIRED when marking done: the tool result that PROVES the criterion (e.g. 'xcode build succeeded', '26 tests passed', 'grep returns 0 matches'). Marking done without evidence is rejected."],
                         "done": ["type": "boolean", "description": "Mark done (true) or still open (false). Default true."]
                     ],
                     "required": ["action"]

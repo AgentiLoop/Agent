@@ -286,9 +286,23 @@ extension AgentViewModel {
                 flushLog()
             }
 
-            // Self-verification pass: the goal gate above only checks that criteria
-            // were *marked* done — and the model marks them itself. This re-checks
-            // the physical evidence: every file this task edited must still exist
+            // Criteria marked done but with no evidence cited are self-reported,
+            // not verified. Block completion the same way open criteria do.
+            let unevidenced = GoalStateStore.shared.unevidencedCriteria
+            if !unevidenced.isEmpty {
+                appendLog("❌ Verify gate: \(unevidenced.count) criterion/criteria marked done without evidence")
+                flushLog()
+                return """
+                    CANNOT COMPLETE — these criteria are marked done but cite no evidence:
+
+                    \(unevidenced.map { "  ? \($0.text)" }.joined(separator: "\n"))
+
+                    Re-mark each with goal_state(action: "mark", criterion: "...", \
+                    evidence: "<the tool result that proves it>") after verifying it \
+                    with an actual tool call.
+                    """
+            }
+            // Physical-evidence pass: every file this task edited must still exist
             // and be non-empty. Catches truncated writes and deleted-by-accident files.
             let touched = FileBackupService.shared.snapshottedFiles()
             var brokenFiles: [String] = []
@@ -346,7 +360,18 @@ extension AgentViewModel {
             let text = input["criterion"] as? String ?? ""
             guard !text.isEmpty else { return "Error: 'criterion' is required for action=mark." }
             let done = input["done"] as? Bool ?? true
-            guard let state = store.setCriterion(text: text, done: done) else {
+            let evidence = (input["evidence"] as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            // Marking done without citing the tool result that proves it is
+            // self-reporting — the exact failure this loop exists to catch.
+            if done, evidence?.isEmpty ?? true {
+                return """
+                    Error: marking a criterion done requires `evidence` — the tool result \
+                    that proves it (e.g. "xcode build succeeded", "grep shows 0 matches", \
+                    "26 tests passed"). Verify it with a tool call first, then mark it.
+                    """
+            }
+            guard let state = store.setCriterion(text: text, done: done, evidence: evidence) else {
                 return "No criterion matching '\(text)'. Use goal_state(action: \"get\") to list them."
             }
             appendLog("🎯 Criterion '\(text.prefix(60))' marked \(done ? "done" : "open")")
