@@ -2,7 +2,20 @@ import Testing
 import Foundation
 @testable import Agent_
 
-@Suite("WebAutomation", .serialized)
+/// Live-network suite: every test drives real Safari against real websites
+/// (Google, LinkedIn, GitHub). Results depend on network, login state and
+/// third-party markup, so these fail unpredictably and train everyone to
+/// ignore a red suite.
+///
+/// Opt in with:  AGENT_RUN_NETWORK_TESTS=1 xcodebuild test ...
+@Suite(
+    "WebAutomation",
+    .serialized,
+    .enabled(
+        if: ProcessInfo.processInfo.environment["AGENT_RUN_NETWORK_TESTS"] == "1",
+        "Live-network test — set AGENT_RUN_NETWORK_TESTS=1 to run"
+    )
+)
 @MainActor
 struct WebAutomationTests {
 
