@@ -25,9 +25,20 @@ extension AgentViewModel {
               let path = input["file_path"] as? String ?? input["path"] as? String,
               let output = toolResult["content"] as? String
         else { return }
-        let lower = output.lowercased()
-        let isFailure = lower.hasPrefix("error") || lower.contains("error:") || lower.contains("failed") || lower
-            .contains("not found") || lower.contains("rejected")
+        // Only the STATUS LINE decides success/failure. Scanning the whole output
+        // produced false positives: a SUCCESSFUL edit echoes a preview of the file's
+        // new content, so editing any file whose source contains "failed", "error:"
+        // or "not found" (e.g. XcodeService.swift) tripped the stuck guard.
+        // Matches the convention in FileTools.swift, which keys off hasPrefix("Error").
+        let status = (output.components(separatedBy: "\n").first ?? output)
+            .trimmingCharacters(in: .whitespaces)
+            .lowercased()
+        let isFailure = status.hasPrefix("error")
+            || status.hasPrefix("warning:")
+            || status.hasPrefix("❌")
+            || status.contains("not found")
+            || status.contains("rejected")
+            || status.contains("no changes")
         if isFailure {
             stuckFiles[path, default: 0] += 1
             let count = stuckFiles[path]!
