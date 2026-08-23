@@ -92,6 +92,29 @@ final class ClaudeService {
         // No mode-based narrowing — every user-enabled tool flows through.
         // Local endpoints with tight context windows can disable groups via the UI.
         var t = AgentTools.claudeFormat(activeGroups: activeGroups, compact: compact, projectFolder: projectFolder)
+        // Keep the spill cache pointed at the current project so restore_tool_result
+        // reads back from the same .agent/toolcache the compactor wrote to.
+        ToolResultCache.setProjectFolder(projectFolder)
+        // Recovery for content compaction truncated. Defined here because AgentTools
+        // is a remote package — this is the local seam for app-specific tools.
+        t.append([
+            "name": "restore_tool_result",
+            "description":
+                "Recover the FULL text of an earlier tool result that context compaction "
+                + "truncated to a 3-line preview or '[cleared]'. Pass the tool_use_id shown "
+                + "in the truncated block. Use this INSTEAD of re-reading a file you already "
+                + "read earlier in this task.",
+            "input_schema": [
+                "type": "object",
+                "properties": [
+                    "tool_use_id": [
+                        "type": "string",
+                        "description": "The tool_use_id of the truncated tool result to restore."
+                    ]
+                ],
+                "required": ["tool_use_id"]
+            ]
+        ])
         // Only add native web_search for real Anthropic API — remove Tavily duplicate first
         if !isLocalEndpoint {
             t.removeAll { ($0["name"] as? String) == "web_search" }
