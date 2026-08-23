@@ -124,6 +124,13 @@ extension AgentViewModel {
                     """
                 return verifyReport
             }
+            if !buildResult.contains("BUILD SUCCEEDED") {
+                await HooksService.shared.runEventHooks(.buildFailure, context: [
+                    "projectPath": projectPath,
+                    "projectFolder": projectFolder,
+                    "output": String(buildResult.suffix(4000))
+                ])
+            }
             return buildResult
         case "xcode_run":
             let projectPath = input["project_path"] as? String ?? ""
