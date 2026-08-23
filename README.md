@@ -1,7 +1,6 @@
 # 🦾 Agent! for macOS 26.4.1 or later
 
 ## **Agentic AI for your  Mac Desktop**
-## Open Source alternative to Claude Code, Cursor and Open Claw
 
 [![Latest Release](https://img.shields.io/github/v/release/macOS26/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/macOS26/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/macOS26/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/macOS26/Agent/stargazers)
@@ -15,10 +14,6 @@
 
 # Chess within Agent
 <img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
-
-## Cadence
-### Release Schedule
-Approved pull requests are tested and implemented on corresponding weekends. Milestone releases are tied to real moments of growth. Reaching 500 stars, for example, will queue a new release. If the latest build becomes the #1 download on [macos26.app](https://macos26.app), that milestone will also trigger a new release. For early adopters: as bug fixes land, pull requests are approved, and new features ship, the main branch will always reflect the latest work.
 
 ## Backstory and the Tech behind Agent!
 Agent! didn't come together overnight. It's the result of three years of building agentic AI apps, drawing on roughly a dozen projects developed along the way. Some of those were published under ANIE, Game Changer, BattleScript, XCF MCP Server and Client, D1F, and about eight original Swift Packages. The missing piece was achieving an intelligent autonomous time loop. Once achieved, I brought in the best of the best from the previous three years. The result is Agent! for macOS 26.4.1 or later.
