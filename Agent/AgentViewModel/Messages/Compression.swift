@@ -126,9 +126,14 @@ extension AgentViewModel {
         log: ((String) -> Void)? = nil
     ) async -> Bool
     {
-        // Respect the user's Token Compression toggle — when OFF, do nothing.
-        // Covers microcompact, stripOldImages, Apple AI summarization, AND Tier 2 prune.
-        guard AppleIntelligenceMediator.shared.tokenCompressionEnabled else { return false }
+        // Structural compaction (microcompact / image strip / Tier 2 prune) is a
+        // safety mechanism, not a feature: without it the conversation grows until
+        // the provider rejects it. It runs regardless of the Token Compression
+        // toggle. Only Tier 1 — Apple Intelligence summarization — respects it.
+        //
+        // Cheap chars/4 estimate first so an under-threshold turn costs nothing:
+        // preciseTokenCount runs an on-device model pass over the whole transcript.
+        guard state.shouldCompact(estimatedTokens: estimateTokens(messages: messages)) else { return false }
 
         let tokensBefore = await preciseTokenCount(messages: messages)
         guard state.shouldCompact(estimatedTokens: tokensBefore) else { return false }
@@ -142,7 +147,7 @@ extension AgentViewModel {
         stripOldImages(&messages)
 
         // Tier 1: Apple AI summarization (fast, on-device).
-        if FoundationModelService.isAvailable {
+        if FoundationModelService.isAvailable, AppleIntelligenceMediator.shared.tokenCompressionEnabled {
             await summarizeOldMessages(&messages)
             let tokensAfterT1 = await preciseTokenCount(messages: messages)
             if state.recordAttempt(tokensBefore: tokensBefore, tokensAfter: tokensAfterT1) {
@@ -168,7 +173,9 @@ extension AgentViewModel {
     /// Clear old tool_result content to save tokens while preserving message structure.
     /// Keeps only the last `keepRecent` tool results intact; older ones replaced with "[cleared]".
     static func microcompact(_ messages: inout [[String: Any]], keepRecent: Int = 3) {
-        guard AppleIntelligenceMediator.shared.tokenCompressionEnabled else { return }
+        // No toggle gate — clearing stale tool results (spilled to ToolResultCache
+        // first, so nothing is lost) is structural recovery, not an Apple
+        // Intelligence feature.
         // Find all tool_result indices
         var toolResultIndices: [(msgIdx: Int, blockIdx: Int)] = []
         for (i, msg) in messages.enumerated() {
