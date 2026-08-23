@@ -130,6 +130,9 @@ extension AgentViewModel {
         ctx: ToolContext,
         toolResults: inout [[String: Any]]
     ) async -> ToolHandlerResult {
+        // Fresh per tool — handlers set this when they stream command output live.
+        lastStreamedOutput = ""
+
         // Normalize empty/relative path to nil so handlers fall back to project folder
         var input = rawInput
         if let p = input["path"] as? String, (p.isEmpty || p == "." || p == "./") { input["path"] = nil }
@@ -221,9 +224,11 @@ extension AgentViewModel {
 
         // Fallback: route through executeNativeTool
         let output = await executeNativeTool(name, input: input)
-        // Shell commands already streamed output via appendRawOutput — skip the duplicate log.
+        // Skip the log when the output was already streamed live via appendRawOutput
+        // — shell tools always stream, and git/xcode/script tools stream whenever
+        // they shell out through executeViaUserAgent. Logging again duplicates it.
         let shellTools: Set<String> = ["execute_agent_command", "run_shell_script", "execute_daemon_command"]
-        if !shellTools.contains(name) {
+        if !shellTools.contains(name), !outputWasStreamed(output) {
             appendLog(output)
         }
         flushLog()
@@ -243,7 +248,11 @@ extension AgentViewModel {
     ) async -> ToolHandlerResult
     {
         let output = await vm.executeNativeTool(name, input: input)
-        vm.appendLog(output); vm.flushLog()
+        // Skip the log when the handler already streamed this exact output live
+        // (git/xcode/script tools run through executeViaUserAgent) — otherwise the
+        // same text appears twice in the activity log.
+        if !vm.outputWasStreamed(output) { vm.appendLog(output) }
+        vm.flushLog()
         return .handled(output)
     }
 

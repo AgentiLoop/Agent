@@ -105,12 +105,25 @@ extension AgentViewModel {
         userService.onOutput = nil
         userServiceActive = false
 
+        // Remember what was streamed live so handlers that log their return value
+        // (ToolDispatch.handleNativeTool) don't print the same text a second time.
+        lastStreamedOutput = silent ? "" : result.output
+
         // Only show exit code on real errors (not cancellation, not success)
         if result.status > 0 {
             appendLog("exit code: \(result.status)")
         }
         flushLog()
         return result
+    }
+
+    /// True when `output` is the exact text executeViaUserAgent already streamed
+    /// live into the activity log for the tool currently being dispatched.
+    /// Callers use this to avoid logging the same command output twice.
+    func outputWasStreamed(_ output: String) -> Bool {
+        let streamed = lastStreamedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !streamed.isEmpty else { return false }
+        return output.trimmingCharacters(in: .whitespacesAndNewlines) == streamed
     }
 
     /// Returns true if the path is under a TCC-protected folder that the launch agent can't access.
