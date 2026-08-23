@@ -47,6 +47,13 @@ final class AgentViewModel {
     var autoVerifyEnabled: Bool = UserDefaults.standard.bool(forKey: "codingAutoVerify") {
         didSet { UserDefaults.standard.set(autoVerifyEnabled, forKey: "codingAutoVerify") }
     }
+    /// Critic review: one-shot LLM review of the task's diff before task_complete is accepted
+    var criticReviewEnabled: Bool = UserDefaults.standard.bool(forKey: "codingCriticReview") {
+        didSet { UserDefaults.standard.set(criticReviewEnabled, forKey: "codingCriticReview") }
+    }
+    /// Per-task flag — the critic runs at most once per task so a stubborn
+    /// review can't loop task_complete forever. Reset at task start.
+    var criticReviewDone: Bool = false
     /// Visual test assertions: allow LLM to define click/verify UI tests
     var visualTestsEnabled: Bool = UserDefaults.standard.bool(forKey: "codingVisualTests") {
         didSet { UserDefaults.standard.set(visualTestsEnabled, forKey: "codingVisualTests") }
