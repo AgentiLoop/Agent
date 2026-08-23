@@ -21,9 +21,7 @@
 
 ## Cadence
 ### Release Schedule
-Approved pull requests are tested and implemented on corresponding weekends. Milestone releases are tied to real moments of growth. Reaching 500 stars, for example, will queue a new release. If the latest build becomes the #1 download on [macos26.app](https://macos26.app), that milestone will also trigger a new release. For early adopters: as bug fixes land, pull requests are approved, and new features ship, the main branch will always reflect the latest work. This summer, updates may be a bit slower due to Family Medical Leave and limited computer access. Thanks in advance for your patience.
-
----
+Approved pull requests are tested and implemented on corresponding weekends. Milestone releases are tied to real moments of growth. Reaching 500 stars, for example, will queue a new release. If the latest build becomes the #1 download on [macos26.app](https://macos26.app), that milestone will also trigger a new release. For early adopters: as bug fixes land, pull requests are approved, and new features ship, the main branch will always reflect the latest work.
 
 ## Backstory and the Tech behind Agent!
 Agent! didn't come together overnight. It's the result of three years of building agentic AI apps, drawing on roughly a dozen projects developed along the way. Some of those were published under ANIE, Game Changer, BattleScript, XCF MCP Server and Client, D1F, and about eight original Swift Packages. The missing piece was achieving an intelligent autonomous time loop. Once achieved, I brought in the best of the best from the previous three years. The result is Agent! for macOS 26.4.1 or later.
