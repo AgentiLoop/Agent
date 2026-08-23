@@ -7,6 +7,29 @@
 
 extension AgentViewModel {
 
+    /// Decide whether a tool's output represents a FAILURE.
+    ///
+    /// Only the STATUS LINE (first line) is examined. Scanning the whole output
+    /// produced false positives: a SUCCESSFUL edit echoes a preview of the file's
+    /// new content, so editing any file whose source contains "failed", "error:"
+    /// or "not found" (e.g. XcodeService.swift) looked like a failure and tripped
+    /// the stuck guards. Matches the convention in FileTools.swift, which keys
+    /// off hasPrefix("Error").
+    ///
+    /// Single source of truth — `runOvernightCodingGuards` and
+    /// `appendStuckFileNudgeIfNeeded` both call this. Do not inline a copy.
+    static func isToolFailure(output: String) -> Bool {
+        let status = (output.components(separatedBy: "\n").first ?? output)
+            .trimmingCharacters(in: .whitespaces)
+            .lowercased()
+        return status.hasPrefix("error")
+            || status.hasPrefix("warning:")
+            || status.hasPrefix("❌")
+            || status.contains("not found")
+            || status.contains("rejected")
+            || status.contains("no changes")
+    }
+
     /// Detect consecutive edit failures on the same file and append a
     /// recovery nudge (at 2 failures) or give-up nudge (at 4 failures).
     /// Mirrors the stuck-file block in runOvernightCodingGuards but
@@ -25,21 +48,7 @@ extension AgentViewModel {
               let path = input["file_path"] as? String ?? input["path"] as? String,
               let output = toolResult["content"] as? String
         else { return }
-        // Only the STATUS LINE decides success/failure. Scanning the whole output
-        // produced false positives: a SUCCESSFUL edit echoes a preview of the file's
-        // new content, so editing any file whose source contains "failed", "error:"
-        // or "not found" (e.g. XcodeService.swift) tripped the stuck guard.
-        // Matches the convention in FileTools.swift, which keys off hasPrefix("Error").
-        let status = (output.components(separatedBy: "\n").first ?? output)
-            .trimmingCharacters(in: .whitespaces)
-            .lowercased()
-        let isFailure = status.hasPrefix("error")
-            || status.hasPrefix("warning:")
-            || status.hasPrefix("❌")
-            || status.contains("not found")
-            || status.contains("rejected")
-            || status.contains("no changes")
-        if isFailure {
+        if Self.isToolFailure(output: output) {
             stuckFiles[path, default: 0] += 1
             let count = stuckFiles[path]!
             if count == 2 {
