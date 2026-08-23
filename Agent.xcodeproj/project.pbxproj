@@ -213,6 +213,7 @@
 		3A2D86472E205A0DA0CB5D69 /* AgenticCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBDF459529494A3928D101A /* AgenticCoreTests.swift */; };
 		FA10000000000000000103 /* PrefixStabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000102 /* PrefixStabilityTests.swift */; };
 		FA10000000000000000105 /* LoopReplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000104 /* LoopReplayTests.swift */; };
+		8694EEF8CDF9D987CE3D1E2A /* PlanStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5A29F2E735D900C78C575E /* PlanStateStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -484,6 +485,7 @@
 		ABBDF459529494A3928D101A /* AgenticCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgenticCoreTests.swift"; sourceTree = "<group>"; };
 		FA10000000000000000102 /* PrefixStabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PrefixStabilityTests.swift"; sourceTree = "<group>"; };
 		FA10000000000000000104 /* LoopReplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoopReplayTests.swift"; sourceTree = "<group>"; };
+		BB5A29F2E735D900C78C575E /* PlanStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlanStateStore.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -935,6 +937,7 @@
 							176D0F01E4553C80C7E38FB2 /* ToolResultCache.swift */,
 							FA10000000000000000106 /* ToolOutcomeStore.swift */,
 				30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */,
+				BB5A29F2E735D900C78C575E /* PlanStateStore.swift */,
 );
 			path = Services;
 			sourceTree = "<group>";
@@ -1384,6 +1387,7 @@
 							C1DD1E30D7BE7F635978E929 /* ToolResultCache.swift in Sources */,
 							FA10000000000000000107 /* ToolOutcomeStore.swift in Sources */,
 				0BCD82BC9C5723C7F775D244 /* GoalStateStore.swift in Sources */,
+				8694EEF8CDF9D987CE3D1E2A /* PlanStateStore.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

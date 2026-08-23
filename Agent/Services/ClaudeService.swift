@@ -87,6 +87,7 @@ final class ClaudeService {
         prompt += MemoryStore.shared.contextBlock
         prompt += GoalStateStore.shared.promptBlock
         prompt += ToolOutcomeStore.shared.promptBlock
+        prompt += PlanStateStore.promptBlock(projectFolder: projectFolder)
         return prompt
     }
 

@@ -483,6 +483,7 @@ final class CodexService {
         s += MemoryStore.shared.contextBlock
         s += GoalStateStore.shared.promptBlock
         s += ToolOutcomeStore.shared.promptBlock
+        s += PlanStateStore.promptBlock(projectFolder: projectFolder)
         return s
     }
 
