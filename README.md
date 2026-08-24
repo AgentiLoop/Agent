@@ -1,27 +1,16 @@
-
-<img width="256" height="256" alt="agent_icon_256" src="https://github.com/user-attachments/assets/20585d64-ea67-4818-8c6c-3435d9bcbf4c" />
-
-
 # 🦾 Agent! for macOS 26.4.1 or later
 
-<img width="1326" height="1428" alt="image" src="https://github.com/user-attachments/assets/9616193e-ab81-456b-ae8f-6fc182d0d6b0" />
-
 ## **Agentic AI for your  Mac Desktop**
-## Open Source alternative to Claude Code, Cursor and Open Claw
 
 [![Latest Release](https://img.shields.io/github/v/release/macOS26/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/macOS26/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/macOS26/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/macOS26/Agent/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/macOS26/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/macOS26/Agent/fork)
 [![macOS 26.4+](https://img.shields.io/badge/macOS-26.4.1-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
-<p><a href="https://www.paypal.com/ncp/payment/9C6RY2UAE5M3S"><img src="https://img.shields.io/badge/Donation-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Tip Jar" /></a>
-<p><b>Thank you for your interest and support!</b></p>
+<a href="https://www.paypal.com/ncp/payment/9C6RY2UAE5M3S"><img src="https://img.shields.io/badge/Donation-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Tip Jar" /></a>
 
----
-
-## Cadence
-### Release Schedule
-Approved pull requests are tested and implemented on corresponding weekends. Milestone releases are tied to real moments of growth. Reaching 500 stars, for example, will queue a new release. If the latest build becomes the #1 download on [macos26.app](https://macos26.app), that milestone will also trigger a new release. For early adopters: as bug fixes land, pull requests are approved, and new features ship, the main branch will always reflect the latest work.
+## Chess within Agent
+<img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
 
 ## Backstory and the Tech behind Agent!
 Agent! didn't come together overnight. It's the result of three years of building agentic AI apps, drawing on roughly a dozen projects developed along the way. Some of those were published under ANIE, Game Changer, BattleScript, XCF MCP Server and Client, D1F, and about eight original Swift Packages. The missing piece was achieving an intelligent autonomous time loop. Once achieved, I brought in the best of the best from the previous three years. The result is Agent! for macOS 26.4.1 or later.
