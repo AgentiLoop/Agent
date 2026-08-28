@@ -203,8 +203,8 @@ final class AgentViewModel {
     }
 
     // Claude settings - stored securely in Keychain
-    var apiKey: String = KeychainService.shared.getClaudeAPIKey() ?? "" {
-        didSet { KeychainService.shared.setClaudeAPIKey(apiKey) }
+    var apiKey: String = KeychainService.shared.get(.claude) ?? "" {
+        didSet { KeychainService.shared.set(.claude, apiKey) }
     }
 
     var selectedModel: String = UserDefaults.standard.string(forKey: "agentModel") ?? "claude-sonnet-4-20250514" {
@@ -212,25 +212,25 @@ final class AgentViewModel {
     }
 
     // Ollama settings - API key stored securely in Keychain
-    var ollamaAPIKey: String = KeychainService.shared.getOllamaAPIKey() ?? "" {
-        didSet { KeychainService.shared.setOllamaAPIKey(ollamaAPIKey) }
+    var ollamaAPIKey: String = KeychainService.shared.get(.ollama) ?? "" {
+        didSet { KeychainService.shared.set(.ollama, ollamaAPIKey) }
     }
 
     // Tavily web search API key (available for all providers)
-    var tavilyAPIKey: String = KeychainService.shared.getTavilyAPIKey() ?? "" {
-        didSet { KeychainService.shared.setTavilyAPIKey(tavilyAPIKey) }
+    var tavilyAPIKey: String = KeychainService.shared.get(.tavily) ?? "" {
+        didSet { KeychainService.shared.set(.tavily, tavilyAPIKey) }
     }
 
     // Exa web search API key (available for all providers)
-    var exaAPIKey: String = KeychainService.shared.getExaAPIKey() ?? "" {
-        didSet { KeychainService.shared.setExaAPIKey(exaAPIKey) }
+    var exaAPIKey: String = KeychainService.shared.get(.exa) ?? "" {
+        didSet { KeychainService.shared.set(.exa, exaAPIKey) }
     }
 
     let ollamaEndpoint = "https://ollama.com/api/chat"
 
     // OpenAI settings
-    var openAIAPIKey: String = KeychainService.shared.getOpenAIAPIKey() ?? "" {
-        didSet { KeychainService.shared.setOpenAIAPIKey(openAIAPIKey) }
+    var openAIAPIKey: String = KeychainService.shared.get(.openAI) ?? "" {
+        didSet { KeychainService.shared.set(.openAI, openAIAPIKey) }
     }
 
     var openAIModel: String = UserDefaults.standard.string(forKey: "openAIModel") ?? "gpt-4.1-nano" {
@@ -253,8 +253,8 @@ final class AgentViewModel {
     var codexContextWindows: [String: Int] = [:]
 
     // DeepSeek settings
-    var deepSeekAPIKey: String = KeychainService.shared.getDeepSeekAPIKey() ?? "" {
-        didSet { KeychainService.shared.setDeepSeekAPIKey(deepSeekAPIKey) }
+    var deepSeekAPIKey: String = KeychainService.shared.get(.deepSeek) ?? "" {
+        didSet { KeychainService.shared.set(.deepSeek, deepSeekAPIKey) }
     }
 
     var deepSeekModel: String = UserDefaults.standard.string(forKey: "deepSeekModel") ?? "deepseek-chat" {
@@ -265,8 +265,8 @@ final class AgentViewModel {
     var isFetchingDeepSeekModels = false
 
     // Hugging Face settings
-    var huggingFaceAPIKey: String = KeychainService.shared.getHuggingFaceAPIKey() ?? "" {
-        didSet { KeychainService.shared.setHuggingFaceAPIKey(huggingFaceAPIKey) }
+    var huggingFaceAPIKey: String = KeychainService.shared.get(.huggingFace) ?? "" {
+        didSet { KeychainService.shared.set(.huggingFace, huggingFaceAPIKey) }
     }
 
     var huggingFaceModel: String = UserDefaults.standard.string(forKey: "huggingFaceModel") ?? "deepseek-ai/DeepSeek-V3-0324" {
@@ -277,8 +277,8 @@ final class AgentViewModel {
     var isFetchingHuggingFaceModels = false
 
     // vLLM settings
-    var vLLMAPIKey: String = KeychainService.shared.getVLLMAPIKey() ?? "" {
-        didSet { KeychainService.shared.setVLLMAPIKey(vLLMAPIKey) }
+    var vLLMAPIKey: String = KeychainService.shared.get(.vLLM) ?? "" {
+        didSet { KeychainService.shared.set(.vLLM, vLLMAPIKey) }
     }
 
     var vLLMEndpoint: String = UserDefaults.standard.string(forKey: "vLLMEndpoint") ?? "http://localhost:8000/v1/chat/completions" {
@@ -311,16 +311,16 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(lmStudioModel, forKey: "lmStudioModel") }
     }
 
-    var lmStudioAPIKey: String = KeychainService.shared.getLMStudioAPIKey() ?? "" {
-        didSet { KeychainService.shared.setLMStudioAPIKey(lmStudioAPIKey) }
+    var lmStudioAPIKey: String = KeychainService.shared.get(.lmStudio) ?? "" {
+        didSet { KeychainService.shared.set(.lmStudio, lmStudioAPIKey) }
     }
 
     var lmStudioModels: [OpenAIModelInfo] = []
     var isFetchingLMStudioModels = false
 
     // Z.ai (ZhipuAI GLM) settings
-    var zAIAPIKey: String = KeychainService.shared.getZAIAPIKey() ?? "" {
-        didSet { KeychainService.shared.setZAIAPIKey(zAIAPIKey) }
+    var zAIAPIKey: String = KeychainService.shared.get(.zAI) ?? "" {
+        didSet { KeychainService.shared.set(.zAI, zAIAPIKey) }
     }
 
     var zAIModel: String = UserDefaults.standard.string(forKey: "zAIModel") ?? "glm-4.7" {
@@ -332,8 +332,8 @@ final class AgentViewModel {
 
     // MARK: - BigModel (China)
 
-    var bigModelAPIKey: String = KeychainService.shared.getBigModelAPIKey() ?? "" {
-        didSet { KeychainService.shared.setBigModelAPIKey(bigModelAPIKey) }
+    var bigModelAPIKey: String = KeychainService.shared.get(.bigModel) ?? "" {
+        didSet { KeychainService.shared.set(.bigModel, bigModelAPIKey) }
     }
 
     var bigModelModel: String = UserDefaults.standard.string(forKey: "bigModelModel") ?? "glm-4.7" {
@@ -342,8 +342,8 @@ final class AgentViewModel {
 
     // MARK: - Qwen (Alibaba DashScope)
 
-    var qwenAPIKey: String = KeychainService.shared.getQwenAPIKey() ?? "" {
-        didSet { KeychainService.shared.setQwenAPIKey(qwenAPIKey) }
+    var qwenAPIKey: String = KeychainService.shared.get(.qwen) ?? "" {
+        didSet { KeychainService.shared.set(.qwen, qwenAPIKey) }
     }
 
     var qwenModel: String = UserDefaults.standard.string(forKey: "qwenModel") ?? "qwen-plus" {
@@ -355,8 +355,8 @@ final class AgentViewModel {
 
     // MARK: - MiniMax
 
-    var miniMaxAPIKey: String = KeychainService.shared.getMiniMaxAPIKey() ?? "" {
-        didSet { KeychainService.shared.setMiniMaxAPIKey(miniMaxAPIKey) }
+    var miniMaxAPIKey: String = KeychainService.shared.get(.miniMax) ?? "" {
+        didSet { KeychainService.shared.set(.miniMax, miniMaxAPIKey) }
     }
 
     var miniMaxModel: String = UserDefaults.standard.string(forKey: "miniMaxModel") ?? "MiniMax-M3" {
@@ -368,8 +368,8 @@ final class AgentViewModel {
 
     // MARK: - OpenRouter
 
-    var openRouterAPIKey: String = KeychainService.shared.getOpenRouterAPIKey() ?? "" {
-        didSet { KeychainService.shared.setOpenRouterAPIKey(openRouterAPIKey) }
+    var openRouterAPIKey: String = KeychainService.shared.get(.openRouter) ?? "" {
+        didSet { KeychainService.shared.set(.openRouter, openRouterAPIKey) }
     }
 
     var openRouterModel: String = UserDefaults.standard.string(forKey: "openRouterModel") ?? "" {
@@ -388,8 +388,8 @@ final class AgentViewModel {
 
     // MARK: - Google Gemini
 
-    var geminiAPIKey: String = KeychainService.shared.getGeminiAPIKey() ?? "" {
-        didSet { KeychainService.shared.setGeminiAPIKey(geminiAPIKey) }
+    var geminiAPIKey: String = KeychainService.shared.get(.gemini) ?? "" {
+        didSet { KeychainService.shared.set(.gemini, geminiAPIKey) }
     }
 
     var geminiModel: String = UserDefaults.standard.string(forKey: "geminiModel") ?? "gemini-2.5-flash" {
@@ -401,8 +401,8 @@ final class AgentViewModel {
 
     // MARK: - Grok (xAI)
 
-    var grokAPIKey: String = KeychainService.shared.getGrokAPIKey() ?? "" {
-        didSet { KeychainService.shared.setGrokAPIKey(grokAPIKey) }
+    var grokAPIKey: String = KeychainService.shared.get(.grok) ?? "" {
+        didSet { KeychainService.shared.set(.grok, grokAPIKey) }
     }
 
     var grokModel: String = UserDefaults.standard.string(forKey: "grokModel") ?? "grok-3-mini-fast" {
@@ -414,8 +414,8 @@ final class AgentViewModel {
 
     // MARK: - Mistral
 
-    var mistralAPIKey: String = KeychainService.shared.getMistralAPIKey() ?? "" {
-        didSet { KeychainService.shared.setMistralAPIKey(mistralAPIKey) }
+    var mistralAPIKey: String = KeychainService.shared.get(.mistral) ?? "" {
+        didSet { KeychainService.shared.set(.mistral, mistralAPIKey) }
     }
 
     var mistralModel: String = UserDefaults.standard.string(forKey: "mistralModel") ?? "mistral-large-latest" {
@@ -427,8 +427,8 @@ final class AgentViewModel {
 
     // MARK: - Codestral (codestral.mistral.ai)
 
-    var codestralAPIKey: String = KeychainService.shared.getCodestralAPIKey() ?? "" {
-        didSet { KeychainService.shared.setCodestralAPIKey(codestralAPIKey) }
+    var codestralAPIKey: String = KeychainService.shared.get(.codestral) ?? "" {
+        didSet { KeychainService.shared.set(.codestral, codestralAPIKey) }
     }
 
     var codestralModel: String = UserDefaults.standard.string(forKey: "codestralModel") ?? "codestral-latest" {
@@ -440,8 +440,8 @@ final class AgentViewModel {
 
     // MARK: - Mistral Vibe (api.mistral.ai with Vibe key, Devstral models)
 
-    var vibeAPIKey: String = KeychainService.shared.getVibeAPIKey() ?? "" {
-        didSet { KeychainService.shared.setVibeAPIKey(vibeAPIKey) }
+    var vibeAPIKey: String = KeychainService.shared.get(.vibe) ?? "" {
+        didSet { KeychainService.shared.set(.vibe, vibeAPIKey) }
     }
 
     var vibeModel: String = UserDefaults.standard.string(forKey: "vibeModel") ?? "devstral-latest" {
