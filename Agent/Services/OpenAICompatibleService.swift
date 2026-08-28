@@ -127,23 +127,8 @@ final class OpenAICompatibleService {
     /// Prepend project folder to the last user message (only on first message).
     private func withFolderPrefix(_ messages: [[String: Any]]) -> [[String: Any]] {
         // Skip if folder is in system prompt already (iteration 1) or short prompt (iteration 2+)
-        guard !projectFolder.isEmpty, messages.count <= 1 else { return messages }
-        let prefix = "PROJECT FOLDER: \(projectFolder)\n"
-        var result = messages
-        for i in stride(from: result.count - 1, through: 0, by: -1) {
-            guard result[i]["role"] as? String == "user" else { continue }
-            if let text = result[i]["content"] as? String {
-                result[i]["content"] = prefix + text
-            } else if var blocks = result[i]["content"] as? [[String: Any]],
-                      let first = blocks.first, first["type"] as? String == "text",
-                      let existing = first["text"] as? String
-            {
-                blocks[0]["text"] = prefix + existing
-                result[i]["content"] = blocks
-            }
-            break
-        }
-        return result
+        guard messages.count <= 1 else { return messages }
+        return LLMMessagePrefix.withFolderPrefix(messages, projectFolder: projectFolder)
     }
 
     /// All tools every iteration — compact descriptions in coding mode.
