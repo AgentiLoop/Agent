@@ -165,10 +165,6 @@
 		E5CBD1143D2B44B8B9A209FE /* RollbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C57073F5C4305AF673454 /* RollbackView.swift */; };
 		E6A8395D5098ED44E0118609 /* InputSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C14A00A8D2269268767BD2D /* InputSectionView.swift */; };
 		EA60000000000000000001 /* SDEFs in Resources */ = {isa = PBXBuildFile; fileRef = EA60000000000000000002 /* SDEFs */; };
-		EA6EA3842F6E35CF003FDB6C /* send_image_output.json in Resources */ = {isa = PBXBuildFile; fileRef = EA6EA3812F6E35CF003FDB6C /* send_image_output.json */; };
-		EA6EA3852F6E35CF003FDB6C /* send_message_output.json in Resources */ = {isa = PBXBuildFile; fileRef = EA6EA3832F6E35CF003FDB6C /* send_message_output.json */; };
-		EA6EA3862F6E35CF003FDB6C /* send_image_input.json in Resources */ = {isa = PBXBuildFile; fileRef = EA6EA3802F6E35CF003FDB6C /* send_image_input.json */; };
-		EA6EA3872F6E35CF003FDB6C /* send_message_input.json in Resources */ = {isa = PBXBuildFile; fileRef = EA6EA3822F6E35CF003FDB6C /* send_message_input.json */; };
 		EA70000000000000000001 /* SDEFService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA70000000000000000002 /* SDEFService.swift */; };
 		EA80000000000000000001 /* NSAppleScriptService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA80000000000000000002 /* NSAppleScriptService.swift */; };
 		EAA08AAC2F7D549300D5998A /* AgentLLM in Frameworks */ = {isa = PBXBuildFile; productRef = EAA08AAB2F7D549300D5998A /* AgentLLM */; };
@@ -222,6 +218,14 @@
 		1DCD8313ABDDD50E52BDA2E0 /* CriticGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F212F6A04076958DD46FD1E4 /* CriticGate.swift */; };
 		D3A4F795003DE4CF29105DB6 /* HarnessGuardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1677C7175A16F2731420499 /* HarnessGuardTests.swift */; };
 		AB11223344556677889900AA /* ShellSafetyServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11223344556677889900BB /* ShellSafetyServiceTests.swift */; };
+		AB112233445566778899010A /* AccessibilityEnabledTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899010B /* AccessibilityEnabledTests.swift */; };
+		AB112233445566778899020A /* AccessibilityServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899020B /* AccessibilityServiceTests.swift */; };
+		AB112233445566778899030A /* CodeBlockHighlighterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899030B /* CodeBlockHighlighterTests.swift */; };
+		AB112233445566778899040A /* CodingServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899040B /* CodingServiceTests.swift */; };
+		AB112233445566778899050A /* PackageAutoDiscoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899050B /* PackageAutoDiscoveryTests.swift */; };
+		AB112233445566778899060A /* PackageGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899060B /* PackageGenerationTests.swift */; };
+		AB112233445566778899070A /* ScriptServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899070B /* ScriptServiceTests.swift */; };
+		AB112233445566778899080A /* ScriptingBridgesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899080B /* ScriptingBridgesTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -453,10 +457,6 @@
 		DFHUDA001556805C0F5ABC260 /* HUDOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDOptionsView.swift; sourceTree = "<group>"; };
 		DFLLMOUT01556805C0F5ABC261 /* LLMOutputTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMOutputTextView.swift; sourceTree = "<group>"; };
 		EA60000000000000000002 /* SDEFs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SDEFs; sourceTree = "<group>"; };
-		EA6EA3802F6E35CF003FDB6C /* send_image_input.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = send_image_input.json; sourceTree = "<group>"; };
-		EA6EA3812F6E35CF003FDB6C /* send_image_output.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = send_image_output.json; sourceTree = "<group>"; };
-		EA6EA3822F6E35CF003FDB6C /* send_message_input.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = send_message_input.json; sourceTree = "<group>"; };
-		EA6EA3832F6E35CF003FDB6C /* send_message_output.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = send_message_output.json; sourceTree = "<group>"; };
 		EA70000000000000000002 /* SDEFService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDEFService.swift; sourceTree = "<group>"; };
 		EA80000000000000000002 /* NSAppleScriptService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppleScriptService.swift; sourceTree = "<group>"; };
 		EAAI000000000000000002 /* AppleIntelligenceMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIntelligenceMediator.swift; sourceTree = "<group>"; };
@@ -499,6 +499,14 @@
 		F212F6A04076958DD46FD1E4 /* CriticGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CriticGate.swift"; sourceTree = "<group>"; };
 		C1677C7175A16F2731420499 /* HarnessGuardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HarnessGuardTests.swift"; sourceTree = "<group>"; };
 		AB11223344556677889900BB /* ShellSafetyServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShellSafetyServiceTests.swift"; sourceTree = "<group>"; };
+		AB112233445566778899010B /* AccessibilityEnabledTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccessibilityEnabledTests.swift"; sourceTree = "<group>"; };
+		AB112233445566778899020B /* AccessibilityServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccessibilityServiceTests.swift"; sourceTree = "<group>"; };
+		AB112233445566778899030B /* CodeBlockHighlighterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CodeBlockHighlighterTests.swift"; sourceTree = "<group>"; };
+		AB112233445566778899040B /* CodingServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CodingServiceTests.swift"; sourceTree = "<group>"; };
+		AB112233445566778899050B /* PackageAutoDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PackageAutoDiscoveryTests.swift"; sourceTree = "<group>"; };
+		AB112233445566778899060B /* PackageGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PackageGenerationTests.swift"; sourceTree = "<group>"; };
+		AB112233445566778899070B /* ScriptServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScriptServiceTests.swift"; sourceTree = "<group>"; };
+		AB112233445566778899080B /* ScriptingBridgesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScriptingBridgesTests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -573,7 +581,6 @@
 				EADF39C72F68BF2100CD01E5 /* Views */,
 				AA1000000000000000001A /* AgentApp.swift */,
 				EAE00000000000000001 /* UX */,
-				EA50J00000000000001 /* JSON */,
 				AA10000000000000000022 /* Agent.entitlements */,
 				EAHELP0000000000000002 /* Resources/Agent.help */,
 				EA60000000000000000002 /* SDEFs */,
@@ -891,19 +898,16 @@
 							FA10000000000000000104 /* LoopReplayTests.swift */,
 				C1677C7175A16F2731420499 /* HarnessGuardTests.swift */,
 				AB11223344556677889900BB /* ShellSafetyServiceTests.swift */,
+				AB112233445566778899010B /* AccessibilityEnabledTests.swift */,
+				AB112233445566778899020B /* AccessibilityServiceTests.swift */,
+				AB112233445566778899030B /* CodeBlockHighlighterTests.swift */,
+				AB112233445566778899040B /* CodingServiceTests.swift */,
+				AB112233445566778899050B /* PackageAutoDiscoveryTests.swift */,
+				AB112233445566778899060B /* PackageGenerationTests.swift */,
+				AB112233445566778899070B /* ScriptServiceTests.swift */,
+				AB112233445566778899080B /* ScriptingBridgesTests.swift */,
 );
 			path = AgentTests;
-			sourceTree = "<group>";
-		};
-		EA50J00000000000001 /* JSON */ = {
-			isa = PBXGroup;
-			children = (
-				EA6EA3802F6E35CF003FDB6C /* send_image_input.json */,
-				EA6EA3812F6E35CF003FDB6C /* send_image_output.json */,
-				EA6EA3822F6E35CF003FDB6C /* send_message_input.json */,
-				EA6EA3832F6E35CF003FDB6C /* send_message_output.json */,
-			);
-			name = JSON;
 			sourceTree = "<group>";
 		};
 		EADF39C62F68BEF100CD01E5 /* Services */ = {
@@ -1205,10 +1209,6 @@
 			files = (
 				AA10000000000000000037 /* Assets.xcassets in Resources */,
 				EAF3666F2F623D6A004B7E38 /* AppIcon.icon in Resources */,
-				EA6EA3842F6E35CF003FDB6C /* send_image_output.json in Resources */,
-				EA6EA3852F6E35CF003FDB6C /* send_message_output.json in Resources */,
-				EA6EA3862F6E35CF003FDB6C /* send_image_input.json in Resources */,
-				EA6EA3872F6E35CF003FDB6C /* send_message_input.json in Resources */,
 				AA100000000000000000B3 /* StartupTwentiethAnniversaryMac.wav in Resources */,
 				EA60000000000000000001 /* SDEFs in Resources */,
 				EAHELP0000000000000001 /* Resources/Agent.help in Resources */,
@@ -1453,6 +1453,11 @@
 				FF20000000000000000006 /* ExaSearchTests.swift in Sources */,
 				D3A4F795003DE4CF29105DB6 /* HarnessGuardTests.swift in Sources */,
 				AB11223344556677889900AA /* ShellSafetyServiceTests.swift in Sources */,
+				AB112233445566778899030A /* CodeBlockHighlighterTests.swift in Sources */,
+				AB112233445566778899050A /* PackageAutoDiscoveryTests.swift in Sources */,
+				AB112233445566778899060A /* PackageGenerationTests.swift in Sources */,
+				AB112233445566778899070A /* ScriptServiceTests.swift in Sources */,
+				AB112233445566778899080A /* ScriptingBridgesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
