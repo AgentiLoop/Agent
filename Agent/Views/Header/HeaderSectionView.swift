@@ -230,9 +230,9 @@ struct HeaderToolbarButtons: View {
 
         Button { showHUDOptions.toggle() } label: {
             Image(systemName: "viewfinder")
-                .foregroundStyle(viewModel.scanLinesEnabled ? Color.green : Color.secondary)
+                .foregroundStyle(viewModel.showThinkingIndicator ? Color.green : Color.gray)
         }
-        .help("HUD (Heads-Up Display)")
+        .help(viewModel.showThinkingIndicator ? "HUD: ON" : "HUD: OFF")
         .accessibilityLabel("HUD")
         .popover(isPresented: $showHUDOptions, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
             HUDOptionsView(viewModel: viewModel)

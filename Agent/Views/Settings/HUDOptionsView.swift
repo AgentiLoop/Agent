@@ -16,6 +16,15 @@ struct HUDOptionsView: View {
 
             Divider()
 
+            HStack {
+                Text("Show HUD").font(.caption)
+                Spacer()
+                Toggle("", isOn: $viewModel.showThinkingIndicator)
+                    .toggleStyle(.switch)
+                    .controlSize(.mini)
+                    .tint(.green)
+            }
+
             VStack(alignment: .leading, spacing: 4) {
                 Text("Terminal Speed")
                     .font(.caption)
