@@ -21,7 +21,7 @@ extension AgentViewModel {
         // Fallback chain — each step tries a more universal backend: 1. Ollama+key → Ollama Web Search 2.
         // Z.AI/BigModel+key → Z.AI search-prime 3. Exa key → Exa /search 4. Tavily key → Tavily 5. DuckDuckGo HTML scrape (no key, always available)
         if provider == .ollama || provider == .localOllama {
-            if let ollamaKey = KeychainService.shared.getOllamaAPIKey(), !ollamaKey.isEmpty {
+            if let ollamaKey = KeychainService.shared.get(.ollama), !ollamaKey.isEmpty {
                 let ollamaResult = await performOllamaWebSearchInternal(query: query, apiKey: ollamaKey)
                 if !ollamaResult.hasPrefix("Error:") {
                     return ollamaResult
@@ -31,7 +31,7 @@ extension AgentViewModel {
         // Z.AI / BigModel providers: try native web_search API first. Returns structured results like Tavily. Not all
         // accounts include it, so fall through on error.
         if provider == .zAI || provider == .bigModel {
-            if let zKey = KeychainService.shared.getZAIAPIKey(), !zKey.isEmpty {
+            if let zKey = KeychainService.shared.get(.zAI), !zKey.isEmpty {
                 let zResult = await performZAIWebSearchInternal(query: query, apiKey: zKey)
                 if !zResult.hasPrefix("Error:") {
                     return zResult
@@ -41,7 +41,7 @@ extension AgentViewModel {
         // Exa — neural/semantic web search via api.exa.ai. Pulled from
         // Keychain inside the function (matches Z.AI/Ollama pattern). Falls
         // through on error so Tavily/DuckDuckGo remain available.
-        if let exaKey = KeychainService.shared.getExaAPIKey(), !exaKey.isEmpty {
+        if let exaKey = KeychainService.shared.get(.exa), !exaKey.isEmpty {
             let exaResult = await performExaSearchInternal(query: query, apiKey: exaKey)
             if !exaResult.hasPrefix("Error:") {
                 return exaResult

@@ -9,82 +9,32 @@ final class KeychainService: Sendable {
 
     private init() {}
 
-    private static let claudeAPIKey = "agent.claudeAPIKey"
-    private static let ollamaAPIKey = "agent.ollamaAPIKey"
-    private static let tavilyAPIKey = "agent.tavilyAPIKey"
-    private static let openAIAPIKey = "agent.openAIAPIKey"
-    private static let deepSeekAPIKey = "agent.deepSeekAPIKey"
-    private static let huggingFaceAPIKey = "agent.huggingFaceAPIKey"
-    private static let vLLMAPIKey = "agent.vLLMAPIKey"
+    /// Every stored credential, keyed by its exact legacy keychain account
+    /// string so existing stored keys keep working.
+    enum APIKey: String, CaseIterable, Sendable {
+        case claude = "agent.claudeAPIKey"
+        case ollama = "agent.ollamaAPIKey"
+        case tavily = "agent.tavilyAPIKey"
+        case openAI = "agent.openAIAPIKey"
+        case deepSeek = "agent.deepSeekAPIKey"
+        case huggingFace = "agent.huggingFaceAPIKey"
+        case vLLM = "agent.vLLMAPIKey"
+        case zAI = "com.agent.zai-api-key"
+        case gemini = "com.agent.gemini-api-key"
+        case grok = "com.agent.grok-api-key"
+        case mistral = "com.agent.mistral-api-key"
+        case codestral = "com.agent.codestral-api-key"
+        case vibe = "com.agent.vibe-api-key"
+        case bigModel = "com.agent.bigmodel-api-key"
+        case qwen = "com.agent.qwen-api-key"
+        case miniMax = "com.agent.minimax-api-key"
+        case openRouter = "com.agent.openrouter-api-key"
+        case exa = "com.agent.exa-api-key"
+        case lmStudio = "com.agent.lmstudio-api-key"
+    }
 
-    func setClaudeAPIKey(_ key: String) { set(key: Self.claudeAPIKey, value: key) }
-    func getClaudeAPIKey() -> String? { get(key: Self.claudeAPIKey) }
-
-    func setOllamaAPIKey(_ key: String) { set(key: Self.ollamaAPIKey, value: key) }
-    func getOllamaAPIKey() -> String? { get(key: Self.ollamaAPIKey) }
-
-    func setTavilyAPIKey(_ key: String) { set(key: Self.tavilyAPIKey, value: key) }
-    func getTavilyAPIKey() -> String? { get(key: Self.tavilyAPIKey) }
-
-    func setOpenAIAPIKey(_ key: String) { set(key: Self.openAIAPIKey, value: key) }
-    func getOpenAIAPIKey() -> String? { get(key: Self.openAIAPIKey) }
-
-    func setDeepSeekAPIKey(_ key: String) { set(key: Self.deepSeekAPIKey, value: key) }
-    func getDeepSeekAPIKey() -> String? { get(key: Self.deepSeekAPIKey) }
-
-    func setHuggingFaceAPIKey(_ key: String) { set(key: Self.huggingFaceAPIKey, value: key) }
-    func getHuggingFaceAPIKey() -> String? { get(key: Self.huggingFaceAPIKey) }
-
-    func setVLLMAPIKey(_ key: String) { set(key: Self.vLLMAPIKey, value: key) }
-    func getVLLMAPIKey() -> String? { get(key: Self.vLLMAPIKey) }
-
-    private static let zAIAPIKey = "com.agent.zai-api-key"
-    func setZAIAPIKey(_ key: String) { set(key: Self.zAIAPIKey, value: key) }
-    func getZAIAPIKey() -> String? { get(key: Self.zAIAPIKey) }
-
-    private static let geminiAPIKey = "com.agent.gemini-api-key"
-    func setGeminiAPIKey(_ key: String) { set(key: Self.geminiAPIKey, value: key) }
-    func getGeminiAPIKey() -> String? { get(key: Self.geminiAPIKey) }
-
-    private static let grokAPIKey = "com.agent.grok-api-key"
-    func setGrokAPIKey(_ key: String) { set(key: Self.grokAPIKey, value: key) }
-    func getGrokAPIKey() -> String? { get(key: Self.grokAPIKey) }
-
-    private static let mistralAPIKey = "com.agent.mistral-api-key"
-    func setMistralAPIKey(_ key: String) { set(key: Self.mistralAPIKey, value: key) }
-    func getMistralAPIKey() -> String? { get(key: Self.mistralAPIKey) }
-
-    private static let codestralAPIKey = "com.agent.codestral-api-key"
-    func setCodestralAPIKey(_ key: String) { set(key: Self.codestralAPIKey, value: key) }
-    func getCodestralAPIKey() -> String? { get(key: Self.codestralAPIKey) }
-
-    private static let vibeAPIKeyId = "com.agent.vibe-api-key"
-    func setVibeAPIKey(_ key: String) { set(key: Self.vibeAPIKeyId, value: key) }
-    func getVibeAPIKey() -> String? { get(key: Self.vibeAPIKeyId) }
-
-    private static let bigModelAPIKeyId = "com.agent.bigmodel-api-key"
-    func setBigModelAPIKey(_ key: String) { set(key: Self.bigModelAPIKeyId, value: key) }
-    func getBigModelAPIKey() -> String? { get(key: Self.bigModelAPIKeyId) }
-
-    private static let qwenAPIKeyId = "com.agent.qwen-api-key"
-    func setQwenAPIKey(_ key: String) { set(key: Self.qwenAPIKeyId, value: key) }
-    func getQwenAPIKey() -> String? { get(key: Self.qwenAPIKeyId) }
-
-    private static let miniMaxAPIKey = "com.agent.minimax-api-key"
-    func setMiniMaxAPIKey(_ key: String) { set(key: Self.miniMaxAPIKey, value: key) }
-    func getMiniMaxAPIKey() -> String? { get(key: Self.miniMaxAPIKey) }
-
-    private static let openRouterAPIKey = "com.agent.openrouter-api-key"
-    func setOpenRouterAPIKey(_ key: String) { set(key: Self.openRouterAPIKey, value: key) }
-    func getOpenRouterAPIKey() -> String? { get(key: Self.openRouterAPIKey) }
-
-    private static let exaAPIKey = "com.agent.exa-api-key"
-    func setExaAPIKey(_ key: String) { set(key: Self.exaAPIKey, value: key) }
-    func getExaAPIKey() -> String? { get(key: Self.exaAPIKey) }
-
-    private static let lmStudioAPIKey = "com.agent.lmstudio-api-key"
-    func setLMStudioAPIKey(_ key: String) { set(key: Self.lmStudioAPIKey, value: key) }
-    func getLMStudioAPIKey() -> String? { get(key: Self.lmStudioAPIKey) }
+    func set(_ apiKey: APIKey, _ value: String) { set(key: apiKey.rawValue, value: value) }
+    func get(_ apiKey: APIKey) -> String? { get(key: apiKey.rawValue) }
 
     private func set(key: String, value: String) {
         guard let data = value.data(using: .utf8) else { return }
