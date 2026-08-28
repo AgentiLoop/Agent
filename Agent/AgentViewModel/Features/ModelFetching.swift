@@ -169,26 +169,54 @@ extension AgentViewModel {
     }
 
     func fetchDeepSeekModels() {
-        guard !deepSeekAPIKey.isEmpty else {
-            deepSeekModels = Self.defaultDeepSeekModels
-            return
-        }
-        isFetchingDeepSeekModels = true
+        fetchProviderModels(
+            key: deepSeekAPIKey,
+            endpoint: "https://api.deepseek.com/v1/models",
+            defaults: Self.defaultDeepSeekModels,
+            fallbackModel: "",
+            isFetching: \.isFetchingDeepSeekModels,
+            models: \.deepSeekModels,
+            selected: \.deepSeekModel,
+            providerName: "DeepSeek"
+        )
+    }
+
+    /// Generic fetcher for providers exposing an OpenAI-compatible /models
+    /// endpoint. Handles the shared fetch → filter → defaults-fallback →
+    /// auto-select flow that was previously duplicated per provider.
+    private func fetchProviderModels(
+        key: String,
+        endpoint: String,
+        defaults: [OpenAIModelInfo],
+        fallbackModel: String,
+        isFetching: ReferenceWritableKeyPath<AgentViewModel, Bool>,
+        models modelsPath: ReferenceWritableKeyPath<AgentViewModel, [OpenAIModelInfo]>,
+        selected selectedPath: ReferenceWritableKeyPath<AgentViewModel, String>,
+        providerName: String,
+        filter: (([OpenAIModelInfo]) -> [OpenAIModelInfo])? = nil
+    ) {
+        self[keyPath: isFetching] = true
         Task {
-            defer { isFetchingDeepSeekModels = false }
+            defer { self[keyPath: isFetching] = false }
+            guard !key.isEmpty else {
+                self[keyPath: modelsPath] = defaults
+                return
+            }
             do {
-                let models = try await Self.fetchOpenAICompatibleModels(
-                    baseURL: "https://api.deepseek.com/v1",
-                    apiKey: deepSeekAPIKey
-                )
-                deepSeekModels = models.isEmpty ? Self.defaultDeepSeekModels : models
-                let ids = deepSeekModels.map(\.id)
-                if deepSeekModel.isEmpty || (!ids.isEmpty && !ids.contains(deepSeekModel)) {
-                    deepSeekModel = ids.first ?? ""
+                let all = try await Self.fetchOpenAICompatibleModels(apiKey: key, endpoint: endpoint)
+                var models = all
+                if let filter {
+                    let filtered = filter(all)
+                    models = filtered.isEmpty ? all : filtered
+                }
+                self[keyPath: modelsPath] = models.isEmpty ? defaults : models
+                let current = self[keyPath: selectedPath]
+                if current.isEmpty || !self[keyPath: modelsPath].contains(where: { $0.id == current }) {
+                    self[keyPath: selectedPath] = self[keyPath: modelsPath].first?.id ?? fallbackModel
                 }
             } catch {
-                appendLog("Failed to fetch DeepSeek models: \(error.localizedDescription)")
-                deepSeekModels = Self.defaultDeepSeekModels
+                appendLog("Failed to fetch \(providerName) models: \(error.localizedDescription)")
+                self[keyPath: modelsPath] = defaults
             }
         }
     }
@@ -269,28 +297,16 @@ extension AgentViewModel {
     }
 
     func fetchMiniMaxModels() {
-        guard !miniMaxAPIKey.isEmpty else {
-            miniMaxModels = Self.defaultMiniMaxModels
-            return
-        }
-        isFetchingMiniMaxModels = true
-        Task {
-            defer { isFetchingMiniMaxModels = false }
-            do {
-                let models = try await Self.fetchOpenAICompatibleModels(
-                    baseURL: "https://api.minimax.io/v1",
-                    apiKey: miniMaxAPIKey
-                )
-                miniMaxModels = models.isEmpty ? Self.defaultMiniMaxModels : models
-                let ids = miniMaxModels.map(\.id)
-                if miniMaxModel.isEmpty || (!ids.isEmpty && !ids.contains(miniMaxModel)) {
-                    miniMaxModel = ids.first ?? "MiniMax-M3"
-                }
-            } catch {
-                appendLog("Failed to fetch MiniMax models: \(error.localizedDescription)")
-                miniMaxModels = Self.defaultMiniMaxModels
-            }
-        }
+        fetchProviderModels(
+            key: miniMaxAPIKey,
+            endpoint: "https://api.minimax.io/v1/models",
+            defaults: Self.defaultMiniMaxModels,
+            fallbackModel: "MiniMax-M3",
+            isFetching: \.isFetchingMiniMaxModels,
+            models: \.miniMaxModels,
+            selected: \.miniMaxModel,
+            providerName: "MiniMax"
+        )
     }
 
     // MARK: - Static API Fetch Helpers
@@ -326,34 +342,6 @@ extension AgentViewModel {
             .sorted { $0.name < $1.name }
 
         return models.isEmpty ? defaultOpenAIModels : models
-    }
-
-    private nonisolated static func fetchOpenAICompatibleModels(baseURL: String, apiKey: String) async throws -> [OpenAIModelInfo] {
-        let endpoint = baseURL.hasSuffix("/models") ? baseURL : baseURL + "/models"
-        guard let url = URL(string: endpoint) else { throw AgentError.invalidURL }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.timeoutInterval = llmAPITimeout
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
-            throw AgentError.apiError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0, message: "API error")
-        }
-
-        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let modelsArray = json["data"] as? [[String: Any]] else
-        {
-            return defaultDeepSeekModels
-        }
-
-        let models = modelsArray.compactMap { model -> OpenAIModelInfo? in
-            guard let id = model["id"] as? String else { return nil }
-            return OpenAIModelInfo(id: id, name: id)
-        }.sorted { $0.name < $1.name }
-
-        return models.isEmpty ? defaultDeepSeekModels : models
     }
 
     private nonisolated static func fetchHuggingFaceModelsFromAPI(apiKey: String) async throws -> [OpenAIModelInfo] {
@@ -640,129 +628,77 @@ extension AgentViewModel {
     // MARK: - Google Gemini Models
 
     func fetchGeminiModels() {
-        isFetchingGeminiModels = true
-        let key = geminiAPIKey
-        Task {
-            defer { isFetchingGeminiModels = false }
-            guard !key.isEmpty else {
-                geminiModels = Self.defaultGeminiModels
-                return
-            }
-            do {
-                let models = try await Self.fetchOpenAICompatibleModels(
-                    apiKey: key,
-                    endpoint: "https://generativelanguage.googleapis.com/v1beta/openai/models"
-                )
-                geminiModels = models.isEmpty ? Self.defaultGeminiModels : models
-                if geminiModel.isEmpty || !geminiModels.contains(where: { $0.id == geminiModel }) {
-                    geminiModel = geminiModels.first?.id ?? "gemini-2.5-flash"
-                }
-            } catch {
-                appendLog("Failed to fetch Gemini models: \(error.localizedDescription)")
-                geminiModels = Self.defaultGeminiModels
-            }
-        }
+        fetchProviderModels(
+            key: geminiAPIKey,
+            endpoint: "https://generativelanguage.googleapis.com/v1beta/openai/models",
+            defaults: Self.defaultGeminiModels,
+            fallbackModel: "gemini-2.5-flash",
+            isFetching: \.isFetchingGeminiModels,
+            models: \.geminiModels,
+            selected: \.geminiModel,
+            providerName: "Gemini"
+        )
     }
 
     // MARK: - Grok Models
 
     func fetchGrokModels() {
-        isFetchingGrokModels = true
-        let key = grokAPIKey
-        Task {
-            defer { isFetchingGrokModels = false }
-            guard !key.isEmpty else {
-                grokModels = Self.defaultGrokModels
-                return
-            }
-            do {
-                let models = try await Self.fetchOpenAICompatibleModels(apiKey: key, endpoint: "https://api.x.ai/v1/models")
-                grokModels = models.isEmpty ? Self.defaultGrokModels : models
-                if grokModel.isEmpty || !grokModels.contains(where: { $0.id == grokModel }) {
-                    grokModel = grokModels.first?.id ?? "grok-3-mini-fast"
-                }
-            } catch {
-                appendLog("Failed to fetch Grok models: \(error.localizedDescription)")
-                grokModels = Self.defaultGrokModels
-            }
-        }
+        fetchProviderModels(
+            key: grokAPIKey,
+            endpoint: "https://api.x.ai/v1/models",
+            defaults: Self.defaultGrokModels,
+            fallbackModel: "grok-3-mini-fast",
+            isFetching: \.isFetchingGrokModels,
+            models: \.grokModels,
+            selected: \.grokModel,
+            providerName: "Grok"
+        )
     }
 
     // MARK: - Mistral Models
 
     func fetchMistralModels() {
-        isFetchingMistralModels = true
-        let key = mistralAPIKey
-        Task {
-            defer { isFetchingMistralModels = false }
-            guard !key.isEmpty else {
-                mistralModels = Self.defaultMistralModels
-                return
-            }
-            do {
-                let models = try await Self.fetchOpenAICompatibleModels(apiKey: key, endpoint: "https://api.mistral.ai/v1/models")
-                mistralModels = models.isEmpty ? Self.defaultMistralModels : models
-                if mistralModel.isEmpty || !mistralModels.contains(where: { $0.id == mistralModel }) {
-                    mistralModel = mistralModels.first?.id ?? "mistral-large-latest"
-                }
-            } catch {
-                AuditLog.log(.api, "Failed to fetch Mistral models: \(error.localizedDescription)")
-                mistralModels = Self.defaultMistralModels
-            }
-        }
+        fetchProviderModels(
+            key: mistralAPIKey,
+            endpoint: "https://api.mistral.ai/v1/models",
+            defaults: Self.defaultMistralModels,
+            fallbackModel: "mistral-large-latest",
+            isFetching: \.isFetchingMistralModels,
+            models: \.mistralModels,
+            selected: \.mistralModel,
+            providerName: "Mistral"
+        )
     }
 
     func fetchCodestralModels() {
-        isFetchingCodestralModels = true
-        let key = codestralAPIKey
-        Task {
-            defer { isFetchingCodestralModels = false }
-            guard !key.isEmpty else {
-                codestralModels = Self.defaultCodestralModels
-                return
-            }
-            do {
-                // Codestral key works on codestral.mistral.ai/v1/models
-                let allModels = try await Self.fetchOpenAICompatibleModels(apiKey: key, endpoint: "https://codestral.mistral.ai/v1/models")
-                // Filter out embed models — keep only chat/completion models
-                let chatModels = allModels.filter { !$0.id.lowercased().contains("embed") }
-                let models = chatModels.isEmpty ? allModels : chatModels
-                codestralModels = models.isEmpty ? Self.defaultCodestralModels : models
-                if codestralModel.isEmpty || !codestralModels.contains(where: { $0.id == codestralModel }) {
-                    codestralModel = codestralModels.first?.id ?? "codestral-latest"
-                }
-            } catch {
-                AuditLog.log(.api, "Failed to fetch Codestral models: \(error.localizedDescription)")
-                codestralModels = Self.defaultCodestralModels
-            }
-        }
+        // Codestral key works on codestral.mistral.ai/v1/models.
+        // Filter out embed models — keep only chat/completion models.
+        fetchProviderModels(
+            key: codestralAPIKey,
+            endpoint: "https://codestral.mistral.ai/v1/models",
+            defaults: Self.defaultCodestralModels,
+            fallbackModel: "codestral-latest",
+            isFetching: \.isFetchingCodestralModels,
+            models: \.codestralModels,
+            selected: \.codestralModel,
+            providerName: "Codestral",
+            filter: { $0.filter { !$0.id.lowercased().contains("embed") } }
+        )
     }
 
     func fetchVibeModels() {
-        isFetchingVibeModels = true
-        let key = vibeAPIKey
-        Task {
-            defer { isFetchingVibeModels = false }
-            guard !key.isEmpty else {
-                vibeModels = Self.defaultVibeModels
-                return
-            }
-            do {
-                let allModels = try await Self.fetchOpenAICompatibleModels(apiKey: key, endpoint: "https://api.mistral.ai/v1/models")
-                // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
-                let filtered = allModels.filter {
-                    $0.id.lowercased().contains("devstral") && $0.id.contains("latest")
-                }
-                let models = filtered.isEmpty ? allModels : filtered
-                vibeModels = models.isEmpty ? Self.defaultVibeModels : models
-                if vibeModel.isEmpty || !vibeModels.contains(where: { $0.id == vibeModel }) {
-                    vibeModel = vibeModels.first?.id ?? "devstral-latest"
-                }
-            } catch {
-                AuditLog.log(.api, "Failed to fetch Vibe models: \(error.localizedDescription)")
-                vibeModels = Self.defaultVibeModels
-            }
-        }
+        // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
+        fetchProviderModels(
+            key: vibeAPIKey,
+            endpoint: "https://api.mistral.ai/v1/models",
+            defaults: Self.defaultVibeModels,
+            fallbackModel: "devstral-latest",
+            isFetching: \.isFetchingVibeModels,
+            models: \.vibeModels,
+            selected: \.vibeModel,
+            providerName: "Vibe",
+            filter: { $0.filter { $0.id.lowercased().contains("devstral") && $0.id.contains("latest") } }
+        )
     }
 
     /// Shared OpenAI-compatible model list fetcher
