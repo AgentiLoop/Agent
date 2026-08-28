@@ -126,6 +126,8 @@
 		AA10000000000000001001 /* RecentAgentsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000001000 /* RecentAgentsService.swift */; };
 		AA10000000000000001201 /* AgentsMenuDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000001200 /* AgentsMenuDelegate.swift */; };
 		AA10000000000000002002 /* CodexService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000002001 /* CodexService.swift */; };
+		CA11000000000000000001 /* CodexAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA11000000000000000002 /* CodexAuth.swift */; };
+		CA11000000000000000003 /* CodexPatchApplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA11000000000000000004 /* CodexPatchApplier.swift */; };
 		AA10000000000000004002 /* LLMRateLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000004001 /* LLMRateLimiter.swift */; };
 		AB1100000000000000000001 /* ScriptTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1100000000000000000002 /* ScriptTabs.swift */; };
 		AB1100000000000000000003 /* Compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1100000000000000000004 /* Compression.swift */; };
@@ -407,6 +409,8 @@
 		AA10000000000000001000 /* RecentAgentsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentAgentsService.swift; sourceTree = "<group>"; };
 		AA10000000000000001200 /* AgentsMenuDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentsMenuDelegate.swift; sourceTree = "<group>"; };
 		AA10000000000000002001 /* CodexService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexService.swift; sourceTree = "<group>"; };
+		CA11000000000000000002 /* CodexAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexAuth.swift; sourceTree = "<group>"; };
+		CA11000000000000000004 /* CodexPatchApplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexPatchApplier.swift; sourceTree = "<group>"; };
 		AA10000000000000004001 /* LLMRateLimiter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMRateLimiter.swift; sourceTree = "<group>"; };
 		AB1100000000000000000002 /* ScriptTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptTabs.swift; sourceTree = "<group>"; };
 		AB1100000000000000000004 /* Compression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compression.swift; sourceTree = "<group>"; };
@@ -922,6 +926,8 @@
 				AA10000000000000000025 /* UserService.swift */,
 				AA1000000000000000001E /* ClaudeService.swift */,
 				AA10000000000000002001 /* CodexService.swift */,
+				CA11000000000000000002 /* CodexAuth.swift */,
+				CA11000000000000000004 /* CodexPatchApplier.swift */,
 				AA10000000000000000028 /* OllamaService.swift */,
 				AA100000000000000000BA /* OpenAICompatibleService.swift */,
 				AA10000000000000004001 /* LLMRateLimiter.swift */,
@@ -1251,6 +1257,8 @@
 				AA10000000000000000038 /* UserService.swift in Sources */,
 				AA10000000000000000034 /* ClaudeService.swift in Sources */,
 				AA10000000000000002002 /* CodexService.swift in Sources */,
+				CA11000000000000000001 /* CodexAuth.swift in Sources */,
+				CA11000000000000000003 /* CodexPatchApplier.swift in Sources */,
 				AA10000000000000000035 /* HelperProtocol.swift in Sources */,
 				AA10000000000000000039 /* UserProtocol.swift in Sources */,
 				AA1000000000000000003A /* OllamaService.swift in Sources */,
