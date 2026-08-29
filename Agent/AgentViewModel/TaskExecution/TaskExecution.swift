@@ -213,6 +213,15 @@ extension AgentViewModel {
                 // Only auto-show overlay on the FIRST iteration. Subsequent iterations
                 // must respect the user's manual dismiss (Cmd+B during a running task).
                 if iterations == 1 { thinkingDismissed = false }
+                // Surface any rate-limit backoff — enforce() sleeps silently inside
+                // the service, which users perceive as the app hanging.
+                let limiterKey = services.claude != nil
+                    ? APIProvider.claude.rawValue : provider.rawValue
+                let backoff = await LLMRateLimiter.shared.pendingWait(provider: limiterKey)
+                if backoff >= 1 {
+                    appendLog("⏳ Rate-limit backoff — waiting \(Int(backoff.rounded()))s before request")
+                    flushLog()
+                }
 
                 // Append-only between compaction events — per-turn rewriting broke
                 // provider prompt-cache prefix stability. tieredCompact (above) is the

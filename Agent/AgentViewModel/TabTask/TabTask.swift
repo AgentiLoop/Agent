@@ -238,6 +238,15 @@ extension AgentViewModel {
                 tab.isLLMThinking = true
                 // Only auto-show overlay on the FIRST iteration. Respect manual dismiss (Cmd+B).
                 if iterations == 1 { tab.thinkingDismissed = false }
+                // Surface any rate-limit backoff — enforce() sleeps silently inside
+                // the service, which users perceive as the app hanging.
+                let limiterKey = services.claude != nil
+                    ? APIProvider.claude.rawValue : provider.rawValue
+                let backoff = await LLMRateLimiter.shared.pendingWait(provider: limiterKey)
+                if backoff >= 1 {
+                    tab.appendLog("⏳ Rate-limit backoff — waiting \(Int(backoff.rounded()))s before request")
+                    tab.flush()
+                }
                 let response: (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int)
                 let streamStart = CFAbsoluteTimeGetCurrent()
                 // Append-only between compaction events — see tieredCompact above.
