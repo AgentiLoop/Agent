@@ -557,7 +557,7 @@ final class ClaudeService {
                         inServerToolUse = false
                         // Surface thinking in the LLM Output HUD so the user sees
                         // progress instead of a frozen spinner during long thinking runs.
-                        onTextDelta("🧠")
+                        onTextDelta("🧠 ")
                     } else if blockType == "redacted_thinking" {
                         // Arrives complete — must be passed back unmodified.
                         contentBlocks.append(block)
@@ -569,14 +569,14 @@ final class ClaudeService {
                         inServerToolUse = false
                         // Tool-only responses previously streamed invisibly (args are
                         // input_json_delta) — announce the call so the UI shows life.
-                        onTextDelta("⚙️\(currentToolName)")
+                        onTextDelta("⚙️ \(currentToolName)")
                     } else if blockType == "server_tool_use" {
                         currentToolId = block["id"] as? String ?? ""
                         currentToolName = block["name"] as? String ?? ""
                         currentToolJson = ""
                         inToolUse = true
                         inServerToolUse = true
-                        onTextDelta("⚙️\(currentToolName)")
+                        onTextDelta("⚙️ \(currentToolName)")
                     } else if blockType == "web_search_tool_result" {
                         pendingServerResult = block
                     }
