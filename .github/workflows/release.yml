@@ -90,10 +90,9 @@ jobs:
       - name: Archive
         run: |
           set -euo pipefail
-          # Pin the app target (the only target with a PROVISIONING_PROFILE_SPECIFIER
-          # line in the pbxproj) to the Developer ID profile. CLI tool targets don't
-          # support profiles, so this must be per-target — not a global xcodebuild flag.
-          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = \"\";/PROVISIONING_PROFILE_SPECIFIER = \"$PROFILE_NAME\";/" Agent.xcodeproj/project.pbxproj
+          # Automatic signing style (matches local Xcode) with the Developer ID
+          # identity. The Xcode-managed Direct profile installed in the previous
+          # step satisfies the app target's keychain-access-groups entitlement.
           xcodebuild \
             -project Agent.xcodeproj \
             -scheme "$SCHEME" \
@@ -101,37 +100,15 @@ jobs:
             -destination 'generic/platform=macOS' \
             -archivePath "$RUNNER_TEMP/Agent.xcarchive" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Developer ID Application" \
             archive
 
-      - name: Export with Developer ID (manual signing)
+      - name: Export with Developer ID (ExportOptions.plist)
         run: |
           set -euo pipefail
-          cat > "$RUNNER_TEMP/ExportOptionsCI.plist" <<PLIST
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>developer-id</string>
-              <key>teamID</key>
-              <string>469UCUB275</string>
-              <key>signingStyle</key>
-              <string>manual</string>
-              <key>signingCertificate</key>
-              <string>Developer ID Application</string>
-              <key>provisioningProfiles</key>
-              <dict>
-                  <key>Agent.app.toddbruss</key>
-                  <string>$PROFILE_NAME</string>
-              </dict>
-          </dict>
-          </plist>
-          PLIST
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/Agent.xcarchive" \
-            -exportOptionsPlist "$RUNNER_TEMP/ExportOptionsCI.plist" \
+            -exportOptionsPlist ExportOptions.plist \
             -exportPath "$RUNNER_TEMP/export"
           ls -la "$RUNNER_TEMP/export"
 
