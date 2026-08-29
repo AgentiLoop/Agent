@@ -344,10 +344,17 @@ final class ScriptTab: Identifiable {
                 // offsets and skipping the next char. Scalar offsets are stable
                 // under append-only mutation.
                 let scalars = self.rawLLMOutput.unicodeScalars
-                if self.dripDisplayIndex < scalars.count {
-                    let idx = scalars.index(scalars.startIndex, offsetBy: self.dripDisplayIndex)
-                    self.displayedLLMOutput.unicodeScalars.append(scalars[idx])
-                    self.dripDisplayIndex += 1
+                let total = scalars.count
+                if self.dripDisplayIndex < total {
+                    // Adaptive chunk: 1 scalar per tick for the terminal feel,
+                    // larger slices when a big backlog builds up — keeps the
+                    // per-tick index walk from going O(n²) on long outputs.
+                    let pending = total - self.dripDisplayIndex
+                    let chunk = max(1, pending / 100)
+                    let start = scalars.index(scalars.startIndex, offsetBy: self.dripDisplayIndex)
+                    let end = scalars.index(start, offsetBy: chunk)
+                    self.displayedLLMOutput.unicodeScalars.append(contentsOf: scalars[start..<end])
+                    self.dripDisplayIndex += chunk
                     await Self.dripEmitTick()
                 } else if self.llmStreamingStarted {
                     await Self.dripIdleTick()

@@ -578,12 +578,16 @@ extension AgentViewModel {
         dripTask = Task { [weak self] in
             guard let self else { return }
             while !Task.isCancelled {
-                // Scalar-based indexing — see ScriptTab.startDripIfNeeded for rationale.
+                // Scalar-based indexing + adaptive chunking — see ScriptTab.startDripIfNeeded for rationale.
                 let scalars = self.rawLLMOutput.unicodeScalars
-                if self.dripDisplayIndex < scalars.count {
-                    let idx = scalars.index(scalars.startIndex, offsetBy: self.dripDisplayIndex)
-                    self.displayedLLMOutput.unicodeScalars.append(scalars[idx])
-                    self.dripDisplayIndex += 1
+                let total = scalars.count
+                if self.dripDisplayIndex < total {
+                    let pending = total - self.dripDisplayIndex
+                    let chunk = max(1, pending / 100)
+                    let start = scalars.index(scalars.startIndex, offsetBy: self.dripDisplayIndex)
+                    let end = scalars.index(start, offsetBy: chunk)
+                    self.displayedLLMOutput.unicodeScalars.append(contentsOf: scalars[start..<end])
+                    self.dripDisplayIndex += chunk
                     await ScriptTab.dripEmitTick()
                 } else if !self.streamingTextStarted {
                     break // Stream ended and all chars dripped
