@@ -9,6 +9,8 @@
 #   MACOS_CERTIFICATE_P12        Base64 of the "Developer ID Application" cert + private key (.p12)
 #                                  export from Keychain Access, then: base64 -i cert.p12 | pbcopy
 #   MACOS_CERTIFICATE_PASSWORD   Password used when exporting the .p12
+#   MACOS_PROVISIONING_PROFILE   Base64 of the "Mac Team Direct" (Developer ID) provisioning
+#                                  profile for Agent.app.toddbruss (needed for keychain-access-groups)
 #   APPLE_ID                     Apple ID email used for notarization
 #   APPLE_APP_SPECIFIC_PASSWORD  App-specific password (appleid.apple.com → Sign-In and Security)
 #
@@ -69,9 +71,29 @@ jobs:
           rm -f "$RUNNER_TEMP/cert.p12"
           security find-identity -v -p codesigning "$KEYCHAIN_PATH"
 
+      - name: Install Developer ID provisioning profile
+        env:
+          MACOS_PROVISIONING_PROFILE: ${{ secrets.MACOS_PROVISIONING_PROFILE }}
+        run: |
+          set -euo pipefail
+          PROFILE_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFILE_DIR"
+          echo "$MACOS_PROVISIONING_PROFILE" | base64 --decode > "$RUNNER_TEMP/profile.provisionprofile"
+          UUID="$(security cms -D -i "$RUNNER_TEMP/profile.provisionprofile" | plutil -extract UUID raw -o - -)"
+          NAME="$(security cms -D -i "$RUNNER_TEMP/profile.provisionprofile" | plutil -extract Name raw -o - -)"
+          cp "$RUNNER_TEMP/profile.provisionprofile" "$PROFILE_DIR/$UUID.provisionprofile"
+          mkdir -p "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
+          cp "$RUNNER_TEMP/profile.provisionprofile" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$UUID.provisionprofile"
+          echo "PROFILE_NAME=$NAME" >> "$GITHUB_ENV"
+          echo "Installed profile: $NAME ($UUID)"
+
       - name: Archive
         run: |
           set -euo pipefail
+          # Pin the app target (the only target with a PROVISIONING_PROFILE_SPECIFIER
+          # line in the pbxproj) to the Developer ID profile. CLI tool targets don't
+          # support profiles, so this must be per-target — not a global xcodebuild flag.
+          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = \"\";/PROVISIONING_PROFILE_SPECIFIER = \"$PROFILE_NAME\";/" Agent.xcodeproj/project.pbxproj
           xcodebuild \
             -project Agent.xcodeproj \
             -scheme "$SCHEME" \
@@ -81,13 +103,12 @@ jobs:
             DEVELOPMENT_TEAM="$TEAM_ID" \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Developer ID Application" \
-            PROVISIONING_PROFILE_SPECIFIER="" \
             archive
 
       - name: Export with Developer ID (manual signing)
         run: |
           set -euo pipefail
-          cat > "$RUNNER_TEMP/ExportOptionsCI.plist" <<'PLIST'
+          cat > "$RUNNER_TEMP/ExportOptionsCI.plist" <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -100,6 +121,11 @@ jobs:
               <string>manual</string>
               <key>signingCertificate</key>
               <string>Developer ID Application</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>Agent.app.toddbruss</key>
+                  <string>$PROFILE_NAME</string>
+              </dict>
           </dict>
           </plist>
           PLIST
