@@ -501,7 +501,15 @@ extension AgentViewModel {
 
         case "ax_click_menu_item":
             let app = input["app"] as? String ?? input["appBundleId"] as? String
-            let menuPath = input["menu_path"] as? [String] ?? []
+            // Accept both forms: menu_path as an array (["File","Save"]) or
+            // menuPath as a string ("File > Save"). Split on ">" and trim so
+            // "File>Save" and "File > Save" both work.
+            let menuPath = input["menu_path"] as? [String]
+                ?? ((input["menuPath"] as? String) ?? (input["menu_path"] as? String))?
+                    .components(separatedBy: ">")
+                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                    .filter { !$0.isEmpty }
+                ?? []
             tab.appendLog("👆 menu: \(menuPath.joined(separator: " > "))...")
             tab.flush()
             let output =
