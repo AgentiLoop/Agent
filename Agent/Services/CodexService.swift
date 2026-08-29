@@ -483,6 +483,11 @@ final class CodexService {
                     let callId = (item["call_id"] as? String) ?? id
                     toolByItem[id] = (name, "", callId)
                     if itemKind[id] == nil { itemOrder.append(id); itemKind[id] = "tool_use" }
+                    // Announce the tool — its argument JSON streams as
+                    // function_call_arguments deltas that are otherwise invisible.
+                    if !name.isEmpty {
+                        await MainActor.run { onDelta("\n⚙️ \(name)\n") }
+                    }
                 }
 
             case "response.output_text.delta":
