@@ -316,6 +316,11 @@ final class AgentViewModel {
     }
 
     var lmStudioModels: [OpenAIModelInfo] = []
+    /// Context window per LM Studio model id, populated by `fetchLMStudioModels`
+    /// from LM Studio's REST API (`/api/v0/models` → loaded_context_length /
+    /// max_context_length). Without this the compaction threshold assumed a
+    /// hardcoded 32K window for every local model and compacted far too early.
+    var lmStudioContextWindows: [String: Int] = [:]
     var isFetchingLMStudioModels = false
 
     // Z.ai (ZhipuAI GLM) settings
