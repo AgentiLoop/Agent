@@ -558,6 +558,10 @@ final class OllamaService {
         var lastSegment = ""
         var streamInputTokens = 0
         var streamOutputTokens = 0
+        // Streaming-visibility: thinking/tool-only turns previously showed a
+        // frozen spinner — surface both live (same treatment as ClaudeService).
+        var thinkingStreamStarted = false
+        var thinkingSeparatorEmitted = false
 
         // Ollama streaming returns NDJSON: one JSON object per line
         for try await line in bytes.lines {
@@ -568,11 +572,28 @@ final class OllamaService {
                 continue
             }
 
+            // Reasoning models (deepseek-r1, qwen3, ...) stream a separate
+            // "thinking" field — display it live instead of dropping it.
+            if let message = json["message"] as? [String: Any],
+               let thinking = message["thinking"] as? String,
+               !thinking.isEmpty
+            {
+                if !thinkingStreamStarted {
+                    thinkingStreamStarted = true
+                    onTextDelta("🧠 ")
+                }
+                onTextDelta(thinking)
+            }
+
             // Each line has: {"message": {"content": "...", "role": "assistant"}, "done": false}
             if let message = json["message"] as? [String: Any],
                let content = message["content"] as? String,
                !content.isEmpty
             {
+                if thinkingStreamStarted && !thinkingSeparatorEmitted {
+                    thinkingSeparatorEmitted = true
+                    onTextDelta("\n\n")
+                }
                 fullText += content
 
                 // Repetition detection: if the model keeps emitting the same ~50 char segment, bail out
@@ -666,6 +687,13 @@ final class OllamaService {
                     {
                         let id = toolCall["id"] as? String ?? "call_\(UUID().uuidString.prefix(8).lowercased())"
                         let input = function["arguments"] as? [String: Any] ?? [:]
+                        // Announce the tool — native tool calls otherwise arrive
+                        // with no visible streaming at all.
+                        if thinkingStreamStarted && !thinkingSeparatorEmitted {
+                            thinkingSeparatorEmitted = true
+                            onTextDelta("\n")
+                        }
+                        onTextDelta("\n⚙️ \(name)\n")
                         contentBlocks.append([
                             "type": "tool_use",
                             "id": id,
