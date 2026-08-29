@@ -180,8 +180,12 @@ extension AgentViewModel {
 
         log?("🗜️ Compacting context (\(tokensBefore) est. tokens, threshold \(state.compactThreshold))...")
 
-        // Microcompact: clear old tool results to "[cleared]" (keeps last 3)
-        microcompact(&messages)
+        // Microcompact: clear old tool results to recoverable stubs. How many
+        // recent results survive scales with the model's context budget — a
+        // 131K local model keeps far more reads intact than a 4K one, so big
+        // models stop losing files they just read (the #37 re-read loop).
+        let keepRecent = max(3, min(24, state.compactThreshold / 6_000))
+        microcompact(&messages, keepRecent: keepRecent)
 
         // Strip images — they're huge and won't summarize well
         stripOldImages(&messages)
@@ -211,7 +215,10 @@ extension AgentViewModel {
     // MARK: - Microcompaction (clear old tool results)
 
     /// Clear old tool_result content to save tokens while preserving message structure.
-    /// Keeps only the last `keepRecent` tool results intact; older ones replaced with "[cleared]".
+    /// Keeps only the last `keepRecent` tool results intact; older ones are replaced
+    /// with a short self-describing stub (head preview + restore instructions) so the
+    /// model knows WHAT was cleared and how to get it back — instead of re-reading
+    /// the same file in a loop.
     static func microcompact(_ messages: inout [[String: Any]], keepRecent: Int = 3) {
         // No toggle gate — clearing stale tool results (spilled to ToolResultCache
         // first, so nothing is lost) is structural recovery, not an Apple
@@ -223,7 +230,8 @@ extension AgentViewModel {
                 for (j, block) in blocks.enumerated() {
                     if block["type"] as? String == "tool_result",
                        let content = block["content"] as? String,
-                       content.count > 100
+                       content.count > 100,
+                       !content.hasPrefix("[cleared")
                     {
                         toolResultIndices.append((i, j))
                     }
@@ -237,13 +245,33 @@ extension AgentViewModel {
             if var blocks = messages[i]["content"] as? [[String: Any]] {
                 // Spill before clearing — otherwise this content is unrecoverable.
                 if let content = blocks[j]["content"] as? String {
-                    ToolResultCache.spill(
-                        toolUseID: blocks[j]["tool_use_id"] as? String, content: content)
+                    let id = blocks[j]["tool_use_id"] as? String
+                    ToolResultCache.spill(toolUseID: id, content: content)
+                    blocks[j]["content"] = clearedStub(content: content, toolUseID: id)
                 }
-                blocks[j]["content"] = "[cleared]"
                 messages[i]["content"] = blocks
             }
         }
+    }
+
+    /// Build the replacement text for a cleared tool result. Keeps a 2-line head
+    /// preview (usually enough to identify which file/command it was) and tells
+    /// the model exactly how to recover the full text — so it calls
+    /// restore_tool_result instead of re-reading the file.
+    private static func clearedStub(content: String, toolUseID: String?) -> String {
+        let head = content
+            .split(separator: "\n", omittingEmptySubsequences: true)
+            .prefix(2)
+            .map { String($0.prefix(120)) }
+            .joined(separator: "\n")
+        var stub = "[cleared to save context]\n\(head)\n"
+        if let toolUseID, !toolUseID.isEmpty {
+            stub += "Full content preserved — call restore_tool_result(tool_use_id:\"\(toolUseID)\") "
+                + "to recover it. Do NOT re-read the file."
+        } else {
+            stub += "Re-run the tool only if this content is needed again."
+        }
+        return stub
     }
 
     // MARK: - Token Counting (precise via Apple AI on macOS 26.4+, fallback ~4 chars/token)
