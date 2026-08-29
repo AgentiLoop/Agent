@@ -79,14 +79,33 @@ jobs:
             -destination 'generic/platform=macOS' \
             -archivePath "$RUNNER_TEMP/Agent.xcarchive" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Developer ID Application" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
             archive
 
-      - name: Export with Developer ID (ExportOptions.plist)
+      - name: Export with Developer ID (manual signing)
         run: |
           set -euo pipefail
+          cat > "$RUNNER_TEMP/ExportOptionsCI.plist" <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>developer-id</string>
+              <key>teamID</key>
+              <string>469UCUB275</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>signingCertificate</key>
+              <string>Developer ID Application</string>
+          </dict>
+          </plist>
+          PLIST
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/Agent.xcarchive" \
-            -exportOptionsPlist ExportOptions.plist \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptionsCI.plist" \
             -exportPath "$RUNNER_TEMP/export"
           ls -la "$RUNNER_TEMP/export"
 
