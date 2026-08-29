@@ -667,6 +667,10 @@ final class OpenAICompatibleService {
 
         var fullText = ""
         var reasoningContent = ""
+        // Streaming-visibility state: reasoning/tool-only responses previously
+        // streamed invisibly and users saw a frozen spinner for the whole turn.
+        var reasoningStreamStarted = false
+        var reasoningSeparatorEmitted = false
         var finishReason = "stop"
         var streamInputTokens = 0
         var streamOutputTokens = 0
@@ -754,7 +758,18 @@ final class OpenAICompatibleService {
             }
 
             // DeepSeek thinking mode streams reasoning_content separately from content.
-            if let rc = delta["reasoning_content"] as? String { reasoningContent += rc }
+            if let rc = delta["reasoning_content"] as? String {
+                reasoningContent += rc
+                // Stream reasoning live (display-only) — same 🧠 treatment as
+                // ClaudeService so long thinking runs show progress in the HUD.
+                if !rc.isEmpty {
+                    if !reasoningStreamStarted {
+                        reasoningStreamStarted = true
+                        onTextDelta("🧠 ")
+                    }
+                    onTextDelta(rc)
+                }
+            }
 
             // Tool call deltas (streamed incrementally)
             if let toolCalls = delta["tool_calls"] as? [[String: Any]] {
@@ -770,7 +785,17 @@ final class OpenAICompatibleService {
                     }
                     if let function = tc["function"] as? [String: Any] {
                         if let name = function["name"] as? String {
+                            let wasEmpty = toolCallAccum[index]?.name.isEmpty ?? true
                             toolCallAccum[index]?.name += name
+                            // Announce the tool as soon as its name arrives — args
+                            // stream as JSON deltas that are otherwise invisible.
+                            if wasEmpty, let full = toolCallAccum[index]?.name, !full.isEmpty {
+                                if reasoningStreamStarted && !reasoningSeparatorEmitted {
+                                    reasoningSeparatorEmitted = true
+                                    onTextDelta("\n")
+                                }
+                                onTextDelta("\n⚙️ \(full)\n")
+                            }
                         }
                         if let args = function["arguments"] as? String {
                             toolCallAccum[index]?.arguments += args
@@ -789,6 +814,11 @@ final class OpenAICompatibleService {
             // Text content delta — buffer by newlines to detect and suppress
             // raw JSON tool calls that vLLM/Qwen outputs as text
             if let content = delta["content"] as? String, !content.isEmpty {
+                // Visual separator between streamed reasoning and the reply.
+                if reasoningStreamStarted && !reasoningSeparatorEmitted {
+                    reasoningSeparatorEmitted = true
+                    onTextDelta("\n\n")
+                }
                 // Strip special tokens
                 let cleaned = content
                     .replacingOccurrences(of: "<|im_start|>", with: "")
