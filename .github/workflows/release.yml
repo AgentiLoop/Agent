@@ -11,6 +11,10 @@
 #   MACOS_CERTIFICATE_PASSWORD   Password used when exporting the .p12
 #   MACOS_PROVISIONING_PROFILE   Base64 of the "Mac Team Direct" (Developer ID) provisioning
 #                                  profile for Agent.app.toddbruss (needed for keychain-access-groups)
+#   MACOS_DEV_CERTIFICATE_P12    Base64 of the "Apple Development" cert + key (.p12) — automatic
+#                                  archive signing, mirrors the local Xcode/ArchiveXcode flow
+#   MACOS_DEV_CERTIFICATE_PASSWORD  Password for the dev .p12
+#   MACOS_DEV_PROVISIONING_PROFILE  Base64 of "Mac Team Provisioning Profile: Agent.app.toddbruss"
 #   APPLE_ID                     Apple ID email used for notarization
 #   APPLE_APP_SPECIFIC_PASSWORD  App-specific password (appleid.apple.com → Sign-In and Security)
 #
@@ -52,88 +56,68 @@ jobs:
           sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)/Contents/Developer"
           xcodebuild -version
 
-      - name: Import Developer ID certificate into temporary keychain
+      - name: Import signing certificates into temporary keychain
         env:
           MACOS_CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
           MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_DEV_CERTIFICATE_P12: ${{ secrets.MACOS_DEV_CERTIFICATE_P12 }}
+          MACOS_DEV_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_DEV_CERTIFICATE_PASSWORD }}
         run: |
           set -euo pipefail
           KEYCHAIN_PASSWORD="$(uuidgen)"
           KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain-db"
-          echo "$MACOS_CERTIFICATE_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          # Developer ID Application (export/notarization)
+          echo "$MACOS_CERTIFICATE_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
           security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN_PATH" \
             -P "$MACOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          # Apple Development (automatic archive signing, same as local Xcode)
+          echo "$MACOS_DEV_CERTIFICATE_P12" | base64 --decode > "$RUNNER_TEMP/devcert.p12"
+          security import "$RUNNER_TEMP/devcert.p12" -k "$KEYCHAIN_PATH" \
+            -P "$MACOS_DEV_CERTIFICATE_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security list-keychains -d user -s "$KEYCHAIN_PATH" login.keychain-db
-          rm -f "$RUNNER_TEMP/cert.p12"
+          rm -f "$RUNNER_TEMP/cert.p12" "$RUNNER_TEMP/devcert.p12"
           security find-identity -v -p codesigning "$KEYCHAIN_PATH"
 
-      - name: Install Developer ID provisioning profile
+      - name: Install provisioning profiles
         env:
           MACOS_PROVISIONING_PROFILE: ${{ secrets.MACOS_PROVISIONING_PROFILE }}
+          MACOS_DEV_PROVISIONING_PROFILE: ${{ secrets.MACOS_DEV_PROVISIONING_PROFILE }}
         run: |
           set -euo pipefail
           PROFILE_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
-          mkdir -p "$PROFILE_DIR"
-          echo "$MACOS_PROVISIONING_PROFILE" | base64 --decode > "$RUNNER_TEMP/profile.provisionprofile"
-          UUID="$(security cms -D -i "$RUNNER_TEMP/profile.provisionprofile" | plutil -extract UUID raw -o - -)"
-          NAME="$(security cms -D -i "$RUNNER_TEMP/profile.provisionprofile" | plutil -extract Name raw -o - -)"
-          cp "$RUNNER_TEMP/profile.provisionprofile" "$PROFILE_DIR/$UUID.provisionprofile"
-          mkdir -p "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
-          cp "$RUNNER_TEMP/profile.provisionprofile" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$UUID.provisionprofile"
-          echo "PROFILE_NAME=$NAME" >> "$GITHUB_ENV"
-          echo "PROFILE_UUID=$UUID" >> "$GITHUB_ENV"
-          echo "Installed profile: $NAME ($UUID)"
+          XCODE_PROFILE_DIR="$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
+          mkdir -p "$PROFILE_DIR" "$XCODE_PROFILE_DIR"
+          for VAR in MACOS_PROVISIONING_PROFILE MACOS_DEV_PROVISIONING_PROFILE; do
+            printenv "$VAR" | base64 --decode > "$RUNNER_TEMP/p.provisionprofile"
+            UUID="$(security cms -D -i "$RUNNER_TEMP/p.provisionprofile" | plutil -extract UUID raw -o - -)"
+            NAME="$(security cms -D -i "$RUNNER_TEMP/p.provisionprofile" | plutil -extract Name raw -o - -)"
+            cp "$RUNNER_TEMP/p.provisionprofile" "$PROFILE_DIR/$UUID.provisionprofile"
+            cp "$RUNNER_TEMP/p.provisionprofile" "$XCODE_PROFILE_DIR/$UUID.provisionprofile"
+            echo "Installed profile: $NAME ($UUID)"
+          done
+          rm -f "$RUNNER_TEMP/p.provisionprofile"
 
-      - name: Archive
+      - name: Archive (automatic signing, same as local ArchiveXcode flow)
         run: |
           set -euo pipefail
-          # Manual signing everywhere (CLI helper targets need no profiles).
-          # The app target is pinned to the Developer ID profile by UUID via the
-          # legacy PROVISIONING_PROFILE setting — pinning by name trips Xcode's
-          # "profile is Xcode managed" rejection under manual signing.
-          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = \"\";/PROVISIONING_PROFILE = \"$PROFILE_UUID\";/" Agent.xcodeproj/project.pbxproj
           xcodebuild \
             -project Agent.xcodeproj \
             -scheme "$SCHEME" \
             -configuration Release \
             -destination 'generic/platform=macOS' \
             -archivePath "$RUNNER_TEMP/Agent.xcarchive" \
-            DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="Developer ID Application" \
             archive
 
-      - name: Export with Developer ID (manual signing)
+      - name: Export with Developer ID (ExportOptions.plist, automatic)
         run: |
           set -euo pipefail
-          cat > "$RUNNER_TEMP/ExportOptionsCI.plist" <<PLIST
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>developer-id</string>
-              <key>teamID</key>
-              <string>469UCUB275</string>
-              <key>signingStyle</key>
-              <string>manual</string>
-              <key>signingCertificate</key>
-              <string>Developer ID Application</string>
-              <key>provisioningProfiles</key>
-              <dict>
-                  <key>Agent.app.toddbruss</key>
-                  <string>$PROFILE_UUID</string>
-              </dict>
-          </dict>
-          </plist>
-          PLIST
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/Agent.xcarchive" \
-            -exportOptionsPlist "$RUNNER_TEMP/ExportOptionsCI.plist" \
+            -exportOptionsPlist ExportOptions.plist \
             -exportPath "$RUNNER_TEMP/export"
           ls -la "$RUNNER_TEMP/export"
 
