@@ -32,6 +32,21 @@ actor LLMRateLimiter {
         lastRequestTime[provider] = CFAbsoluteTimeGetCurrent()
     }
 
+    /// Seconds the next request for `provider` will sleep in `enforce` (0 = none).
+    /// Lets callers log the wait instead of stalling silently.
+    func pendingWait(provider: String) -> Double {
+        let now = CFAbsoluteTimeGetCurrent()
+        var wait = 0.0
+        if let until = retryAfterUntil[provider], until > now {
+            wait = until - now
+        }
+        if let gap = minGapSeconds[provider], let last = lastRequestTime[provider] {
+            let remaining = gap - (now - last)
+            if remaining > wait { wait = remaining }
+        }
+        return wait
+    }
+
     /// Record a Retry-After value (in seconds) seen on a 429/529 response.
     func recordRetryAfter(_ seconds: Double, provider: String) {
         retryAfterUntil[provider] = CFAbsoluteTimeGetCurrent() + seconds
