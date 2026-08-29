@@ -85,14 +85,17 @@ jobs:
           mkdir -p "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
           cp "$RUNNER_TEMP/profile.provisionprofile" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$UUID.provisionprofile"
           echo "PROFILE_NAME=$NAME" >> "$GITHUB_ENV"
+          echo "PROFILE_UUID=$UUID" >> "$GITHUB_ENV"
           echo "Installed profile: $NAME ($UUID)"
 
       - name: Archive
         run: |
           set -euo pipefail
-          # Automatic signing style (matches local Xcode) with the Developer ID
-          # identity. The Xcode-managed Direct profile installed in the previous
-          # step satisfies the app target's keychain-access-groups entitlement.
+          # Manual signing everywhere (CLI helper targets need no profiles).
+          # The app target is pinned to the Developer ID profile by UUID via the
+          # legacy PROVISIONING_PROFILE setting — pinning by name trips Xcode's
+          # "profile is Xcode managed" rejection under manual signing.
+          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = \"\";/PROVISIONING_PROFILE = \"$PROFILE_UUID\";/" Agent.xcodeproj/project.pbxproj
           xcodebuild \
             -project Agent.xcodeproj \
             -scheme "$SCHEME" \
@@ -100,15 +103,37 @@ jobs:
             -destination 'generic/platform=macOS' \
             -archivePath "$RUNNER_TEMP/Agent.xcarchive" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Developer ID Application" \
             archive
 
-      - name: Export with Developer ID (ExportOptions.plist)
+      - name: Export with Developer ID (manual signing)
         run: |
           set -euo pipefail
+          cat > "$RUNNER_TEMP/ExportOptionsCI.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>developer-id</string>
+              <key>teamID</key>
+              <string>469UCUB275</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>signingCertificate</key>
+              <string>Developer ID Application</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>Agent.app.toddbruss</key>
+                  <string>$PROFILE_UUID</string>
+              </dict>
+          </dict>
+          </plist>
+          PLIST
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/Agent.xcarchive" \
-            -exportOptionsPlist ExportOptions.plist \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptionsCI.plist" \
             -exportPath "$RUNNER_TEMP/export"
           ls -la "$RUNNER_TEMP/export"
 
