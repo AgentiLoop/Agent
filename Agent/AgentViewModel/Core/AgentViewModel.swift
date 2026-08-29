@@ -740,7 +740,7 @@ final class AgentViewModel {
     }
     /// Character-by-character dripped version of rawLLMOutput for terminal effect
     var displayedLLMOutput: String = UserDefaults.standard.string(forKey: "mainRawLLMOutput") ?? ""
-    var dripDisplayIndex: Int = (UserDefaults.standard.string(forKey: "mainRawLLMOutput") ?? "").count
+    var dripDisplayIndex: Int = (UserDefaults.standard.string(forKey: "mainRawLLMOutput") ?? "").unicodeScalars.count
     var dripTask: Task<Void, Never>?
     var streamFlushTask: Task<Void, Never>?
     var streamingTextStarted = false

@@ -300,7 +300,7 @@ extension AgentViewModel {
                 await tab.dripTask?.value
                 if !tab.rawLLMOutput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     tab.displayedLLMOutput = tab.rawLLMOutput
-                    tab.dripDisplayIndex = tab.rawLLMOutput.count
+                    tab.dripDisplayIndex = tab.rawLLMOutput.unicodeScalars.count
                 }
                 // Track token usage — use reported counts or estimate from text (~4 chars/token)
                 let inTok = response.inputTokens > 0 ? response.inputTokens : Self.estimateTokens(messages: messages)

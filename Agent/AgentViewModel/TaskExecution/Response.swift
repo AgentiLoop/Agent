@@ -307,7 +307,7 @@ extension AgentViewModel {
         case .completeDoneSignal(let summary):
             // Ensure LLM Output shows the response
             displayedLLMOutput = rawLLMOutput
-            dripDisplayIndex = rawLLMOutput.count
+            dripDisplayIndex = rawLLMOutput.unicodeScalars.count
             appendLog("✅ Completed: \(summary)")
             flushLog()
             return true
@@ -339,7 +339,7 @@ extension AgentViewModel {
                 rawLLMOutput = responseText
             }
             displayedLLMOutput = rawLLMOutput
-            dripDisplayIndex = rawLLMOutput.count
+            dripDisplayIndex = rawLLMOutput.unicodeScalars.count
             appendLog("✅ Completed: \(summary)")
             flushLog()
             return true
