@@ -75,7 +75,12 @@ extension AgentViewModel {
         case .vibe: return 128_000
         case .huggingFace: return 32_000
         case .ollama, .localOllama: return localOllamaContextSize > 0 ? localOllamaContextSize : 32_000
-        case .vLLM, .lmStudio: return 32_000
+        case .vLLM: return 32_000
+        case .lmStudio:
+            // Real context length from LM Studio's /api/v0/models (loaded or max);
+            // fall back to 32K only when the REST API hasn't answered.
+            if let ctx = lmStudioContextWindows[lmStudioModel], ctx > 0 { return ctx }
+            return 32_000
         case .foundationModel: return 4_096
         }
     }
