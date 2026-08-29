@@ -26,7 +26,7 @@ struct HUDOptionsView: View {
             }
 
             HStack {
-                Text("Drip Typing").font(.caption)
+                Text("Smooth Streaming").font(.caption)
                 Spacer()
                 Toggle("", isOn: $viewModel.dripEnabled)
                     .toggleStyle(.switch)
