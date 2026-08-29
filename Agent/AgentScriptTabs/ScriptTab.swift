@@ -256,6 +256,12 @@ final class ScriptTab: Identifiable {
     // log-debounce timings live in one place. Both callers had byte-identical sleeps;
     // routing them through these helpers keeps the cadence consistent.
 
+    /// Whether the terminal drip-typing effect is on (HUD option). Default true.
+    /// When off, drip loops dump pending text instantly.
+    nonisolated static var dripEnabled: Bool {
+        UserDefaults.standard.object(forKey: "dripEnabled") as? Bool ?? true
+    }
+
     /// One char emission tick during the terminal drip animation.
     /// Reads `terminalSpeed` from UserDefaults; defaults to 22ms.
     nonisolated static func dripEmitTick() async {
@@ -346,6 +352,13 @@ final class ScriptTab: Identifiable {
                 let scalars = self.rawLLMOutput.unicodeScalars
                 let total = scalars.count
                 if self.dripDisplayIndex < total {
+                    // Drip off (HUD option): dump everything instantly.
+                    if !Self.dripEnabled {
+                        self.displayedLLMOutput = self.rawLLMOutput
+                        self.dripDisplayIndex = total
+                        await Self.dripIdleTick()
+                        continue
+                    }
                     // Adaptive chunk: 1 scalar per tick for the terminal feel,
                     // larger slices when a big backlog builds up — keeps the
                     // per-tick index walk from going O(n²) on long outputs.

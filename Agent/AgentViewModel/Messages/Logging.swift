@@ -582,6 +582,13 @@ extension AgentViewModel {
                 let scalars = self.rawLLMOutput.unicodeScalars
                 let total = scalars.count
                 if self.dripDisplayIndex < total {
+                    // Drip off (HUD option): dump everything instantly.
+                    if !ScriptTab.dripEnabled {
+                        self.displayedLLMOutput = self.rawLLMOutput
+                        self.dripDisplayIndex = total
+                        await ScriptTab.dripIdleTick()
+                        continue
+                    }
                     let pending = total - self.dripDisplayIndex
                     let chunk = max(1, pending / 100)
                     let start = scalars.index(scalars.startIndex, offsetBy: self.dripDisplayIndex)

@@ -733,6 +733,11 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(scanLinesEnabled, forKey: "scanLinesEnabled") }
     }
 
+    /// Terminal drip-typing effect for LLM Output. When off, text appears instantly.
+    var dripEnabled: Bool = UserDefaults.standard.object(forKey: "dripEnabled") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(dripEnabled, forKey: "dripEnabled") }
+    }
+
     // LLM streaming state
     var streamBuffer = ""
     @ObservationIgnored var rawLLMOutput: String = UserDefaults.standard.string(forKey: "mainRawLLMOutput") ?? "" {
