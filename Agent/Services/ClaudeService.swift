@@ -84,6 +84,14 @@ final class ClaudeService {
                 AgentTools.compactSystemPrompt(userName: userName, userHome: userHome, projectFolder: projectFolder)
             )
         }
+        return stableSystemPrompt + dynamicSystemSuffix
+    }
+
+    /// Static prefix of the system prompt — byte-identical across tasks for a
+    /// given project folder, so it can carry its own cache breakpoint. Keeping
+    /// it in a separate system block means the (large) base prompt stays cached
+    /// even though historyContext/stateBlocks change on every new task.
+    private var stableSystemPrompt: String {
         var prompt = SystemPromptService.shared.prompt(for: .claude, userName: userName, userHome: userHome, projectFolder: projectFolder)
         if !projectFolder.isEmpty {
             prompt =
@@ -93,12 +101,13 @@ final class ClaudeService {
                     + "operations. You may go outside it when needed.\n\n" +
                 prompt
         }
-        if !historyContext.isEmpty {
-            prompt += historyContext
-        }
-        prompt += stateBlocks
         return prompt
     }
+
+    /// Per-task suffix: tab history context + frozen state snapshots. Changes
+    /// between tasks — cached in its own block so a change here only re-prefills
+    /// this suffix, not the whole system prompt.
+    private var dynamicSystemSuffix: String { historyContext + stateBlocks }
 
     func tools(activeGroups: Set<String>? = nil, compact: Bool = false) -> [[String: Any]] {
         // No mode-based narrowing — every user-enabled tool flows through.
@@ -251,7 +260,8 @@ final class ClaudeService {
         await Self.enforceRateLimit()
 
         let systemBlock: Any = isLocalEndpoint ? systemPrompt : Self.buildSystemBlock(
-            systemPrompt: systemPrompt,
+            stable: overrideSystemPrompt ?? stableSystemPrompt,
+            dynamic: overrideSystemPrompt == nil ? dynamicSystemSuffix : "",
             credential: apiKey
         )
 
@@ -317,20 +327,24 @@ final class ClaudeService {
 
     /// Build the `system` array. For OAuth credentials, prepend the Claude
     /// Code identity block so the request passes Anthropic's OAuth gate.
-    /// Agent's real system prompt follows, still marked for prompt caching.
+    /// The stable base and the per-task dynamic suffix are separate blocks,
+    /// each with its own cache breakpoint — a new task only re-prefills the
+    /// small dynamic suffix instead of the whole system prompt.
+    /// Breakpoint budget: tools(1) + stable(1) + dynamic(1) + message(1) = 4 (Anthropic max).
     nonisolated static func buildSystemBlock(
-        systemPrompt: String,
+        stable: String,
+        dynamic: String,
         credential: String
     ) -> [[String: Any]] {
+        var blocks: [[String: Any]] = []
         if isOAuthToken(credential) {
-            return [
-                ["type": "text", "text": claudeCodeIdentityPrompt],
-                ["type": "text", "text": systemPrompt, "cache_control": ["type": "ephemeral"]]
-            ]
+            blocks.append(["type": "text", "text": claudeCodeIdentityPrompt])
         }
-        return [
-            ["type": "text", "text": systemPrompt, "cache_control": ["type": "ephemeral"]]
-        ]
+        blocks.append(["type": "text", "text": stable, "cache_control": ["type": "ephemeral"]])
+        if !dynamic.isEmpty {
+            blocks.append(["type": "text", "text": dynamic, "cache_control": ["type": "ephemeral"]])
+        }
+        return blocks
     }
 
     /// Apply the correct auth headers for either an API key or an OAuth token.
@@ -423,7 +437,8 @@ final class ClaudeService {
         await Self.enforceRateLimit()
 
         let systemBlock: Any = isLocalEndpoint ? systemPrompt : Self.buildSystemBlock(
-            systemPrompt: systemPrompt,
+            stable: overrideSystemPrompt ?? stableSystemPrompt,
+            dynamic: overrideSystemPrompt == nil ? dynamicSystemSuffix : "",
             credential: apiKey
         )
 
