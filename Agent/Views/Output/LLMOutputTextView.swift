@@ -342,10 +342,15 @@ struct LLMOutputTextView: NSViewRepresentable {
                 return
             }
             // Make sure layout is up to date so the document height is correct.
-            if let container = textView.textContainer {
-                textView.layoutManager?.ensureLayout(for: container)
+            var usedHeight: CGFloat = 0
+            if let container = textView.textContainer, let lm = textView.layoutManager {
+                lm.ensureLayout(for: container)
+                usedHeight = lm.usedRect(for: container).height + textView.textContainerInset.height * 2
             }
-            let docHeight = textView.frame.height
+            // frame.height can be STALE after a tail-splice edit (partial layout
+            // invalidation doesn't always resize the view synchronously) — trust
+            // the layout manager's usedRect when it's larger.
+            let docHeight = max(textView.frame.height, usedHeight)
             let visibleHeight = scrollView.contentView.bounds.height
             let bottomY = max(0, docHeight - visibleHeight)
             isProgrammaticScroll = true
