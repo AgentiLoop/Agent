@@ -540,6 +540,9 @@ final class ClaudeService {
                         inThinking = true
                         inToolUse = false
                         inServerToolUse = false
+                        // Surface thinking in the LLM Output HUD so the user sees
+                        // progress instead of a frozen spinner during long thinking runs.
+                        onTextDelta("🧠 ")
                     } else if blockType == "redacted_thinking" {
                         // Arrives complete — must be passed back unmodified.
                         contentBlocks.append(block)
@@ -549,12 +552,16 @@ final class ClaudeService {
                         currentToolJson = ""
                         inToolUse = true
                         inServerToolUse = false
+                        // Tool-only responses previously streamed invisibly (args are
+                        // input_json_delta) — announce the call so the UI shows life.
+                        onTextDelta("\n⚙️ \(currentToolName)\n")
                     } else if blockType == "server_tool_use" {
                         currentToolId = block["id"] as? String ?? ""
                         currentToolName = block["name"] as? String ?? ""
                         currentToolJson = ""
                         inToolUse = true
                         inServerToolUse = true
+                        onTextDelta("\n⚙️ \(currentToolName)\n")
                     } else if blockType == "web_search_tool_result" {
                         pendingServerResult = block
                     }
@@ -571,6 +578,9 @@ final class ClaudeService {
                         currentToolJson += json
                     } else if deltaType == "thinking_delta", let text = delta["thinking"] as? String {
                         currentThinking += text
+                        // Stream thinking live — display-only; the signed thinking
+                        // block passed back to the API is built from currentThinking.
+                        onTextDelta(text)
                     } else if deltaType == "signature_delta", let sig = delta["signature"] as? String {
                         currentThinkingSignature += sig
                     }
@@ -588,6 +598,8 @@ final class ClaudeService {
                     currentThinking = ""
                     currentThinkingSignature = ""
                     inThinking = false
+                    // Visual separator between streamed thinking and the reply.
+                    onTextDelta("\n\n")
                 } else if inToolUse {
                     let input: [String: Any]
                     if let parsed = try? JSONSerialization.jsonObject(with: Data(currentToolJson.utf8)) as? [String: Any] {
