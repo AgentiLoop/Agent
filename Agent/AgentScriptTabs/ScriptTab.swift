@@ -207,7 +207,7 @@ final class ScriptTab: Identifiable {
         }
         self.rawLLMOutput = record.rawLLMOutput
         self.displayedLLMOutput = record.rawLLMOutput // Show full text on restore (no drip)
-        self.dripDisplayIndex = record.rawLLMOutput.count
+        self.dripDisplayIndex = record.rawLLMOutput.unicodeScalars.count
         self.lastElapsed = record.lastElapsed
         self.thinkingExpanded = record.thinkingExpanded
         self.thinkingOutputExpanded = record.thinkingOutputExpanded
@@ -339,9 +339,14 @@ final class ScriptTab: Identifiable {
         dripTask = Task { [weak self] in
             guard let self else { return }
             while !Task.isCancelled {
-                if self.dripDisplayIndex < self.rawLLMOutput.count {
-                    let idx = self.rawLLMOutput.index(self.rawLLMOutput.startIndex, offsetBy: self.dripDisplayIndex)
-                    self.displayedLLMOutput.append(self.rawLLMOutput[idx])
+                // Index by unicode scalars, not Characters: appending a delta can
+                // merge grapheme clusters (e.g. ⚙ + U+FE0F), shifting Character
+                // offsets and skipping the next char. Scalar offsets are stable
+                // under append-only mutation.
+                let scalars = self.rawLLMOutput.unicodeScalars
+                if self.dripDisplayIndex < scalars.count {
+                    let idx = scalars.index(scalars.startIndex, offsetBy: self.dripDisplayIndex)
+                    self.displayedLLMOutput.unicodeScalars.append(scalars[idx])
                     self.dripDisplayIndex += 1
                     await Self.dripEmitTick()
                 } else if self.llmStreamingStarted {

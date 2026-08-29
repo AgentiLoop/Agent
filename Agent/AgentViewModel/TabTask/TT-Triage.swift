@@ -42,7 +42,7 @@ extension AgentViewModel {
             // Show in LLM Output, not LogView
             tab.rawLLMOutput = reply
             tab.displayedLLMOutput = reply
-            tab.dripDisplayIndex = reply.count
+            tab.dripDisplayIndex = reply.unicodeScalars.count
             tab.appendLog("✅ Completed: \(String(reply.prefix(200)))")
             tab.flush()
             completionSummary = String(reply.prefix(200))

@@ -303,7 +303,7 @@ extension AgentViewModel {
                 await dripTask?.value
                 if !rawLLMOutput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     displayedLLMOutput = rawLLMOutput
-                    dripDisplayIndex = rawLLMOutput.count
+                    dripDisplayIndex = rawLLMOutput.unicodeScalars.count
                 }
                 guard !Task.isCancelled else { break }
 

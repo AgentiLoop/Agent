@@ -578,9 +578,11 @@ extension AgentViewModel {
         dripTask = Task { [weak self] in
             guard let self else { return }
             while !Task.isCancelled {
-                if self.dripDisplayIndex < self.rawLLMOutput.count {
-                    let idx = self.rawLLMOutput.index(self.rawLLMOutput.startIndex, offsetBy: self.dripDisplayIndex)
-                    self.displayedLLMOutput.append(self.rawLLMOutput[idx])
+                // Scalar-based indexing — see ScriptTab.startDripIfNeeded for rationale.
+                let scalars = self.rawLLMOutput.unicodeScalars
+                if self.dripDisplayIndex < scalars.count {
+                    let idx = scalars.index(scalars.startIndex, offsetBy: self.dripDisplayIndex)
+                    self.displayedLLMOutput.unicodeScalars.append(scalars[idx])
                     self.dripDisplayIndex += 1
                     await ScriptTab.dripEmitTick()
                 } else if !self.streamingTextStarted {
