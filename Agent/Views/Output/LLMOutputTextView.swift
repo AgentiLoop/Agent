@@ -180,6 +180,10 @@ struct LLMOutputTextView: NSViewRepresentable {
 
             if isAppend && !coord.needsTableRender {
                 // FAST PATH: strip previous cursor glyph, append new content delta (UTF-16 offsets), then append fresh "█" cursor. Color switches via setAttributes, not replaceCharacters.
+                // The cursor delete MUST be inside the beginEditing/endEditing batch —
+                // deleting it outside forced an immediate relayout with the cursor
+                // missing, then the append repainted again: visible bottom flicker.
+                storage.beginEditing()
                 let attrLen = storage.length
                 if attrLen > 0 {
                     let lastChar = storage.string.suffix(1)
@@ -187,7 +191,6 @@ struct LLMOutputTextView: NSViewRepresentable {
                         storage.deleteCharacters(in: NSRange(location: attrLen - 1, length: 1))
                     }
                 }
-                storage.beginEditing()
                 let startIdx = min(coord.renderedSourceLength, contentLen)
                 if startIdx < contentLen {
                     storage.append(NSAttributedString(string: contentNS.substring(from: startIdx), attributes: [
@@ -352,7 +355,9 @@ struct LLMOutputTextView: NSViewRepresentable {
             // the layout manager's usedRect when it's larger.
             let docHeight = max(textView.frame.height, usedHeight)
             let visibleHeight = scrollView.contentView.bounds.height
-            let bottomY = max(0, docHeight - visibleHeight)
+            // Pixel-align the scroll origin — a fractional y makes the bottom line
+            // render at sub-pixel offsets that shimmer on every streamed tick.
+            let bottomY = max(0, (docHeight - visibleHeight).rounded(.up))
             isProgrammaticScroll = true
             scrollView.contentView.scroll(to: NSPoint(x: 0, y: bottomY))
             scrollView.reflectScrolledClipView(scrollView.contentView)
