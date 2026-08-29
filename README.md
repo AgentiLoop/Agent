@@ -108,7 +108,7 @@ Users sometimes ask why `AgentHelper`'s XPC listener accepts connections without
 That recommendation is a holdover from the pre-SMAppService **SMJobBless era**, where launchd did not validate identity for you and the XPC server had to set a designated-requirement string itself. SMAppService changed that contract:
 
 - The app-bundle-embedded plist plus signature-gated registration **is** the code-signing requirement.
-- The Mach service names (`Agent.app.toddbruss.helper`, `Agent.app.toddbruss.user`) are namespaced to the signed bundle that registered them — no other bundle can claim them.
+- The Mach service names (`Agent.app.redacted.helper`, `Agent.app.redacted.user`) are namespaced to the signed bundle that registered them — no other bundle can claim them.
 - Any signature mismatch (tampering, re-signing, different Team ID, bundle swap) **breaks the XPC channel at the launchd layer** — `listener(_:shouldAcceptNewConnection:)` is never even invoked.
 
 **Empirical proof:** Agent! itself attempted to re-sign its own daemons during an experiment and immediately lost the ability to connect. `NSXPCConnection` to both Mach services failed at the launchd layer before a single byte reached the listener delegate — exactly the behavior a manual `setCodeSigningRequirement` call would enforce, except SMAppService is doing it in the kernel's XPC lookup path where it cannot be bypassed from userland.
