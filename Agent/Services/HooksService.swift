@@ -125,9 +125,25 @@ final class HooksService {
     }
 
     /// Execute a single hook command with environment variables.
+    /// Non-blocking: uses terminationHandler instead of waitUntilExit — this
+    /// class is @MainActor and the old blocking wait froze the UI for the
+    /// hook's entire runtime (taskStart hooks ran BEFORE the first LLM
+    /// request, so a slow hook read as the app hanging). Capped at 30s;
+    /// a hook that runs longer is terminated and its partial output returned.
     private func executeHook(_ hook: Hook, toolName: String, input: [String: Any], output: String = "") async -> String {
         let inputJSON = (try? JSONSerialization.data(withJSONObject: input))
             .flatMap { String(data: $0, encoding: .utf8) } ?? "{}"
+
+        final class ResumeOnce: @unchecked Sendable {
+            private let lock = NSLock()
+            private var resumed = false
+            func claim() -> Bool {
+                lock.lock(); defer { lock.unlock() }
+                if resumed { return false }
+                resumed = true
+                return true
+            }
+        }
 
         return await withCheckedContinuation { continuation in
             let process = Process()
@@ -148,14 +164,24 @@ final class HooksService {
             process.standardOutput = pipe
             process.standardError = pipe
 
-            do {
-                try process.run()
-                process.waitUntilExit()
+            let once = ResumeOnce()
+            process.terminationHandler = { _ in
+                guard once.claim() else { return }
                 let data = pipe.fileHandleForReading.readDataToEndOfFile()
                 let result = String(data: data, encoding: .utf8) ?? ""
                 continuation.resume(returning: result.trimmingCharacters(in: .whitespacesAndNewlines))
+            }
+
+            do {
+                try process.run()
             } catch {
-                continuation.resume(returning: "")
+                if once.claim() { continuation.resume(returning: "") }
+                return
+            }
+            // Timeout: terminate the hook after 30s — terminationHandler then
+            // fires and resumes the continuation with whatever output exists.
+            DispatchQueue.global().asyncAfter(deadline: .now() + 30) {
+                if process.isRunning { process.terminate() }
             }
         }
     }
