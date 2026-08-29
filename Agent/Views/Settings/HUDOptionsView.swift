@@ -25,6 +25,15 @@ struct HUDOptionsView: View {
                     .tint(.green)
             }
 
+            HStack {
+                Text("Drip Typing").font(.caption)
+                Spacer()
+                Toggle("", isOn: $viewModel.dripEnabled)
+                    .toggleStyle(.switch)
+                    .controlSize(.mini)
+                    .tint(.green)
+            }
+
             VStack(alignment: .leading, spacing: 4) {
                 Text("Terminal Speed")
                     .font(.caption)
