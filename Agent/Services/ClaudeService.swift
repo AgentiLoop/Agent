@@ -517,9 +517,6 @@ final class ClaudeService {
         var pendingServerResult: [String: Any]?
         var inputTokens = 0
         var outputTokens = 0
-        // Tracks whether the last streamed delta ended at a line start so
-        // markers (🧠/⚙️) never stack blank lines between each other.
-        var atLineStart = true
 
         for try await line in bytes.lines {
             guard line.hasPrefix("data: ") else { continue }
@@ -560,8 +557,7 @@ final class ClaudeService {
                         inServerToolUse = false
                         // Surface thinking in the LLM Output HUD so the user sees
                         // progress instead of a frozen spinner during long thinking runs.
-                        onTextDelta(atLineStart ? "🧠 " : "\n🧠 ")
-                        atLineStart = false
+                        onTextDelta("🧠")
                     } else if blockType == "redacted_thinking" {
                         // Arrives complete — must be passed back unmodified.
                         contentBlocks.append(block)
@@ -573,16 +569,14 @@ final class ClaudeService {
                         inServerToolUse = false
                         // Tool-only responses previously streamed invisibly (args are
                         // input_json_delta) — announce the call so the UI shows life.
-                        onTextDelta(atLineStart ? "⚙️ \(currentToolName)\n" : "\n⚙️ \(currentToolName)\n")
-                        atLineStart = true
+                        onTextDelta("⚙️\(currentToolName)")
                     } else if blockType == "server_tool_use" {
                         currentToolId = block["id"] as? String ?? ""
                         currentToolName = block["name"] as? String ?? ""
                         currentToolJson = ""
                         inToolUse = true
                         inServerToolUse = true
-                        onTextDelta(atLineStart ? "⚙️ \(currentToolName)\n" : "\n⚙️ \(currentToolName)\n")
-                        atLineStart = true
+                        onTextDelta("⚙️\(currentToolName)")
                     } else if blockType == "web_search_tool_result" {
                         pendingServerResult = block
                     }
@@ -595,7 +589,6 @@ final class ClaudeService {
                     if deltaType == "text_delta", let text = delta["text"] as? String {
                         currentTextBlock += text
                         onTextDelta(text)
-                        if !text.isEmpty { atLineStart = text.hasSuffix("\n") }
                     } else if deltaType == "input_json_delta", let json = delta["partial_json"] as? String {
                         currentToolJson += json
                     } else if deltaType == "thinking_delta", let text = delta["thinking"] as? String {
@@ -603,7 +596,6 @@ final class ClaudeService {
                         // Stream thinking live — display-only; the signed thinking
                         // block passed back to the API is built from currentThinking.
                         onTextDelta(text)
-                        if !text.isEmpty { atLineStart = text.hasSuffix("\n") }
                     } else if deltaType == "signature_delta", let sig = delta["signature"] as? String {
                         currentThinkingSignature += sig
                     }
@@ -621,10 +613,6 @@ final class ClaudeService {
                     currentThinking = ""
                     currentThinkingSignature = ""
                     inThinking = false
-                    // Single newline closes the thinking line — no blank-line
-                    // separator (stacked 🧠/⚙️ markers looked broken in the HUD).
-                    if !atLineStart { onTextDelta("\n") }
-                    atLineStart = true
                 } else if inToolUse {
                     let input: [String: Any]
                     if let parsed = try? JSONSerialization.jsonObject(with: Data(currentToolJson.utf8)) as? [String: Any] {
