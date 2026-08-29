@@ -548,7 +548,30 @@ Agent! is a 100% original pure Swift macOS application. It is not a port, fork, 
 | **Prompt caching** | Anthropic `cache_control` ephemeral | Anthropic `cache_control` ephemeral + automatic prefix-cache hit tracking for OpenAI/Z.ai/Grok/Mistral/Gemini/Qwen/DeepSeek; Ollama `keep_alive: 30m` |
 | **Context compaction** | Cloud Claude (paid tokens; conversation re-sent to Anthropic) | Tiered: Tier 1 = on-device Apple Intelligence summarization (free, private, no API tokens). Tier 2 = aggressive prune if Apple AI unavailable. Threshold scales to the model's context window (~55%, 2K–400K), summaries memoized, 3-failure circuit breaker, full tool results spilled to disk before truncation |
 
+## Agent! vs Cursor — Quick Comparison
+
+Cursor is an excellent AI code editor. Agent! plays a different game: it's an agent for your **whole Mac**, not just your codebase.
+
+| | Cursor | Agent! |
+|---|---|---|
+| **What it is** | AI code editor (VS Code fork, Electron) | Native SwiftUI macOS agent app |
+| **Scope** | Your codebase | Your entire Mac — code, apps, files, system |
+| **Pricing** | Subscription | Free & open source (MIT) — bring your own API key or run local |
+| **Local models** | Cloud-first | Ollama, vLLM, LM Studio, on-device Apple Intelligence |
+| **Mac app automation** | None | Accessibility API, AppleScript/JXA, ScriptingBridge (51 app bridges) |
+| **Root-level admin tasks** | None | Privileged Launch Daemon via XPC (approved once) |
+| **Voice / iMessage control** | None | Hotword dictation + remote agent via Messages |
+| **Xcode integration** | Terminal `xcodebuild` | Native build/run/analyze/code-review tools |
+| **Telemetry** | Cloud account required | None — your keys, your machine, your data |
+
+If you live inside one repo all day, Cursor is great. If you want an agent that also builds your Xcode project, drives Safari, texts you results, and installs software as root — that's Agent!.
+
+## Contributing
+
+Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can build from source in about 5 minutes with just the Xcode Command Line Tools (`./build.sh`), no Apple Developer account required. Check the [good first issues](https://github.com/macOS26/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) for scoped starter tasks.
+
 ---
+
 
 > ⚠️ **Legal Notice & Attribution**
 >
