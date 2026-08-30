@@ -139,15 +139,19 @@ struct AgentApp: App {
                     UpdateChecker.shared.checkForUpdates()
                 }
                 Divider()
-                Button("Website") {
+                Button {
                     if let url = URL(string: "https://agent.macos26.app") {
                         NSWorkspace.shared.open(url)
                     }
+                } label: {
+                    Label("Website", systemImage: "globe")
                 }
-                Button("GitHub") {
+                Button {
                     if let url = URL(string: "https://github.com/macOS26/Agent") {
                         NSWorkspace.shared.open(url)
                     }
+                } label: {
+                    Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                 }
             }
             CommandGroup(after: .windowArrangement) {
