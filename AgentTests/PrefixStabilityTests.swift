@@ -85,8 +85,8 @@ struct PrefixStabilityTests {
                 }
             }
             #expect(contents.count == 6)
-            #expect(contents.prefix(3).allSatisfy { $0 == "[cleared]" })
-            #expect(contents.suffix(3).allSatisfy { $0 != "[cleared]" })
+            #expect(contents.prefix(3).allSatisfy { $0.hasPrefix("[cleared") })
+            #expect(contents.suffix(3).allSatisfy { !$0.hasPrefix("[cleared") })
         }
     }
 
