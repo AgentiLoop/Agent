@@ -202,6 +202,9 @@ extension AgentViewModel {
 
             // Token-aware context compaction — replaces fixed iteration-based triggers
             if iterations > 1 {
+                // Async context-window fetches can land after task start — pick
+                // up the real threshold instead of a possibly-stale 32K fallback.
+                compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
                 _ = await Self.tieredCompact(&messages, state: &compactionState) { [weak self] msg in
                     self?.appendLog(msg)
                     self?.flushLog()
