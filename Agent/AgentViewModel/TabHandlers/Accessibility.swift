@@ -11,8 +11,18 @@ extension AgentViewModel {
         tab: ScriptTab, name: String, input: [String: Any], toolId: String
     ) async -> TabToolResult {
 
-        // Block accessibility when Safari is frontmost — use web tool instead
-        if let bid = NSWorkspace.shared.frontmostApplication?.bundleIdentifier, bid == "com.apple.Safari" {
+        // Block accessibility ONLY when the call actually targets Safari — either
+        // explicitly, or implicitly (no app given while Safari is frontmost).
+        // A frontmost Safari must NOT veto calls aimed at other apps.
+        let requestedApp = input["appBundleId"] as? String ?? input["app"] as? String ?? input["name"] as? String
+        let targetsSafari: Bool = {
+            if let requested = requestedApp, !requested.isEmpty {
+                return requested.lowercased().contains("safari")
+            }
+            let front = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
+            return front == "com.apple.Safari"
+        }()
+        if targetsSafari {
             let msg =
                 "Error: Safari is active. Use the web tool: "
                 + "web(action: \"scan\"), web(action: \"open\", url: \"...\"), "
@@ -137,13 +147,20 @@ extension AgentViewModel {
                 .resolveBundleId(input["appBundleId"] as? String ?? input["app"] as? String ?? input["name"] as? String)
             tab.appendLog("⌨️ \(text.count) characters → \(title ?? role ?? "focused")")
             tab.flush()
-            let output = AccessibilityService.shared.typeTextIntoElement(
+            var output = AccessibilityService.shared.typeTextIntoElement(
                 role: role,
                 title: title,
                 text: text,
                 appBundleId: appBundleId,
                 verify: input["verify"] as? Bool ?? true
             )
+            // Fuzzy rescue parity with the native path.
+            if Self.axResultIsNotFound(output), let requested = title, let app = appBundleId,
+               let rescued = Self.rescueType(ax: AccessibilityService.shared, role: role,
+                                             requestedTitle: requested, appBundleId: app, text: text,
+                                             verify: input["verify"] as? Bool ?? true) {
+                output = rescued
+            }
             tab.appendLog(output)
             tab.flush()
             return TabToolResult(
@@ -160,7 +177,7 @@ extension AgentViewModel {
                 .resolveBundleId(input["appBundleId"] as? String ?? input["app"] as? String ?? input["name"] as? String)
             tab.appendLog("♿️ Click \(title ?? role ?? "?") in \(appBundleId ?? "frontmost")")
             tab.flush()
-            let output = AccessibilityService.shared.clickElement(
+            var output = AccessibilityService.shared.clickElement(
                 role: role,
                 title: title,
                 value: value,
@@ -168,6 +185,15 @@ extension AgentViewModel {
                 timeout: input["timeout"] as? Double ?? 5,
                 verify: input["verify"] as? Bool ?? false
             )
+            // Fuzzy rescue parity with the native path: if the exact title
+            // missed, retry against the closest real title in the app.
+            if Self.axResultIsNotFound(output), let role = role, let requested = title, let app = appBundleId,
+               let rescued = Self.rescueClick(ax: AccessibilityService.shared, role: role,
+                                              requestedTitle: requested, appBundleId: app, value: value,
+                                              timeout: input["timeout"] as? Double ?? 5,
+                                              verify: input["verify"] as? Bool ?? false) {
+                output = rescued
+            }
             tab.appendLog(output)
             tab.flush()
             return TabToolResult(
@@ -388,10 +414,19 @@ extension AgentViewModel {
             let verify = input["verify"] as? Bool ?? false
             tab.appendLog("👆 element (role: \(role ?? "any"), title: \(title ?? "any"))...")
             tab.flush()
-            let output = await MainActor.run {
+            var output = await MainActor.run {
                 AccessibilityService.shared.clickElement(
                     role: role, title: title, value: value, appBundleId: appBundleId, timeout: timeout, verify: verify
                 )
+            }
+            // Fuzzy rescue parity with the native path.
+            if Self.axResultIsNotFound(output), let role = role, let requested = title, let app = appBundleId {
+                let rescued = await MainActor.run {
+                    Self.rescueClick(ax: AccessibilityService.shared, role: role,
+                                     requestedTitle: requested, appBundleId: app, value: value,
+                                     timeout: timeout, verify: verify)
+                }
+                if let rescued { output = rescued }
             }
             tab.appendLog(Self.preview(output, lines: 30))
             tab.flush()
@@ -431,10 +466,18 @@ extension AgentViewModel {
             let verify = input["verify"] as? Bool ?? true
             tab.appendLog("⌨️ \(text.count) chars into element...")
             tab.flush()
-            let output = await MainActor.run {
+            var output = await MainActor.run {
                 AccessibilityService.shared.typeTextIntoElement(
                     role: role, title: title, text: text, appBundleId: appBundleId, verify: verify
                 )
+            }
+            // Fuzzy rescue parity with the native path.
+            if Self.axResultIsNotFound(output), let requested = title, let app = appBundleId {
+                let rescued = await MainActor.run {
+                    Self.rescueType(ax: AccessibilityService.shared, role: role,
+                                    requestedTitle: requested, appBundleId: app, text: text, verify: verify)
+                }
+                if let rescued { output = rescued }
             }
             tab.appendLog(Self.preview(output, lines: 30))
             tab.flush()
@@ -501,7 +544,15 @@ extension AgentViewModel {
 
         case "ax_click_menu_item":
             let app = input["app"] as? String ?? input["appBundleId"] as? String
-            let menuPath = input["menu_path"] as? [String] ?? []
+            // Accept both forms: menu_path as an array (["File","Save"]) or
+            // menuPath as a string ("File > Save"). Split on ">" and trim so
+            // "File>Save" and "File > Save" both work.
+            let menuPath = input["menu_path"] as? [String]
+                ?? ((input["menuPath"] as? String) ?? (input["menu_path"] as? String))?
+                    .components(separatedBy: ">")
+                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                    .filter { !$0.isEmpty }
+                ?? []
             tab.appendLog("👆 menu: \(menuPath.joined(separator: " > "))...")
             tab.flush()
             let output =

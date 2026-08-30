@@ -281,8 +281,16 @@ extension AgentViewModel {
                         summaryLines.append("tool: \(name)")
                     } else if type == "tool_result" {
                         let content = block["content"] as? String ?? ""
+                        // Spill before destroying — same recovery path as
+                        // microcompact, so pruning is no longer lossy.
+                        let id = block["tool_use_id"] as? String
+                        ToolResultCache.spill(toolUseID: id, content: content)
                         let preview = content.hasPrefix("Error") ? String(content.prefix(100)) : "OK"
-                        summaryLines.append("result: \(preview)")
+                        if let id, !id.isEmpty, content.utf8.count >= ToolResultCache.minSpillBytes {
+                            summaryLines.append("result: \(preview) — recover via restore_tool_result(tool_use_id:\"\(id)\")")
+                        } else {
+                            summaryLines.append("result: \(preview)")
+                        }
                     } else if type == "text", let text = block["text"] as? String {
                         summaryLines.append("\(role): \(String(text.prefix(150)))")
                     } else if type == "image" {

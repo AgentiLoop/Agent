@@ -99,6 +99,38 @@ extension AgentViewModel {
         return lower.contains("not found") || lower.contains("no element")
     }
 
+    /// Fuzzy-match rescue for type_into_element — same idea as rescueClick but
+    /// scans text-input roles ("Search" vs the app's actual "Search Field").
+    /// Returns nil if no reasonable match so the caller keeps the original error.
+    static func rescueType(
+        ax: AgentAccess.AccessibilityService,
+        role: String?,
+        requestedTitle: String,
+        appBundleId: String,
+        text: String,
+        verify: Bool
+    ) -> String? {
+        let roles = role.map { [$0] } ?? ["AXTextField", "AXTextArea", "AXSearchField", "AXComboBox"]
+        for r in roles {
+            let candidatesJSON = ax.collectAllElements(
+                appIdentifier: appBundleId,
+                attributes: ["AXTitle", "AXDescription", "AXRole"],
+                maxDepth: 12,
+                filterCriteria: ["AXRole": r]
+            )
+            guard let bestTitle = pickBestTitle(candidatesJSON: candidatesJSON, requested: requestedTitle) else {
+                continue
+            }
+            let retry = ax.typeTextIntoElement(role: r, title: bestTitle, text: text,
+                                               appBundleId: appBundleId, verify: verify)
+            if axResultIsNotFound(retry) { continue }
+            let escReq = requestedTitle.replacingOccurrences(of: "\"", with: "\\\"")
+            let escMatch = bestTitle.replacingOccurrences(of: "\"", with: "\\\"")
+            return #"{"auto_retry":{"requested_title":"\#(escReq)","matched_title":"\#(escMatch)"},"result":\#(retry)}"#
+        }
+        return nil
+    }
+
     /// Walk any AXorcist JSON response, collect every AXTitle/AXDescription, and
     /// pick the one that best matches `requested`. Threshold is deliberately
     /// conservative — we'd rather keep the original error than click the wrong button.
@@ -197,11 +229,22 @@ extension AgentViewModel {
         case "type_text", "type_into_element":
             // AXorcist-only: typing requires an element. There is no "type at the
             // current focus" path — find the text field by role/title first.
-            return ax.typeTextIntoElement(
+            let text = input["text"] as? String ?? ""
+            let verify = input["verify"] as? Bool ?? true
+            let first = ax.typeTextIntoElement(
                 role: role, title: title,
-                text: input["text"] as? String ?? "",
+                text: text,
                 appBundleId: app,
-                verify: input["verify"] as? Bool ?? true)
+                verify: verify)
+            if Self.axResultIsNotFound(first), let requested = title, let app = app {
+                if let rescued = Self.rescueType(ax: ax, role: role,
+                                                 requestedTitle: requested,
+                                                 appBundleId: app, text: text,
+                                                 verify: verify) {
+                    return rescued
+                }
+            }
+            return first
         case "click", "click_element":
             // AXorcist-only. Coordinate-based click is not supported — provide role/title/value (and ideally
             // appBundleId) so the click goes through AXorcist's element-finder.
@@ -300,10 +343,14 @@ extension AgentViewModel {
                 appBundleId: app, x: x, y: y,
                 width: sw, height: sh)
         case "click_menu_item":
-            return ax.clickMenuItem(
-                appBundleId: app,
-                menuPath: (input["menuPath"] as? String)?
-                    .components(separatedBy: " > ") ?? [])
+            // Tolerant path parsing: accept "File > Save", "File>Save", or a
+            // menu_path array. Split on ">" and trim each segment.
+            let path = (input["menuPath"] as? String).map {
+                $0.components(separatedBy: ">")
+                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                    .filter { !$0.isEmpty }
+            } ?? (input["menu_path"] as? [String]) ?? []
+            return ax.clickMenuItem(appBundleId: app, menuPath: path)
         case "get_window_frame":
             return ax.getWindowFrame(
                 windowId: input["windowId"] as? Int ?? 0)

@@ -112,12 +112,27 @@ jobs:
             -archivePath "$RUNNER_TEMP/Agent.xcarchive" \
             archive
 
-      - name: Export with Developer ID (ExportOptions.plist, automatic)
+      - name: Export with Developer ID (automatic, same plist ArchiveXcode generates)
         run: |
           set -euo pipefail
+          # ExportOptions.plist is gitignored (generated locally by ArchiveXcode) — recreate it
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>developer-id</string>
+              <key>teamID</key>
+              <string>469UCUB275</string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+          </dict>
+          </plist>
+          PLIST
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/Agent.xcarchive" \
-            -exportOptionsPlist ExportOptions.plist \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
             -exportPath "$RUNNER_TEMP/export"
           ls -la "$RUNNER_TEMP/export"
 

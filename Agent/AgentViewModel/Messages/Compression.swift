@@ -22,13 +22,32 @@ struct CompactionState {
         // window, leaving headroom for the system prompt, tool schemas and the
         // response. Previously this argument was ignored and every model — 4K
         // Foundation Models or 1M Claude — compacted at a hardcoded 30K.
+        self.compactThreshold = Self.threshold(for: contextWindow)
+    }
+
+    /// 55% of the context window, clamped 2K...400K.
+    static func threshold(for contextWindow: Int) -> Int {
         let target = Int(Double(contextWindow) * 0.55)
-        self.compactThreshold = max(2_000, min(target, 400_000))
+        return max(2_000, min(target, 400_000))
+    }
+
+    /// Re-derive the threshold from the provider's current context window.
+    /// The async local-server context fetch (LM Studio /api/v0/models,
+    /// Ollama /api/show, vLLM /v1/models) can land AFTER a task starts —
+    /// without this, the first task after launch runs on the 32K fallback.
+    mutating func refreshThreshold(contextWindow: Int) {
+        compactThreshold = Self.threshold(for: contextWindow)
     }
 
     /// True if we should attempt compaction for the given estimated token count.
     func shouldCompact(estimatedTokens: Int) -> Bool {
-        guard consecutiveFailures < Self.maxFailures else { return false }
+        if consecutiveFailures >= Self.maxFailures {
+            // Circuit breaker tripped — but recover once the transcript has
+            // grown another ~25% past the last failed attempt, instead of
+            // never compacting again for the rest of the task.
+            return tokensBeforeLastCompact > 0
+                && estimatedTokens > tokensBeforeLastCompact + tokensBeforeLastCompact / 4
+        }
         return estimatedTokens > compactThreshold
     }
 
@@ -74,8 +93,24 @@ extension AgentViewModel {
         case .codestral: return 256_000
         case .vibe: return 128_000
         case .huggingFace: return 32_000
-        case .ollama, .localOllama: return localOllamaContextSize > 0 ? localOllamaContextSize : 32_000
-        case .vLLM, .lmStudio: return 32_000
+        case .ollama, .localOllama:
+            // Explicit user setting wins — it's also what gets sent as num_ctx.
+            if localOllamaContextSize > 0 { return localOllamaContextSize }
+            // Real per-model context from /api/show (num_ctx or context_length);
+            // fall back to 32K only when the API hasn't answered.
+            let model = provider == .ollama ? ollamaModel : localOllamaModel
+            if let ctx = ollamaContextWindows[model], ctx > 0 { return ctx }
+            return 32_000
+        case .vLLM:
+            // Real context from vLLM's /v1/models max_model_len; fall back to
+            // 32K only when the API hasn't answered.
+            if let ctx = vLLMContextWindows[vLLMModel], ctx > 0 { return ctx }
+            return 32_000
+        case .lmStudio:
+            // Real context length from LM Studio's /api/v0/models (loaded or max);
+            // fall back to 32K only when the REST API hasn't answered.
+            if let ctx = lmStudioContextWindows[lmStudioModel], ctx > 0 { return ctx }
+            return 32_000
         case .foundationModel: return 4_096
         }
     }
@@ -107,6 +142,10 @@ extension AgentViewModel {
         guard messages.count > keepRecent + 1, FoundationModelService.isAvailable else {
             return
         }
+        // Bound the in-memory summary cache — long sessions previously grew it
+        // without limit. Dropping it all is safe: entries are re-summarized on
+        // demand and keyed by content hash.
+        if _summaryCache.count > 512 { _summaryCache.removeAll() }
 
         let middleEnd = messages.count - keepRecent
         let session = LanguageModelSession(
@@ -168,15 +207,22 @@ extension AgentViewModel {
         //
         // Cheap chars/4 estimate first so an under-threshold turn costs nothing:
         // preciseTokenCount runs an on-device model pass over the whole transcript.
-        guard state.shouldCompact(estimatedTokens: estimateTokens(messages: messages)) else { return false }
+        // chars/4 under-counts dense code (~3.3 chars/token), so inflate the cheap
+        // estimate 25% — the precise check below stays authoritative.
+        let cheap = estimateTokens(messages: messages)
+        guard state.shouldCompact(estimatedTokens: cheap + cheap / 4) else { return false }
 
         let tokensBefore = await preciseTokenCount(messages: messages)
         guard state.shouldCompact(estimatedTokens: tokensBefore) else { return false }
 
         log?("🗜️ Compacting context (\(tokensBefore) est. tokens, threshold \(state.compactThreshold))...")
 
-        // Microcompact: clear old tool results to "[cleared]" (keeps last 3)
-        microcompact(&messages)
+        // Microcompact: clear old tool results to recoverable stubs. How many
+        // recent results survive scales with the model's context budget — a
+        // 131K local model keeps far more reads intact than a 4K one, so big
+        // models stop losing files they just read (the #37 re-read loop).
+        let keepRecent = max(3, min(24, state.compactThreshold / 6_000))
+        microcompact(&messages, keepRecent: keepRecent)
 
         // Strip images — they're huge and won't summarize well
         stripOldImages(&messages)
@@ -191,8 +237,9 @@ extension AgentViewModel {
             }
         }
 
-        // Tier 2: Aggressive prune (drops middle messages into summary)
-        pruneMessages(&messages)
+        // Tier 2: Aggressive prune (drops middle messages into summary).
+        // keepRecent scales with the context budget, same as microcompact.
+        pruneMessages(&messages, keepRecent: max(6, min(24, state.compactThreshold / 6_000)))
         let tokensAfterT2 = await preciseTokenCount(messages: messages)
         let reduced = state.recordAttempt(tokensBefore: tokensBefore, tokensAfter: tokensAfterT2)
         if reduced {
@@ -206,7 +253,10 @@ extension AgentViewModel {
     // MARK: - Microcompaction (clear old tool results)
 
     /// Clear old tool_result content to save tokens while preserving message structure.
-    /// Keeps only the last `keepRecent` tool results intact; older ones replaced with "[cleared]".
+    /// Keeps only the last `keepRecent` tool results intact; older ones are replaced
+    /// with a short self-describing stub (head preview + restore instructions) so the
+    /// model knows WHAT was cleared and how to get it back — instead of re-reading
+    /// the same file in a loop.
     static func microcompact(_ messages: inout [[String: Any]], keepRecent: Int = 3) {
         // No toggle gate — clearing stale tool results (spilled to ToolResultCache
         // first, so nothing is lost) is structural recovery, not an Apple
@@ -216,11 +266,18 @@ extension AgentViewModel {
         for (i, msg) in messages.enumerated() {
             if let blocks = msg["content"] as? [[String: Any]] {
                 for (j, block) in blocks.enumerated() {
-                    if block["type"] as? String == "tool_result",
-                       let content = block["content"] as? String,
-                       content.count > 100
+                    guard block["type"] as? String == "tool_result" else { continue }
+                    if let content = block["content"] as? String,
+                       content.count > 100,
+                       !content.hasPrefix("[cleared")
                     {
                         toolResultIndices.append((i, j))
+                    } else if let nested = block["content"] as? [[String: Any]] {
+                        // Block-array content (image/screenshot returns) — huge
+                        // and previously never compacted.
+                        let hasImage = nested.contains { $0["type"] as? String == "image" }
+                        let textLen = nested.compactMap { $0["text"] as? String }.reduce(0) { $0 + $1.count }
+                        if hasImage || textLen > 100 { toolResultIndices.append((i, j)) }
                     }
                 }
             }
@@ -232,13 +289,42 @@ extension AgentViewModel {
             if var blocks = messages[i]["content"] as? [[String: Any]] {
                 // Spill before clearing — otherwise this content is unrecoverable.
                 if let content = blocks[j]["content"] as? String {
-                    ToolResultCache.spill(
-                        toolUseID: blocks[j]["tool_use_id"] as? String, content: content)
+                    let id = blocks[j]["tool_use_id"] as? String
+                    ToolResultCache.spill(toolUseID: id, content: content)
+                    blocks[j]["content"] = clearedStub(content: content, toolUseID: id)
+                } else if let nested = blocks[j]["content"] as? [[String: Any]] {
+                    // Flatten block-array content: spill the text, drop images.
+                    let text = nested.compactMap { $0["text"] as? String }.joined(separator: "\n")
+                    let imageCount = nested.filter { $0["type"] as? String == "image" }.count
+                    let id = blocks[j]["tool_use_id"] as? String
+                    ToolResultCache.spill(toolUseID: id, content: text)
+                    let header = imageCount > 0 ? "[\(imageCount) image(s) removed]\n" : ""
+                    let recoverable = text.utf8.count >= ToolResultCache.minSpillBytes
+                    blocks[j]["content"] = clearedStub(content: header + text, toolUseID: recoverable ? id : nil)
                 }
-                blocks[j]["content"] = "[cleared]"
                 messages[i]["content"] = blocks
             }
         }
+    }
+
+    /// Build the replacement text for a cleared tool result. Keeps a 2-line head
+    /// preview (usually enough to identify which file/command it was) and tells
+    /// the model exactly how to recover the full text — so it calls
+    /// restore_tool_result instead of re-reading the file.
+    private static func clearedStub(content: String, toolUseID: String?) -> String {
+        let head = content
+            .split(separator: "\n", omittingEmptySubsequences: true)
+            .prefix(2)
+            .map { String($0.prefix(120)) }
+            .joined(separator: "\n")
+        var stub = "[cleared to save context]\n\(head)\n"
+        if let toolUseID, !toolUseID.isEmpty {
+            stub += "Full content preserved — call restore_tool_result(tool_use_id:\"\(toolUseID)\") "
+                + "to recover it. Do NOT re-read the file."
+        } else {
+            stub += "Re-run the tool only if this content is needed again."
+        }
+        return stub
     }
 
     // MARK: - Token Counting (precise via Apple AI on macOS 26.4+, fallback ~4 chars/token)
@@ -281,6 +367,14 @@ extension AgentViewModel {
                 for block in blocks {
                     if let text = block["text"] as? String { allText += text }
                     else if let text = block["content"] as? String { allText += text }
+                    else if let nested = block["content"] as? [[String: Any]] {
+                        // tool_result with block-array content (image/screenshot
+                        // returns) — previously invisible to both counters.
+                        for n in nested {
+                            if let t = n["text"] as? String { allText += t }
+                            if n["type"] as? String == "image" { imageTokens += imageTokenEstimate }
+                        }
+                    }
                     if block["type"] as? String == "image" { imageTokens += imageTokenEstimate }
                     if let input = block["input"] as? [String: Any],
                        let data = try? JSONSerialization.data(withJSONObject: input)
