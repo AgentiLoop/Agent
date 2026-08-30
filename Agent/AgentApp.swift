@@ -134,6 +134,11 @@ struct AgentApp: App {
         .commands {
             // Remove system Cmd+N so our shortcuts aren't hidden
             CommandGroup(replacing: .newItem) {}
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") {
+                    UpdateChecker.shared.checkForUpdates()
+                }
+            }
             CommandGroup(after: .windowArrangement) {
                 Button("System Prompts") {
                     SystemPromptWindow.shared.show()
