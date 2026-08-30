@@ -228,6 +228,9 @@ extension AgentViewModel {
             // Token-aware compaction — mutations happen only at threshold events so
             // the request prefix stays byte-stable and provider prompt caches hit.
             if iterations > 1 {
+                // Async context-window fetches can land after task start — pick
+                // up the real threshold instead of a possibly-stale 32K fallback.
+                compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
                 _ = await Self.tieredCompact(&messages, state: &compactionState) { [weak tab] msg in
                     tab?.appendLog(msg)
                     tab?.flush()
