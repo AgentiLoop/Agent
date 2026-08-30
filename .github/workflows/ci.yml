@@ -1,0 +1,56 @@
+# CI — Build & Test
+#
+# Runs on every pull request into main (and pushes to main).
+# Builds the Agent! scheme and runs the AgentTests suite with
+# ad-hoc signing (same flags as build.sh) — no secrets required,
+# so it also works for PRs from forks.
+
+name: CI — Build & Test
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  SCHEME: "Agent!"
+
+jobs:
+  test:
+    name: Build & Test (macOS)
+    runs-on: macos-26   # deployment target is macOS 26 — needs the newest image/Xcode
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select latest Xcode
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)/Contents/Developer"
+          xcodebuild -version
+
+      - name: Build & run tests (ad-hoc signed, no Apple account)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Agent.xcodeproj \
+            -scheme "$SCHEME" \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGN_STYLE="Manual" \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            ENABLE_APP_SANDBOX=NO \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            test
