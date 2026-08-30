@@ -98,6 +98,14 @@ extension AgentViewModel {
                 appendLog("Failed to fetch models: \(error.localizedDescription)")
                 ollamaModels = Self.defaultOllamaModels
             }
+            // Best-effort real context length per model — drives the compaction
+            // threshold instead of the hardcoded 32K fallback.
+            let names = ollamaModels.map(\.name)
+            if let windows = try? await Self.fetchOllamaContextWindows(
+                endpoint: endpoint, apiKey: apiKey, models: names
+            ) {
+                ollamaContextWindows.merge(windows) { _, new in new }
+            }
         }
     }
 
@@ -116,6 +124,14 @@ extension AgentViewModel {
             } catch {
                 appendLog("Failed to fetch local models: \(error.localizedDescription)")
                 localOllamaModels = Self.defaultOllamaModels
+            }
+            // Best-effort real context length per model — drives the compaction
+            // threshold instead of the hardcoded 32K fallback.
+            let names = localOllamaModels.map(\.name)
+            if let windows = try? await Self.fetchOllamaContextWindows(
+                endpoint: endpoint, apiKey: "", models: names
+            ) {
+                ollamaContextWindows.merge(windows) { _, new in new }
             }
         }
     }
@@ -461,6 +477,61 @@ extension AgentViewModel {
         }
     }
 
+    /// Query Ollama's `/api/show` for each model's context length. Prefers the
+    /// Modelfile's `num_ctx` (what the model actually loads with) over the
+    /// architecture's `<arch>.context_length` in model_info (what it supports).
+    /// Best-effort: failures for individual models are skipped.
+    private nonisolated static func fetchOllamaContextWindows(
+        endpoint: String, apiKey: String, models: [String]
+    ) async throws -> [String: Int] {
+        let effectiveEndpoint = endpoint.isEmpty ? "http://localhost:11434/api/chat" : endpoint
+        guard let chatURL = URL(string: effectiveEndpoint) else { return [:] }
+        let baseDir = chatURL.deletingLastPathComponent().absoluteString
+        guard let showURL = URL(string: baseDir + "show") else { return [:] }
+
+        return await withTaskGroup(of: (String, Int)?.self) { group in
+            for model in models {
+                group.addTask {
+                    guard let body = try? JSONSerialization.data(withJSONObject: ["model": model]) else { return nil }
+                    var request = URLRequest(url: showURL)
+                    request.httpMethod = "POST"
+                    request.setValue("application/json", forHTTPHeaderField: "content-type")
+                    if !apiKey.isEmpty {
+                        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+                    }
+                    request.httpBody = body
+                    request.timeoutInterval = llmAPITimeout
+                    guard let (data, response) = try? await URLSession.shared.data(for: request),
+                          let http = response as? HTTPURLResponse, http.statusCode == 200,
+                          let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else
+                    {
+                        return nil
+                    }
+                    var ctx = 0
+                    // Modelfile parameters — one "num_ctx <value>" line when set.
+                    if let params = json["parameters"] as? String {
+                        for line in params.split(separator: "\n") {
+                            let parts = line.split(separator: " ", omittingEmptySubsequences: true)
+                            if parts.count >= 2, parts[0] == "num_ctx", let n = Int(parts[1]) { ctx = n }
+                        }
+                    }
+                    // Architecture max, e.g. "qwen3.context_length": 131072.
+                    if ctx == 0, let info = json["model_info"] as? [String: Any] {
+                        for (key, value) in info where key.hasSuffix(".context_length") {
+                            if let n = value as? Int, n > 0 { ctx = n }
+                        }
+                    }
+                    return ctx > 0 ? (model, ctx) : nil
+                }
+            }
+            var windows: [String: Int] = [:]
+            for await pair in group {
+                if let (model, ctx) = pair { windows[model] = ctx }
+            }
+            return windows
+        }
+    }
+
     // MARK: - Z.ai Models
 
     func fetchZAIModels() {
@@ -727,8 +798,9 @@ extension AgentViewModel {
         Task {
             defer { isFetchingVLLMModels = false }
             do {
-                let models = try await Self.fetchVLLMModelsFromAPI(endpoint: endpoint, apiKey: key)
+                let (models, windows) = try await Self.fetchVLLMModelsFromAPI(endpoint: endpoint, apiKey: key)
                 vLLMModels = models
+                vLLMContextWindows = windows
                 let ids = models.map(\.id)
                 if vLLMModel.isEmpty || (!ids.isEmpty && !ids.contains(vLLMModel)) {
                     vLLMModel = ids.first ?? ""
@@ -739,7 +811,10 @@ extension AgentViewModel {
         }
     }
 
-    private nonisolated static func fetchVLLMModelsFromAPI(endpoint: String, apiKey: String) async throws -> [OpenAIModelInfo] {
+    /// Fetch vLLM's `/v1/models` list. vLLM includes each model's real context
+    /// window as `max_model_len` — captured so the compaction threshold scales
+    /// to the served model instead of the hardcoded 32K fallback.
+    private nonisolated static func fetchVLLMModelsFromAPI(endpoint: String, apiKey: String) async throws -> ([OpenAIModelInfo], [String: Int]) {
         let modelsURL: URL
         if let range = endpoint.range(of: "/v1/") {
             let base = String(endpoint[endpoint.startIndex..<range.upperBound])
@@ -756,11 +831,16 @@ extension AgentViewModel {
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200,
               let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let modelsData = json["data"] as? [[String: Any]] else { return [] }
-        return modelsData.compactMap { model -> OpenAIModelInfo? in
+              let modelsData = json["data"] as? [[String: Any]] else { return ([], [:]) }
+        var windows: [String: Int] = [:]
+        let models = modelsData.compactMap { model -> OpenAIModelInfo? in
             guard let id = model["id"] as? String else { return nil }
+            if let maxLen = model["max_model_len"] as? Int, maxLen > 0 {
+                windows[id] = maxLen
+            }
             return OpenAIModelInfo(id: id, name: id)
         }.sorted { $0.name < $1.name }
+        return (models, windows)
     }
 
     // MARK: - LM Studio Models

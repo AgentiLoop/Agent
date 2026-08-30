@@ -323,6 +323,16 @@ final class AgentViewModel {
     var lmStudioContextWindows: [String: Int] = [:]
     var isFetchingLMStudioModels = false
 
+    /// Context window per Ollama model name (cloud + local), populated by
+    /// `fetchOllamaModels` / `fetchLocalOllamaModels` from `/api/show`
+    /// (Modelfile num_ctx preferred, else the architecture's context_length).
+    /// Used only when the user hasn't set an explicit context size.
+    var ollamaContextWindows: [String: Int] = [:]
+
+    /// Context window per vLLM model id, populated by `fetchVLLMModels` from
+    /// `/v1/models` → max_model_len.
+    var vLLMContextWindows: [String: Int] = [:]
+
     // Z.ai (ZhipuAI GLM) settings
     var zAIAPIKey: String = KeychainService.shared.get(.zAI) ?? "" {
         didSet { KeychainService.shared.set(.zAI, zAIAPIKey) }

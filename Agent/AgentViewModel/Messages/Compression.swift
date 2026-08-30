@@ -74,8 +74,19 @@ extension AgentViewModel {
         case .codestral: return 256_000
         case .vibe: return 128_000
         case .huggingFace: return 32_000
-        case .ollama, .localOllama: return localOllamaContextSize > 0 ? localOllamaContextSize : 32_000
-        case .vLLM: return 32_000
+        case .ollama, .localOllama:
+            // Explicit user setting wins — it's also what gets sent as num_ctx.
+            if localOllamaContextSize > 0 { return localOllamaContextSize }
+            // Real per-model context from /api/show (num_ctx or context_length);
+            // fall back to 32K only when the API hasn't answered.
+            let model = provider == .ollama ? ollamaModel : localOllamaModel
+            if let ctx = ollamaContextWindows[model], ctx > 0 { return ctx }
+            return 32_000
+        case .vLLM:
+            // Real context from vLLM's /v1/models max_model_len; fall back to
+            // 32K only when the API hasn't answered.
+            if let ctx = vLLMContextWindows[vLLMModel], ctx > 0 { return ctx }
+            return 32_000
         case .lmStudio:
             // Real context length from LM Studio's /api/v0/models (loaded or max);
             // fall back to 32K only when the REST API hasn't answered.
