@@ -47,6 +47,8 @@ struct GoalStateStoreTests {
     func emptyCriteriaIsNotDone() {
         let store = makeStore()
         let state = store.set(goal: "G", criteria: [])
+        // allCriteriaDone requires a non-empty list — a goal with no criteria
+        // must not silently satisfy the task_complete gate.
         #expect(state.allCriteriaDone == false)
     }
 
@@ -87,6 +89,7 @@ struct GoalStateStoreTests {
         store.set(goal: "G", criteria: ["a"])
         store.clear()
         #expect(store.current == nil)
+        // No goal means nothing to verify — the gate must not deadlock.
         #expect(store.isVerified == true)
         #expect(store.promptBlock.isEmpty)
     }
@@ -150,10 +153,18 @@ struct GoalStateStoreTests {
 }
 
 /// Regression coverage for AgentViewModel.isToolFailure(output:).
+///
+/// This logic has been wrong TWICE: it originally lowercased the entire tool
+/// output and searched for "error:" / "failed" / "not found" anywhere in it.
+/// A successful edit_file echoes a preview of the file's new content, so
+/// editing any file whose SOURCE contains those words (XcodeService.swift,
+/// Guards.swift) reported phantom failures and fired the stuck guards.
 @MainActor
 struct ToolFailureDetectionTests {
     @Test("a successful edit whose body contains failure words is NOT a failure")
     func successfulEditWithFailureWordsInBody() {
+        // The exact shape that caused the bug: success status line, echoed
+        // source code below it containing every trigger word.
         let output = """
         Replaced 1 occurrence in /path/XcodeService.swift [verified: true]
 
@@ -196,6 +207,9 @@ struct ToolFailureDetectionTests {
 
     @Test("the bare word 'failed' in a status line does not trigger detection")
     func bareFailedIsNotATrigger() {
+        // "failed" was dropped as a trigger precisely because it matches
+        // ordinary prose and source text. Build failures are caught by the
+        // separate consecutiveBuildFailures counter, not this helper.
         #expect(AgentViewModel.isToolFailure(output: "3 tests failed in DiffToolsTests") == false)
     }
 }
@@ -250,6 +264,8 @@ struct StuckGuardFingerprintTests {
 
     @Test("polling and dialog tools are exempt from the repeat guard")
     func pollingToolsAreExempt() {
+        // These legitimately repeat with identical input and must never be
+        // flagged as a broken record.
         #expect(AgentViewModel.repeatExemptTools.contains("wait_for_element"))
         #expect(AgentViewModel.repeatExemptTools.contains("find_element"))
         #expect(AgentViewModel.repeatExemptTools.contains("ask_user"))
