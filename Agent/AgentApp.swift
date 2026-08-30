@@ -135,8 +135,10 @@ struct AgentApp: App {
             // Remove system Cmd+N so our shortcuts aren't hidden
             CommandGroup(replacing: .newItem) {}
             CommandGroup(after: .appInfo) {
-                Button("Check for Updates…") {
+                Button {
                     UpdateChecker.shared.checkForUpdates()
+                } label: {
+                    Label("Check for Updates…", systemImage: "arrow.triangle.2.circlepath")
                 }
                 Divider()
                 Button {
