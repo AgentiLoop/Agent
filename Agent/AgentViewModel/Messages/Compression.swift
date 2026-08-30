@@ -123,6 +123,10 @@ extension AgentViewModel {
         guard messages.count > keepRecent + 1, FoundationModelService.isAvailable else {
             return
         }
+        // Bound the in-memory summary cache — long sessions previously grew it
+        // without limit. Dropping it all is safe: entries are re-summarized on
+        // demand and keyed by content hash.
+        if _summaryCache.count > 512 { _summaryCache.removeAll() }
 
         let middleEnd = messages.count - keepRecent
         let session = LanguageModelSession(
@@ -211,8 +215,9 @@ extension AgentViewModel {
             }
         }
 
-        // Tier 2: Aggressive prune (drops middle messages into summary)
-        pruneMessages(&messages)
+        // Tier 2: Aggressive prune (drops middle messages into summary).
+        // keepRecent scales with the context budget, same as microcompact.
+        pruneMessages(&messages, keepRecent: max(6, min(24, state.compactThreshold / 6_000)))
         let tokensAfterT2 = await preciseTokenCount(messages: messages)
         let reduced = state.recordAttempt(tokensBefore: tokensBefore, tokensAfter: tokensAfterT2)
         if reduced {

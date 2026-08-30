@@ -13,6 +13,10 @@ enum ToolResultCache {
     /// Only spill results big enough to be worth recovering.
     static let minSpillBytes = 200
 
+    /// Cap on total spill size per cache dir — oldest files evicted first.
+    /// Without this the dir grew unbounded (clear() has no callers).
+    static let maxCacheBytes = 50_000_000
+
     private static let queue = DispatchQueue(label: "agent.toolresultcache")
 
     /// Project folder used for spills. Set by the task loop; falls back to a temp dir
@@ -55,8 +59,30 @@ enum ToolResultCache {
         do {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
             try content.write(to: file, atomically: true, encoding: .utf8)
+            evictIfNeeded(dir: dir)
         } catch {
             // Spilling is best-effort — a failure must never break compaction.
+        }
+    }
+
+    /// Evict oldest spill files until the cache is back under maxCacheBytes.
+    private static func evictIfNeeded(dir: URL) {
+        let fm = FileManager.default
+        let keys: [URLResourceKey] = [.fileSizeKey, .contentModificationDateKey]
+        guard let files = try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys) else { return }
+        var entries: [(url: URL, size: Int, date: Date)] = []
+        var total = 0
+        for f in files where f.pathExtension == "txt" {
+            let vals = try? f.resourceValues(forKeys: Set(keys))
+            let size = vals?.fileSize ?? 0
+            entries.append((f, size, vals?.contentModificationDate ?? .distantPast))
+            total += size
+        }
+        guard total > maxCacheBytes else { return }
+        for e in entries.sorted(by: { $0.date < $1.date }) {
+            try? fm.removeItem(at: e.url)
+            total -= e.size
+            if total <= maxCacheBytes { break }
         }
     }
 
