@@ -215,9 +215,18 @@ extension AgentViewModel {
         var iterations = 0
         let maxIterations = agent.maxIterations
         var finalResult = ""
+        // Sub-agents previously never compacted — a long research loop grew
+        // until the provider rejected the transcript. Same tiered compaction
+        // as the main/tab loops, threshold from the provider's real context.
+        var compactionState = CompactionState(contextWindow: contextWindow(for: provider))
 
         while !Task.isCancelled && iterations < maxIterations {
             iterations += 1
+
+            if iterations > 1 {
+                compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
+                _ = await Self.tieredCompact(&messages, state: &compactionState)
+            }
 
             do {
                 let response: (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int)

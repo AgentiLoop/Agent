@@ -571,7 +571,15 @@ private struct LLMOutputBox: View {
                         // Use the larger of: line-count estimate (pre-size), or actual rendered
                         // height from the package (which accounts for word-wrap and tables).
                         let proposed = min(max(minHeight, max(lineEstimate, h + 4)), maxHeight)
-                        height = proposed
+                        // Anti-shake: while streaming, the box only GROWS. The line-count
+                        // estimate and the rendered height race each other during fill,
+                        // and letting the box shrink mid-stream makes the bottom edge
+                        // jitter. When idle, apply a small dead-band to ignore ±2pt noise.
+                        if isStreaming {
+                            if proposed > height { height = proposed }
+                        } else if abs(proposed - height) > 2 {
+                            height = proposed
+                        }
                     }
                     .overlay {
                         if showScanlines {

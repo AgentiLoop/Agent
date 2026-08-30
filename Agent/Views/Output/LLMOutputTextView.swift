@@ -150,7 +150,10 @@ struct LLMOutputTextView: NSViewRepresentable {
         let cursorVisible = text.hasSuffix("█")
         let hasCursor = cursorVisible || text.hasSuffix(" ")
         let contentText = hasCursor ? String(text.dropLast()) : text
-        let contentLen = contentText.count
+        // UTF-16 units throughout — NSTextStorage/NSString offsets are UTF-16. Mixing
+        // grapheme counts (String.count) with storage.length garbles deltas on emoji.
+        let contentNS = contentText as NSString
+        let contentLen = contentNS.length
 
         let isDark = tv.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
         let textColor: NSColor = isDark
@@ -163,9 +166,10 @@ struct LLMOutputTextView: NSViewRepresentable {
         ]
 
         if contentLen != coord.lastContentLength {
-            // Text shrank → new task / reset → re-arm auto-follow
+            // Text shrank → new task / reset → re-arm auto-follow + drop table latch
             if contentLen < coord.lastContentLength {
                 coord.autoFollowDisabled = false
+                coord.needsTableRender = false
             }
             let isAppend = contentLen > coord.lastContentLength && coord.lastContentLength > 0
             let hasTable = contentText.contains("|\n") && contentText.contains("---")
@@ -175,7 +179,11 @@ struct LLMOutputTextView: NSViewRepresentable {
             CATransaction.setDisableActions(true)
 
             if isAppend && !coord.needsTableRender {
-                // FAST PATH: strip previous cursor glyph, append new content delta, then append fresh "█" cursor. Color switches via setAttributes, not replaceCharacters.
+                // FAST PATH: strip previous cursor glyph, append new content delta (UTF-16 offsets), then append fresh "█" cursor. Color switches via setAttributes, not replaceCharacters.
+                // The cursor delete MUST be inside the beginEditing/endEditing batch —
+                // deleting it outside forced an immediate relayout with the cursor
+                // missing, then the append repainted again: visible bottom flicker.
+                storage.beginEditing()
                 let attrLen = storage.length
                 if attrLen > 0 {
                     let lastChar = storage.string.suffix(1)
@@ -183,13 +191,9 @@ struct LLMOutputTextView: NSViewRepresentable {
                         storage.deleteCharacters(in: NSRange(location: attrLen - 1, length: 1))
                     }
                 }
-                let startIdx = storage.length
-                storage.beginEditing()
-                if startIdx < contentText.count {
-                    let newPart = String(
-                        contentText[contentText.index(contentText.startIndex, offsetBy: startIdx)...]
-                    )
-                    storage.append(NSAttributedString(string: newPart, attributes: [
+                let startIdx = min(coord.renderedSourceLength, contentLen)
+                if startIdx < contentLen {
+                    storage.append(NSAttributedString(string: contentNS.substring(from: startIdx), attributes: [
                         .font: font, .foregroundColor: textColor
                     ]))
                 }
@@ -198,18 +202,39 @@ struct LLMOutputTextView: NSViewRepresentable {
                 }
                 storage.endEditing()
             } else {
-                // SLOW PATH: full markdown re-render of contentText (no cursor), then append cursor as separate run.
-                storage.beginEditing()
-                storage.setAttributedString(TerminalNeoRenderer.render(contentText))
+                // SLOW PATH: full markdown re-render, but splice only the changed tail into
+                // storage. setAttributedString() here forced a full relayout/repaint on every
+                // streamed character once a table appeared — that was the visible flicker.
+                let rendered = NSMutableAttributedString(attributedString: TerminalNeoRenderer.render(contentText))
                 if hasCursor {
-                    storage.append(NSAttributedString(string: "█", attributes: cursorAttrs))
+                    rendered.append(NSAttributedString(string: "█", attributes: cursorAttrs))
                 }
+                let oldStr = storage.string as NSString
+                let newStr = rendered.string as NSString
+                // Longest common text prefix (UTF-16 units).
+                var prefixLen = 0
+                let maxPrefix = min(oldStr.length, newStr.length)
+                while prefixLen < maxPrefix, oldStr.character(at: prefixLen) == newStr.character(at: prefixLen) {
+                    prefixLen += 1
+                }
+                // Back up to the start of the line containing the divergence: inline markdown
+                // (bold/code/headers) restyles characters WITHIN the current line without
+                // changing its text, so the whole current line must be respliced to pick up
+                // fresh attributes. Also guarantees we never split a surrogate pair.
+                let lastNewline = newStr.range(of: "\n", options: .backwards, range: NSRange(location: 0, length: prefixLen))
+                prefixLen = (lastNewline.location == NSNotFound) ? 0 : lastNewline.location + 1
+                storage.beginEditing()
+                storage.replaceCharacters(
+                    in: NSRange(location: prefixLen, length: oldStr.length - prefixLen),
+                    with: rendered.attributedSubstring(from: NSRange(location: prefixLen, length: newStr.length - prefixLen))
+                )
                 storage.endEditing()
                 tv.layoutManager?.ensureLayout(for: tv.textContainer!)
             }
 
             CATransaction.commit()
             coord.lastContentLength = contentLen
+            coord.renderedSourceLength = contentLen
 
             // Latch table-render mode while the tail looks like a table row
             let lastNonEmpty = contentText.components(separatedBy: "\n")
@@ -224,7 +249,7 @@ struct LLMOutputTextView: NSViewRepresentable {
             }
         } else {
             // Cursor blink — only color changes via setAttributes, no replaceCharacters. Surrounding text stays pixel-stable.
-            guard !coord.needsTableRender, hasCursor else { return }
+            guard hasCursor else { return }
             let attrLen = storage.length
             guard attrLen > 0 else { return }
             let lastRange = NSRange(location: attrLen - 1, length: 1)
@@ -246,6 +271,10 @@ struct LLMOutputTextView: NSViewRepresentable {
         weak var textView: NSTextView?
         var onContentHeight: ((CGFloat) -> Void)?
         var lastContentLength: Int = 0
+        /// UTF-16 length of the raw source text already represented in storage. The fast path
+        /// appends raw deltas from this offset — NOT from storage.length, which diverges from
+        /// the source length after any markdown render (fences stripped, bullets widened, etc.).
+        var renderedSourceLength: Int = 0
         var lastReportedHeight: CGFloat = 0
         /// Latched once we see a markdown table — stays on so we keep doing full re-renders instead of incremental appends.
         var needsTableRender: Bool = false
@@ -316,12 +345,19 @@ struct LLMOutputTextView: NSViewRepresentable {
                 return
             }
             // Make sure layout is up to date so the document height is correct.
-            if let container = textView.textContainer {
-                textView.layoutManager?.ensureLayout(for: container)
+            var usedHeight: CGFloat = 0
+            if let container = textView.textContainer, let lm = textView.layoutManager {
+                lm.ensureLayout(for: container)
+                usedHeight = lm.usedRect(for: container).height + textView.textContainerInset.height * 2
             }
-            let docHeight = textView.frame.height
+            // frame.height can be STALE after a tail-splice edit (partial layout
+            // invalidation doesn't always resize the view synchronously) — trust
+            // the layout manager's usedRect when it's larger.
+            let docHeight = max(textView.frame.height, usedHeight)
             let visibleHeight = scrollView.contentView.bounds.height
-            let bottomY = max(0, docHeight - visibleHeight)
+            // Pixel-align the scroll origin — a fractional y makes the bottom line
+            // render at sub-pixel offsets that shimmer on every streamed tick.
+            let bottomY = max(0, (docHeight - visibleHeight).rounded(.up))
             isProgrammaticScroll = true
             scrollView.contentView.scroll(to: NSPoint(x: 0, y: bottomY))
             scrollView.reflectScrolledClipView(scrollView.contentView)

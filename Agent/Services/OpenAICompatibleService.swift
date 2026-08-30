@@ -121,6 +121,9 @@ final class OpenAICompatibleService {
     func tools(activeGroups: Set<String>? = nil, compact: Bool = false) -> [[String: Any]] {
         // No mode-based narrowing — every user-enabled tool flows through.
         // Local endpoints with tight context windows can disable groups via the UI.
+        // Keep the spill cache pointed at the current project so restore_tool_result
+        // reads back from the same .agent/toolcache the compactor wrote to.
+        ToolResultCache.setProjectFolder(projectFolder)
         return AgentTools.ollamaTools(for: provider, activeGroups: activeGroups, compact: compact, projectFolder: projectFolder)
     }
 

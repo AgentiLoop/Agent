@@ -9,6 +9,7 @@
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://www.paypal.com/ncp/payment/9C6RY2UAE5M3S"><img src="https://img.shields.io/badge/Donation-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Tip Jar" /></a>
 
+<<<<<<< HEAD
 ## README Translations
 
 - [English](README.md)
@@ -18,6 +19,8 @@
 - [中文 (简体)](README_zh.md)
 
 
+=======
+>>>>>>> 3e0fefb635642d336a6416aff0f8fedf19519933
 ## Chess within Agent
 <img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
 
@@ -117,7 +120,7 @@ Users sometimes ask why `AgentHelper`'s XPC listener accepts connections without
 That recommendation is a holdover from the pre-SMAppService **SMJobBless era**, where launchd did not validate identity for you and the XPC server had to set a designated-requirement string itself. SMAppService changed that contract:
 
 - The app-bundle-embedded plist plus signature-gated registration **is** the code-signing requirement.
-- The Mach service names (`Agent.app.toddbruss.helper`, `Agent.app.toddbruss.user`) are namespaced to the signed bundle that registered them — no other bundle can claim them.
+- The Mach service names (`Agent.app.redacted.helper`, `Agent.app.redacted.user`) are namespaced to the signed bundle that registered them — no other bundle can claim them.
 - Any signature mismatch (tampering, re-signing, different Team ID, bundle swap) **breaks the XPC channel at the launchd layer** — `listener(_:shouldAcceptNewConnection:)` is never even invoked.
 
 **Empirical proof:** Agent! itself attempted to re-sign its own daemons during an experiment and immediately lost the ability to connect. `NSXPCConnection` to both Mach services failed at the launchd layer before a single byte reached the listener delegate — exactly the behavior a manual `setCodeSigningRequirement` call would enforce, except SMAppService is doing it in the kernel's XPC lookup path where it cannot be bypassed from userland.
@@ -588,7 +591,7 @@ Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can bui
 >
 > "🦾 Agent! for macOS26" is an independent software project and is **not** affiliated with, endorsed by, sponsored by, or otherwise associated with Apple Inc. "Apple," "Mac," "Mac mini," "MacBook," "macOS," and related marks are trademarks of Apple Inc., registered in the U.S. and other countries. All other trademarks, service marks, and trade names referenced herein are the property of their respective owners and are used for identification purposes only.
 >
-> "🦾 Agent!" and the 🦾 Agent! logo are trademarks of Todd Bruss. Use of these marks requires prior written permission. The MIT license below grants rights to the source code only — it does **not** grant any trademark rights.
+> "🦾 Agent!" and the 🦾 Agent! logo are trademarks of Heisenburg. Use of these marks requires prior written permission. The MIT license below grants rights to the source code only — it does **not** grant any trademark rights.
 >
 > ### Source Code License (MIT)
 >
@@ -596,9 +599,9 @@ Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can bui
 >
 > ### Compiled Binaries & Releases
 >
-> Compiled binaries, installers, code-signed builds, and release artifacts distributed through this project's GitHub Releases, [agent.macOS26.app](https://agent.macOS26.app), or any other official channel are the copyrighted work of Todd Bruss and are **not** covered by the MIT license that governs the source code. All rights to the official binaries — including the "🦾 Agent!" name, logo, code-signing identity, and Developer ID — are reserved.
+> Compiled binaries, installers, code-signed builds, and release artifacts distributed through this project's GitHub Releases, [agent.macOS26.app](https://agent.macOS26.app), or any other official channel are the copyrighted work of Heisenburg and are **not** covered by the MIT license that governs the source code. All rights to the official binaries — including the "🦾 Agent!" name, logo, code-signing identity, and Developer ID — are reserved.
 >
-> Copyright © 2000, 2023–2026 Todd Bruss, All Rights Reserved.
+> Copyright © 2000, 2023–2026 Heisenburg, All Rights Reserved.
 >
 > You are welcome to build your own binaries from source under the MIT license, provided you do not use the "🦾 Agent!" name, logo, or branding to identify your product.
 >
@@ -611,7 +614,7 @@ Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can bui
 > Thank you for your interest in 🦾 Agent! — an application crafted for Mac mini, MacBook, and Mac desktop computers running macOS 26.4 or later on genuine Mac hardware and software.
 >
 > Sincerely,
-> **Todd Bruss**
+> **Heisenburg**
 > Forward Deployed Engineer, 🦾 Agent! for macOS 26.4.1
 > https://agent.macOS26.app
 > https://github.com/macos26/agent
