@@ -84,6 +84,19 @@ Download it. Say what you need. Watch it happen.
 
 > 💡 **Cheap GLM setup:** **GLM-5.1** runs on all four cheap providers — **Ollama**, **Hugging Face**, **Z.ai**, **BigModel** — at pennies per million tokens. New here? Start with **Z.ai** (fastest signup, GLM-5.1 is the default, nothing to provision). Running locally? Only **GLM-4.7-Turbo** (32B) fits on consumer hardware (M2/M3/M4 Mac, 64-128GB, via Ollama) — GLM-5 and GLM-5.1 are too large (~1.6TB), use them via the cloud providers above.
 
+### Troubleshooting (Build from Source)
+
+First-time builders of Option B hit a few predictable snags:
+
+- **`xcode-select` points at the Command Line Tools, not full Xcode.** `./build.sh` calls `xcodebuild`; if `xcode-select -p` prints `/Library/Developer/CommandLineTools`, `xcodebuild` can fail to resolve the project. Point it at a full Xcode: `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer` (then `xcodebuild -version` to confirm).
+
+- **`BUILD FAILED` after pulling new changes (stale DerivedData).** The build caches under `build/DerivedData`. When a stale cache causes odd, unrelated errors, wipe it and rebuild: `./build.sh clean && ./build.sh`.
+
+- **The Launch Agent / Daemon helpers never register.** Expected on Option B — the script builds ad-hoc signed (`CODE_SIGN_IDENTITY="-"`, empty `DEVELOPMENT_TEAM`), and `SMAppService` needs a valid Team ID to register the helpers. The LLM loop, all tools, Accessibility, AppleScript, shell, and MCP still work. To get the helpers, use **Option A** (open `Agent.xcodeproj` in Xcode, set your own Development Team, Build & Run, and approve the helper when prompted).
+
+- **macOS / Swift version mismatch.** Agent! targets macOS 26. If `xcodebuild` reports an unsupported deployment target or missing SDK, update to the required macOS and the matching Xcode before rebuilding.
+
+- **Wrong build configuration.** The config argument is case-sensitive as the script uses it — `./build.sh` (Debug) or `./build.sh Release`. The app lands in `build/DerivedData/Build/Products/<Config>/Agent!.app`.
 
 ## What Can It Do?
 
