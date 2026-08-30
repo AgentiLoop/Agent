@@ -41,11 +41,18 @@ jobs:
       - name: Build & run tests (ad-hoc signed, no Apple account)
         run: |
           set -o pipefail
+          # Skipped suites are environment-dependent: they clone AgentScripts
+          # repos into ~/Documents/AgentScript, compile Swift dylibs, and check
+          # app-bundle resources — none of which exist on a clean runner.
           xcodebuild \
             -project Agent.xcodeproj \
             -scheme "$SCHEME" \
             -configuration Debug \
             -destination 'platform=macOS' \
+            -skip-testing:AgentTests/ScriptServiceTests \
+            -skip-testing:AgentTests/PackageAutoDiscoveryTests \
+            -skip-testing:AgentTests/PackageGenerationTests \
+            -skip-testing:AgentTests/ScriptingBridgesTests \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGN_STYLE="Manual" \
             DEVELOPMENT_TEAM="" \

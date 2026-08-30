@@ -338,7 +338,7 @@ struct CodeBlockHighlighterTests {
     
     @Test("Activity log shell commands are highlighted")
     func activityLogShellCommandsHighlighted() {
-        let code = "$ cd /path/to/project"
+        let code = "[12:34:56] $ cd /path/to/project"
         let result = CodeBlockHighlighter.highlightActivityLogLine(line: code, font: defaultFont)
         
         #expect(result != nil)
