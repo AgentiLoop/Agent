@@ -620,7 +620,7 @@ Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can bui
 >
 > ---
 >
-> Thank you for your interest in 🦾 Agent! — an application crafted for Mac mini, MacBook, and Mac desktop computers running macOS 26.4 or later on genuine Mac hardware and software.
+> Thank you for your interest in 🦾 Agent! — an application crafted for Mac mini, MacBook, and Mac studio computers running macOS 26.4 or later on genuine Mac hardware and software.
 >
 > Sincerely,
 > **Heisenburg**

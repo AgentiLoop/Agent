@@ -599,7 +599,7 @@ Envie de bidouiller Agent! ? Consultez [CONTRIBUTING.md](./CONTRIBUTING.md) — 
 >
 > ---
 >
-> Merci de votre intérêt pour 🦾 Agent! — une application conçue pour les ordinateurs Mac mini, MacBook, et Mac de bureau fonctionnant sous macOS 26.4 ou ultérieur sur du matériel et logiciel Mac authentique.
+> Merci de votre intérêt pour 🦾 Agent! — une application conçue pour les ordinateurs Mac mini, MacBook, et Mac Studio fonctionnant sous macOS 26.4 ou ultérieur sur du matériel et logiciel Mac authentique.
 >
 > Cordialement,
 > **Heisenburg**
