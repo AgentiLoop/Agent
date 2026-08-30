@@ -599,7 +599,7 @@ Si vives dentro de un solo repositorio todo el día, Cursor es excelente. Si qui
 >
 > ---
 >
-> Gracias por tu interés en 🦾 Agent! — una aplicación creada para computadoras Mac mini, MacBook y Mac de escritorio que ejecutan macOS 26.4 o posterior en hardware y software Mac genuino.
+> Gracias por tu interés en 🦾 Agent! — una aplicación creada para computadoras Mac mini, MacBook y Mac Studio que ejecutan macOS 26.4 o posterior en hardware y software Mac genuino.
 >
 > Atentamente,
 > **Heisenburg**
