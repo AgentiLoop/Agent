@@ -48,6 +48,7 @@
 		9A9C3DD66695959EE70C20DD /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B4573B1D1FB583C85DC43C /* SearchBarView.swift */; };
 		A7E47434EDA23DD83D205D65 /* ModelFetching.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CD920ED377E5386B020BC79 /* ModelFetching.swift */; };
 		AA10000000000000000030 /* AgentApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001A /* AgentApp.swift */; };
+		AA100000000000000000F1 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100000000000000000F2 /* UpdateChecker.swift */; };
 		AA10000000000000000031 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001B /* ContentView.swift */; };
 		AA10000000000000000032 /* AgentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001C /* AgentViewModel.swift */; };
 		AA10000000000000000033 /* HelperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001D /* HelperService.swift */; };
@@ -323,6 +324,7 @@
 		93C673DDB50E956B2E5FD610 /* NativeToolHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeToolHandler.swift; sourceTree = "<group>"; };
 		A3804F32B8914764A3690CB5 /* TokenUsageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenUsageStore.swift; sourceTree = "<group>"; };
 		AA1000000000000000001A /* AgentApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentApp.swift; sourceTree = "<group>"; };
+		AA100000000000000000F2 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		AA1000000000000000001B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AA1000000000000000001C /* AgentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentViewModel.swift; sourceTree = "<group>"; };
 		AA1000000000000000001D /* HelperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperService.swift; sourceTree = "<group>"; };
@@ -583,6 +585,7 @@
 				EADF39CB2F68BFD600CD01E5 /* Protocols */,
 				EADF39C72F68BF2100CD01E5 /* Views */,
 				AA1000000000000000001A /* AgentApp.swift */,
+				AA100000000000000000F2 /* UpdateChecker.swift */,
 				EAE00000000000000001 /* UX */,
 				AA10000000000000000022 /* Agent.entitlements */,
 				EAHELP0000000000000002 /* Resources/Agent.help */,
@@ -1251,6 +1254,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA10000000000000000030 /* AgentApp.swift in Sources */,
+				AA100000000000000000F1 /* UpdateChecker.swift in Sources */,
 				AA10000000000000000031 /* ContentView.swift in Sources */,
 				AA10000000000000000032 /* AgentViewModel.swift in Sources */,
 				AA10000000000000000033 /* HelperService.swift in Sources */,
@@ -1625,7 +1629,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 195;
+				CURRENT_PROJECT_VERSION = 196;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 469UCUB275;
 				ENABLE_APP_SANDBOX = NO;
@@ -1653,7 +1657,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1678,7 +1682,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 195;
+				CURRENT_PROJECT_VERSION = 196;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 469UCUB275;
 				ENABLE_APP_SANDBOX = NO;
@@ -1706,7 +1710,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
