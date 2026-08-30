@@ -27,6 +27,30 @@ Any Mac running macOS 26 or later. Apple Silicon (M1/M2/M3/M4) recommended. 32GB
 
 ---
 
+## Setup & Providers
+
+### Which provider is cheapest to start with?
+**Z.ai** is the recommended starting point — it has the fastest signup, GLM-5.1 is its default model (nothing to provision), and it runs at pennies per million tokens. GLM-5.1 also runs on the other cheap providers (Hugging Face, BigModel, and Ollama Cloud). See the "Cheap GLM setup" note in the README Quick Start.
+
+### How do I run Agent! fully local (Ollama / LM Studio)?
+Both are self-hosted, offline, and need no account:
+- **Local Ollama** — run the Ollama daemon, then in Settings pick **Local Ollama** as your provider.
+- **LM Studio** — the easiest GUI for local models; start its local server and select **LM Studio** in Settings.
+
+Only models that fit your hardware run well: a 30B+ model at usable speed effectively needs an M2/M3/M4 Ultra (64–128GB unified memory) or a Linux box with 24GB+ VRAM. For GLM specifically, only **GLM-4.7-Turbo (32B)** fits consumer hardware locally; GLM-5 / GLM-5.1 are too large (~1.6TB) and should be used via the cloud providers. "Local/free" providers are free only in the API-fee sense — if you don't already own the hardware, the cheap cloud paths (Z.ai, BigModel, Hugging Face, DeepSeek, Ollama Cloud) are far cheaper than buying it.
+
+### Why won't the Launch Agent / Daemon register on my build from source?
+Because a build without an Apple Development Team is **ad-hoc signed**, and `SMAppService` requires a Team ID to register the Launch Agent/Daemon helpers. Everything else still works: the LLM loop, all tools, Accessibility, AppleScript, shell, and MCP. To get the helpers, open `Agent.xcodeproj` in Xcode, select the **Agent** scheme, set your own Development Team, then Build & Run and approve the helper when prompted.
+
+### What permissions does Agent! need, and how do I grant them?
+Agent! requests permissions **on-demand** when a feature is first used, not all at once — you can deny any one and still use the rest. The common ones (all under System Settings → Privacy & Security):
+- **Accessibility** — click buttons, type text, and control other apps.
+- **Screen Recording** — see what's on screen for visual automation.
+- **Automation** — control apps via Apple Events.
+- **Full Disk Access** — required only for **iMessage remote control**, so Agent! can read `~/Library/Messages/chat.db` directly. Enable Agent! under System Settings → Privacy & Security → Full Disk Access.
+
+---
+
 ## Security Questions
 
 > **Note:** This section addresses concerns raised in GitHub Issues regarding security architecture. Agent! follows Apple's official patterns for privileged helper tools.
