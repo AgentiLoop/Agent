@@ -183,7 +183,7 @@ extension AgentViewModel {
                 flushLog()
                 messages.append([
                     "role": "user",
-                    "content": "You have reached the iteration limit. Call task_complete with a summary of what you accomplished on your next turn. This is your last chance — no more tool calls."
+                    "content": "You have reached the iteration limit. This is your final turn. You may make ONE last tool call to save your progress (e.g. write a status/handoff document), then call task_complete with a summary of what you accomplished. Do not start any new work."
                 ])
             }
             if iterations > maxIterations {
