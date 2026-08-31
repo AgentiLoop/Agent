@@ -95,6 +95,14 @@ extension AgentViewModel {
                         blockedCompletion = (toolId: toolId, message: blocker)
                         continue
                     }
+                    // Execute tool calls made in this same turn (e.g. a final
+                    // status/handoff document write) before finishing — the early
+                    // return below used to silently drop them.
+                    if !pendingTools.isEmpty {
+                        var finalToolResults: [[String: Any]] = []
+                        await executePendingToolBatches(pendingTools: pendingTools, toolResults: &finalToolResults)
+                        pendingTools.removeAll()
+                    }
                     var summary = input["summary"] as? String ?? "Done"
                     let stripped = summary.trimmingCharacters(in: CharacterSet(charactersIn: ". "))
                     if stripped.isEmpty || summary == "..." {
