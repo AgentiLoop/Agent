@@ -192,6 +192,63 @@ final class ClaudeService {
         return result
     }
 
+    /// Repair orphan `tool_use` blocks — an assistant message whose tool_use ids
+    /// have no matching `tool_result` in the immediately-following user message.
+    /// Anthropic 400s on these ("tool_use ids were found without tool_result
+    /// blocks immediately after"). Rather than dropping the assistant turn,
+    /// synthesize stub tool_results so the transcript stays legal. Runs at the
+    /// request boundary, after stripOrphanToolResults (which can remove a user
+    /// message entirely and thereby orphan the preceding tool_use).
+    private func repairOrphanToolUse(_ messages: [[String: Any]]) -> [[String: Any]] {
+        var result = messages
+        var i = 0
+        while i < result.count {
+            guard (result[i]["role"] as? String) == "assistant",
+                  let blocks = result[i]["content"] as? [[String: Any]]
+            else { i += 1; continue }
+            let toolUseIds: [String] = blocks.compactMap { block in
+                guard (block["type"] as? String) == "tool_use" else { return nil }
+                return block["id"] as? String
+            }
+            if toolUseIds.isEmpty { i += 1; continue }
+
+            var paired = Set<String>()
+            if i + 1 < result.count,
+               (result[i + 1]["role"] as? String) == "user",
+               let nextBlocks = result[i + 1]["content"] as? [[String: Any]]
+            {
+                for block in nextBlocks where (block["type"] as? String) == "tool_result" {
+                    if let id = block["tool_use_id"] as? String { paired.insert(id) }
+                }
+            }
+            let orphans = toolUseIds.filter { !paired.contains($0) }
+            if orphans.isEmpty { i += 1; continue }
+
+            let stubs: [[String: Any]] = orphans.map {
+                [
+                    "type": "tool_result",
+                    "tool_use_id": $0,
+                    "content": "[result unavailable — tool call was interrupted before a result was recorded]"
+                ]
+            }
+            if i + 1 < result.count, (result[i + 1]["role"] as? String) == "user" {
+                if var nextBlocks = result[i + 1]["content"] as? [[String: Any]] {
+                    // tool_result blocks must lead the user message.
+                    nextBlocks.insert(contentsOf: stubs, at: 0)
+                    result[i + 1]["content"] = nextBlocks
+                } else if let text = result[i + 1]["content"] as? String {
+                    result[i + 1]["content"] = stubs + [["type": "text", "text": text]]
+                } else {
+                    result.insert(["role": "user", "content": stubs], at: i + 1)
+                }
+            } else {
+                result.insert(["role": "user", "content": stubs], at: i + 1)
+            }
+            i += 1
+        }
+        return result
+    }
+
     // The old withFolderPrefix mutated the newest user message per-request, which
     // changed already-sent message bytes on the next turn and defeated incremental
     // prompt caching. The folder is already in the system prompt and in the task's
@@ -270,7 +327,7 @@ final class ClaudeService {
             "max_tokens": maxTokens > 0 ? maxTokens : 16384,
             "temperature": temperature,
             "system": systemBlock,
-            "messages": withMessageCacheBreakpoint(stripOrphanToolResults(messages))
+            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(messages)))
         ]
         // Skip tools only for actual localhost servers (LM Studio's Claude-compat
         // mode often mis-handles native Anthropic tool format). Remote
@@ -446,7 +503,7 @@ final class ClaudeService {
             "model": model,
             "max_tokens": maxTokens > 0 ? maxTokens : 16384,
             "system": systemBlock,
-            "messages": withMessageCacheBreakpoint(stripOrphanToolResults(messages)),
+            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(messages))),
             "stream": true
         ]
         if !isLocalhostEndpoint {
