@@ -5,7 +5,7 @@ Thanks for your interest! Agent! is a 100% Swift, native macOS agentic AI app �
 ## 5-Minute Setup (no Apple Developer account needed)
 
 ```bash
-git clone https://github.com/macOS26/Agent.git
+git clone https://github.com/AgentiLoop/Agent.git
 cd Agent
 ./build.sh              # Debug build (requires only Xcode Command Line Tools)
 open "build/DerivedData/Build/Products/Debug/Agent!.app"
@@ -45,7 +45,7 @@ PRs are reviewed quickly — usually within a day or two.
 
 ## Good First Issues
 
-Look for the [`good first issue`](https://github.com/macOS26/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) label — these are scoped, recipe-style tasks with pointers to the exact files to touch. If you have a fork sitting around, that's the fastest way to turn it into a merged PR.
+Look for the [`good first issue`](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) label — these are scoped, recipe-style tasks with pointers to the exact files to touch. If you have a fork sitting around, that's the fastest way to turn it into a merged PR.
 
 ## Ideas That Are Always Welcome
 
@@ -57,7 +57,7 @@ Look for the [`good first issue`](https://github.com/macOS26/Agent/issues?q=is%3
 
 ## Questions?
 
-Open a [GitHub issue](https://github.com/macOS26/Agent/issues) or a [discussion](https://github.com/macOS26/Agent/discussions). No question is too small.
+Open a [GitHub issue](https://github.com/AgentiLoop/Agent/issues) or a [discussion](https://github.com/AgentiLoop/Agent/discussions). No question is too small.
 
 ## License
 

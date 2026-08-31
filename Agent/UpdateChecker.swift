@@ -9,7 +9,7 @@ final class UpdateChecker {
     static let shared = UpdateChecker()
     private init() {}
 
-    private static let releasesAPI = "https://api.github.com/repos/macOS26/Agent/releases"
+    private static let releasesAPI = "https://api.github.com/repos/AgentiLoop/Agent/releases"
 
     private struct Release: Decodable {
         struct Asset: Decodable {
