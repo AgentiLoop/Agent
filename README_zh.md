@@ -2,9 +2,9 @@
 
 ## **为你的 Mac 桌面打造的智能体 AI**
 
-[![Latest Release](https://img.shields.io/github/v/release/macOS26/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/macOS26/Agent/releases/latest)
-[![GitHub Stars](https://img.shields.io/github/stars/macOS26/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/macOS26/Agent/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/macOS26/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/macOS26/Agent/fork)
+[![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
+[![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 26.4+](https://img.shields.io/badge/macOS-26.4.1-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://www.paypal.com/ncp/payment/9C6RY2UAE5M3S"><img src="https://img.shields.io/badge/Donation-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Tip Jar" /></a>
@@ -15,13 +15,13 @@
 ## 背后的故事与技术
 Agent! 并非一夜之间诞生。它是三年来打造智能体 AI 应用的成果，借鉴了大约十几个在此过程中开发的项目。其中一些曾以 ANIE、Game Changer、BattleScript、XCF MCP Server and Client、D1F 等名义发布，还有大约八个原创的 Swift 包。缺失的那一块拼图是实现一个智能、自主的时间循环。一旦做到这一点，我便把过去三年里最好的成果整合了进来。最终的结果就是适用于 macOS 26.4.1 及更高版本的 Agent!。
 
-最初的目标是打造一个「Cursor 杀手」。而最终诞生的是更有意思的东西：一个真正能「跑起来」的智能体 AI。Agent! 只受限于你的想象力。它能编写代码，包括像 Boss-Man 这样的视频游戏（https://github.com/macos26/bossman），能创建应用，能通过 AppleScript 在 Pages 中写诗，能生成磁盘映像并将其附加到 GitHub 发布中。它几乎能自动化你 Mac 上的大多数任务。用简单的英语或你的母语告诉它你想要什么，在完成初始配置和用户授权后，它会竭尽全力实现你的愿望。Agent! 不知疲倦，志在取悦。
+最初的目标是打造一个「Cursor 杀手」。而最终诞生的是更有意思的东西：一个真正能「跑起来」的智能体 AI。Agent! 只受限于你的想象力。它能编写代码，包括像 Boss-Man 这样的视频游戏（https://github.com/AgentiLoop/bossman），能创建应用，能通过 AppleScript 在 Pages 中写诗，能生成磁盘映像并将其附加到 GitHub 发布中。它几乎能自动化你 Mac 上的大多数任务。用简单的英语或你的母语告诉它你想要什么，在完成初始配置和用户授权后，它会竭尽全力实现你的愿望。Agent! 不知疲倦，志在取悦。
 
 Agent! 的全部知识产权都是原创且开源的。每一个 Swift 包依赖以及应用本身最初都由同一个人编写。这是一个真正与众不同的生态系统。大多数智能体 AI 应用（比如 Claude Code）依赖 65 个第三方 NPM 包。Agent! 则是 100% 原生的，占用极少的内存，未压缩体积仅为 35.5。这个体积包含了 Xcode 自动化、用于原生应用故障排查的 Swift Syntax 6.2 包、Accessibility、AppleScript、AgentScript/ScriptingBridge、Safari 自动化、MCP 服务器支持等等。开箱即用。
 
 ## 新功能 🚀
 
-**v1.0.92 (186) — 自我验证自主性版本** · [完整发布说明 →](https://github.com/macOS26/Agent/releases/tag/v1.0.92.186)
+**v1.0.92 (186) — 自我验证自主性版本** · [完整发布说明 →](https://github.com/AgentiLoop/Agent/releases/tag/v1.0.92.186)
 
 Agent! 现在能证明自己的工作成果。任务只有在成功标准通过证据验证（`goal_state`）后才能被声明完成，一个可选的审核者会在完成前审查差异，且每一个被改动的文件都能一键回滚（`rewind_task`）。为 Claude 提供扩展思考，为兼容 OpenAI 的提供商提供 `reasoning_effort`，以及一个提示词缓存稳定的上下文机制，会压缩到每个模型的真实窗口大小——且可恢复，所有工具结果都会溢出保存到磁盘。类型化的工具错误带有恢复提示，子智能体可以运行各自的模型（最多 6 个只读研究型子智能体），事件钩子已完全接入，57 项通过的测试保证一切诚实可靠。
 
@@ -39,7 +39,7 @@ Agent! 将 **18 个 LLM 提供商**——Claude、GPT、Gemini、Grok、Mistral�
 
 ## 快速开始（下载）
 
-1. **下载** [Agent!](https://github.com/macOS26/Agent/releases/latest) 并拖到「应用程序」中
+1. **下载** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) 并拖到「应用程序」中
 2. **打开 Agent!** -- 它会自动完成所有设置
 3. **选择你的 AI** -- 设置 → 选择一个提供商 → 输入 API 密钥
 
@@ -47,7 +47,7 @@ Agent! 将 **18 个 LLM 提供商**——Claude、GPT、Gemini、Grok、Mistral�
 
 1. **克隆仓库：**
    ```bash
-   git clone https://github.com/macos26/agent.git
+   git clone https://github.com/AgentiLoop/agent.git
    cd Agent
    ```
 
@@ -568,7 +568,7 @@ Cursor 是一款出色的 AI 代码编辑器。Agent! 玩的是另一种游戏�
 
 ## 参与贡献
 
-想为 Agent! 贡献代码吗？请查看 [CONTRIBUTING.md](./CONTRIBUTING.md)——你只需使用 Xcode Command Line Tools（`./build.sh`），大约 5 分钟即可从源码完成构建，无需 Apple Developer 账户。可查看 [good first issues](https://github.com/macOS26/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) 获取范围明确的入门任务。
+想为 Agent! 贡献代码吗？请查看 [CONTRIBUTING.md](./CONTRIBUTING.md)——你只需使用 Xcode Command Line Tools（`./build.sh`），大约 5 分钟即可从源码完成构建，无需 Apple Developer 账户。可查看 [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) 获取范围明确的入门任务。
 
 ---
 
@@ -587,7 +587,7 @@ Cursor 是一款出色的 AI 代码编辑器。Agent! 玩的是另一种游戏�
 >
 > ### 已编译的二进制文件与发布版本
 >
-> 通过本项目的 GitHub Releases、[agent.macOS26.app](https://agent.macOS26.app) 或任何其他官方渠道分发的已编译二进制文件、安装程序、经过代码签名的构建版本以及发布产物，均属 Heisenburg 拥有版权的作品，**不**受管辖源代码的 MIT 许可证覆盖。官方二进制文件的所有权利——包括「🦾 Agent!」名称、标志、代码签名身份和 Developer ID——均予保留。
+> 通过本项目的 GitHub Releases、[AgentiLoop.ai](https://AgentiLoop.ai) 或任何其他官方渠道分发的已编译二进制文件、安装程序、经过代码签名的构建版本以及发布产物，均属 Heisenburg 拥有版权的作品，**不**受管辖源代码的 MIT 许可证覆盖。官方二进制文件的所有权利——包括「🦾 Agent!」名称、标志、代码签名身份和 Developer ID——均予保留。
 >
 > Copyright © 2000, 2023–2026 Heisenburg，保留所有权利。
 >
@@ -604,5 +604,5 @@ Cursor 是一款出色的 AI 代码编辑器。Agent! 玩的是另一种游戏�
 > 此致，
 > **Heisenburg**
 > 前线部署工程师，🦾 Agent!，适用于 macOS 26.4.1
-> https://agent.macOS26.app
-> https://github.com/macos26/agent
+> https://AgentiLoop.ai
+> https://github.com/AgentiLoop/agent
