@@ -477,7 +477,6 @@
 		EA60000000000000000002 /* SDEFs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SDEFs; sourceTree = "<group>"; };
 		EA70000000000000000002 /* SDEFService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDEFService.swift; sourceTree = "<group>"; };
 		EA80000000000000000002 /* NSAppleScriptService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppleScriptService.swift; sourceTree = "<group>"; };
-		EA9A2CB7304509CC00E9AE67 /* Agent! copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Agent! copy-Info.plist"; path = "/Users/toddbruss/Documents/GitHub/Agent/Agent! copy-Info.plist"; sourceTree = "<absolute>"; };
 		EAAI000000000000000002 /* AppleIntelligenceMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIntelligenceMediator.swift; sourceTree = "<group>"; };
 		EABA0FBC2F7B78DA005CCD6E /* ChatModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModels.swift; sourceTree = "<group>"; };
 		EAE1E7232F7C01000079432C /* LLMProviderSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMProviderSetup.swift; sourceTree = "<group>"; };
@@ -571,7 +570,6 @@
 				DD10000000000000000040 /* AgentTests */,
 				AA10000000000000000042 /* Products */,
 				AA10000000000000000043 /* Frameworks */,
-				EA9A2CB7304509CC00E9AE67 /* Agent! copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
