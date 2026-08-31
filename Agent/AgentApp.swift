@@ -149,7 +149,7 @@ struct AgentApp: App {
                     Label("Website", systemImage: "globe")
                 }
                 Button {
-                    if let url = URL(string: "https://github.com/macOS26/Agent") {
+                    if let url = URL(string: "https://github.com/AgentiLoop/Agent") {
                         NSWorkspace.shared.open(url)
                     }
                 } label: {
