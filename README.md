@@ -2,9 +2,9 @@
 
 ## **Agentic AI for your  Mac Desktop**
 
-[![Latest Release](https://img.shields.io/github/v/release/macOS26/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/macOS26/Agent/releases/latest)
-[![GitHub Stars](https://img.shields.io/github/stars/macOS26/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/macOS26/Agent/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/macOS26/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/macOS26/Agent/fork)
+[![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
+[![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 26.4+](https://img.shields.io/badge/macOS-26.4.1-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://www.paypal.com/ncp/payment/9C6RY2UAE5M3S"><img src="https://img.shields.io/badge/Donation-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Tip Jar" /></a>
@@ -23,13 +23,13 @@
 ## Backstory and the Tech behind Agent!
 Agent! didn't come together overnight. It's the result of three years of building agentic AI apps, drawing on roughly a dozen projects developed along the way. Some of those were published under ANIE, Game Changer, BattleScript, XCF MCP Server and Client, D1F, and about eight original Swift Packages. The missing piece was achieving an intelligent autonomous time loop. Once achieved, I brought in the best of the best from the previous three years. The result is Agent! for macOS 26.4.1 or later.
 
-The original goal was to build a Cursor killer. What emerged is something more interesting: an agentic AI with real legs. Agent! is only limited by your imagination. It can write code including video games like Boss-Man, https://github.com/macos26/bossman, create apps, write poetry via AppleScript within Pages, generate disk images, and attach them to GitHub releases. It can automate most tasks on your Mac. Ask it what you want in plain English or your native language and, after some initial configuration and user approvals, it will do everything it can to carry out your wish. Agent! is relentless, and aims to please.
+The original goal was to build a Cursor killer. What emerged is something more interesting: an agentic AI with real legs. Agent! is only limited by your imagination. It can write code including video games like Boss-Man, https://github.com/AgentiLoop/bossman, create apps, write poetry via AppleScript within Pages, generate disk images, and attach them to GitHub releases. It can automate most tasks on your Mac. Ask it what you want in plain English or your native language and, after some initial configuration and user approvals, it will do everything it can to carry out your wish. Agent! is relentless, and aims to please.
 
 All of Agent!'s IP is original and open source. Every Swift package dependency and the app itself were originally authored by the same person. This is a genuinely different ecosystem. Most agentic AI apps like Claude Code rely on 65 NPM packages from third parties. Agent! is 100% native, requires very little RAM, and weighs in at 35.5 uncompressed. That footprint includes Xcode automation, a Swift Syntax 6.2 package for troubleshooting native apps, Accessibility, AppleScript, AgentScript/ScriptingBridge, Safari automation, MCP Server support, and more. Out of the box.
 
 ## What's New 🚀
 
-**v1.0.92 (186) — The Self-Verifying Autonomy Release** · [Full release notes →](https://github.com/macOS26/Agent/releases/tag/v1.0.92.186)
+**v1.0.92 (186) — The Self-Verifying Autonomy Release** · [Full release notes →](https://github.com/AgentiLoop/Agent/releases/tag/v1.0.92.186)
 
 Agent! now proves its work. A task can't declare itself done until its success criteria are verified with evidence (`goal_state`), an opt-in critic reviews the diff before completion, and every file touched can be rolled back in one shot (`rewind_task`). Extended thinking for Claude, `reasoning_effort` for OpenAI-compatible providers, and a prompt-cache-stable context that compacts to each model's real window — recoverably, with full tool results spilled to disk. Typed tool errors carry recovery hints, sub-agents run their own models (up to 6 read-only researchers), event hooks are fully wired, and 57 passing tests keep it honest.
 
@@ -47,7 +47,7 @@ Download it. Say what you need. Watch it happen.
 
 ## Quick Start (Download)
 
-1. **Download** [Agent!](https://github.com/macOS26/Agent/releases/latest) and drag to Applications
+1. **Download** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) and drag to Applications
 2. **Open Agent!** -- it sets up everything automatically
 3. **Pick your AI** -- Settings → choose a provider → enter API key
 
@@ -55,7 +55,7 @@ Download it. Say what you need. Watch it happen.
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/macos26/agent.git
+   git clone https://github.com/AgentiLoop/agent.git
    cd Agent
    ```
 
@@ -589,7 +589,7 @@ If you live inside one repo all day, Cursor is great. If you want an agent that 
 
 ## Contributing
 
-Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can build from source in about 5 minutes with just the Xcode Command Line Tools (`./build.sh`), no Apple Developer account required. Check the [good first issues](https://github.com/macOS26/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) for scoped starter tasks.
+Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can build from source in about 5 minutes with just the Xcode Command Line Tools (`./build.sh`), no Apple Developer account required. Check the [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) for scoped starter tasks.
 
 ---
 
@@ -608,7 +608,7 @@ Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can bui
 >
 > ### Compiled Binaries & Releases
 >
-> Compiled binaries, installers, code-signed builds, and release artifacts distributed through this project's GitHub Releases, [agent.macOS26.app](https://agent.macOS26.app), or any other official channel are the copyrighted work of Heisenburg and are **not** covered by the MIT license that governs the source code. All rights to the official binaries — including the "🦾 Agent!" name, logo, code-signing identity, and Developer ID — are reserved.
+> Compiled binaries, installers, code-signed builds, and release artifacts distributed through this project's GitHub Releases, [AgentiLoop.ai](https://AgentiLoop.ai), or any other official channel are the copyrighted work of Heisenburg and are **not** covered by the MIT license that governs the source code. All rights to the official binaries — including the "🦾 Agent!" name, logo, code-signing identity, and Developer ID — are reserved.
 >
 > Copyright © 2000, 2023–2026 Heisenburg, All Rights Reserved.
 >
@@ -625,5 +625,5 @@ Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can bui
 > Sincerely,
 > **Heisenburg**
 > Forward Deployed Engineer, 🦾 Agent! for macOS 26.4.1
-> https://agent.macOS26.app
-> https://github.com/macos26/agent
+> https://AgentiLoop.ai
+> https://github.com/AgentiLoop/agent
