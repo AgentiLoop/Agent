@@ -204,6 +204,14 @@ extension AgentViewModel {
         let y = (input["y"] as? Double).map { CGFloat($0) }
 
         switch action {
+        case "check_permission":
+            return AgentAccess.AccessibilityService.hasAccessibilityPermission()
+                ? "Accessibility permission: granted"
+                : "Accessibility permission: NOT granted. Use request_permission to prompt the user."
+        case "request_permission":
+            return AgentAccess.AccessibilityService.requestAccessibilityPermission()
+                ? "Accessibility permission granted!"
+                : "Accessibility permission denied. Please enable it in System Settings > Privacy & Security > Accessibility."
         case "open_app":
             // Launch/activate app and return all interactive elements in one call
             return ax.openApp(input["appBundleId"] as? String ?? input["app"] as? String ?? input["name"] as? String)
