@@ -48,7 +48,6 @@
 		9A9C3DD66695959EE70C20DD /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B4573B1D1FB583C85DC43C /* SearchBarView.swift */; };
 		A7E47434EDA23DD83D205D65 /* ModelFetching.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CD920ED377E5386B020BC79 /* ModelFetching.swift */; };
 		AA10000000000000000030 /* AgentApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001A /* AgentApp.swift */; };
-		AA100000000000000000F1 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100000000000000000F2 /* UpdateChecker.swift */; };
 		AA10000000000000000031 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001B /* ContentView.swift */; };
 		AA10000000000000000032 /* AgentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001C /* AgentViewModel.swift */; };
 		AA10000000000000000033 /* HelperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000001D /* HelperService.swift */; };
@@ -92,6 +91,7 @@
 		AA100000000000000000C4 /* MCPTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100000000000000000C5 /* MCPTools.swift */; };
 		AA100000000000000000C6 /* GitTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100000000000000000C7 /* GitTools.swift */; };
 		AA100000000000000000C8 /* FileTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100000000000000000C9 /* FileTools.swift */; };
+		AA100000000000000000F1 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100000000000000000F2 /* UpdateChecker.swift */; };
 		AA10000000000000000101 /* ProjectFolderField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000000100 /* ProjectFolderField.swift */; };
 		AA10000000000000000103 /* RecentFoldersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000000102 /* RecentFoldersService.swift */; };
 		AA10000000000000000104 /* TokenBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000000105 /* TokenBadge.swift */; };
@@ -324,7 +324,6 @@
 		93C673DDB50E956B2E5FD610 /* NativeToolHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeToolHandler.swift; sourceTree = "<group>"; };
 		A3804F32B8914764A3690CB5 /* TokenUsageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenUsageStore.swift; sourceTree = "<group>"; };
 		AA1000000000000000001A /* AgentApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentApp.swift; sourceTree = "<group>"; };
-		AA100000000000000000F2 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		AA1000000000000000001B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AA1000000000000000001C /* AgentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentViewModel.swift; sourceTree = "<group>"; };
 		AA1000000000000000001D /* HelperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperService.swift; sourceTree = "<group>"; };
@@ -372,6 +371,7 @@
 		AA100000000000000000C5 /* MCPTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPTools.swift; sourceTree = "<group>"; };
 		AA100000000000000000C7 /* GitTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitTools.swift; sourceTree = "<group>"; };
 		AA100000000000000000C9 /* FileTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTools.swift; sourceTree = "<group>"; };
+		AA100000000000000000F2 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		AA10000000000000000100 /* ProjectFolderField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectFolderField.swift; sourceTree = "<group>"; };
 		AA10000000000000000102 /* RecentFoldersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentFoldersService.swift; sourceTree = "<group>"; };
 		AA10000000000000000105 /* TokenBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenBadge.swift; sourceTree = "<group>"; };
@@ -477,6 +477,7 @@
 		EA60000000000000000002 /* SDEFs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SDEFs; sourceTree = "<group>"; };
 		EA70000000000000000002 /* SDEFService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDEFService.swift; sourceTree = "<group>"; };
 		EA80000000000000000002 /* NSAppleScriptService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppleScriptService.swift; sourceTree = "<group>"; };
+		EA9A2CB7304509CC00E9AE67 /* Agent! copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Agent! copy-Info.plist"; path = "/Users/toddbruss/Documents/GitHub/Agent/Agent! copy-Info.plist"; sourceTree = "<absolute>"; };
 		EAAI000000000000000002 /* AppleIntelligenceMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIntelligenceMediator.swift; sourceTree = "<group>"; };
 		EABA0FBC2F7B78DA005CCD6E /* ChatModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModels.swift; sourceTree = "<group>"; };
 		EAE1E7232F7C01000079432C /* LLMProviderSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMProviderSetup.swift; sourceTree = "<group>"; };
@@ -570,6 +571,7 @@
 				DD10000000000000000040 /* AgentTests */,
 				AA10000000000000000042 /* Products */,
 				AA10000000000000000043 /* Frameworks */,
+				EA9A2CB7304509CC00E9AE67 /* Agent! copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1629,7 +1631,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 200;
+				CURRENT_PROJECT_VERSION = 201;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 469UCUB275;
 				ENABLE_APP_SANDBOX = NO;
@@ -1652,12 +1654,14 @@
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Agent/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Agent Ada";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1682,7 +1686,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 200;
+				CURRENT_PROJECT_VERSION = 201;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 469UCUB275;
 				ENABLE_APP_SANDBOX = NO;
@@ -1705,12 +1709,14 @@
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Agent/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Agent Ada";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
