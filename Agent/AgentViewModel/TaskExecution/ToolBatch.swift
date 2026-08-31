@@ -46,6 +46,7 @@ extension AgentViewModel {
                         "git_diff_patch"
                     ]
                     let parallelBatch = batch.tools.filter { parallelTools.contains($0.name) }
+                    var preResults: [String: String] = [:]
                     if parallelBatch.count > 1 {
                         let capturedPF = projectFolder
                         let capturedTabID = selectedTabId ?? Self.mainTabID
@@ -72,7 +73,6 @@ extension AgentViewModel {
                                 Self.buildReadOnlyCommand(name: tool.name, input: tool.input, projectFolder: capturedPF)
                             )
                         }
-                        var preResults: [String: String] = [:]
                         await withTaskGroup(of: (String, String).self) { group in
                             for (i, payload) in payloads.enumerated() where i < maxConcurrency {
                                 let toolId = payload.toolId
@@ -118,28 +118,30 @@ extension AgentViewModel {
                             }
                             for await (id, result) in group { preResults[id] = result }
                         }
-                        // Consume the pre-executed results directly instead of
-                        // re-running every tool through dispatchTool (the old code
-                        // stashed them but never read the stash — every parallel
-                        // batch executed twice).
-                        for tool in batch.tools {
-                            if let pre = preResults[tool.toolId] {
-                                appendLog("⚡ \(tool.name) (parallel pre-exec)")
-                                toolResults.append([
-                                    "type": "tool_result",
-                                    "tool_use_id": tool.toolId,
-                                    "content": pre
-                                ])
-                                continue
-                            }
-                            let ctx = ToolContext(
-                                toolId: tool.toolId,
-                                projectFolder: projectFolder,
-                                selectedProvider: selectedProvider,
-                                tavilyAPIKey: tavilyAPIKey
-                            )
-                            _ = await dispatchTool(name: tool.name, input: tool.input, ctx: ctx, toolResults: &toolResults)
+                    }
+                    // Consume the pre-executed results and dispatch everything else
+                    // serially. This loop runs for EVERY parallel-eligible batch —
+                    // including batches with <2 shell-parallelizable tools (e.g. two
+                    // accessibility reads), which previously fell through the inner
+                    // `parallelBatch.count > 1` check and were silently dropped,
+                    // orphaning their tool_use ids.
+                    for tool in batch.tools {
+                        if let pre = preResults[tool.toolId] {
+                            appendLog("⚡ \(tool.name) (parallel pre-exec)")
+                            toolResults.append([
+                                "type": "tool_result",
+                                "tool_use_id": tool.toolId,
+                                "content": pre
+                            ])
+                            continue
                         }
+                        let ctx = ToolContext(
+                            toolId: tool.toolId,
+                            projectFolder: projectFolder,
+                            selectedProvider: selectedProvider,
+                            tavilyAPIKey: tavilyAPIKey
+                        )
+                        _ = await dispatchTool(name: tool.name, input: tool.input, ctx: ctx, toolResults: &toolResults)
                     }
                 } else {
                     // Serial batch: execute one by one
