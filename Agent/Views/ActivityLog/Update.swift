@@ -59,9 +59,13 @@ extension ActivityLogView.Coordinator {
             TerminalNeoTheme.updateAppearance()
         }
 
-        guard len != lastLength || showingPlaceholder || searchChanged || tabSwitched || appearanceChanged else { return }
+        // Cap-trim (`ScriptTab.capActivityLog`) drops the FRONT of the string, so at
+        // steady state the log can change content while keeping the exact same length —
+        // length alone would skip the render and freeze the view (e.g. ✅ Completed never shows).
+        let sameLenContentChanged = len == lastLength && lastLength > 0 && text != lastRenderedText
+        guard len != lastLength || sameLenContentChanged || showingPlaceholder || searchChanged || tabSwitched || appearanceChanged else { return }
 
-        let textChanged = len != lastLength || showingPlaceholder
+        let textChanged = len != lastLength || sameLenContentChanged || showingPlaceholder
         let textGrew = len > lastLength
         let searchCleared = searchText.isEmpty && !lastSearch.isEmpty
         showingPlaceholder = false
@@ -81,12 +85,14 @@ extension ActivityLogView.Coordinator {
 
         if textChanged || searchCleared {
             // Source `activityLog` is bounded at 50K by `ScriptTab.capActivityLog`. When trim happens, the front of the string
-            // shifts — the append optimization is only safe if the prefix is still intact. Compare a small window to detect shifts.
+            // shifts — the append optimization is only safe if the WHOLE previously-rendered text is still an exact prefix.
+            // (A 64-char window is not enough: at steady-state cap every flush starts with the same trim banner, the window
+            // can match while the front shifted, and `substring(from: prevLen)` then appends only a mid-word tail of the
+            // new content — eating e.g. the "✅ Completed:" head.)
             let prefixIntact: Bool = {
                 guard lastLength > 0, !lastRenderedText.isEmpty else { return true }
-                let n = min(64, min(text.count, lastRenderedText.count))
-                guard n > 0 else { return true }
-                return (text as NSString).substring(to: n) == (lastRenderedText as NSString).substring(to: n)
+                guard len >= lastLength else { return false }
+                return (text as NSString).substring(to: lastLength) == lastRenderedText
             }()
             let isAppending = len > lastLength && lastLength > 0 && !searchCleared && prefixIntact
 
