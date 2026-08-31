@@ -1,4 +1,4 @@
-# 🦾 Agent! für macOS 26.4.1 oder neuer
+# 🦾 AgentiLoop Agent! entwickelt für macOS 26.4.1 oder neuer
 
 ## **Agentische KI für deinen Mac-Desktop**
 
