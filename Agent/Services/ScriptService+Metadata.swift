@@ -270,7 +270,7 @@ extension ScriptService {
 
     private static let lastSyncedAgentVersionKey = "agentLastSyncedBundledVersion"
     private static let bundledCatalogAPIURL =
-        "https://api.github.com/repos/macOS26/AgentScripts/contents/Agent/agents/Sources/Scripts"
+        "https://api.github.com/repos/AgentiLoop/AgentScripts/contents/Agent/agents/Sources/Scripts"
 
     /// Refresh upstream-bundled scripts on launch when version changes. Version-gated, catalog-driven, SHA-compared, backed up before replacing, silent on failure, never auto-resurrects locally-deleted scripts.
     func syncBundledScriptsFromRemote() async {

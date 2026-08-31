@@ -44,8 +44,8 @@ final class ScriptService: @unchecked Sendable {
 
     // MARK: - Remote repos
 
-    private static let scriptsRepoURL = "https://github.com/macOS26/AgentScripts.git"
-    private static let bridgesRepoURL = "https://github.com/macOS26/AgentEventBridges.git"
+    private static let scriptsRepoURL = "https://github.com/AgentiLoop/AgentScripts.git"
+    private static let bridgesRepoURL = "https://github.com/AgentiLoop/AgentEventBridges.git"
 
       /// Pinned AgentScripts release tag. Bump when a new release ships.
       /// Pull/sync URLs use this tag — users get an immutable snapshot, not main HEAD.
@@ -57,7 +57,7 @@ final class ScriptService: @unchecked Sendable {
 
       /// Raw GitHub URL prefix for pulling individual script files (single-file recovery
       /// without a full clone). Uses pinned release tag for immutability.
-    static let scriptsRawURLPrefix = "https://raw.githubusercontent.com/macOS26/AgentScripts/refs/tags/\(scriptsRelease)/Agent/agents/Sources/Scripts"
+    static let scriptsRawURLPrefix = "https://raw.githubusercontent.com/AgentiLoop/AgentScripts/refs/tags/\(scriptsRelease)/Agent/agents/Sources/Scripts"
 
     /// Installed location: ~/Documents/AgentScript/bridges/
     static let installedBridgesPath: URL = {

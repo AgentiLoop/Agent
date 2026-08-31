@@ -1884,7 +1884,7 @@
 /* Begin XCRemoteSwiftPackageReference section */
 		EAA08AAA2F7D549300D5998A /* XCRemoteSwiftPackageReference "AgentLLM" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/macOS26/AgentLLM.git";
+			repositoryURL = "https://github.com/AgentiLoop/AgentLLM.git";
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
@@ -1893,7 +1893,7 @@
 		};
 		EAE1E7012F7BF5270079432C /* XCRemoteSwiftPackageReference "AgentTerminalNeo" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/macOS26/AgentTerminalNeo.git";
+			repositoryURL = "https://github.com/AgentiLoop/AgentTerminalNeo.git";
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
@@ -1902,7 +1902,7 @@
 		};
 		EAE1E7042F7BF5470079432C /* XCRemoteSwiftPackageReference "AgentTools" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/macOS26/AgentTools.git";
+			repositoryURL = "https://github.com/AgentiLoop/AgentTools.git";
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
@@ -1911,7 +1911,7 @@
 		};
 		EAE1E7072F7BF5590079432C /* XCRemoteSwiftPackageReference "AgentColorSyntax" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/macOS26/AgentColorSyntax.git";
+			repositoryURL = "https://github.com/AgentiLoop/AgentColorSyntax.git";
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
@@ -1920,7 +1920,7 @@
 		};
 		EAE1E70A2F7BF5780079432C /* XCRemoteSwiftPackageReference "AgentMCP" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/macOS26/AgentMCP.git";
+			repositoryURL = "https://github.com/AgentiLoop/AgentMCP.git";
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
@@ -1929,7 +1929,7 @@
 		};
 		EAE1E7102F7BF6290079432C /* XCRemoteSwiftPackageReference "AgentD1F" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/macOS26/AgentD1F.git";
+			repositoryURL = "https://github.com/AgentiLoop/AgentD1F.git";
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
@@ -1938,7 +1938,7 @@
 		};
 		EAE1E7132F7BF6880079432C /* XCRemoteSwiftPackageReference "AgentSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/macOS26/AgentSwift.git";
+			repositoryURL = "https://github.com/AgentiLoop/AgentSwift.git";
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
@@ -1947,7 +1947,7 @@
 		};
 		EAE1E7162F7BF6E70079432C /* XCRemoteSwiftPackageReference "AgentEventBridges" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/macOS26/AgentEventBridges.git";
+			repositoryURL = "https://github.com/AgentiLoop/AgentEventBridges.git";
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
@@ -1956,7 +1956,7 @@
 		};
 		EAE1E7192F7BF7000079432C /* XCRemoteSwiftPackageReference "AgentAudit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/macOS26/AgentAudit.git";
+			repositoryURL = "https://github.com/AgentiLoop/AgentAudit.git";
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
@@ -1965,7 +1965,7 @@
 		};
 		EAE1E7242F7C02000079432C /* XCRemoteSwiftPackageReference "AgentAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/macOS26/AgentAccess.git";
+			repositoryURL = "https://github.com/AgentiLoop/AgentAccess.git";
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
