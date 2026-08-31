@@ -142,7 +142,7 @@ struct AgentApp: App {
                 }
                 Divider()
                 Button {
-                    if let url = URL(string: "https://agent.macos26.app") {
+                    if let url = URL(string: "https://AgentiLoop.ai") {
                         NSWorkspace.shared.open(url)
                     }
                 } label: {
