@@ -64,7 +64,7 @@
 	<key>NSHomeKitUsageDescription</key>
 	<string>Agent! needs HomeKit access for scripts that control smart home accessories and scenes.</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2026 agent@macos26.app</string>
+	<string>© 2026 AgentiLoop.ai</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Agent! needs local network access for scripts that discover devices on your network.</string>
 	<key>NSLocationUsageDescription</key>

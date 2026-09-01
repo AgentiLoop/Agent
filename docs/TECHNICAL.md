@@ -5,7 +5,7 @@
 # Agent! for macOS26
 
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-blue.svg)](https://swift.org)
-[![Website](https://img.shields.io/badge/website-macos26.app-blue.svg)](https://macos26.app)
+[![Website](https://img.shields.io/badge/website-agentiloop.ai-blue.svg)](https://agentiloop.ai)
 [![Version](https://img.shields.io/badge/version-latest-blue.svg)](https://github.com/AgentiLoop/Agent)
 [![GitHub downloads](https://img.shields.io/github/downloads/AgentiLoop/Agent/total.svg)](https://github.com/AgentiLoop/Agent/releases)
 [![GitHub stars](https://img.shields.io/github/stars/AgentiLoop/Agent.svg?style=social)](https://github.com/AgentiLoop/Agent/stargazers)
