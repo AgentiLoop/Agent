@@ -579,7 +579,7 @@ Cursor 是一款出色的 AI 代码编辑器。Agent! 玩的是另一种游戏�
 >
 > 「🦾 Agent! for macOS26」是一个独立的软件项目，**并未**与 Apple Inc. 存在任何关联、认可、赞助或其他形式的关系。「Apple」、「Mac」、「Mac mini」、「MacBook」、「macOS」及相关标志均为 Apple Inc. 在美国及其他国家/地区注册的商标。此处提及的所有其他商标、服务标志和商号均归其各自所有者所有，仅用于标识目的。
 >
-> 「🦾 Agent!」及 🦾 Agent! 标志均为 Heisenburg 的商标。使用这些标志需事先获得书面许可。以下的 MIT 许可证仅授予源代码方面的权利——**不**授予任何商标权利。
+> 「🦾 Agent!」及 🦾 Agent! 标志均为 AgentiLoop Agent 的商标。使用这些标志需事先获得书面许可。以下的 MIT 许可证仅授予源代码方面的权利——**不**授予任何商标权利。
 >
 > ### 源代码许可证（MIT）
 >
@@ -587,9 +587,9 @@ Cursor 是一款出色的 AI 代码编辑器。Agent! 玩的是另一种游戏�
 >
 > ### 已编译的二进制文件与发布版本
 >
-> 通过本项目的 GitHub Releases、[AgentiLoop.ai](https://AgentiLoop.ai) 或任何其他官方渠道分发的已编译二进制文件、安装程序、经过代码签名的构建版本以及发布产物，均属 Heisenburg 拥有版权的作品，**不**受管辖源代码的 MIT 许可证覆盖。官方二进制文件的所有权利——包括「🦾 Agent!」名称、标志、代码签名身份和 Developer ID——均予保留。
+> 通过本项目的 GitHub Releases、[AgentiLoop.ai](https://AgentiLoop.ai) 或任何其他官方渠道分发的已编译二进制文件、安装程序、经过代码签名的构建版本以及发布产物，均属 AgentiLoop Agent 拥有版权的作品，**不**受管辖源代码的 MIT 许可证覆盖。官方二进制文件的所有权利——包括「🦾 Agent!」名称、标志、代码签名身份和 Developer ID——均予保留。
 >
-> Copyright © 2000, 2023–2026 Heisenburg，保留所有权利。
+> Copyright © 2000, 2023–2026 AgentiLoop Agent，保留所有权利。
 >
 > 你可以在 MIT 许可证下自由地从源代码构建你自己的二进制文件，前提是不使用「🦾 Agent!」名称、标志或品牌来标识你的产品。
 >
@@ -602,7 +602,7 @@ Cursor 是一款出色的 AI 代码编辑器。Agent! 玩的是另一种游戏�
 > 感谢你对 🦾 Agent! 的关注——这是一款专为运行 macOS 26.4 及以上版本、使用正版 Mac 硬件和软件的 Mac mini、MacBook 以及 Mac Studio 电脑打造的应用程序。
 >
 > 此致，
-> **Heisenburg**
+> **AgentiLoop Agent**
 > 前线部署工程师，🦾 Agent!，适用于 macOS 26.4.1
 > https://AgentiLoop.ai
 > https://github.com/AgentiLoop/agent

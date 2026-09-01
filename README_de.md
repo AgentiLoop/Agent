@@ -579,7 +579,7 @@ Lust, an Agent! zu basteln? Siehe [CONTRIBUTING.md](./CONTRIBUTING.md) — du ka
 >
 > „🦾 Agent! for macOS26" ist ein unabhängiges Softwareprojekt und **nicht** mit Apple Inc. verbunden, von Apple genehmigt, gesponsert oder anderweitig assoziiert. „Apple", „Mac", „Mac mini", „MacBook", „macOS" und verwandte Marken sind Marken von Apple Inc., eingetragen in den USA und anderen Ländern. Alle anderen hier erwähnten Marken, Dienstleistungsmarken und Handelsnamen sind Eigentum ihrer jeweiligen Inhaber und werden nur zu Identifikationszwecken verwendet.
 >
-> „🦾 Agent!" und das 🦾-Agent!-Logo sind Marken von Heisenburg. Die Nutzung dieser Marken erfordert vorherige schriftliche Genehmigung. Die untenstehende MIT-Lizenz gewährt Rechte nur am Quellcode — sie gewährt **keine** Markenrechte.
+> „🦾 Agent!" und das 🦾-Agent!-Logo sind Marken von AgentiLoop Agent. Die Nutzung dieser Marken erfordert vorherige schriftliche Genehmigung. Die untenstehende MIT-Lizenz gewährt Rechte nur am Quellcode — sie gewährt **keine** Markenrechte.
 >
 > ### Quellcode-Lizenz (MIT)
 >
@@ -587,9 +587,9 @@ Lust, an Agent! zu basteln? Siehe [CONTRIBUTING.md](./CONTRIBUTING.md) — du ka
 >
 > ### Kompilierte Binärdateien & Releases
 >
-> Kompilierte Binärdateien, Installationsprogramme, code-signierte Builds und Release-Artefakte, die über die GitHub Releases dieses Projekts, [AgentiLoop.ai](https://AgentiLoop.ai), oder jeden anderen offiziellen Kanal verteilt werden, sind das urheberrechtlich geschützte Werk von Heisenburg und **nicht** von der MIT-Lizenz abgedeckt, die den Quellcode regelt. Alle Rechte an den offiziellen Binärdateien — einschließlich des Namens „🦾 Agent!", des Logos, der Code-Signing-Identität und der Developer ID — sind vorbehalten.
+> Kompilierte Binärdateien, Installationsprogramme, code-signierte Builds und Release-Artefakte, die über die GitHub Releases dieses Projekts, [AgentiLoop.ai](https://AgentiLoop.ai), oder jeden anderen offiziellen Kanal verteilt werden, sind das urheberrechtlich geschützte Werk von AgentiLoop Agent und **nicht** von der MIT-Lizenz abgedeckt, die den Quellcode regelt. Alle Rechte an den offiziellen Binärdateien — einschließlich des Namens „🦾 Agent!", des Logos, der Code-Signing-Identität und der Developer ID — sind vorbehalten.
 >
-> Copyright © 2000, 2023–2026 Heisenburg, Alle Rechte vorbehalten.
+> Copyright © 2000, 2023–2026 AgentiLoop Agent, Alle Rechte vorbehalten.
 >
 > Du bist herzlich eingeladen, deine eigenen Binärdateien aus dem Quellcode unter der MIT-Lizenz zu bauen, solange du nicht den Namen „🦾 Agent!", das Logo oder das Branding zur Identifikation deines Produkts verwendest.
 >
@@ -602,7 +602,7 @@ Lust, an Agent! zu basteln? Siehe [CONTRIBUTING.md](./CONTRIBUTING.md) — du ka
 > Danke für dein Interesse an 🦾 Agent! — einer Anwendung, entwickelt für Mac-mini-, MacBook- und Mac-Studio-Computer, die macOS 26.4 oder neuer auf originaler Mac-Hardware und -Software ausführen.
 >
 > Mit freundlichen Grüßen,
-> **Heisenburg**
+> **AgentiLoop Agent**
 > Forward Deployed Engineer, 🦾 Agent! für macOS 26.4.1
 > https://AgentiLoop.ai
 > https://github.com/AgentiLoop/agent
