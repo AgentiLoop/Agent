@@ -209,12 +209,19 @@ extension AgentViewModel {
                     self?.appendLog(msg)
                     self?.flushLog()
                 }
-                _ = await Self.tieredCompact(
+                let compacted = await Self.tieredCompact(
                     &messages,
                     state: &compactionState,
                     summarizer: makeCompactSummarizer(services: services, log: compactLog),
                     log: compactLog
                 )
+                // Re-attach what the summary can't carry verbatim: open goal
+                // criteria, the plan checklist, and the current on-disk content
+                // of files edited this task. Lives in the frozen prefix.
+                if compacted, let restored = postCompactReattachment(tabID: Self.mainTabID) {
+                    Self.appendUserText(restored, to: &messages)
+                    compactLog("🗂️ Re-attached goal/plan/edited files after compaction (\(restored.count) chars)")
+                }
             }
 
             do {

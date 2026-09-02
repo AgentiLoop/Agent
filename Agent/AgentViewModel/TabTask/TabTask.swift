@@ -240,12 +240,16 @@ extension AgentViewModel {
                     openAICompatible: services.openAICompatible,
                     ollama: services.ollama, foundationModel: services.foundationModel
                 )
-                _ = await Self.tieredCompact(
+                let compacted = await Self.tieredCompact(
                     &messages,
                     state: &compactionState,
                     summarizer: makeCompactSummarizer(services: bundle, log: compactLog),
                     log: compactLog
                 )
+                if compacted, let restored = postCompactReattachment(tabID: tab.id) {
+                    Self.appendUserText(restored, to: &messages)
+                    compactLog("🗂️ Re-attached goal/plan/edited files after compaction (\(restored.count) chars)")
+                }
             }
 
             do {
