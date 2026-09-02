@@ -31,8 +31,6 @@ extension AgentViewModel {
                 let prefixed = Self.prependWorkingDirectory(rawCmd, projectFolder: tabFolder)
                 if let suggestion = Self.suggestTool(prefixed) {
                     blocks += "[\(idx + 1)] $ \(rawCmd)\n\(suggestion)\n\n"
-                } else if let pathErr = Self.preflightCommand(prefixed) {
-                    blocks += "[\(idx + 1)] $ \(rawCmd)\n\(pathErr)\n\n"
                 }
             }
             if !blocks.isEmpty {
@@ -145,14 +143,7 @@ extension AgentViewModel {
                     isComplete: false
                 )
             }
-            if let pathErr = Self.preflightCommand(command) {
-                tab.appendLog(pathErr)
-                tab.flush()
-                return TabToolResult(
-                    toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": pathErr],
-                    isComplete: false
-                )
-            }
+            // No path pre-validation on free-form shell text (Tier 11.3) — see NTH-Shell.
             // TCC commands MUST run in-process where Agent! holds the user's TCC grants. This check has to come BEFORE
             // the privileged-daemon branch — otherwise an `execute_daemon_command(command:"osascript ...")` would go to the root daemon (which has zero TCC) and fail with a confusing permission error.
             let needsTCC = Self.needsTCCPermissions(command)
