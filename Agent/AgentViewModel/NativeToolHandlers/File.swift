@@ -56,6 +56,36 @@ extension AgentViewModel {
         defer { _readCountLock.unlock() }
         let dedupPrefix = "\(tabID.uuidString):\(filePath):"
         _lastReadEmissions = _lastReadEmissions.filter { !$0.key.hasPrefix(dedupPrefix) }
+        // Our own edit is the newest content the model has seen — refresh the
+        // edit-gate hash so the next edit isn't refused as "modified since read".
+        if let hash = computeFileHash(path: filePath) {
+            _lastSeenHash["\(tabID.uuidString):\(filePath)"] = hash
+        }
+    }
+
+    /// Tier 8 edit gate: sha256 of the file as the model last saw it (read or
+    /// its own edit), keyed "tab:path". Separate from the dedup records so a
+    /// post-edit verification read stays allowed.
+    nonisolated(unsafe) static var _lastSeenHash: [String: String] = [:]
+
+    /// Refuse an edit when the model never read the file this task, or when
+    /// the file changed on disk since it last saw it (user edit, formatter,
+    /// another tab). Returns the error text, or nil when the edit may proceed.
+    /// New files (nothing on disk) are always allowed. `requireRead` is false
+    /// for write_file so whole-file overwrites of unread files still work.
+    static nonisolated func editGateError(tabID: UUID, expandedPath: String, requireRead: Bool) -> String? {
+        guard FileManager.default.fileExists(atPath: expandedPath) else { return nil }
+        _readCountLock.lock()
+        defer { _readCountLock.unlock() }
+        guard let seen = _lastSeenHash["\(tabID.uuidString):\(expandedPath)"] else {
+            guard requireRead else { return nil }
+            return "Error: File has not been read yet. Read it first before editing it — "
+                + "file(action:\"read\", file_path:\"\(expandedPath)\") — then copy old_string/source verbatim from that output."
+        }
+        guard let current = computeFileHash(path: expandedPath), current != seen else { return nil }
+        return "Error: File has been modified since you last read it (by the user, a formatter, a build step, or another tab). "
+            + "Read it again before editing: file(action:\"read\", file_path:\"\(expandedPath)\"). "
+            + "Do not retry the same edit blindly — the line numbers and old_string you have are stale."
     }
 
     /// Clear all read-dedup state for a tab (called when the tab's conversation resets).
@@ -64,6 +94,19 @@ extension AgentViewModel {
         defer { _readCountLock.unlock() }
         let prefix = tabID.uuidString + ":"
         _lastReadEmissions = _lastReadEmissions.filter { !$0.key.hasPrefix(prefix) }
+        // Keep _lastSeenHash: after compaction the model may still hold the
+        // file content in its summary/tail, and an edit against unchanged
+        // bytes is safe. Only a new task start should drop it (see
+        // clearEditGateForTab).
+    }
+
+    /// Forget what the model has seen for a tab — called at task start so an
+    /// edit in a new task must be preceded by a read in that task.
+    static func clearEditGateForTab(tabID: UUID) {
+        _readCountLock.lock()
+        defer { _readCountLock.unlock() }
+        let prefix = tabID.uuidString + ":"
+        _lastSeenHash = _lastSeenHash.filter { !$0.key.hasPrefix(prefix) }
     }
 
     /// Dedup cache keyed by "\(tabUUID):\(expandedPath):\(offset):\(limit)". Each
@@ -145,6 +188,7 @@ extension AgentViewModel {
         else { return }
         let key = dedupKey(tabID: tabID, expandedPath: expandedPath, offset: offset, limit: limit)
         _lastReadEmissions[key] = LastReadEmission(mtime: stat.mtime, size: stat.size, fileHash: hash)
+        _lastSeenHash["\(tabID.uuidString):\(expandedPath)"] = hash
     }
 
     /// / Handles file CRUD, diff, list/search, backup/restore, symbol search, / and refactor_rename tool calls. Returns
@@ -174,10 +218,14 @@ extension AgentViewModel {
             guard !content.isEmpty else { return "Error: content is required for write_file (empty content would truncate the file). Recovery: pass content:\"...\"." }
             let tabID = selectedTabId ?? Self.mainTabID
             FileBackupService.shared.snapshot(filePath: (path as NSString).expandingTildeInPath, tabID: tabID)
-            Self.recordFileEdit(tabID: tabID, filePath: (path as NSString).expandingTildeInPath)
             let url = URL(fileURLWithPath: path)
             try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-            do { try content.write(to: url, atomically: true, encoding: .utf8); return "Wrote \(path)" }
+            do {
+                try content.write(to: url, atomically: true, encoding: .utf8)
+                // After the write — the gate hash must describe the new bytes.
+                Self.recordFileEdit(tabID: tabID, filePath: (path as NSString).expandingTildeInPath)
+                return "Wrote \(path)"
+            }
             catch { return "Error writing \(path): \(error.localizedDescription). Recovery: check path is writable or use file(action:\"list\") to verify the directory." }
         // MARK: edit_file — delegate to CodingService.editFile (d1f-powered with line-ending normalization, fuzzy
         // whitespace match, context disambiguation, and round-trip verification). The duplicate edit_file logic that lived here had none of those safeguards and was the source of most "old_string not found" errors when the LLM had a slightly-stale snapshot of the file.
@@ -210,10 +258,12 @@ extension AgentViewModel {
                 return "Error: Duplicate edit rejected — you just tried the exact same old_string on this file and it failed. Recovery: re-read the file to get fresh content, then use a different old_string or try diff_and_apply with start_line/end_line instead."
             }
             FileBackupService.shared.backup(filePath: expanded, tabID: tabID)
-            Self.recordFileEdit(tabID: tabID, filePath: expanded)
-            return await Self.offMain {
+            let editResult = await Self.offMain {
                 CodingService.editFile(path: expanded, oldString: old, newString: new, replaceAll: replaceAll, context: context)
             }
+            // After the edit — the gate hash must describe the new bytes.
+            if !editResult.hasPrefix("Error") { Self.recordFileEdit(tabID: tabID, filePath: expanded) }
+            return editResult
         // MARK: create_diff
         case "create_diff":
             var source = input["source"] as? String ?? ""

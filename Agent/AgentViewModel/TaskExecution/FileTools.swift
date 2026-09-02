@@ -23,6 +23,22 @@ extension AgentViewModel {
             input["file_path"] = (base as NSString).appendingPathComponent(fp)
         }
 
+        // Tier 8 edit gate: an existing file may only be edited after it was
+        // read this task, and only if it hasn't changed on disk since.
+        let editGatedTools: Set<String> = ["edit_file", "apply_diff", "diff_and_apply", "write_file"]
+        if editGatedTools.contains(name), let fp = input["file_path"] as? String, !fp.isEmpty {
+            let expandedGate = (fp as NSString).expandingTildeInPath
+            if let gate = Self.editGateError(
+                tabID: selectedTabId ?? Self.mainTabID,
+                expandedPath: expandedGate,
+                requireRead: name != "write_file"
+            ) {
+                appendLog("🛑 \(name) refused: \(gate.prefix(90))…")
+                toolResults.append(["type": "tool_result", "tool_use_id": toolId, "content": gate])
+                return true
+            }
+        }
+
         // MARK: read_file
         switch name {
 
