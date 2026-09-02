@@ -21,7 +21,7 @@ extension AgentViewModel {
             // Partition into batches: consecutive read-only = parallel batch, write = serial batch
             var batches: [(parallel: Bool, tools: [(toolId: String, name: String, input: [String: Any])])] = []
             for tool in pendingTools {
-                let isReadOnly = Self.readOnlyTools.contains(tool.name)
+                let isReadOnly = Self.readOnlyTools.contains(tool.name) || Self.isReadOnlyShellCall(tool.name, input: tool.input)
                 if isReadOnly, let last = batches.last, last.parallel {
                     batches[batches.count - 1].tools.append(tool)
                 } else {
@@ -45,7 +45,9 @@ extension AgentViewModel {
                         "git_log",
                         "git_diff_patch"
                     ]
-                    let parallelBatch = batch.tools.filter { parallelTools.contains($0.name) }
+                    let parallelBatch = batch.tools.filter {
+                        parallelTools.contains($0.name) || Self.isReadOnlyShellCall($0.name, input: $0.input)
+                    }
                     var preResults: [String: String] = [:]
                     if parallelBatch.count > 1 {
                         let capturedPF = projectFolder
@@ -70,7 +72,9 @@ extension AgentViewModel {
                             return (
                                 tool.toolId,
                                 nil,
-                                Self.buildReadOnlyCommand(name: tool.name, input: tool.input, projectFolder: capturedPF)
+                                Self.isReadOnlyShellCall(tool.name, input: tool.input)
+                                    ? (tool.input["command"] as? String ?? "")
+                                    : Self.buildReadOnlyCommand(name: tool.name, input: tool.input, projectFolder: capturedPF)
                             )
                         }
                         await withTaskGroup(of: (String, String).self) { group in
@@ -127,7 +131,11 @@ extension AgentViewModel {
                     // orphaning their tool_use ids.
                     for tool in batch.tools {
                         if let pre = preResults[tool.toolId] {
-                            appendLog("⚡ \(tool.name) (parallel pre-exec)")
+                            if let cmd = tool.input["command"] as? String, Self.userShellTools.contains(tool.name) {
+                                appendLog("⚡ $ \(Self.collapseHeredocs(cmd)) (parallel, read-only)")
+                            } else {
+                                appendLog("⚡ \(tool.name) (parallel pre-exec)")
+                            }
                             toolResults.append([
                                 "type": "tool_result",
                                 "tool_use_id": tool.toolId,
@@ -158,6 +166,16 @@ extension AgentViewModel {
             }
             recordToolOutcomes(pendingTools: pendingTools, toolResults: &toolResults)
         }
+    }
+
+    /// Tier 9.2: user-shell tools whose command is a plain read (see
+    /// `ShellSafetyService.isReadOnly`) join the parallel batch instead of
+    /// serialising. `execute_daemon_command` (root) never does.
+    nonisolated static let userShellTools: Set<String> = ["execute_agent_command", "run_shell_script"]
+
+    nonisolated static func isReadOnlyShellCall(_ name: String, input: [String: Any]) -> Bool {
+        guard userShellTools.contains(name), let cmd = input["command"] as? String else { return false }
+        return ShellSafetyService.isReadOnly(cmd) && ShellSafetyService.check(cmd).allowed
     }
 
     /// Classify each executed tool's result and inject a one-shot advisory when

@@ -243,4 +243,55 @@ struct ShellSafetyServiceTests {
         #expect(ok.reason == nil)
         #expect(ok.rule == nil)
     }
+
+    // MARK: - Tier 9.2: read-only classification
+
+    @Test("9.2: plain reads (incl. pipes, &&, 2>/dev/null, git status) are read-only")
+    func readOnlyCommands() {
+        let ro = ShellSafetyService.isReadOnly
+        #expect(ro("ls -la"))
+        #expect(ro("cat foo.swift | head -50"))
+        #expect(ro("grep -rn 'func foo' Agent 2>/dev/null | head -20"))
+        #expect(ro("ls .agent/subagents 2>/dev/null || echo none"))
+        #expect(ro("git status --short && git log --oneline -5"))
+        #expect(ro("git diff HEAD~1 2>&1"))
+        #expect(ro("find . -name '*.swift' -maxdepth 3"))
+        #expect(ro("FOO=bar wc -l file.txt"))
+        #expect(ro("xcodebuild -list"))
+        #expect(ro("defaults read com.apple.finder"))
+        #expect(!ro("sed -n '1,10p' x")) // sed not in the allow-list (could be -i)
+    }
+
+    @Test("9.2: anything that can mutate is NOT read-only")
+    func mutatingCommands() {
+        let ro = ShellSafetyService.isReadOnly
+        #expect(!ro("rm -rf build"))
+        #expect(!ro("ls > out.txt"))
+        #expect(!ro("cat a >> b"))
+        #expect(!ro("echo $(rm x)"))
+        #expect(!ro("echo `touch y`"))
+        #expect(!ro("cat <<EOF > f\nhi\nEOF"))
+        #expect(!ro("ls; rm -rf build"))
+        #expect(!ro("git commit -am x"))
+        #expect(!ro("git stash"))
+        #expect(!ro("git branch -D main"))
+        #expect(!ro("git config user.name x"))
+        #expect(!ro("find . -name '*.o' -delete"))
+        #expect(!ro("find . -name '*.o' -exec rm {} \\;"))
+        #expect(!ro("xcodebuild build"))
+        #expect(!ro("defaults write com.foo bar 1"))
+        #expect(!ro("sleep 100 &"))
+        #expect(!ro("mkdir -p x && ls x"))
+        #expect(!ro(""))
+    }
+
+    @Test("9.2: batch classification — user shell reads join the parallel batch, root shell never does")
+    @MainActor
+    func batchClassification() {
+        #expect(AgentViewModel.isReadOnlyShellCall("execute_agent_command", input: ["command": "ls -la"]))
+        #expect(AgentViewModel.isReadOnlyShellCall("run_shell_script", input: ["command": "git status"]))
+        #expect(!AgentViewModel.isReadOnlyShellCall("execute_agent_command", input: ["command": "rm -rf build"]))
+        #expect(!AgentViewModel.isReadOnlyShellCall("execute_daemon_command", input: ["command": "ls"]))
+        #expect(!AgentViewModel.isReadOnlyShellCall("execute_agent_command", input: [:]))
+    }
 }
