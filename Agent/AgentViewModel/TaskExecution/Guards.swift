@@ -50,7 +50,6 @@ extension AgentViewModel {
     func runOvernightCodingGuards(
         pendingTools: [(toolId: String, name: String, input: [String: Any])],
         toolResults: inout [[String: Any]],
-        consecutiveReadOnlyCount: inout Int,
         unbuiltEditCount: inout Int,
         consecutiveBuildFailures: inout Int,
         stuckFiles: inout [String: Int],
@@ -60,34 +59,12 @@ extension AgentViewModel {
         if !pendingTools.isEmpty {
             let editTools: Set<String> = ["write_file", "edit_file", "diff_apply", "apply_diff", "create_diff", "diff_and_apply"]
             let buildTools: Set<String> = ["xcode_build", "xc_build"]
-            let actionTools: Set<String> = editTools.union(buildTools).union([
-                "git_commit",
-                "run_shell_script",
-                "execute_agent_command",
-                "execute_daemon_command",
-                "task_complete"
-            ])
-            let automationPrefixes = ["ax_", "web_", "selenium_"]
-            let automationTools: Set<String> = [
-                "accessibility",
-                "run_applescript",
-                "run_osascript",
-                "execute_javascript",
-                "lookup_sdef",
-                "ax",
-                "web",
-                "sel"
-            ]
-            let hadAction = pendingTools.contains { tool in
-                actionTools.contains(tool.name)
-                    || automationPrefixes.contains(where: { tool.name.hasPrefix($0) })
-                    || automationTools.contains(tool.name)
-            }
             let hadEdit = pendingTools.contains { editTools.contains($0.name) }
             let hadBuild = pendingTools.contains { buildTools.contains($0.name) }
 
-              // Read guard removed — LLMs need freedom to research entire projects without interruption.
-            if hadAction { consecutiveReadOnlyCount = 0 } else { consecutiveReadOnlyCount += pendingTools.count }
+            // No read guard here on purpose — LLMs need freedom to research
+            // entire projects without interruption. Read discipline is enforced
+            // per-call by the read-dedup / edit gates in FileTools instead.
 
             // 2. Build enforcement — only for Xcode projects
             if isXcode {

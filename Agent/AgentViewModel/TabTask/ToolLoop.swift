@@ -26,7 +26,6 @@ extension AgentViewModel {
         repeatedCalls: inout [String: Int],
         filesEditedThisTask: inout Set<String>,
         completionSummary: inout String,
-        consecutiveReadOnlyCount: inout Int,
         unbuiltEditCount: inout Int,
         consecutiveBuildFailures: inout Int
     ) async -> TabToolProcessingOutcome {
@@ -124,7 +123,6 @@ extension AgentViewModel {
                     let guardShouldBreak = runOvernightCodingGuards(
                         pendingTools: [(toolId: toolId, name: name, input: input)],
                         toolResults: &toolResults,
-                        consecutiveReadOnlyCount: &consecutiveReadOnlyCount,
                         unbuiltEditCount: &unbuiltEditCount,
                         consecutiveBuildFailures: &consecutiveBuildFailures,
                         stuckFiles: &stuckFiles,

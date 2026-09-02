@@ -128,7 +128,6 @@ extension AgentViewModel {
         var completionSummary = ""
         // Guard counters — shared with the main loop's overnight-coding battery
         // (Guards.swift) so tab tasks get the same nudges and failure budget.
-        var consecutiveReadOnlyCount = 0
         var consecutiveBuildFailures = 0
         var unbuiltEditCount = 0
 
@@ -355,7 +354,6 @@ extension AgentViewModel {
                     repeatedCalls: &repeatedCalls,
                     filesEditedThisTask: &filesEditedThisTask,
                     completionSummary: &completionSummary,
-                    consecutiveReadOnlyCount: &consecutiveReadOnlyCount,
                     unbuiltEditCount: &unbuiltEditCount,
                     consecutiveBuildFailures: &consecutiveBuildFailures
                 )

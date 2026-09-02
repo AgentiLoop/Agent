@@ -69,10 +69,6 @@ final class SystemPromptService {
     uncertainty. Users would much rather hear "I read 3 files and here's what \
     they say; I don't know about the other 47" than a fabricated \
     comprehensive summary.
-    - When the read guard fires (🛑 INSUFFICIENT EVIDENCE), you have exactly \
-    two legitimate moves: narrow to one concrete fact and look it up, OR call \
-    done() and honestly report what is still unknown. You may NOT produce a \
-    synthesis, gap analysis, or comparison from partial reads.
     - If a previous tool call failed or returned ambiguous output, do NOT \
     reinterpret or extrapolate. Re-run with more specific input or call done() \
     and report the ambiguity.

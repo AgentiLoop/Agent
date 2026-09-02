@@ -172,7 +172,6 @@ extension AgentViewModel {
         // Context compaction state — token-aware triggers with circuit breaker
         var compactionState = CompactionState(contextWindow: contextWindow(for: provider), maxTokens: mt)
         // Overnight coding guards
-        var consecutiveReadOnlyCount = 0 // read guard — force stop after 10
         var unbuiltEditCount = 0 // build enforcement — nudge after edit without build
         var consecutiveBuildFailures = 0 // error budget — stop after 5
         var stuckFiles: [String: Int] = [:] // stuck detection — skip after 5 failures per file
@@ -497,7 +496,6 @@ extension AgentViewModel {
                 let guardShouldBreak = runOvernightCodingGuards(
                     pendingTools: pendingTools,
                     toolResults: &toolResults,
-                    consecutiveReadOnlyCount: &consecutiveReadOnlyCount,
                     unbuiltEditCount: &unbuiltEditCount,
                     consecutiveBuildFailures: &consecutiveBuildFailures,
                     stuckFiles: &stuckFiles,
