@@ -57,6 +57,12 @@ final class AgentViewModel {
     /// Per-task flag — the critic runs at most once per task so a stubborn
     /// review can't loop task_complete forever. Reset at task start.
     var criticReviewDone: Bool = false
+    /// Per-task count of task_complete refusals by the completion gates. Once
+    /// it reaches `maxCompletionGateRefusals` the gates step aside so an
+    /// unsatisfiable criterion can't loop the task to the iteration cap.
+    /// Reset at task start.
+    var completionGateRefusals: Int = 0
+    static let maxCompletionGateRefusals = 3
     /// Visual test assertions: allow LLM to define click/verify UI tests
     var visualTestsEnabled: Bool = UserDefaults.standard.bool(forKey: "codingVisualTests") {
         didSet { UserDefaults.standard.set(visualTestsEnabled, forKey: "codingVisualTests") }

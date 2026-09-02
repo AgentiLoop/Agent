@@ -128,6 +128,7 @@ extension AgentViewModel {
 
         commandsRun = []
         criticReviewDone = false
+        completionGateRefusals = 0
         var completionSummary = ""
         var stopRouteRetries = 0
         // Tier 10.1: output truncation has its own recovery ladder — one

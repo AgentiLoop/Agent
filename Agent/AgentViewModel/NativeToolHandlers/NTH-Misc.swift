@@ -273,7 +273,21 @@ extension AgentViewModel {
     /// task must NOT be allowed to finish, or nil when completion is permitted.
     /// Called from both the `task_complete` dispatch path and the main task loop's
     /// inline handler in `parseLLMResponseContent`.
+    /// Refusals are capped per task (`maxCompletionGateRefusals`): after that many
+    /// the gates step aside and log it, so a criterion the model can't satisfy
+    /// doesn't loop the task all the way to the iteration cap.
     func completionGateBlocker() async -> String? {
+        guard completionGateRefusals < Self.maxCompletionGateRefusals else {
+            appendLog("⚠️ Completion gates refused \(completionGateRefusals)× this task — allowing task_complete")
+            flushLog()
+            return nil
+        }
+        guard let blocker = await runCompletionGates() else { return nil }
+        completionGateRefusals += 1
+        return blocker
+    }
+
+    private func runCompletionGates() async -> String? {
         // Goal gate: every verification criterion must be marked done
         if let goal = GoalStateStore.shared.current, !goal.allCriteriaDone {
             let open = goal.openCriteria
