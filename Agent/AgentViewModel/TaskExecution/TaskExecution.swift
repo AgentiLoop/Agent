@@ -396,6 +396,20 @@ extension AgentViewModel {
                     toolResults: &toolResults
                 )
 
+                // Tier 8.3: files the model read this task that changed on disk
+                // behind its back (user, formatter, build, other tab) — surface
+                // the diff now so the next edit isn't built on stale lines.
+                if !toolResults.isEmpty {
+                    let changed = Self.externalChangeBlocks(tabID: Self.mainTabID)
+                    for block in changed {
+                        toolResults.append(["type": "text", "text": block])
+                    }
+                    if !changed.isEmpty {
+                        appendLog("📝 \(changed.count) read file(s) changed on disk — diff attached")
+                        flushLog()
+                    }
+                }
+
                 // Token budget checks — nudge LLM or auto-stop if budget exhausted / diminishing returns
                 if budgetTracker.shouldStop {
                     let reason = budgetTracker.isDiminishing ? "diminishing returns detected" : "token budget exhausted"

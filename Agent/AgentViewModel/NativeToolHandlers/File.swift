@@ -58,15 +58,88 @@ extension AgentViewModel {
         _lastReadEmissions = _lastReadEmissions.filter { !$0.key.hasPrefix(dedupPrefix) }
         // Our own edit is the newest content the model has seen — refresh the
         // edit-gate hash so the next edit isn't refused as "modified since read".
-        if let hash = computeFileHash(path: filePath) {
-            _lastSeenHash["\(tabID.uuidString):\(filePath)"] = hash
-        }
+        rememberSeenContent(tabID: tabID, path: filePath)
     }
 
     /// Tier 8 edit gate: sha256 of the file as the model last saw it (read or
     /// its own edit), keyed "tab:path". Separate from the dedup records so a
     /// post-edit verification read stays allowed.
     nonisolated(unsafe) static var _lastSeenHash: [String: String] = [:]
+
+    /// Tier 8.3: text of the file as the model last saw it, keyed like
+    /// `_lastSeenHash`, so an external change can be reported as a diff
+    /// snippet. Files over `maxSeenContentBytes` or non-UTF-8 keep only the hash.
+    nonisolated(unsafe) static var _lastSeenContent: [String: String] = [:]
+    nonisolated static let maxSeenContentBytes = 512 * 1024
+
+    /// Caller must hold `_readCountLock`. Records hash + text of `path` as the
+    /// model's last-seen state. Returns the hash, nil if the file is unreadable.
+    @discardableResult
+    private nonisolated static func rememberSeenContent(tabID: UUID, path: String) -> String? {
+        guard let data = FileManager.default.contents(atPath: path) else { return nil }
+        let hash = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+        let key = "\(tabID.uuidString):\(path)"
+        _lastSeenHash[key] = hash
+        if data.count <= maxSeenContentBytes, let text = String(data: data, encoding: .utf8) {
+            _lastSeenContent[key] = text
+        } else {
+            _lastSeenContent[key] = nil
+        }
+        return hash
+    }
+
+    /// Tier 8.3: walk every file the model has seen this task (tab) and report
+    /// the ones whose bytes changed on disk since — user edit, formatter, build
+    /// step, another tab. Each entry is one `text` block with a unified-diff
+    /// snippet capped at `maxDiffLines`. The seen-state is refreshed so the same
+    /// change is reported once and the edit gate accepts the new content.
+    /// Deleted files are evicted silently. Zero cost when nothing changed.
+    static nonisolated func externalChangeBlocks(tabID: UUID, maxDiffLines: Int = 40) -> [String] {
+        _readCountLock.lock()
+        defer { _readCountLock.unlock() }
+        let prefix = tabID.uuidString + ":"
+        var blocks: [String] = []
+        for (key, seenHash) in _lastSeenHash where key.hasPrefix(prefix) {
+            let path = String(key.dropFirst(prefix.count))
+            guard FileManager.default.fileExists(atPath: path) else {
+                _lastSeenHash[key] = nil
+                _lastSeenContent[key] = nil
+                continue
+            }
+            let oldText = _lastSeenContent[key]
+            guard let newHash = rememberSeenContent(tabID: tabID, path: path), newHash != seenHash else { continue }
+            var block = "📝 \(path) was modified on disk outside this conversation since you last read it. "
+            if let oldText, let newText = _lastSeenContent[key] {
+                block += "Diff (old → current):\n" + diffSnippet(old: oldText, new: newText, maxLines: maxDiffLines)
+            } else {
+                block += "Re-read it before editing."
+            }
+            blocks.append(block)
+        }
+        return blocks.sorted()
+    }
+
+    /// Minimal unified-diff snippet: strips the common head/tail lines and emits
+    /// the changed middle as `-`/`+` lines under a `@@` header, truncated to
+    /// `maxLines` with a "… N more" marker.
+    static nonisolated func diffSnippet(old: String, new: String, maxLines: Int) -> String {
+        let a = old.components(separatedBy: "\n")
+        let b = new.components(separatedBy: "\n")
+        var head = 0
+        while head < a.count, head < b.count, a[head] == b[head] { head += 1 }
+        var tail = 0
+        while tail < a.count - head, tail < b.count - head, a[a.count - 1 - tail] == b[b.count - 1 - tail] { tail += 1 }
+        let removed = a[head..<(a.count - tail)]
+        let added = b[head..<(b.count - tail)]
+        var lines = ["@@ -\(head + 1),\(removed.count) +\(head + 1),\(added.count) @@"]
+        lines += removed.map { "-" + $0 }
+        lines += added.map { "+" + $0 }
+        if lines.count > maxLines + 1 {
+            let dropped = lines.count - (maxLines + 1)
+            lines = Array(lines.prefix(maxLines + 1)) + ["… \(dropped) more changed line(s) — read the file for the full content"]
+        }
+        return lines.joined(separator: "\n")
+    }
 
     /// Refuse an edit when the model never read the file this task, or when
     /// the file changed on disk since it last saw it (user edit, formatter,
@@ -107,6 +180,7 @@ extension AgentViewModel {
         defer { _readCountLock.unlock() }
         let prefix = tabID.uuidString + ":"
         _lastSeenHash = _lastSeenHash.filter { !$0.key.hasPrefix(prefix) }
+        _lastSeenContent = _lastSeenContent.filter { !$0.key.hasPrefix(prefix) }
     }
 
     /// Dedup cache keyed by "\(tabUUID):\(expandedPath):\(offset):\(limit)". Each
@@ -188,7 +262,7 @@ extension AgentViewModel {
         else { return }
         let key = dedupKey(tabID: tabID, expandedPath: expandedPath, offset: offset, limit: limit)
         _lastReadEmissions[key] = LastReadEmission(mtime: stat.mtime, size: stat.size, fileHash: hash)
-        _lastSeenHash["\(tabID.uuidString):\(expandedPath)"] = hash
+        rememberSeenContent(tabID: tabID, path: expandedPath)
     }
 
     /// / Handles file CRUD, diff, list/search, backup/restore, symbol search, / and refactor_rename tool calls. Returns
