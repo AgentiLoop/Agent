@@ -33,7 +33,12 @@ final class SubAgent: Identifiable {
 
     enum Status: String {
         case running, completed, failed
+        /// Ran out of iterations (or text-only nudges) without calling
+        /// task_complete — `result` is the last narration, not a verified answer.
+        case exhausted
     }
+    /// Iterations actually used, shown in the notification.
+    var iterationsUsed: Int = 0
 
     init(name: String, prompt: String, projectFolder: String) {
         self.name = name
@@ -50,12 +55,15 @@ final class SubAgent: Identifiable {
         let fileLine = resultFilePath.map {
             "\n  <full-result-file>\($0) — read_file for the complete findings</full-result-file>"
         } ?? ""
+        let exhaustedLine = status == .exhausted
+            ? "\n  <note>stopped after \(iterationsUsed)/\(maxIterations) iterations without task_complete — treat the result as partial</note>"
+            : ""
         return """
         <task-notification>
           <task-id>\(id.uuidString.prefix(8))</task-id>
           <name>\(name)</name>
           <status>\(status.rawValue)</status>
-          <result>\(LogLimits.trim(result, cap: LogLimits.summaryChars))</result>\(fileLine)
+          <result>\(LogLimits.trim(result, cap: LogLimits.summaryChars))</result>\(fileLine)\(exhaustedLine)
           <usage>
             <input_tokens>\(inputTokens)</input_tokens>
             <output_tokens>\(outputTokens)</output_tokens>
@@ -215,12 +223,17 @@ extension AgentViewModel {
         var iterations = 0
         let maxIterations = agent.maxIterations
         var finalResult = ""
+        // Tier 11.1: "completed" only when the agent called task_complete.
+        var completedViaTool = false
+        var textOnlyNudges = 0
+        // Everything the agent wrote, for the on-disk report when it runs out.
+        var narration: [String] = []
         // Sub-agents previously never compacted — a long research loop grew
         // until the provider rejected the transcript. Same tiered compaction
         // as the main/tab loops, threshold from the provider's real context.
         var compactionState = CompactionState(contextWindow: contextWindow(for: provider), maxTokens: mt)
 
-        while !Task.isCancelled && iterations < maxIterations {
+        agentLoop: while !Task.isCancelled && iterations < maxIterations {
             iterations += 1
 
             if iterations > 1 {
@@ -255,6 +268,7 @@ extension AgentViewModel {
                     guard let type = block["type"] as? String else { continue }
                     if type == "text", let text = block["text"] as? String {
                         finalResult = text
+                        narration.append(text)
                     } else if type == "tool_use" {
                         hasToolUse = true
                         guard let toolId = block["id"] as? String,
@@ -265,7 +279,8 @@ extension AgentViewModel {
 
                         if name == "task_complete" {
                             finalResult = input["summary"] as? String ?? finalResult
-                            break
+                            completedViaTool = true
+                            break agentLoop
                         }
 
                         // Execute tool (sub-agent shares parent's dispatch)
@@ -296,10 +311,16 @@ extension AgentViewModel {
                     ])
                 }
 
-                if hasToolUse && !toolResults.isEmpty {
+                switch Self.subAgentTurn(hasToolUse: hasToolUse, hasToolResults: !toolResults.isEmpty, textOnlyNudges: textOnlyNudges) {
+                case .continueLoop:
                     messages.append(["role": "user", "content": toolResults])
-                } else if !hasToolUse {
-                    break // Text-only response = done
+                case .nudge(let text):
+                    // A text-only turn is usually mid-task narration ("Now
+                    // claude.ts…"), not the answer — ask for task_complete.
+                    textOnlyNudges += 1
+                    messages.append(["role": "user", "content": text])
+                case .exhausted:
+                    break agentLoop
                 }
 
             } catch {
@@ -311,26 +332,58 @@ extension AgentViewModel {
             }
         }
 
-        agent.status = .completed
-        // Spill full findings to disk when they exceed the notification cap so
-        // long research isn't lost to truncation — the parent reads the file.
-        if !agent.projectFolder.isEmpty, finalResult.count > LogLimits.summaryChars {
+        agent.iterationsUsed = iterations
+        agent.status = completedViaTool ? .completed : .exhausted
+        // Always write the full findings to disk — the notification carries a
+        // capped excerpt, and an exhausted agent's narration is the only
+        // record of what it found.
+        let report = completedViaTool
+            ? finalResult
+            : ([finalResult] + narration.dropLast().suffix(10).reversed())
+                .filter { !$0.isEmpty }.joined(separator: "\n\n---\n\n")
+        if !agent.projectFolder.isEmpty, !report.isEmpty {
             let dir = URL(fileURLWithPath: agent.projectFolder)
                 .appendingPathComponent(".agent/subagents")
             try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
             let url = dir.appendingPathComponent("\(agent.id.uuidString.prefix(8)).md")
-            if (try? finalResult.write(to: url, atomically: true, encoding: .utf8)) != nil {
+            let header = "# Sub-agent '\(agent.name)' — \(agent.status.rawValue) after \(iterations)/\(maxIterations) iterations\n\n"
+            if (try? (header + report).write(to: url, atomically: true, encoding: .utf8)) != nil {
                 agent.resultFilePath = url.path
             }
         }
         agent.result = LogLimits.trim(finalResult, cap: LogLimits.summaryChars)
         appendLog(
-            "🔀 Sub-agent '\(agent.name)' completed "
-                + "(\(agent.inputTokens + agent.outputTokens) tokens, "
+            "🔀 Sub-agent '\(agent.name)' \(agent.status.rawValue) "
+                + "(\(iterations)/\(maxIterations) iterations, "
+                + "\(agent.inputTokens + agent.outputTokens) tokens, "
                 + "\(String(format: "%.1f", agent.duration))s)"
+                + (agent.resultFilePath.map { " → \($0)" } ?? "")
         )
         flushLog()
         return agent.notification
+    }
+
+    /// Tier 11.1: what a sub-agent turn means for its loop.
+    enum SubAgentTurn: Equatable {
+        /// Tools ran — feed the results back.
+        case continueLoop
+        /// Text only — ask for task_complete (bounded by `maxSubAgentTextNudges`).
+        case nudge(String)
+        /// Text only after the nudges ran out (or a tool turn produced nothing
+        /// to send) — stop and report `exhausted`.
+        case exhausted
+    }
+
+    nonisolated static let maxSubAgentTextNudges = 2
+    nonisolated static let subAgentNudgeMessage =
+        "That reads as narration, not a final answer. If you are done, call task_complete(summary:) "
+        + "with your complete findings now; otherwise keep working with tools."
+
+    nonisolated static func subAgentTurn(hasToolUse: Bool, hasToolResults: Bool, textOnlyNudges: Int) -> SubAgentTurn {
+        if hasToolUse {
+            return hasToolResults ? .continueLoop : .exhausted
+        }
+        return textOnlyNudges < maxSubAgentTextNudges ? .nudge(subAgentNudgeMessage) : .exhausted
     }
 
     /// Send a message to a running sub-agent by name. Returns status.

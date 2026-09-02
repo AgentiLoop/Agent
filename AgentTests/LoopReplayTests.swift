@@ -79,7 +79,7 @@ struct RouteStopReasonTests {
             stopReason: "max_tokens", hasToolUse: false, hasPendingTools: false,
             responseText: "half an ans", openCriteria: [], retriesUsed: 0)
         guard case .retry(let correction, _) = route else { Issue.record("expected retry"); return }
-        #expect(correction.contains("truncated"))
+        #expect(correction.contains("Output token limit hit"))
     }
 
     @Test("end_turn with open goal criteria nudges with the specific list")
@@ -174,6 +174,40 @@ struct TurnDecisionTests {
 
 @MainActor
 struct LoopReplayScenarioTests {
+
+    @Test("11.1: sub-agent narration turns are nudged twice, then the run is exhausted (not completed)")
+    func subAgentExhaustionPath() {
+        // Mirrors executeSubAgent's per-turn decision: tool turns continue,
+        // text-only turns get at most 2 nudges, then the loop stops as exhausted.
+        var nudges = 0
+        var events: [AgentViewModel.SubAgentTurn] = []
+        let turns: [(tools: Bool, results: Bool)] = [
+            (true, true), (true, true),      // real work
+            (false, false),                  // "Now claude.ts — grep for…"
+            (false, false),                  // "The report above is complete"
+            (false, false)                   // still no task_complete
+        ]
+        for t in turns {
+            let d = AgentViewModel.subAgentTurn(hasToolUse: t.tools, hasToolResults: t.results, textOnlyNudges: nudges)
+            if case .nudge = d { nudges += 1 }
+            events.append(d)
+            if d == .exhausted { break }
+        }
+        #expect(events.count == 5)
+        #expect(events[0] == .continueLoop && events[1] == .continueLoop)
+        #expect(events[2] == .nudge(AgentViewModel.subAgentNudgeMessage))
+        #expect(events[3] == .nudge(AgentViewModel.subAgentNudgeMessage))
+        #expect(events[4] == .exhausted)
+        // A tool turn that produced nothing to send back also ends the run
+        #expect(AgentViewModel.subAgentTurn(hasToolUse: true, hasToolResults: false, textOnlyNudges: 0) == .exhausted)
+        // The notification for an exhausted agent says so and carries the iteration count
+        let agent = SubAgent(name: "probe", prompt: "x", projectFolder: "")
+        agent.status = .exhausted
+        agent.iterationsUsed = 15
+        agent.result = "Now claude.ts — grep for the key sections."
+        #expect(agent.notification.contains("<status>exhausted</status>"))
+        #expect(agent.notification.contains("15/15 iterations without task_complete"))
+    }
 
     @Test("happy path: tool turns then explicit completion")
     func happyPath() {
