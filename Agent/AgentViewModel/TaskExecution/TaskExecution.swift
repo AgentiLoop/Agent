@@ -62,6 +62,8 @@ extension AgentViewModel {
             appendLog("🎯 Cleared stale goal (untouched >24h): \(stale.prefix(60))")
         }
         Self.clearToolCache()
+        // Tier 8: edits in this task must be preceded by a read in this task.
+        Self.clearEditGateForTab(tabID: Self.mainTabID)
         // No mode filtering — send every user-enabled tool on every turn.
         // The LLM picks what it needs; ToolPreferencesService is the only filter.
         let activeGroups: Set<String>? = nil
