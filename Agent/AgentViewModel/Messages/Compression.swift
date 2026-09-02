@@ -228,12 +228,107 @@ extension AgentViewModel {
 
     // MARK: - Tiered Compaction (token-budget-aware)
 
-    /// Two-tier compaction: try Apple AI summarization first (fast), fall back to aggressive pruning.
+    /// Produces the compaction summary for a request transcript (the live
+    /// messages, images stripped, plus one summary-request user message).
+    /// Returns nil on any failure so the caller falls back to pruning.
+    typealias CompactSummarizer = @MainActor ([[String: Any]]) async -> String?
+
+    /// The 9-section summary request appended as the final user message.
+    /// Appending (not replacing) keeps the request prefix identical to the
+    /// task's own requests, so the provider's prompt cache serves the whole
+    /// transcript and the summary costs roughly its output tokens only.
+    static let compactSummaryPrompt = """
+        Your task is to create a detailed summary of the conversation so far, \
+        paying close attention to the user's explicit requests and your previous actions. \
+        This summary will REPLACE the conversation history; you will continue the task from it, \
+        so it must capture everything needed to continue without re-doing work.
+
+        Do NOT call any tools. Reply with plain text only, using exactly these sections:
+
+        1. Primary Request and Intent: all of the user's explicit requests and intents, in detail.
+        2. Key Technical Concepts: important technologies, frameworks, patterns and constraints discussed.
+        3. Files and Code Sections: every file examined, modified or created, with full paths. \
+        Include the relevant code snippets for anything you edited and why the file matters.
+        4. Errors and Fixes: every error you hit and how you fixed it, plus any user feedback on how to do things differently.
+        5. Problem Solving: problems solved and any ongoing troubleshooting.
+        6. All User Messages: list ALL user messages that are not tool results, verbatim where short.
+        7. Pending Tasks: work you have explicitly been asked to do that is not finished.
+        8. Current Work: precisely what was being worked on immediately before this summary, \
+        including file names, line numbers and code snippets.
+        9. Next Step: the single next action, directly in line with the user's most recent request. \
+        If the task was already finished, say so.
+        """
+
+    /// Compact by asking the active model for a structured summary and
+    /// rebuilding the transcript as `[first user prompt] + summary + tail`.
+    /// The summary sees the WHOLE transcript (up to the model's own window), so
+    /// bigger models produce richer summaries automatically — unlike the
+    /// on-device path, which is boxed into a 4K window. Returns false without
+    /// touching `messages` on any failure.
+    @MainActor
+    static func compactWithLLM(
+        _ messages: inout [[String: Any]],
+        keepRecent: Int,
+        summarizer: CompactSummarizer,
+        log: ((String) -> Void)? = nil
+    ) async -> Bool {
+        guard messages.count > keepRecent + 4 else { return false }
+
+        // Request = transcript minus images (huge, and they don't summarize)
+        // + one summary-request user message. No transcript mutation yet.
+        var request = messages
+        stripOldImages(&request, keepRecentCount: 0)
+        request.append(["role": "user", "content": compactSummaryPrompt])
+
+        guard let summary = await summarizer(request), !summary.isEmpty else {
+            log?("⚠️ LLM compaction summary failed — falling back to prune")
+            return false
+        }
+
+        let firstMsg = messages[0]
+        var tail = Array(messages.suffix(keepRecent))
+        let middle = Array(messages.dropFirst(1).dropLast(keepRecent))
+
+        // The dropped middle may hold tool results the model will want back —
+        // spill them so restore_tool_result still works after compaction.
+        for msg in middle {
+            guard let blocks = msg["content"] as? [[String: Any]] else { continue }
+            for block in blocks where block["type"] as? String == "tool_result" {
+                if let content = block["content"] as? String {
+                    ToolResultCache.spill(toolUseID: block["tool_use_id"] as? String, content: content)
+                }
+            }
+        }
+        demoteOrphanToolResults(&tail)
+
+        let continuation = """
+            This session is being continued from a previous conversation that ran out of context. \
+            The conversation is summarized below:
+
+            \(summary)
+
+            Continue the task from exactly where it left off without asking the user any further questions. \
+            Recent messages after this summary are preserved verbatim. \
+            Older tool output was cleared — call restore_tool_result(tool_use_id:) to recover any of it \
+            instead of re-reading files.
+            """
+
+        messages = [firstMsg]
+        messages.append(["role": "user", "content": continuation])
+        messages.append(["role": "assistant", "content": "Understood, continuing."])
+        messages.append(contentsOf: tail)
+        log?("🗜️ LLM compaction: summarized \(middle.count) messages (\(summary.count) chars), kept last \(tail.count)")
+        return true
+    }
+
+    /// Compaction ladder: LLM summary on the active provider (when a summarizer
+    /// is supplied) → Apple AI per-message summaries → structural prune.
     /// Returns true if tokens were meaningfully reduced.
     @MainActor
     static func tieredCompact(
         _ messages: inout [[String: Any]],
         state: inout CompactionState,
+        summarizer: CompactSummarizer? = nil,
         log: ((String) -> Void)? = nil
     ) async -> Bool
     {
@@ -265,12 +360,26 @@ extension AgentViewModel {
 
         log?("🗜️ Compacting context (\(tokensBefore) est. tokens, threshold \(state.compactThreshold))...")
 
-        // Microcompact: clear old tool results to recoverable stubs. How many
-        // recent results survive scales with the model's context budget — a
-        // 131K local model keeps far more reads intact than a 4K one, so big
-        // models stop losing files they just read (the #37 re-read loop).
-        let keepRecent = max(3, min(24, state.compactThreshold / 6_000))
-        microcompact(&messages, keepRecent: keepRecent)
+        // How many recent messages / tool results survive scales with the
+        // model's context budget — a 131K local model keeps far more reads
+        // intact than a 4K one, so big models stop losing files they just read.
+        let keepRecent = max(6, min(24, state.compactThreshold / 6_000))
+
+        // Tier 0: structured summary from the active model over the FULL
+        // transcript. Runs before microcompact so the summarizer still sees
+        // the tool output it is summarizing.
+        if let summarizer {
+            if await compactWithLLM(&messages, keepRecent: keepRecent, summarizer: summarizer, log: log) {
+                let tokensAfterT0 = await preciseTokenCount(messages: messages)
+                if state.recordAttempt(tokensBefore: tokensBefore, tokensAfter: tokensAfterT0) {
+                    log?("🗜️ LLM compaction: \(tokensBefore) → \(tokensAfterT0) tokens")
+                    return true
+                }
+            }
+        }
+
+        // Microcompact: clear old tool results to recoverable stubs.
+        microcompact(&messages, keepRecent: max(3, keepRecent))
 
         // Strip images — they're huge and won't summarize well
         stripOldImages(&messages)
@@ -286,8 +395,7 @@ extension AgentViewModel {
         }
 
         // Tier 2: Aggressive prune (drops middle messages into summary).
-        // keepRecent scales with the context budget, same as microcompact.
-        pruneMessages(&messages, keepRecent: max(6, min(24, state.compactThreshold / 6_000)))
+        pruneMessages(&messages, keepRecent: keepRecent)
         let tokensAfterT2 = await preciseTokenCount(messages: messages)
         let reduced = state.recordAttempt(tokensBefore: tokensBefore, tokensAfter: tokensAfterT2)
         if reduced {
@@ -297,6 +405,7 @@ extension AgentViewModel {
         }
         return reduced
     }
+
 
     // MARK: - Microcompaction (clear old tool results)
 

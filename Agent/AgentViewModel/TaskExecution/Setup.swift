@@ -20,6 +20,35 @@ extension AgentViewModel {
         var foundationModel: FoundationModelService?
     }
 
+    /// Compaction summarizer bound to the task's own service instance — same
+    /// system prompt, tools and model, so the request prefix is a prompt-cache
+    /// hit and only the summary output is billed. Nil for the on-device
+    /// provider (4K window — it can't see a transcript worth summarizing).
+    func makeCompactSummarizer(services: LLMServiceBundle, log: ((String) -> Void)? = nil) -> CompactSummarizer? {
+        guard services.claude != nil || services.codex != nil
+            || services.openAICompatible != nil || services.ollama != nil
+        else { return nil }
+        return { request in
+            do {
+                let r: (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int)
+                if let s = services.claude { r = try await s.send(messages: request) }
+                else if let s = services.codex { r = try await s.send(messages: request) }
+                else if let s = services.openAICompatible { r = try await s.send(messages: request) }
+                else if let s = services.ollama { r = try await s.send(messages: request) }
+                else { return nil }
+                TokenUsageStore.shared.record(inputTokens: r.inputTokens, outputTokens: r.outputTokens)
+                log?("🗜️ Summary call: \(r.inputTokens) in / \(r.outputTokens) out")
+                let text = r.content.compactMap { $0["text"] as? String }
+                    .joined(separator: "\n")
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                return text.isEmpty ? nil : text
+            } catch {
+                log?("⚠️ Summary call failed: \(error.localizedDescription.prefix(200))")
+                return nil
+            }
+        }
+    }
+
     /// / Resolves the initial `(provider, modelName, isVision)` triple for a new task / from the currently-selected
     /// provider and per-provider model/vision settings. / Matches the original inline switch exactly.
     func resolveInitialProviderConfig() -> (provider: APIProvider, modelName: String, isVision: Bool) {

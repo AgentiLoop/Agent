@@ -231,10 +231,21 @@ extension AgentViewModel {
                 // Async context-window fetches can land after task start — pick
                 // up the real threshold instead of a possibly-stale 32K fallback.
                 compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
-                _ = await Self.tieredCompact(&messages, state: &compactionState) { [weak tab] msg in
+                let compactLog: (String) -> Void = { [weak tab] msg in
                     tab?.appendLog(msg)
                     tab?.flush()
                 }
+                let bundle = LLMServiceBundle(
+                    claude: services.claude, codex: nil,
+                    openAICompatible: services.openAICompatible,
+                    ollama: services.ollama, foundationModel: services.foundationModel
+                )
+                _ = await Self.tieredCompact(
+                    &messages,
+                    state: &compactionState,
+                    summarizer: makeCompactSummarizer(services: bundle, log: compactLog),
+                    log: compactLog
+                )
             }
 
             do {
