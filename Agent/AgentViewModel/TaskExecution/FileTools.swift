@@ -64,21 +64,16 @@ extension AgentViewModel {
             let expanded = (filePath as NSString).expandingTildeInPath
             let tabID = selectedTabId ?? Self.mainTabID
 
-            // ONE read per (file, range) while the data is unchanged.
-            // sha256 of the raw file bytes is the authoritative check; the rule
-            // and the helper live on the AgentViewModel extension in
-            // NativeToolHandlers/File.swift. Different ranges get separate slots
-            // — lines 1-10 then 2-20 is allowed (each once). Same range repeated
-            // on unchanged data is blocked. Editing the file clears the slots.
-            if let dedup = Self.dedupRead(tabID: tabID, expandedPath: expanded, offset: offset, limit: limit) {
-                appendLog("📖 Read: \(filePath)")
-                appendLog(dedup)
-                toolResults.append(["type": "tool_result", "tool_use_id": toolId, "content": dedup])
-                return true
-            }
+            // Duplicate-read detection: sha256 of the raw file bytes is the
+            // authoritative check; the helper lives on the AgentViewModel
+            // extension in NativeToolHandlers/File.swift. A repeat read of the
+            // same (path, range) on unchanged data is NOT refused — it gets a
+            // short note prepended so the model knows it already had this.
+            let dedupNote = Self.dedupRead(tabID: tabID, expandedPath: expanded, offset: offset, limit: limit)
+            if let dedupNote { appendLog(dedupNote) }
 
             appendLog("📖 Read: \(filePath)")
-            let output = await Self.offMain { CodingService.readFile(path: filePath, offset: offset, limit: limit) }
+            var output = await Self.offMain { CodingService.readFile(path: filePath, offset: offset, limit: limit) }
             // If file not found, suggest listing files first
             if output.hasPrefix("Error:") && output.contains("not found") {
                 let dir = (filePath as NSString).deletingLastPathComponent
@@ -90,8 +85,9 @@ extension AgentViewModel {
             }
 
             // Record emission so the next read of this (path, offset, limit) on
-            // an unchanged file is blocked. Captures mtime + size + sha256.
+            // an unchanged file is flagged as a duplicate. Captures mtime + size + sha256.
             Self.recordReadEmission(tabID: tabID, expandedPath: expanded, offset: offset, limit: limit)
+            if let dedupNote { output = dedupNote + "\n\n" + output }
 
             let lang = Self.langFromPath(filePath)
             appendLog(Self.codeFence(Self.preview(output, lines: readFilePreviewLines), language: lang))
