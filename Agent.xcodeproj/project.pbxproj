@@ -205,6 +205,7 @@
 		F123A9EA71C5383EFFFF1A8A /* Rendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = C428D9A5859B0E1BB0D2FB6B /* Rendering.swift */; };
 		FA10000000000000000101 /* LoopControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000100 /* LoopControl.swift */; };
 		FA10000000000000000103 /* PrefixStabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000102 /* PrefixStabilityTests.swift */; };
+		FA10000000000000000203 /* LLMCompactionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000202 /* LLMCompactionTests.swift */; };
 		FA10000000000000000105 /* LoopReplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000104 /* LoopReplayTests.swift */; };
 		FA10000000000000000107 /* ToolOutcomeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000106 /* ToolOutcomeStore.swift */; };
 		FA10000000000000000109 /* XPCClientTrust.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000108 /* XPCClientTrust.swift */; };
@@ -493,6 +494,7 @@
 		F212F6A04076958DD46FD1E4 /* CriticGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CriticGate.swift; sourceTree = "<group>"; };
 		FA10000000000000000100 /* LoopControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopControl.swift; sourceTree = "<group>"; };
 		FA10000000000000000102 /* PrefixStabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefixStabilityTests.swift; sourceTree = "<group>"; };
+		FA10000000000000000202 /* LLMCompactionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMCompactionTests.swift; sourceTree = "<group>"; };
 		FA10000000000000000104 /* LoopReplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopReplayTests.swift; sourceTree = "<group>"; };
 		FA10000000000000000106 /* ToolOutcomeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolOutcomeStore.swift; sourceTree = "<group>"; };
 		FA10000000000000000108 /* XPCClientTrust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XPCClientTrust.swift; sourceTree = "<group>"; };
@@ -903,6 +905,7 @@
 				FF20000000000000000005 /* ExaSearchTests.swift */,
 				ABBDF459529494A3928D101A /* AgenticCoreTests.swift */,
 				FA10000000000000000102 /* PrefixStabilityTests.swift */,
+				FA10000000000000000202 /* LLMCompactionTests.swift */,
 				FA10000000000000000104 /* LoopReplayTests.swift */,
 				C1677C7175A16F2731420499 /* HarnessGuardTests.swift */,
 				AB11223344556677889900BB /* ShellSafetyServiceTests.swift */,
@@ -1464,6 +1467,7 @@
 				FF20000000000000000002 /* SafariWebAutomationTests.swift in Sources */,
 				3A2D86472E205A0DA0CB5D69 /* AgenticCoreTests.swift in Sources */,
 				FA10000000000000000103 /* PrefixStabilityTests.swift in Sources */,
+				FA10000000000000000203 /* LLMCompactionTests.swift in Sources */,
 				FA10000000000000000105 /* LoopReplayTests.swift in Sources */,
 				FF20000000000000000004 /* DiffToolsTests.swift in Sources */,
 				FF20000000000000000006 /* ExaSearchTests.swift in Sources */,
