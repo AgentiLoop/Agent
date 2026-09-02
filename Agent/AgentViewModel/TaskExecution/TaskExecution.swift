@@ -82,7 +82,7 @@ extension AgentViewModel {
         let isCoding = apiURL.contains("/coding/")
         let cloudModelLogLine = "🧠 \(provider.displayName) / \(displayModel)\(isCoding ? " (code)" : "")\(isVision ? " (vision)" : "")"
 
-        let mt = maxTokens
+        var mt = maxTokens
         var services = buildLLMServiceBundle(
             provider: provider,
             modelName: modelName,
@@ -130,6 +130,10 @@ extension AgentViewModel {
         criticReviewDone = false
         var completionSummary = ""
         var stopRouteRetries = 0
+        // Tier 10.1: output truncation has its own recovery ladder — one
+        // same-request retry with a bigger budget, then ≤3 continuations.
+        var maxTokensRetries = 0
+        var maxTokensEscalated = false
         var timeoutRetryCount = 0
         let maxTimeoutRetries = maxRetries
 
@@ -361,16 +365,40 @@ extension AgentViewModel {
                 // appended its correction to toolResults, which finalize ignored
                 // for text-only turns — the task completed anyway.)
                 let routeText = (response.content.compactMap { $0["text"] as? String }).joined()
+                // Tier 10.1: first truncation → re-send the SAME request with a
+                // larger output budget (bounded by the context window; a 4K
+                // window gets no escalation) before spending a continuation.
+                if response.stopReason == "max_tokens", !hasToolUse, !maxTokensEscalated {
+                    maxTokensEscalated = true
+                    let effective = mt > 0 ? mt : (services.claude != nil ? 16_384 : 8_192)
+                    if let bigger = Self.escalatedMaxTokens(
+                        current: effective,
+                        contextWindow: contextWindow(for: provider),
+                        lastInputTokens: response.inputTokens)
+                    {
+                        mt = bigger
+                        services = buildLLMServiceBundle(
+                            provider: provider, modelName: modelName, isVision: isVision,
+                            historyContext: historyContext, maxTokens: mt)
+                        compactionState.maxTokens = mt
+                        compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
+                        appendLog("⚠️ Response truncated at max_tokens — retrying the same request with max_tokens \(effective) → \(bigger)")
+                        flushLog()
+                        rawLLMOutput = ""
+                        continue taskLoop
+                    }
+                }
                 let route = Self.routeStopReason(
                     stopReason: response.stopReason,
                     hasToolUse: hasToolUse,
                     hasPendingTools: !pendingTools.isEmpty,
                     responseText: routeText,
                     openCriteria: GoalStateStore.shared.current?.openCriteria.map(\.text) ?? [],
-                    retriesUsed: stopRouteRetries
+                    retriesUsed: stopRouteRetries,
+                    maxTokensRetriesUsed: maxTokensRetries
                 )
                 if case .retry(let correction, let logLine) = route {
-                    stopRouteRetries += 1
+                    if response.stopReason == "max_tokens" { maxTokensRetries += 1 } else { stopRouteRetries += 1 }
                     appendLog(logLine)
                     flushLog()
                     // Keep text + thinking blocks — appending unparsable tool_use
