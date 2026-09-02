@@ -141,6 +141,7 @@
 		AB112233445566778899050A /* PackageAutoDiscoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899050B /* PackageAutoDiscoveryTests.swift */; };
 		AB112233445566778899060A /* PackageGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899060B /* PackageGenerationTests.swift */; };
 		AB112233445566778899070A /* ScriptServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899070B /* ScriptServiceTests.swift */; };
+		AB1122334455667788990C70 /* ToolErrorClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1122334455667788990C71 /* ToolErrorClassifierTests.swift */; };
 		AB112233445566778899080A /* ScriptingBridgesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899080B /* ScriptingBridgesTests.swift */; };
 		ABC7EAA6F77F494989A1A61F /* AgentTools+AppBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC627819110EDB4BE4A30406 /* AgentTools+AppBridge.swift */; };
 		AD0E84FCAA3A3D6AF61ECD16 /* SavedScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4709078FC05AA3587261B14 /* SavedScripts.swift */; };
@@ -427,6 +428,7 @@
 		AB112233445566778899050B /* PackageAutoDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageAutoDiscoveryTests.swift; sourceTree = "<group>"; };
 		AB112233445566778899060B /* PackageGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageGenerationTests.swift; sourceTree = "<group>"; };
 		AB112233445566778899070B /* ScriptServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptServiceTests.swift; sourceTree = "<group>"; };
+		AB1122334455667788990C71 /* ToolErrorClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolErrorClassifierTests.swift; sourceTree = "<group>"; };
 		AB112233445566778899080B /* ScriptingBridgesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptingBridgesTests.swift; sourceTree = "<group>"; };
 		ABBDF459529494A3928D101A /* AgenticCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticCoreTests.swift; sourceTree = "<group>"; };
 		AC627819110EDB4BE4A30406 /* AgentTools+AppBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentTools+AppBridge.swift"; sourceTree = "<group>"; };
@@ -919,6 +921,7 @@
 				AB112233445566778899050B /* PackageAutoDiscoveryTests.swift */,
 				AB112233445566778899060B /* PackageGenerationTests.swift */,
 				AB112233445566778899070B /* ScriptServiceTests.swift */,
+				AB1122334455667788990C71 /* ToolErrorClassifierTests.swift */,
 				AB112233445566778899080B /* ScriptingBridgesTests.swift */,
 							39A507049182BD42AD200EC6 /* ResponseCompletionTests.swift */,
 );
@@ -1481,6 +1484,7 @@
 				AB112233445566778899050A /* PackageAutoDiscoveryTests.swift in Sources */,
 				AB112233445566778899060A /* PackageGenerationTests.swift in Sources */,
 				AB112233445566778899070A /* ScriptServiceTests.swift in Sources */,
+				AB1122334455667788990C70 /* ToolErrorClassifierTests.swift in Sources */,
 				AB112233445566778899080A /* ScriptingBridgesTests.swift in Sources */,
 				89A5281FFE610EA7450B573B /* ResponseCompletionTests.swift in Sources */,
 			);
