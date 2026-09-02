@@ -1,7 +1,6 @@
 # 🦾 AgentiLoop Agent!
-## macOS 26.4.1 or later
 
-### **Agentic AI for your  Mac Desktop**
+### **Agentic AI for your  Mac Desktop (macOS 26.4.1+)**
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
