@@ -336,6 +336,24 @@ struct HarnessGuardTests {
         #expect(PlanStateStore.promptBlock(projectFolder: "/tmp").isEmpty)
     }
 
+    // MARK: - Tier 10.3: input + max_tokens overflow
+
+    @Test("10.3: 'A + B > C' overflow parses and lowers max_tokens instead of pruning")
+    func inputPlusMaxTokensOverflow() {
+        let msg = "invalid_request_error: input length and `max_tokens` exceed context limit: 28500 + 8192 > 32768"
+        let parsed = AgentViewModel.parseInputPlusMaxTokensOverflow(msg)
+        #expect(parsed?.input == 28_500)
+        #expect(parsed?.maxTokens == 8_192)
+        #expect(parsed?.limit == 32_768)
+        // 32768 - 28500 - 1000 = 3268 → still above the 3000 floor
+        #expect(AgentViewModel.loweredMaxTokens(limit: 32_768, input: 28_500) == 3_268)
+        // Floor at 3000 even when nothing really fits
+        #expect(AgentViewModel.loweredMaxTokens(limit: 16_000, input: 15_500) == 3_000)
+        // Other overflow messages don't match → compaction path
+        #expect(AgentViewModel.parseInputPlusMaxTokensOverflow("prompt is too long: 210000 tokens > 200000 maximum") == nil)
+        #expect(AgentViewModel.parseInputPlusMaxTokensOverflow("max_tokens must be a positive integer") == nil)
+    }
+
     // MARK: - Tier 10.2: retry delay
 
     @Test("10.2: retry delay is exponential with 25% jitter, capped at 32s; Retry-After wins")

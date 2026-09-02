@@ -546,6 +546,15 @@ extension AgentViewModel {
                     continue taskLoop
                 case .breakLoop:
                     break taskLoop
+                case .lowerMaxTokens(let newMT):
+                    // Tier 10.3: same transcript, smaller output budget.
+                    mt = newMT
+                    compactionState.maxTokens = mt
+                    compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
+                    services = buildLLMServiceBundle(
+                        provider: provider, modelName: modelName, isVision: isVision,
+                        historyContext: historyContext, maxTokens: mt)
+                    continue taskLoop
                 case .fallbackRequested(let newProvider, let newModel, let newIsVision):
                     provider = newProvider
                     modelName = newModel
