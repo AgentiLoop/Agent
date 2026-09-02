@@ -167,7 +167,7 @@ extension AgentViewModel {
         tab.appendLog("🧠 \(provider.displayName) / \(modelId)")
         tab.flush()
 
-        let mt = maxTokens
+        var mt = maxTokens
         var services = buildTabLLMServices(
             provider: provider,
             modelId: modelId,
@@ -483,6 +483,19 @@ extension AgentViewModel {
                     continue
                 case .breakLoop:
                     break mainLoop
+                case .lowerMaxTokens(let newMT):
+                    // Tier 10.3: same transcript, smaller output budget.
+                    mt = newMT
+                    compactionState.maxTokens = mt
+                    compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
+                    services = buildTabLLMServices(
+                        provider: provider,
+                        modelId: modelId,
+                        historyContext: tabHistoryContext,
+                        projectFolder: projectFolder,
+                        maxTokens: mt
+                    )
+                    continue
                 case .fallbackRequested(let fbProvider, let fbModel, _):
                     provider = fbProvider
                     modelId = fbModel

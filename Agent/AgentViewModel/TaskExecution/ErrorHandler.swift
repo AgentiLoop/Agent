@@ -19,6 +19,10 @@ extension AgentViewModel {
         /// Caller should switch to the named fallback provider/model and `continue`.
         /// The caller is responsible for rebuilding LLM services from these values.
         case fallbackRequested(provider: APIProvider, modelName: String, isVision: Bool)
+        /// Tier 10.3: the provider said input + max_tokens exceeds the window.
+        /// Caller should rebuild services with this smaller max_tokens and `continue`
+        /// — the transcript itself still fits, so nothing is pruned.
+        case lowerMaxTokens(Int)
     }
 
     /// / Which LLM service a given task-loop iteration is talking to. / Used only so the caller can tell
@@ -67,6 +71,17 @@ extension AgentViewModel {
             || (errMsg.contains("max_tokens") && (errMsg.contains("exceed") || errMsg.contains("greater than")))
             || (errMsg.contains("context_length") && (errMsg.contains("exceed") || errMsg.contains("greater than")))
         if isOverflow {
+            // Tier 10.3: "input length and max_tokens exceed context limit: A + B > C"
+            // — only the output budget is too big. Lower it and retry the same
+            // transcript instead of throwing context away.
+            if let parsed = Self.parseInputPlusMaxTokensOverflow(errMsg) {
+                let lowered = Self.loweredMaxTokens(limit: parsed.limit, input: parsed.input)
+                if lowered < parsed.maxTokens {
+                    appendLog("⚠️ input (\(parsed.input)) + max_tokens (\(parsed.maxTokens)) exceeds the \(parsed.limit) window — lowering max_tokens to \(lowered) and retrying")
+                    flushLog()
+                    return .lowerMaxTokens(lowered)
+                }
+            }
             let beforeCount = messages.count
             let beforeTokens = Self.estimateTokens(messages: messages)
             // Reactive compaction: the provider already rejected the transcript,
@@ -378,5 +393,29 @@ extension AgentViewModel {
         appendLog("✅ Now using \(fbProvider.displayName) / \(fallback.model)")
         flushLog()
         return .fallbackRequested(provider: fbProvider, modelName: fallback.model, isVision: newIsVision)
+    }
+
+    // MARK: - Tier 10.3: input + max_tokens overflow
+
+    /// Parse Anthropic's "input length and `max_tokens` exceed context limit:
+    /// A + B > C" (A = input tokens, B = max_tokens, C = window). Returns nil for
+    /// any other overflow message so those still go through compaction.
+    nonisolated static func parseInputPlusMaxTokensOverflow(_ message: String) -> (input: Int, maxTokens: Int, limit: Int)? {
+        guard message.contains("max_tokens"), message.contains("exceed") else { return nil }
+        let pattern = #"(\d+)\s*\+\s*(\d+)\s*>\s*(\d+)"#
+        guard let re = try? NSRegularExpression(pattern: pattern),
+              let m = re.firstMatch(in: message, range: NSRange(message.startIndex..., in: message)),
+              m.numberOfRanges == 4,
+              let a = Range(m.range(at: 1), in: message).flatMap({ Int(message[$0]) }),
+              let b = Range(m.range(at: 2), in: message).flatMap({ Int(message[$0]) }),
+              let c = Range(m.range(at: 3), in: message).flatMap({ Int(message[$0]) })
+        else { return nil }
+        return (a, b, c)
+    }
+
+    /// Output budget that fits next to `input` inside `limit`, with a 1K
+    /// safety margin and a 3K floor so the model can still finish a thought.
+    nonisolated static func loweredMaxTokens(limit: Int, input: Int) -> Int {
+        max(3_000, limit - input - 1_000)
     }
 }
