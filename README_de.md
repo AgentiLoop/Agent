@@ -601,7 +601,5 @@ Lust, an Agent! zu basteln? Siehe [CONTRIBUTING.md](./CONTRIBUTING.md) — du ka
 >
 > Danke für dein Interesse an 🦾 Agent! — einer Anwendung, entwickelt für Mac-mini-, MacBook- und Mac-Studio-Computer, die macOS 26.4 oder neuer auf originaler Mac-Hardware und -Software ausführen.
 >
-> Mit freundlichen Grüßen,
-> **AgentiLoop — Agent!**
-> https://AgentiLoop.ai
-> https://github.com/AgentiLoop/agent
+> - Website: https://AgentiLoop.ai
+> - Github : https://github.com/AgentiLoop/agent
