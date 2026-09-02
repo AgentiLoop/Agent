@@ -188,7 +188,9 @@ extension AgentViewModel {
     /// to the output that triggered it. Falls back to the last result when the id
     /// isn't present (pre-executed batches, synthesized results).
     func appendNudge(_ toolResults: inout [[String: Any]], toolId: String, nudge: String) {
-        guard let idx = toolResults.firstIndex(where: { $0["tool_use_id"] as? String == toolId }) else {
+        guard let idx = toolResults.firstIndex(where: {
+            ($0["type"] as? String) == "tool_result" && $0["tool_use_id"] as? String == toolId && $0["content"] is String
+        }) else {
             appendNudgeToLastToolResult(&toolResults, nudge: nudge)
             return
         }
@@ -201,9 +203,20 @@ extension AgentViewModel {
     /// synthetic `tool_result` — Anthropic rejects `tool_use_id` values that
     /// have no matching `tool_use` in the prior assistant message).
     func appendNudgeToLastToolResult(_ toolResults: inout [[String: Any]], nudge: String) {
-        if let lastIdx = toolResults.indices.last {
-            let existing = (toolResults[lastIdx]["content"] as? String) ?? ""
-            toolResults[lastIdx]["content"] = existing.isEmpty ? nudge : existing + "\n\n" + nudge
+        // Only mutate a real tool_result whose content is a plain string.
+        // Writing "content" onto a `text` block (advisories/nudges appended
+        // earlier in the batch) yields {"type":"text","text":…,"content":…}
+        // which Anthropic rejects with "Extra inputs are not permitted".
+        if let idx = toolResults.lastIndex(where: {
+            ($0["type"] as? String) == "tool_result" && $0["content"] is String
+        }) {
+            let existing = (toolResults[idx]["content"] as? String) ?? ""
+            toolResults[idx]["content"] = existing.isEmpty ? nudge : existing + "\n\n" + nudge
+        } else if let lastIdx = toolResults.indices.last,
+                  (toolResults[lastIdx]["type"] as? String) == "text",
+                  let existing = toolResults[lastIdx]["text"] as? String
+        {
+            toolResults[lastIdx]["text"] = existing.isEmpty ? nudge : existing + "\n\n" + nudge
         } else {
             toolResults.append(["type": "text", "text": nudge])
         }
