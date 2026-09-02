@@ -21,7 +21,9 @@ extension AgentViewModel {
             let command = input["command"] as? String ?? ""
             guard !command.isEmpty else { return "Error: command is required. Recovery: pass command:\"ls -la\" or any shell command." }
             if let suggestion = Self.suggestTool(command) { return suggestion }
-            if let pathErr = Self.preflightCommand(command) { return pathErr }
+            // No path pre-validation on free-form shell text (Tier 11.3): the
+            // command itself decides what a missing path means (`|| echo`,
+            // `2>/dev/null`, `mkdir -p`, `test -e`…). The shell reports real typos.
             appendLog("🔧 $ \(Self.collapseHeredocs(command))")
             flushLog()
             if Self.needsTCCPermissions(command) {

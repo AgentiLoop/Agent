@@ -215,29 +215,6 @@ extension AgentViewModel {
         return result
     }
 
-    static func preflightCommand(_ command: String) -> String? {
-        // Match paths under /Users/ or ~/ — most common source of typos
-        guard let regex = try? NSRegularExpression(
-            pattern: #"(?:^|\s)(/Users/[^\s'";&|><$]+|~/[^\s'";&|><$]+)"#
-        ) else { return nil }
-        let nsCmd = command as NSString
-        let matches = regex.matches(in: command, range: NSRange(location: 0, length: nsCmd.length))
-        for match in matches {
-            var path = nsCmd.substring(with: match.range(at: 1))
-                .trimmingCharacters(in: CharacterSet(charactersIn: "'\""))
-            // Skip paths with glob characters — shell will expand them
-            if path.contains("*") || path.contains("?") || path.contains("[") { continue }
-            // Strip trailing slash
-            while path.hasSuffix("/") { path = String(path.dropLast()) }
-            guard !path.isEmpty else { continue }
-            let expanded = (path as NSString).expandingTildeInPath
-            if !FileManager.default.fileExists(atPath: expanded) {
-                return "Error: path does not exist: \(path) — check for typos in the path"
-            }
-        }
-        return nil
-    }
-
     /// Count files at a path.
     static func countFilesAtPath(_ path: String, hasWildcard: Bool) -> Int {
         let fm: FileManager = FileManager.default
