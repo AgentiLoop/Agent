@@ -73,6 +73,7 @@ struct CompactionState {
             return cheap + cheap / 4
         }
         let appended = Array(messages[messageCountAtReport...])
+        guard !appended.isEmpty else { return lastReportedInputTokens }
         return lastReportedInputTokens + AgentViewModel.estimateTokens(messages: appended)
     }
 
