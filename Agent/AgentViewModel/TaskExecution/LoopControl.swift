@@ -100,6 +100,33 @@ extension AgentViewModel {
             + "task_complete is refused while any remain open."
     }
 
+    // MARK: - Tier 10.5: prompt-cache warmth reminder for ≥1M windows
+
+    /// Windows this large get the reminder; smaller ones compact long before
+    /// cache warmth matters.
+    nonisolated static let cacheWarmthMinWindow = 1_000_000
+    /// Fraction of the window after which the reminder fires (once per task).
+    nonisolated static let cacheWarmthFraction = 0.25
+
+    /// On a ≥1M window, once real input usage passes 25% of it, tell the model
+    /// once that the prefix is big enough that re-reads and bulky outputs cost
+    /// real money — prefer restore_tool_result and small tool calls so the
+    /// cached prefix stays warm and compaction stays far away. Nil when the
+    /// window is small, usage is under the line, or it was already sent.
+    nonisolated static func cacheWarmthReminderBlock(
+        contextWindow: Int,
+        inputTokens: Int,
+        alreadySent: Bool
+    ) -> String? {
+        guard !alreadySent, contextWindow >= cacheWarmthMinWindow, inputTokens > 0 else { return nil }
+        guard Double(inputTokens) >= Double(contextWindow) * cacheWarmthFraction else { return nil }
+        let pct = Int((Double(inputTokens) / Double(contextWindow) * 100).rounded())
+        return "📦 Context note: this task is using \(inputTokens / 1_000)K of the \(contextWindow / 1_000_000)M-token window (\(pct)%). "
+            + "The cached prefix is large — do not re-read files already in context (use restore_tool_result for truncated results), "
+            + "keep tool outputs narrow (offset/limit, targeted search), and finish with task_complete rather than exploring further. "
+            + "Compaction will summarize the transcript if usage keeps growing."
+    }
+
     // MARK: - Tier 10.1: max_tokens recovery
 
     /// Continuation messages allowed after the escalation retry.
