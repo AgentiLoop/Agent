@@ -485,9 +485,15 @@ final class ClaudeService {
 
     // MARK: - Streaming
 
+    /// Tier 9.3: fired the moment a `tool_use` block finishes streaming
+    /// (id, name, raw input JSON) so the caller can start read-only tools
+    /// before the rest of the response arrives. Server tools never fire it.
+    typealias ToolUseHook = @Sendable (_ id: String, _ name: String, _ inputJSON: String) -> Void
+
     func sendStreaming(
         messages: [[String: Any]],
         activeGroups: Set<String>? = nil,
+        onToolUse: ToolUseHook? = nil,
         onTextDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         guard isLocalEndpoint || !apiKey.isEmpty else { throw AgentError.noAPIKey }
@@ -523,6 +529,7 @@ final class ClaudeService {
             apiVersion: Self.apiVersion,
             url: endpointURL,
             thinkingEnabled: thinkingBudget > 0 && !isLocalhostEndpoint,
+            onToolUse: onToolUse,
             onTextDelta: onTextDelta
         )
     }
@@ -530,6 +537,7 @@ final class ClaudeService {
     nonisolated private static func performStreamingRequest(
         bodyData: Data, apiKey: String, apiVersion: String, url: URL,
         thinkingEnabled: Bool = false,
+        onToolUse: ToolUseHook? = nil,
         onTextDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         var request = URLRequest(url: url)
@@ -688,6 +696,10 @@ final class ClaudeService {
                         "name": currentToolName,
                         "input": input
                     ])
+                    // Tier 9.3: the block is complete — let the caller start it now.
+                    if !inServerToolUse, !currentToolId.isEmpty {
+                        onToolUse?(currentToolId, currentToolName, currentToolJson)
+                    }
                     currentToolName = ""
                     currentToolId = ""
                     currentToolJson = ""
