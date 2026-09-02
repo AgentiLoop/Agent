@@ -1,4 +1,4 @@
-# 🦾 AgentiLoop Agent! diseñado para macOS 26.4.1 o posterior
+# 🦾 AgentiLoop Agent!
 
 ## **IA Agéntica para tu Mac de Escritorio**
 
