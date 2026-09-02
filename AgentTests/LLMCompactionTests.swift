@@ -110,4 +110,22 @@ struct LLMCompactionTests {
         let oldRead = (messages[4]["content"] as? [[String: Any]])?.first?["content"] as? String ?? ""
         #expect(oldRead.hasPrefix("[cleared"))
     }
+
+    @Test("7.6: continuation idle >60 min clears all but the last 5 tool results; fresh one untouched")
+    func timeBasedMicrocompact() {
+        let now = Date()
+        var fresh = sample(rounds: 8)
+        #expect(AgentViewModel.microcompactIfStale(&fresh, lastActivity: now.addingTimeInterval(-30 * 60), now: now) == false)
+        let freshFirst = (fresh[2]["content"] as? [[String: Any]])?.first?["content"] as? String ?? ""
+        #expect(freshFirst.hasPrefix("content 0"))
+        // No prior task → nothing to do
+        #expect(AgentViewModel.microcompactIfStale(&fresh, lastActivity: nil, now: now) == false)
+
+        var stale = sample(rounds: 8)
+        #expect(AgentViewModel.microcompactIfStale(&stale, lastActivity: now.addingTimeInterval(-61 * 60), now: now))
+        let cleared = (0..<8).filter { i in
+            ((stale[2 + i * 2]["content"] as? [[String: Any]])?.first?["content"] as? String ?? "").hasPrefix("[cleared")
+        }
+        #expect(cleared == [0, 1, 2])
+    }
 }
