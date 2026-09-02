@@ -35,6 +35,9 @@ final class AgentViewModel {
     /// into the next task so the model continues the conversation (same behavior
     /// as ScriptTab.llmMessages). Sanitized on reuse — see MessageSanitizer.
     @ObservationIgnored var lastTaskMessages: [[String: Any]] = []
+    /// When `lastTaskMessages` was last written (task end). Drives the
+    /// Tier 7.6 time-based microcompact on the next task start.
+    @ObservationIgnored var lastTaskMessagesDate: Date?
 
     // Stored property drives live UI; ChatHistoryStore persists across launches via SwiftData
     var activityLog = ""

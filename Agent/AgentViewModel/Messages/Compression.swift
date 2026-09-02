@@ -483,6 +483,27 @@ extension AgentViewModel {
 
     // MARK: - Microcompaction (clear old tool results)
 
+    /// Tier 7.6: gap after which a carried-over transcript is treated as cold.
+    /// Provider prompt caches expire well inside an hour, so nothing is saved
+    /// by keeping stale tool results verbatim — clear all but the last 5.
+    static let staleContinuationGap: TimeInterval = 60 * 60
+
+    /// Time-based microcompact at task start. `lastActivity` is when the
+    /// previous task last touched `messages`; returns true when the gap
+    /// exceeded `gap` and old tool results were cleared.
+    @discardableResult
+    static func microcompactIfStale(
+        _ messages: inout [[String: Any]],
+        lastActivity: Date?,
+        now: Date = Date(),
+        gap: TimeInterval = staleContinuationGap
+    ) -> Bool {
+        guard let lastActivity, !messages.isEmpty,
+              now.timeIntervalSince(lastActivity) > gap else { return false }
+        microcompact(&messages, keepRecent: 5)
+        return true
+    }
+
     /// Clear old tool_result content to save tokens while preserving message structure.
     /// Keeps only the last `keepRecent` tool results intact; older ones are replaced
     /// with a short self-describing stub (head preview + restore instructions) so the

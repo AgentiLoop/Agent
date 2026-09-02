@@ -94,7 +94,12 @@ extension AgentViewModel {
         // Carry over prior-task messages so the session continues across Escape/new-prompt boundaries.
         // Sanitizer drops orphaned tool_use blocks and trailing assistant turns so Anthropic accepts the request.
         var messages: [[String: Any]] = Self.sanitizeMessagesForContinuation(lastTaskMessages)
-        defer { lastTaskMessages = messages }
+        // Tier 7.6: a transcript idle for over an hour has a cold prompt cache —
+        // clear old tool results (recoverable via restore_tool_result) up front.
+        if Self.microcompactIfStale(&messages, lastActivity: lastTaskMessagesDate) {
+            appendLog("🗜️ Continuation idle >60 min — cleared old tool results before first request")
+        }
+        defer { lastTaskMessages = messages; lastTaskMessagesDate = Date() }
 
         let effectivePrompt = Self.newTaskPrefix(projectFolder: projectFolder, prompt: prompt) + prompt
 
