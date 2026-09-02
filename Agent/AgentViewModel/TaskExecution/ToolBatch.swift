@@ -52,12 +52,10 @@ extension AgentViewModel {
     /// run under the AGENT_PROJECT_FOLDER contract like every other path.
     nonisolated static func runReadPrefetch(_ payload: ReadPrefetchPayload, tabID: UUID, workDir: String) -> String {
         if let rf = payload.readFile {
-            if let dedup = dedupRead(tabID: tabID, expandedPath: rf.expanded, offset: rf.offset, limit: rf.limit) {
-                return dedup
-            }
+            let dedupNote = dedupRead(tabID: tabID, expandedPath: rf.expanded, offset: rf.offset, limit: rf.limit)
             let out = CodingService.readFile(path: rf.filePath, offset: rf.offset, limit: rf.limit)
             recordReadEmission(tabID: tabID, expandedPath: rf.expanded, offset: rf.offset, limit: rf.limit)
-            return out
+            return dedupNote.map { $0 + "\n\n" + out } ?? out
         }
         guard let cmd = payload.shellCmd, !cmd.isEmpty else { return "" }
         let pipe = Pipe(); let p = Process()

@@ -215,10 +215,11 @@ extension AgentViewModel {
     }
 
     /// If we've already emitted bytes for this exact (path, offset, limit) AND
-    /// the file's mtime+size+sha256 all match the prior emission, BLOCK the read
-    /// with an explicit message citing the rule and the hash match. Returns nil
-    /// on first read of this range or if the file has changed.
-    /// Does NOT consume a read-count slot — blocks are no-ops.
+    /// the file's mtime+size+sha256 all match the prior emission, return a
+    /// short duplicate-read NOTE. Callers still perform the read and prepend
+    /// the note — a duplicate read is never refused (after compaction the
+    /// model may legitimately need the bytes again). Returns nil on first read
+    /// of this range or if the file has changed.
     static nonisolated func dedupRead(tabID: UUID, expandedPath: String, offset: Int?, limit: Int?) -> String? {
         _readCountLock.lock()
         defer { _readCountLock.unlock() }
@@ -228,7 +229,7 @@ extension AgentViewModel {
               stat.mtime == last.mtime,
               stat.size == last.size
         else { return nil }
-        // Stat matched — confirm with content hash before blocking.
+        // Stat matched — confirm with content hash before noting.
         guard let currentHash = computeFileHash(path: expandedPath),
               currentHash == last.fileHash
         else { return nil }
@@ -239,17 +240,11 @@ extension AgentViewModel {
             rangeDesc = "the entire file"
         }
         let hashPrefix = String(currentHash.prefix(12))
-        return """
-            🛑 BLOCKED. You can only read each file (or each section of a file) 1 time \
-            unless the data has changed. You already read \(expandedPath) for this same \
-            range (\(rangeDesc)) and the data is byte-for-byte identical \
-            (sha256 \(hashPrefix)…). The data is stale — no read is allowed.
-            Allowed next moves:
-              • Read a DIFFERENT range of this file (different offset/limit) — each unique range gets 1 read.
-              • Edit the file (edit_file / write_file / apply_diff / diff_and_apply) — that changes the data and allows another read.
-              • Act on what you already have, or call task_complete.
-            """
+        return "ℹ️ Duplicate read: you already read \(expandedPath) for this range (\(rangeDesc)) "
+            + "and it is byte-for-byte identical (sha256 \(hashPrefix)…). Content re-sent below — "
+            + "next time prefer restore_tool_result or the copy already in context."
     }
+
 
     /// Record a successful read so the next read of the same (path, range) on an
     /// unchanged file is blocked. Captures mtime, size, and the sha256 of the
