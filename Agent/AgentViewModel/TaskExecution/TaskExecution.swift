@@ -134,6 +134,8 @@ extension AgentViewModel {
         // same-request retry with a bigger budget, then ≤3 continuations.
         var maxTokensRetries = 0
         var maxTokensEscalated = false
+        // Tier 10.4: iteration of the last goal_state call or goal reminder.
+        var lastGoalActivity = 0
         var timeoutRetryCount = 0
         let maxTimeoutRetries = maxRetries
 
@@ -441,6 +443,23 @@ extension AgentViewModel {
                         appendLog("📝 \(changed.count) read file(s) changed on disk — diff attached")
                         flushLog()
                     }
+                }
+
+                // Tier 10.4: a model that keeps calling tools never sees the
+                // end_turn goal nudge — re-list the open criteria every 10
+                // turns unless it touched goal_state (or was reminded) since.
+                if pendingTools.contains(where: { $0.name == "goal_state" }) {
+                    lastGoalActivity = iterations
+                }
+                if !toolResults.isEmpty, let reminder = Self.goalReminderBlock(
+                    openCriteria: GoalStateStore.shared.current?.openCriteria.map(\.text) ?? [],
+                    iteration: iterations,
+                    lastGoalActivity: lastGoalActivity)
+                {
+                    lastGoalActivity = iterations
+                    toolResults.append(["type": "text", "text": reminder])
+                    appendLog("🎯 Goal reminder attached (iteration \(iterations))")
+                    flushLog()
                 }
 
                 // Token budget checks — nudge LLM or auto-stop if budget exhausted / diminishing returns

@@ -78,6 +78,28 @@ extension AgentViewModel {
         return .proceed
     }
 
+    // MARK: - Tier 10.4: periodic goal-state reminder
+
+    /// Turns between reminders of the open goal criteria.
+    nonisolated static let goalReminderInterval = 10
+
+    /// A model that keeps calling tools never hits the end_turn nudge, so
+    /// re-surface the open criteria every `interval` iterations unless it
+    /// touched `goal_state` (or was reminded) more recently. Returns the text
+    /// block to append, or nil.
+    nonisolated static func goalReminderBlock(
+        openCriteria: [String],
+        iteration: Int,
+        lastGoalActivity: Int,
+        interval: Int = goalReminderInterval
+    ) -> String? {
+        guard !openCriteria.isEmpty, iteration - lastGoalActivity >= interval else { return nil }
+        return "🎯 Goal reminder — these criteria are still open:\n- "
+            + openCriteria.joined(separator: "\n- ")
+            + "\nMark each one done with goal_state(action:\"mark\", evidence:\"…\") as you verify it. "
+            + "task_complete is refused while any remain open."
+    }
+
     // MARK: - Tier 10.1: max_tokens recovery
 
     /// Continuation messages allowed after the escalation retry.

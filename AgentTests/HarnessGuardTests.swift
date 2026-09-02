@@ -336,6 +336,25 @@ struct HarnessGuardTests {
         #expect(PlanStateStore.promptBlock(projectFolder: "/tmp").isEmpty)
     }
 
+    // MARK: - Tier 10.4: periodic goal-state reminder
+
+    @Test("10.4: open criteria are re-listed every 10 turns unless goal_state was touched")
+    func goalReminderCadence() {
+        let open = ["build passes", "tests green"]
+        // Not yet 10 turns since last activity
+        #expect(AgentViewModel.goalReminderBlock(openCriteria: open, iteration: 9, lastGoalActivity: 0) == nil)
+        // 10 turns → reminder listing every open criterion
+        let block = AgentViewModel.goalReminderBlock(openCriteria: open, iteration: 10, lastGoalActivity: 0)
+        #expect(block?.contains("- build passes") == true)
+        #expect(block?.contains("- tests green") == true)
+        #expect(block?.contains("goal_state") == true)
+        // goal_state call at iteration 8 resets the clock
+        #expect(AgentViewModel.goalReminderBlock(openCriteria: open, iteration: 15, lastGoalActivity: 8) == nil)
+        #expect(AgentViewModel.goalReminderBlock(openCriteria: open, iteration: 18, lastGoalActivity: 8) != nil)
+        // Nothing open → never
+        #expect(AgentViewModel.goalReminderBlock(openCriteria: [], iteration: 50, lastGoalActivity: 0) == nil)
+    }
+
     // MARK: - Tier 10.3: input + max_tokens overflow
 
     @Test("10.3: 'A + B > C' overflow parses and lowers max_tokens instead of pruning")
