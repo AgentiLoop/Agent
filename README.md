@@ -624,6 +624,5 @@ Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can bui
 >
 > Sincerely,
 > **AgentiLoop — Agent!**
-> 🦾 Agent! for macOS 26.4.1
 > https://AgentiLoop.ai
 > https://github.com/AgentiLoop/agent

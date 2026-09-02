@@ -603,6 +603,5 @@ Si vives dentro de un solo repositorio todo el día, Cursor es excelente. Si qui
 >
 > Atentamente,
 > **AgentiLoop — Agent!**
-> 🦾 Agent! para macOS 26.4.1
 > https://AgentiLoop.ai
 > https://github.com/AgentiLoop/agent
