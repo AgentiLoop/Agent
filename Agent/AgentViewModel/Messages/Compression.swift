@@ -280,7 +280,25 @@ extension AgentViewModel {
         stripOldImages(&request, keepRecentCount: 0)
         request.append(["role": "user", "content": compactSummaryPrompt])
 
-        guard let summary = await summarizer(request), !summary.isEmpty else {
+        var summary = await summarizer(request)
+        if summary == nil, messages.count > keepRecent + 8 {
+            // The summary request itself may be too long for the provider
+            // (forced compaction after a 413). Retry once summarizing only the
+            // newer half of the middle — the older half is spilled below and
+            // stays recoverable via restore_tool_result.
+            let dropCount = (messages.count - 1 - keepRecent) / 2
+            var shorter = [messages[0]]
+            shorter.append(["role": "user", "content": "[\(dropCount) earlier messages omitted from this summary request]"])
+            shorter.append(["role": "assistant", "content": "Understood."])
+            var rest = Array(messages.dropFirst(1 + dropCount))
+            demoteOrphanToolResults(&rest)
+            shorter.append(contentsOf: rest)
+            stripOldImages(&shorter, keepRecentCount: 0)
+            shorter.append(["role": "user", "content": compactSummaryPrompt])
+            log?("🗜️ Summary request too long — retrying with the oldest \(dropCount) messages omitted")
+            summary = await summarizer(shorter)
+        }
+        guard let summary, !summary.isEmpty else {
             log?("⚠️ LLM compaction summary failed — falling back to prune")
             return false
         }
@@ -329,6 +347,7 @@ extension AgentViewModel {
         _ messages: inout [[String: Any]],
         state: inout CompactionState,
         summarizer: CompactSummarizer? = nil,
+        force: Bool = false,
         log: ((String) -> Void)? = nil
     ) async -> Bool
     {
@@ -340,14 +359,15 @@ extension AgentViewModel {
         // Cheap check first so an under-threshold turn costs nothing. When the
         // provider has reported input_tokens for the previous request that
         // figure is authoritative (it includes system prompt + tool schemas);
-        // otherwise fall back to an inflated chars/4 estimate.
+        // otherwise fall back to an inflated chars/4 estimate. `force` skips
+        // the check — the provider already rejected the transcript as too long.
         let measured = state.measuredTokens(for: messages)
-        guard state.shouldCompact(estimatedTokens: measured) else { return false }
+        guard force || state.shouldCompact(estimatedTokens: measured) else { return false }
 
         // Without a usage report, confirm with the on-device counter before
         // paying for a compaction — chars/4 alone is too noisy to act on.
         let tokensBefore: Int
-        if state.lastReportedInputTokens > 0 {
+        if force || state.lastReportedInputTokens > 0 {
             tokensBefore = measured
         } else {
             tokensBefore = await preciseTokenCount(messages: messages)
@@ -467,16 +487,42 @@ extension AgentViewModel {
     /// with a short self-describing stub (head preview + restore instructions) so the
     /// model knows WHAT was cleared and how to get it back — instead of re-reading
     /// the same file in a loop.
+    /// Tool results that are never cleared by microcompact: small, and the
+    /// model steers on them (goal/plan state, user answers, sub-agent
+    /// findings, memory). Everything else — file reads, shell output,
+    /// searches, web fetches, edits — is cheap to recover via
+    /// restore_tool_result and is what actually fills the window.
+    static let microcompactProtectedTools: Set<String> = [
+        "goal_state", "plan", "plan_mode", "ask_user", "task_complete", "done",
+        "memory", "restore_tool_result", "spawn_agent", "tell_agent", "skill"
+    ]
+
     static func microcompact(_ messages: inout [[String: Any]], keepRecent: Int = 3) {
         // No toggle gate — clearing stale tool results (spilled to ToolResultCache
         // first, so nothing is lost) is structural recovery, not an Apple
         // Intelligence feature.
+        // Map tool_use id → tool name so protected results can be skipped.
+        var toolNames: [String: String] = [:]
+        for msg in messages where msg["role"] as? String == "assistant" {
+            guard let blocks = msg["content"] as? [[String: Any]] else { continue }
+            for block in blocks where block["type"] as? String == "tool_use" {
+                if let id = block["id"] as? String, let name = block["name"] as? String {
+                    toolNames[id] = name
+                }
+            }
+        }
         // Find all tool_result indices
         var toolResultIndices: [(msgIdx: Int, blockIdx: Int)] = []
         for (i, msg) in messages.enumerated() {
             if let blocks = msg["content"] as? [[String: Any]] {
                 for (j, block) in blocks.enumerated() {
                     guard block["type"] as? String == "tool_result" else { continue }
+                    if let id = block["tool_use_id"] as? String,
+                       let name = toolNames[id],
+                       microcompactProtectedTools.contains(name)
+                    {
+                        continue
+                    }
                     if let content = block["content"] as? String,
                        content.count > 100,
                        !content.hasPrefix("[cleared")
