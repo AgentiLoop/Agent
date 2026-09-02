@@ -191,7 +191,7 @@ extension AgentViewModel {
         var textOnlyCount = 0
         var timeoutRetryCount = 0
         var stopRouteRetries = 0
-        var compactionState = CompactionState(contextWindow: contextWindow(for: provider))
+        var compactionState = CompactionState(contextWindow: contextWindow(for: provider), maxTokens: mt)
         var stuckFiles: [String: Int] = [:] // Edit failure count per file (for nudge)
         var repeatedCalls: [String: Int] = [:] // Identical tool-call fingerprint counts (broken-record guard)
         // Plan-mode enforcement state
@@ -305,6 +305,7 @@ extension AgentViewModel {
                     tab.displayedLLMOutput = tab.rawLLMOutput
                     tab.dripDisplayIndex = tab.rawLLMOutput.unicodeScalars.count
                 }
+                compactionState.recordUsage(inputTokens: response.inputTokens, messageCount: sendMessages.count)
                 // Track token usage — use reported counts or estimate from text (~4 chars/token)
                 let inTok = response.inputTokens > 0 ? response.inputTokens : Self.estimateTokens(messages: messages)
                 let outTok = response.outputTokens > 0 ? response.outputTokens : Self.estimateTokens(content: response.content)
@@ -472,7 +473,7 @@ extension AgentViewModel {
                     modelId = fbModel
                     // Rescale the compaction threshold to the fallback provider's
                     // real context window (see the main loop's fallback path).
-                    compactionState = CompactionState(contextWindow: contextWindow(for: fbProvider))
+                    compactionState = CompactionState(contextWindow: contextWindow(for: fbProvider), maxTokens: mt)
                     services = buildTabLLMServices(
                         provider: provider,
                         modelId: modelId,

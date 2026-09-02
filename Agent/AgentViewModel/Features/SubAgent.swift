@@ -218,7 +218,7 @@ extension AgentViewModel {
         // Sub-agents previously never compacted — a long research loop grew
         // until the provider rejected the transcript. Same tiered compaction
         // as the main/tab loops, threshold from the provider's real context.
-        var compactionState = CompactionState(contextWindow: contextWindow(for: provider))
+        var compactionState = CompactionState(contextWindow: contextWindow(for: provider), maxTokens: mt)
 
         while !Task.isCancelled && iterations < maxIterations {
             iterations += 1
@@ -246,6 +246,7 @@ extension AgentViewModel {
 
                 agent.inputTokens += response.inputTokens
                 agent.outputTokens += response.outputTokens
+                compactionState.recordUsage(inputTokens: response.inputTokens, messageCount: messages.count)
 
                 var toolResults: [[String: Any]] = []
                 var hasToolUse = false
