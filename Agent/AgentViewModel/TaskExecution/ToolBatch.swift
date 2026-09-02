@@ -10,14 +10,125 @@ import Cocoa
 
 extension AgentViewModel {
 
+    /// Sendable payload for one pre-executable read-only tool call.
+    struct ReadPrefetchPayload: Sendable {
+        let toolId: String
+        let readFile: (filePath: String, expanded: String, offset: Int?, limit: Int?)?
+        let shellCmd: String?
+    }
+
+    /// Build the payload for a tool that can run off the main actor, or nil
+    /// when the tool must go through `dispatchTool`.
+    nonisolated static func readPrefetchPayload(
+        toolId: String, name: String, input: [String: Any], projectFolder: String
+    ) -> ReadPrefetchPayload? {
+        if name == "read_file" {
+            let filePath = input["file_path"] as? String ?? ""
+            return ReadPrefetchPayload(
+                toolId: toolId,
+                readFile: (filePath, (filePath as NSString).expandingTildeInPath,
+                           input["offset"] as? Int, input["limit"] as? Int),
+                shellCmd: nil)
+        }
+        if isReadOnlyShellCall(name, input: input) {
+            return ReadPrefetchPayload(toolId: toolId, readFile: nil, shellCmd: input["command"] as? String ?? "")
+        }
+        guard preExecutableTools.contains(name) else { return nil }
+        return ReadPrefetchPayload(
+            toolId: toolId, readFile: nil,
+            shellCmd: buildReadOnlyCommand(name: name, input: input, projectFolder: projectFolder))
+    }
+
+    /// Tools whose result can be computed off the main actor by a shell
+    /// command (read_file and read-only user-shell calls are handled
+    /// separately in `readPrefetchPayload`).
+    nonisolated static let preExecutableTools: Set<String> = [
+        "list_files", "search_files", "read_dir",
+        "git_status", "git_diff", "git_log", "git_diff_patch"
+    ]
+
+    /// Run one prefetch payload. Same guard sequence as handleFileTool's
+    /// serial path for read_file (dedup + emission record); shell commands
+    /// run under the AGENT_PROJECT_FOLDER contract like every other path.
+    nonisolated static func runReadPrefetch(_ payload: ReadPrefetchPayload, tabID: UUID, workDir: String) -> String {
+        if let rf = payload.readFile {
+            if let dedup = dedupRead(tabID: tabID, expandedPath: rf.expanded, offset: rf.offset, limit: rf.limit) {
+                return dedup
+            }
+            let out = CodingService.readFile(path: rf.filePath, offset: rf.offset, limit: rf.limit)
+            recordReadEmission(tabID: tabID, expandedPath: rf.expanded, offset: rf.offset, limit: rf.limit)
+            return out
+        }
+        guard let cmd = payload.shellCmd, !cmd.isEmpty else { return "" }
+        let pipe = Pipe(); let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        p.arguments = ["-c", cmd]
+        p.currentDirectoryURL = URL(fileURLWithPath: workDir)
+        var env = ProcessInfo.processInfo.environment
+        env["HOME"] = NSHomeDirectory()
+        // Match the AGENT_PROJECT_FOLDER contract used by every other
+        // shell-execution path (executeTCC, UserService, HelperToolService).
+        env["AGENT_PROJECT_FOLDER"] = workDir
+        env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:" + (env["PATH"] ?? "")
+        p.environment = env; p.standardOutput = pipe; p.standardError = pipe
+        try? p.run(); p.waitUntilExit()
+        return String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+    }
+
+    /// Tier 9.3: read-only tools started while the response is still
+    /// streaming. `start` is called from the stream parser the moment a
+    /// `tool_use` block closes; `drain` hands the in-flight tasks to
+    /// `executePendingToolBatches` once the response is complete.
+    final class StreamPrefetch: @unchecked Sendable {
+        private let lock = NSLock()
+        private var tasks: [String: Task<String, Never>] = [:]
+        private(set) var started = 0
+
+        func start(toolId: String, name: String, inputJSON: String, projectFolder: String, tabID: UUID) {
+            guard let data = inputJSON.data(using: .utf8),
+                  let input = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let payload = AgentViewModel.readPrefetchPayload(
+                    toolId: toolId, name: name, input: input, projectFolder: projectFolder)
+            else { return }
+            let workDir = projectFolder.isEmpty ? NSHomeDirectory() : projectFolder
+            let task = Task.detached(priority: .userInitiated) {
+                AgentViewModel.runReadPrefetch(payload, tabID: tabID, workDir: workDir)
+            }
+            lock.lock(); tasks[toolId] = task; started += 1; lock.unlock()
+        }
+
+        func drain() -> [String: Task<String, Never>] {
+            lock.lock(); defer { lock.unlock() }
+            let out = tasks; tasks = [:]
+            return out
+        }
+    }
+
     /// / Executes a set of pending tool calls from a single LLM turn. / / Consecutive read-only tools are partitioned
     /// into parallel batches that / pre-execute common shell reads off the main actor via a TaskGroup; the / results are stashed into `Self.precomputedResults` so the subsequent / `dispatchTool` calls return instantly. Write/mutating tools serialize. / Appends the tool results to `toolResults` via inout.
+    /// `prefetched` (Tier 9.3) holds results already started during streaming — they are awaited instead of re-run.
     func executePendingToolBatches(
         pendingTools: [(toolId: String, name: String, input: [String: Any])],
-        toolResults: inout [[String: Any]]
+        toolResults: inout [[String: Any]],
+        prefetched: [String: Task<String, Never>] = [:]
     ) async {
         if !pendingTools.isEmpty {
             let maxConcurrency = 10
+            // Tier 9.3: tools that never made it into pendingTools (blocked,
+            // disabled) must not leak a running task.
+            let pendingIds = Set(pendingTools.map(\.toolId))
+            for (id, task) in prefetched where !pendingIds.contains(id) { task.cancel() }
+            /// Consume a streaming prefetch for `tool`, or nil when it wasn't started.
+            func takePrefetched(_ tool: (toolId: String, name: String, input: [String: Any])) async -> String? {
+                guard let task = prefetched[tool.toolId] else { return nil }
+                let out = await task.value
+                if let cmd = tool.input["command"] as? String, Self.userShellTools.contains(tool.name) {
+                    appendLog("⚡ $ \(Self.collapseHeredocs(cmd)) (started during stream)")
+                } else {
+                    appendLog("⚡ \(tool.name) (started during stream)")
+                }
+                return out
+            }
             // Partition into batches: consecutive read-only = parallel batch, write = serial batch
             var batches: [(parallel: Bool, tools: [(toolId: String, name: String, input: [String: Any])])] = []
             for tool in pendingTools {
@@ -35,18 +146,11 @@ extension AgentViewModel {
                     // INCLUDING read_file, which routes through the same lock-protected
                     // dedup/sha256 statics (dedupRead / recordReadEmission) that
                     // handleFileTool uses, so the read guards still run per-read.
-                    let parallelTools: Set<String> = [
-                        "read_file",
-                        "list_files",
-                        "search_files",
-                        "read_dir",
-                        "git_status",
-                        "git_diff",
-                        "git_log",
-                        "git_diff_patch"
-                    ]
+                    // Tools already started during streaming are skipped here.
                     let parallelBatch = batch.tools.filter {
-                        parallelTools.contains($0.name) || Self.isReadOnlyShellCall($0.name, input: $0.input)
+                        prefetched[$0.toolId] == nil
+                            && (Self.preExecutableTools.contains($0.name) || $0.name == "read_file"
+                                || Self.isReadOnlyShellCall($0.name, input: $0.input))
                     }
                     var preResults: [String: String] = [:]
                     if parallelBatch.count > 1 {
@@ -55,69 +159,16 @@ extension AgentViewModel {
                         let workDir = capturedPF.isEmpty ? NSHomeDirectory() : capturedPF
                         // Extract Sendable payloads on the main actor — the child
                         // task must not capture the non-Sendable [String: Any] input.
-                        let payloads: [(toolId: String, readFile: (filePath: String, expanded: String, offset: Int?, limit: Int?)?, shellCmd: String?)] = parallelBatch.map { tool in
-                            if tool.name == "read_file" {
-                                let filePath = tool.input["file_path"] as? String ?? ""
-                                return (
-                                    tool.toolId,
-                                    (
-                                        filePath,
-                                        (filePath as NSString).expandingTildeInPath,
-                                        tool.input["offset"] as? Int,
-                                        tool.input["limit"] as? Int
-                                    ),
-                                    nil
-                                )
-                            }
-                            return (
-                                tool.toolId,
-                                nil,
-                                Self.isReadOnlyShellCall(tool.name, input: tool.input)
-                                    ? (tool.input["command"] as? String ?? "")
-                                    : Self.buildReadOnlyCommand(name: tool.name, input: tool.input, projectFolder: capturedPF)
-                            )
+                        let payloads: [ReadPrefetchPayload] = parallelBatch.compactMap { tool in
+                            Self.readPrefetchPayload(
+                                toolId: tool.toolId, name: tool.name, input: tool.input, projectFolder: capturedPF)
                         }
                         await withTaskGroup(of: (String, String).self) { group in
                             for (i, payload) in payloads.enumerated() where i < maxConcurrency {
-                                let toolId = payload.toolId
-                                let rf = payload.readFile
-                                let cmd = payload.shellCmd
                                 let tabID = capturedTabID
                                 let workDirLocal = workDir
                                 group.addTask {
-                                    if let rf = rf {
-                                        // Same guard sequence as handleFileTool's serial path.
-                                        if let dedup = Self.dedupRead(
-                                            tabID: tabID, expandedPath: rf.expanded,
-                                            offset: rf.offset, limit: rf.limit)
-                                        {
-                                            return (toolId, dedup)
-                                        }
-                                        let out = CodingService.readFile(
-                                            path: rf.filePath, offset: rf.offset, limit: rf.limit)
-                                        Self.recordReadEmission(
-                                            tabID: tabID, expandedPath: rf.expanded,
-                                            offset: rf.offset, limit: rf.limit)
-                                        return (toolId, out)
-                                    }
-                                    guard let cmd = cmd, !cmd.isEmpty else { return (toolId, "") }
-                                    let pipe = Pipe(); let p = Process()
-                                    p.executableURL = URL(fileURLWithPath: "/bin/zsh")
-                                    p.arguments = ["-c", cmd]
-                                    p.currentDirectoryURL = URL(fileURLWithPath: workDirLocal)
-                                    var env = ProcessInfo.processInfo.environment
-                                    env["HOME"] = NSHomeDirectory()
-                                    // Match the AGENT_PROJECT_FOLDER contract used by every other
-                                    // shell-execution path (executeTCC, UserService, HelperToolService).
-                                    env["AGENT_PROJECT_FOLDER"] = workDirLocal
-                                    env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:" +
-                                        (env["PATH"] ?? "")
-                                    p.environment = env; p.standardOutput = pipe; p.standardError = pipe
-                                    try? p.run(); p.waitUntilExit()
-                                    return (
-                                        toolId,
-                                        String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-                                    )
+                                    (payload.toolId, Self.runReadPrefetch(payload, tabID: tabID, workDir: workDirLocal))
                                 }
                             }
                             for await (id, result) in group { preResults[id] = result }
@@ -130,6 +181,10 @@ extension AgentViewModel {
                     // `parallelBatch.count > 1` check and were silently dropped,
                     // orphaning their tool_use ids.
                     for tool in batch.tools {
+                        if let pre = await takePrefetched(tool) {
+                            toolResults.append(["type": "tool_result", "tool_use_id": tool.toolId, "content": pre])
+                            continue
+                        }
                         if let pre = preResults[tool.toolId] {
                             if let cmd = tool.input["command"] as? String, Self.userShellTools.contains(tool.name) {
                                 appendLog("⚡ $ \(Self.collapseHeredocs(cmd)) (parallel, read-only)")
@@ -154,6 +209,10 @@ extension AgentViewModel {
                 } else {
                     // Serial batch: execute one by one
                     for tool in batch.tools {
+                        if let pre = await takePrefetched(tool) {
+                            toolResults.append(["type": "tool_result", "tool_use_id": tool.toolId, "content": pre])
+                            continue
+                        }
                         let ctx = ToolContext(
                             toolId: tool.toolId,
                             projectFolder: projectFolder,

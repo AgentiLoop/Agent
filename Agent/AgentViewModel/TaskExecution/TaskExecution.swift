@@ -259,9 +259,21 @@ extension AgentViewModel {
                 let sendMessages = messages
 
                 let response: (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int)
+                // Tier 9.3: read-only tool_use blocks start executing the
+                // moment they finish streaming; results are consumed below.
+                let streamPrefetch = Self.StreamPrefetch()
                 flushLog()
                 if let claude = services.claude {
-                    response = try await claude.sendStreaming(messages: sendMessages, activeGroups: activeGroups) { [weak self] delta in
+                    let prefetchPF = projectFolder
+                    let prefetchTab = selectedTabId ?? Self.mainTabID
+                    response = try await claude.sendStreaming(
+                        messages: sendMessages,
+                        activeGroups: activeGroups,
+                        onToolUse: { id, name, json in
+                            streamPrefetch.start(toolId: id, name: name, inputJSON: json,
+                                                 projectFolder: prefetchPF, tabID: prefetchTab)
+                        }
+                    ) { [weak self] delta in
                         Task { @MainActor in
                             self?.isThinking = false
                             self?.appendStreamDelta(delta)
@@ -388,6 +400,7 @@ extension AgentViewModel {
                         appendLog("⚠️ Response truncated at max_tokens — retrying the same request with max_tokens \(effective) → \(bigger)")
                         flushLog()
                         rawLLMOutput = ""
+                        streamPrefetch.drain().values.forEach { $0.cancel() }
                         continue taskLoop
                     }
                 }
@@ -401,6 +414,7 @@ extension AgentViewModel {
                     maxTokensRetriesUsed: maxTokensRetries
                 )
                 if case .retry(let correction, let logLine) = route {
+                    streamPrefetch.drain().values.forEach { $0.cancel() }
                     if response.stopReason == "max_tokens" { maxTokensRetries += 1 } else { stopRouteRetries += 1 }
                     appendLog(logLine)
                     flushLog()
@@ -422,7 +436,8 @@ extension AgentViewModel {
                 // Consecutive read-only tools run in parallel; write tools serialize
                 await executePendingToolBatches(
                     pendingTools: pendingTools,
-                    toolResults: &toolResults
+                    toolResults: &toolResults,
+                    prefetched: streamPrefetch.drain()
                 )
 
                 // Vision verification: auto-screenshot after UI actions so the LLM can see the result.
