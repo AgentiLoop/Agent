@@ -574,7 +574,7 @@ extension AgentViewModel {
                     messages: &messages,
                     timeoutRetryCount: &timeoutRetryCount,
                     maxTimeoutRetries: maxTimeoutRetries,
-                    overflowCompactor: { msgs in
+                    overflowCompactor: { [services] msgs in
                         // 413 / context overflow → same compactor as the
                         // threshold path, threshold check bypassed (Tier 7.7).
                         let overflowLog: (String) -> Void = { [weak self] m in
