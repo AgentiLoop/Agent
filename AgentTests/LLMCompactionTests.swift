@@ -128,4 +128,120 @@ struct LLMCompactionTests {
         }
         #expect(cleared == [0, 1, 2])
     }
+
+    // MARK: - Tier 7.4: re-attachment after compaction
+
+    @Test("7.4: appendUserText joins the trailing user message or opens a new one")
+    func appendUserTextShape() {
+        var messages: [[String: Any]] = [["role": "user", "content": "plain"]]
+        AgentViewModel.appendUserText("restored", to: &messages)
+        #expect(messages.count == 1)
+        let blocks = messages[0]["content"] as? [[String: Any]] ?? []
+        #expect(blocks.count == 2)
+        #expect(blocks[0]["text"] as? String == "plain")
+        #expect(blocks[1]["text"] as? String == "restored")
+
+        messages.append(["role": "assistant", "content": "ok"])
+        AgentViewModel.appendUserText("again", to: &messages)
+        #expect(messages.count == 3)
+        #expect(messages[2]["role"] as? String == "user")
+        #expect(messages[2]["content"] as? String == "again")
+    }
+
+    @Test("7.4: postCompactReattachment carries open goal + edited file head and resets read-dedup")
+    func reattachmentAfterCompaction() {
+        let vm = AgentViewModel()
+        let savedFolder = vm.projectFolder
+        let tmpDir = NSTemporaryDirectory() + "reattach-\(UUID().uuidString)"
+        try! FileManager.default.createDirectory(atPath: tmpDir, withIntermediateDirectories: true)
+        vm.projectFolder = tmpDir
+        let tab = UUID()
+        let path = tmpDir + "/edited.swift"
+        try! "let edited = true\n".write(toFile: path, atomically: true, encoding: .utf8)
+        defer {
+            vm.projectFolder = savedFolder
+            GoalStateStore.shared.clear()
+            FileBackupService.shared.clearTaskSnapshots()
+            try? FileManager.default.removeItem(atPath: tmpDir)
+        }
+
+        // Nothing open, nothing edited → nothing to re-attach
+        GoalStateStore.shared.clear()
+        FileBackupService.shared.clearTaskSnapshots()
+        #expect(vm.postCompactReattachment(tabID: tab) == nil)
+
+        _ = GoalStateStore.shared.set(goal: "ship it", criteria: ["tests pass", "commit made"])
+        _ = GoalStateStore.shared.setCriterion(text: "commit made", done: true, evidence: "abc123")
+        FileBackupService.shared.snapshot(filePath: path, tabID: tab)
+        // A prior read of the edited file is blocked as a duplicate…
+        AgentViewModel.recordReadEmission(tabID: tab, expandedPath: path, offset: nil, limit: nil)
+        #expect(AgentViewModel.dedupRead(tabID: tab, expandedPath: path, offset: nil, limit: nil) != nil)
+
+        let block = vm.postCompactReattachment(tabID: tab) ?? ""
+        #expect(block.hasPrefix("[Context restored after compaction]"))
+        #expect(block.contains("OPEN GOAL — ship it"))
+        #expect(block.contains("- tests pass"))
+        #expect(!block.contains("- commit made"))
+        #expect(block.contains("FILE \(path) (full file, current on disk)"))
+        #expect(block.contains("let edited = true"))
+        #expect(block.contains("Read-dedup was reset"))
+        // …and is legitimate again once the content left the context.
+        #expect(AgentViewModel.dedupRead(tabID: tab, expandedPath: path, offset: nil, limit: nil) == nil)
+    }
+
+    // MARK: - Tier 7.7: overflow routes through forced compaction
+
+    private struct OverflowError: LocalizedError {
+        var errorDescription: String? { "invalid_request_error: prompt is too long: 210000 tokens > 200000 maximum" }
+    }
+
+    @Test("7.7: overflow calls the compactor and continues without blind pruning")
+    func overflowUsesCompactor() async {
+        let vm = AgentViewModel()
+        var messages = sample(rounds: 10)
+        var retries = 0
+        var compactorCalls = 0
+        var logs: [String] = []
+        let outcome = await vm.handleTaskLoopError(
+            OverflowError(), activeService: .claude, providerDisplayName: "Claude",
+            messages: &messages, timeoutRetryCount: &retries, maxTimeoutRetries: 3,
+            appendLogFn: { logs.append($0) }, flushFn: {},
+            overflowCompactor: { msgs in
+                compactorCalls += 1
+                msgs = [msgs[0], ["role": "user", "content": "summary"], ["role": "assistant", "content": "Understood, continuing."]]
+                return true
+            })
+        guard case .continueLoop = outcome else { Issue.record("expected continueLoop, got \(outcome)"); return }
+        #expect(compactorCalls == 1)
+        #expect(retries == 1)
+        // The compactor's shape is kept verbatim — pruneMessages did not run on top.
+        #expect(messages.count == 3)
+        #expect(messages[1]["content"] as? String == "summary")
+        #expect(logs.contains { $0.contains("Context overflow — pruned 21 → 3") })
+    }
+
+    @Test("7.7: compactor failure falls back to the blind prune; no shrink → breakLoop")
+    func overflowFallbackAndGiveUp() async {
+        let vm = AgentViewModel()
+        var messages = sample(rounds: 10)
+        var retries = 0
+        let outcome = await vm.handleTaskLoopError(
+            OverflowError(), activeService: .claude, providerDisplayName: "Claude",
+            messages: &messages, timeoutRetryCount: &retries, maxTimeoutRetries: 3,
+            appendLogFn: { _ in }, flushFn: {},
+            overflowCompactor: { _ in false })
+        guard case .continueLoop = outcome else { Issue.record("expected continueLoop, got \(outcome)"); return }
+        #expect(messages.count < 21)
+
+        // A compactor that claims success but changes nothing is futile — stop.
+        var frozen: [[String: Any]] = [["role": "user", "content": "x"]]
+        var retries2 = 0
+        let stop = await vm.handleTaskLoopError(
+            OverflowError(), activeService: .claude, providerDisplayName: "Claude",
+            messages: &frozen, timeoutRetryCount: &retries2, maxTimeoutRetries: 3,
+            appendLogFn: { _ in }, flushFn: {},
+            overflowCompactor: { _ in true })
+        guard case .breakLoop = stop else { Issue.record("expected breakLoop, got \(stop)"); return }
+    }
 }
+

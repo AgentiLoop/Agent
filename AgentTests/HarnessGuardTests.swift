@@ -367,3 +367,116 @@ struct HarnessGuardTests {
         #expect(AgentViewModel.uncommittedDiff(folder: dir.path).isEmpty)
     }
 }
+
+// Tier 9.3: read-only tools start while the Claude response is still
+// streaming. `readPrefetchPayload` decides what may run off the main actor,
+// `StreamPrefetch` launches it at content_block_stop, and
+// `executePendingToolBatches(prefetched:)` awaits those tasks instead of
+// re-running the tool — and cancels any prefetch whose tool was dropped.
+
+@Suite("StreamPrefetch")
+@MainActor
+struct StreamPrefetchTests {
+
+    private func tempDir() -> String {
+        let dir = NSTemporaryDirectory() + "prefetch-\(UUID().uuidString)"
+        try! FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+        return dir
+    }
+
+    @Test("9.3: payload classification — read_file, shell reads and list tools only")
+    func payloadClassification() {
+        let rf = AgentViewModel.readPrefetchPayload(
+            toolId: "t1", name: "read_file", input: ["file_path": "~/x.swift", "offset": 5, "limit": 20], projectFolder: "/tmp")
+        #expect(rf?.readFile?.filePath == "~/x.swift")
+        #expect(rf?.readFile?.expanded == NSHomeDirectory() + "/x.swift")
+        #expect(rf?.readFile?.offset == 5)
+        #expect(rf?.readFile?.limit == 20)
+        #expect(rf?.shellCmd == nil)
+
+        let sh = AgentViewModel.readPrefetchPayload(
+            toolId: "t2", name: "execute_agent_command", input: ["command": "ls -la /tmp"], projectFolder: "/tmp")
+        #expect(sh?.shellCmd == "ls -la /tmp")
+        #expect(sh?.readFile == nil)
+
+        let ls = AgentViewModel.readPrefetchPayload(
+            toolId: "t3", name: "list_files", input: ["path": "/tmp", "pattern": "*.swift"], projectFolder: "/tmp")
+        #expect(ls?.shellCmd?.hasPrefix("find '/tmp'") == true)
+
+        // Writes, root shell and non-prefetchable tools stay serial.
+        #expect(AgentViewModel.readPrefetchPayload(
+            toolId: "t4", name: "execute_agent_command", input: ["command": "rm -rf build"], projectFolder: "/tmp") == nil)
+        #expect(AgentViewModel.readPrefetchPayload(
+            toolId: "t5", name: "execute_daemon_command", input: ["command": "ls"], projectFolder: "/tmp") == nil)
+        #expect(AgentViewModel.readPrefetchPayload(
+            toolId: "t6", name: "edit_file", input: ["file_path": "/tmp/a"], projectFolder: "/tmp") == nil)
+    }
+
+    @Test("9.3: StreamPrefetch starts eligible tool_use blocks and drains them once")
+    func startAndDrain() async {
+        let dir = tempDir()
+        defer { try? FileManager.default.removeItem(atPath: dir) }
+        let path = dir + "/hello.txt"
+        try! "hello prefetch\n".write(toFile: path, atomically: true, encoding: .utf8)
+        let tab = UUID()
+
+        let prefetch = AgentViewModel.StreamPrefetch()
+        prefetch.start(toolId: "r1", name: "read_file",
+                       inputJSON: "{\"file_path\":\"\(path)\"}", projectFolder: dir, tabID: tab)
+        prefetch.start(toolId: "s1", name: "execute_agent_command",
+                       inputJSON: "{\"command\":\"echo streamed-shell\"}", projectFolder: dir, tabID: tab)
+        // Not eligible: write tool, malformed JSON
+        prefetch.start(toolId: "w1", name: "write_file",
+                       inputJSON: "{\"file_path\":\"\(path)\",\"content\":\"x\"}", projectFolder: dir, tabID: tab)
+        prefetch.start(toolId: "bad", name: "read_file", inputJSON: "{not json", projectFolder: dir, tabID: tab)
+        #expect(prefetch.started == 2)
+
+        let tasks = prefetch.drain()
+        #expect(Set(tasks.keys) == ["r1", "s1"])
+        #expect(prefetch.drain().isEmpty)
+
+        let readOut = await tasks["r1"]!.value
+        #expect(readOut.contains("hello prefetch"))
+        let shellOut = await tasks["s1"]!.value
+        #expect(shellOut.trimmingCharacters(in: .whitespacesAndNewlines) == "streamed-shell")
+        // The stream-time read recorded its emission, so an identical re-read is deduped.
+        #expect(AgentViewModel.dedupRead(tabID: tab, expandedPath: path, offset: nil, limit: nil) != nil)
+        AgentViewModel.clearReadCountsForTab(tabID: tab)
+    }
+
+    @Test("9.3: executePendingToolBatches consumes prefetched results and cancels orphans")
+    func batchConsumesPrefetched() async {
+        let vm = AgentViewModel()
+        let dir = tempDir()
+        defer { try? FileManager.default.removeItem(atPath: dir) }
+        let path = dir + "/on-disk.txt"
+        try! "on disk\n".write(toFile: path, atomically: true, encoding: .utf8)
+
+        let pending: [(toolId: String, name: String, input: [String: Any])] = [
+            ("p1", "read_file", ["file_path": path]),
+            ("p2", "execute_agent_command", ["command": "echo second"]),
+        ]
+        let prefetchedRead = Task<String, Never> { "PREFETCHED-READ" }
+        let prefetchedShell = Task<String, Never> { "PREFETCHED-SHELL" }
+        let orphan = Task<String, Never> {
+            try? await Task.sleep(for: .seconds(30))
+            return "orphan"
+        }
+        var results: [[String: Any]] = []
+        await vm.executePendingToolBatches(
+            pendingTools: pending, toolResults: &results,
+            prefetched: ["p1": prefetchedRead, "p2": prefetchedShell, "dropped": orphan])
+
+        let byId = Dictionary(uniqueKeysWithValues: results.compactMap { r -> (String, String)? in
+            guard r["type"] as? String == "tool_result",
+                  let id = r["tool_use_id"] as? String, let c = r["content"] as? String else { return nil }
+            return (id, c)
+        })
+        // Awaited, not re-run: the on-disk content never appears.
+        #expect(byId["p1"] == "PREFETCHED-READ")
+        #expect(byId["p2"] == "PREFETCHED-SHELL")
+        #expect(byId.count == 2)
+        #expect(orphan.isCancelled)
+    }
+}
+
