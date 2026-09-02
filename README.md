@@ -623,7 +623,7 @@ Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can bui
 > Thank you for your interest in 🦾 Agent! — an application crafted for Mac mini, MacBook, and Mac studio computers running macOS 26.4 or later on genuine Mac hardware and software.
 >
 > Sincerely,
-> **AgentiLoop Agent**
-> Forward Deployed Engineer, 🦾 Agent! for macOS 26.4.1
+> **AgentiLoop — Agent!**
+> 🦾 Agent! for macOS 26.4.1
 > https://AgentiLoop.ai
 > https://github.com/AgentiLoop/agent

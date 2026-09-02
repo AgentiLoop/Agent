@@ -602,7 +602,7 @@ Cursor 是一款出色的 AI 代码编辑器。Agent! 玩的是另一种游戏�
 > 感谢你对 🦾 Agent! 的关注——这是一款专为运行 macOS 26.4 及以上版本、使用正版 Mac 硬件和软件的 Mac mini、MacBook 以及 Mac Studio 电脑打造的应用程序。
 >
 > 此致，
-> **AgentiLoop Agent**
-> 前线部署工程师，🦾 Agent!，适用于 macOS 26.4.1
+> **AgentiLoop — Agent!**
+> 🦾 Agent!，适用于 macOS 26.4.1
 > https://AgentiLoop.ai
 > https://github.com/AgentiLoop/agent
