@@ -603,6 +603,5 @@ Lust, an Agent! zu basteln? Siehe [CONTRIBUTING.md](./CONTRIBUTING.md) — du ka
 >
 > Mit freundlichen Grüßen,
 > **AgentiLoop — Agent!**
-> 🦾 Agent! für macOS 26.4.1
 > https://AgentiLoop.ai
 > https://github.com/AgentiLoop/agent

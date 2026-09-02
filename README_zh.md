@@ -603,6 +603,5 @@ Cursor 是一款出色的 AI 代码编辑器。Agent! 玩的是另一种游戏�
 >
 > 此致，
 > **AgentiLoop — Agent!**
-> 🦾 Agent!，适用于 macOS 26.4.1
 > https://AgentiLoop.ai
 > https://github.com/AgentiLoop/agent
