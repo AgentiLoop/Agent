@@ -136,6 +136,8 @@ extension AgentViewModel {
         var maxTokensEscalated = false
         // Tier 10.4: iteration of the last goal_state call or goal reminder.
         var lastGoalActivity = 0
+        // Tier 10.5: cache-warmth note for ≥1M windows, sent once per task.
+        var cacheWarmthSent = false
         var timeoutRetryCount = 0
         let maxTimeoutRetries = maxRetries
 
@@ -458,6 +460,20 @@ extension AgentViewModel {
                     lastGoalActivity = iterations
                     toolResults.append(["type": "text", "text": reminder])
                     appendLog("🎯 Goal reminder attached (iteration \(iterations))")
+                    flushLog()
+                }
+
+                // Tier 10.5: on a ≥1M window, once past 25% usage, remind the
+                // model once that the cached prefix is large — no re-reads,
+                // narrow outputs, wrap up.
+                if !toolResults.isEmpty, let note = Self.cacheWarmthReminderBlock(
+                    contextWindow: contextWindow(for: provider),
+                    inputTokens: response.inputTokens,
+                    alreadySent: cacheWarmthSent)
+                {
+                    cacheWarmthSent = true
+                    toolResults.append(["type": "text", "text": note])
+                    appendLog("📦 Context past 25% of the 1M window — cache-warmth note attached")
                     flushLog()
                 }
 

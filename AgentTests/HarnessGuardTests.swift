@@ -355,6 +355,24 @@ struct HarnessGuardTests {
         #expect(AgentViewModel.goalReminderBlock(openCriteria: [], iteration: 50, lastGoalActivity: 0) == nil)
     }
 
+    // MARK: - Tier 10.5: cache-warmth reminder for ≥1M windows
+
+    @Test("10.5: cache-warmth note fires once past 25% of a ≥1M window, never on small windows")
+    func cacheWarmthReminder() {
+        // 200K window → never, even at 90%
+        #expect(AgentViewModel.cacheWarmthReminderBlock(contextWindow: 200_000, inputTokens: 180_000, alreadySent: false) == nil)
+        // 1M window under 25% → nil
+        #expect(AgentViewModel.cacheWarmthReminderBlock(contextWindow: 1_000_000, inputTokens: 249_000, alreadySent: false) == nil)
+        // 1M window at 26% → note with usage and the restore_tool_result hint
+        let note = AgentViewModel.cacheWarmthReminderBlock(contextWindow: 1_000_000, inputTokens: 260_000, alreadySent: false)
+        #expect(note?.contains("260K of the 1M-token window (26%)") == true)
+        #expect(note?.contains("restore_tool_result") == true)
+        // Already sent → nil
+        #expect(AgentViewModel.cacheWarmthReminderBlock(contextWindow: 1_000_000, inputTokens: 600_000, alreadySent: true) == nil)
+        // No reported usage (estimate-only providers) → nil
+        #expect(AgentViewModel.cacheWarmthReminderBlock(contextWindow: 1_000_000, inputTokens: 0, alreadySent: false) == nil)
+    }
+
     // MARK: - Tier 10.3: input + max_tokens overflow
 
     @Test("10.3: 'A + B > C' overflow parses and lowers max_tokens instead of pruning")
