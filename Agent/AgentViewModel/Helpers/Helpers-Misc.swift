@@ -298,13 +298,26 @@ extension AgentViewModel {
 
     // MARK: - Xcode Project Detection
 
-    /// Check if the project folder contains an Xcode project.
+    /// Check if the project folder (or any parent up to `$HOME` / a `.git` root)
+    /// contains an Xcode project, so sub-folders like `.agent/subagents` still
+    /// expose the Xcode tools.
     static func isXcodeProject(_ folder: String) -> Bool {
         guard !folder.isEmpty else { return false }
         let fm = FileManager.default
-        if let contents = try? fm.contentsOfDirectory(atPath: folder) {
-            return contents.contains(where: { $0.hasSuffix(".xcodeproj") || $0.hasSuffix(".xcworkspace") })
+        let home = fm.homeDirectoryForCurrentUser.path
+        var url = URL(fileURLWithPath: folder).standardizedFileURL
+        while true {
+            let path = url.path
+            if let contents = try? fm.contentsOfDirectory(atPath: path),
+               contents.contains(where: { $0.hasSuffix(".xcodeproj") || $0.hasSuffix(".xcworkspace") }) {
+                return true
+            }
+            if path == home || path == "/" || fm.fileExists(atPath: url.appendingPathComponent(".git").path) {
+                return false
+            }
+            let parent = url.deletingLastPathComponent()
+            if parent.path == path { return false }
+            url = parent
         }
-        return false
     }
 }

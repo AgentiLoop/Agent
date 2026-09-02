@@ -441,6 +441,10 @@ extension AgentViewModel {
             let result = await executeViaUserAgent(command: "mkdir -p \(escaped) && echo 'Created: \(resolved)'")
             let out = result.output.trimmingCharacters(in: .whitespacesAndNewlines)
             if out.hasPrefix("Created:") {
+                // Never switch the tab's project folder into a hidden tree
+                // (e.g. `.agent/subagents`) — that strips the Xcode tools.
+                let hidden = URL(fileURLWithPath: resolved).pathComponents.contains { $0.hasPrefix(".") }
+                if hidden { return out }
                 projectFolder = resolved
                 return "\(out)\nProject folder set to: \(resolved)"
             }
