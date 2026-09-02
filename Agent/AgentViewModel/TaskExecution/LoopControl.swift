@@ -16,14 +16,28 @@ extension AgentViewModel {
     /// of phrase-matching the text. All provider services normalize to
     /// Anthropic-style reasons: "tool_use", "end_turn", "max_tokens".
     /// `retriesUsed` caps corrective bounces so a stubborn model can't loop.
+    /// `maxTokensRetriesUsed` is the separate counter for output-truncation
+    /// continuations (Tier 10.1) so one malformed call plus two truncations
+    /// no longer exhausts the shared cap. Defaults to the shared counter.
     nonisolated static func routeStopReason(
         stopReason: String,
         hasToolUse: Bool,
         hasPendingTools: Bool,
         responseText: String,
         openCriteria: [String],
-        retriesUsed: Int
+        retriesUsed: Int,
+        maxTokensRetriesUsed: Int? = nil
     ) -> StopRoute {
+        // Output truncated mid-thought. Treating this as a finished answer is
+        // wrong — continue instead of completing. Own cap, own counter.
+        if stopReason == "max_tokens" && !hasToolUse {
+            guard (maxTokensRetriesUsed ?? retriesUsed) < maxTokensContinuations else { return .proceed }
+            return .retry(
+                correction: maxTokensContinuationMessage,
+                log: "⚠️ Response truncated at max_tokens — continuing"
+            )
+        }
+
         guard retriesUsed < 3 else { return .proceed }
 
         // Model stopped to call a tool but nothing parsable arrived — malformed
@@ -33,16 +47,6 @@ extension AgentViewModel {
                 correction: "No tool was executed — your tool call was malformed or empty. "
                     + "Re-issue the call using the proper tool-use format with all required parameters.",
                 log: "⚠️ tool_use stop with no parsable tool call — asking LLM to re-issue"
-            )
-        }
-
-        // Output truncated mid-thought. Treating this as a finished answer is
-        // wrong — continue instead of completing.
-        if stopReason == "max_tokens" && !hasToolUse {
-            return .retry(
-                correction: "Your response hit the max_tokens limit and was truncated. "
-                    + "Continue exactly where you left off.",
-                log: "⚠️ Response truncated at max_tokens — continuing"
             )
         }
 
@@ -72,5 +76,28 @@ extension AgentViewModel {
         }
 
         return .proceed
+    }
+
+    // MARK: - Tier 10.1: max_tokens recovery
+
+    /// Continuation messages allowed after the escalation retry.
+    nonisolated static let maxTokensContinuations = 3
+
+    nonisolated static let maxTokensContinuationMessage =
+        "Output token limit hit. Resume directly from where you stopped — no apology, no recap, "
+        + "do not repeat anything already written. Break the remaining work into smaller pieces: "
+        + "one file / one edit / one tool call per turn."
+
+    /// Output budget to retry the SAME request with after the first
+    /// truncation: double the current budget, cap 64K, but never past what the
+    /// context window can still hold after the input. Small windows get a
+    /// proportionate bump (32K → ~16K, 16K → whatever is left) and a 4K
+    /// window gets nil — the retry would just overflow. `current` is the
+    /// effective budget (pass the provider default when the user left 0).
+    nonisolated static func escalatedMaxTokens(current: Int, contextWindow: Int, lastInputTokens: Int) -> Int? {
+        guard current > 0 else { return nil }
+        let room = contextWindow - max(lastInputTokens, 0) - 1_000
+        let target = min(64_000, current * 2, room)
+        return target > current ? target : nil
     }
 }

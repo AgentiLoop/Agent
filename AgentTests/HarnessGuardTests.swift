@@ -86,7 +86,39 @@ struct HarnessGuardTests {
         guard case .retry(let correction, _) = route else {
             Issue.record("Expected .retry, got .proceed"); return
         }
-        #expect(correction.contains("truncated"))
+        #expect(correction.contains("Output token limit hit"))
+        #expect(correction.contains("smaller pieces"))
+    }
+
+    @Test("10.1: max_tokens continuations use their own counter and cap")
+    func maxTokensOwnCounter() {
+        // Shared counter exhausted (3 malformed bounces) — truncation still continues
+        let route = AgentViewModel.routeStopReason(
+            stopReason: "max_tokens", hasToolUse: false, hasPendingTools: false,
+            responseText: "", openCriteria: [], retriesUsed: 3, maxTokensRetriesUsed: 0)
+        guard case .retry = route else { Issue.record("Expected .retry"); return }
+        // Own cap reached → proceed even with the shared counter fresh
+        let capped = AgentViewModel.routeStopReason(
+            stopReason: "max_tokens", hasToolUse: false, hasPendingTools: false,
+            responseText: "", openCriteria: [], retriesUsed: 0, maxTokensRetriesUsed: 3)
+        #expect(capped == .proceed)
+    }
+
+    @Test("10.1: escalation doubles to 64K but never past the context window; tiny windows get none")
+    func maxTokensEscalationBounds() {
+        // 1M window: plain doubling
+        #expect(AgentViewModel.escalatedMaxTokens(current: 16_384, contextWindow: 1_000_000, lastInputTokens: 50_000) == 32_768)
+        // Cap at 64K
+        #expect(AgentViewModel.escalatedMaxTokens(current: 48_000, contextWindow: 1_000_000, lastInputTokens: 50_000) == 64_000)
+        // 32K window with 10K input: room = 21K → 16384 fits
+        #expect(AgentViewModel.escalatedMaxTokens(current: 8_192, contextWindow: 32_000, lastInputTokens: 10_000) == 16_384)
+        // 16K window with 6K input: room 9K < 16384 → bumped only to what fits
+        #expect(AgentViewModel.escalatedMaxTokens(current: 8_192, contextWindow: 16_000, lastInputTokens: 6_000) == 9_000)
+        // 16K window with 8K input: room 7K < current → nothing to gain
+        #expect(AgentViewModel.escalatedMaxTokens(current: 8_192, contextWindow: 16_000, lastInputTokens: 8_000) == nil)
+        // 4K window: never
+        #expect(AgentViewModel.escalatedMaxTokens(current: 8_192, contextWindow: 4_096, lastInputTokens: 0) == nil)
+        #expect(AgentViewModel.escalatedMaxTokens(current: 0, contextWindow: 200_000, lastInputTokens: 0) == nil)
     }
 
     @Test("end_turn with open goal criteria → retry listing the criteria")
