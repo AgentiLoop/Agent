@@ -353,6 +353,74 @@ enum ShellSafetyService {
         return nil
     }
 
+    // MARK: - Read-only classification (Tier 9.2)
+
+    /// Verbs that never mutate state. `git`/`find` get extra argument checks.
+    private static let readOnlyVerbs: Set<String> = [
+        "ls", "cat", "head", "tail", "less", "more", "grep", "egrep", "fgrep", "rg", "ag",
+        "find", "fd", "wc", "echo", "printf", "pwd", "which", "whereis", "type", "file",
+        "stat", "du", "df", "date", "uname", "sw_vers", "env", "printenv", "id", "whoami",
+        "hostname", "basename", "dirname", "realpath", "readlink", "md5", "shasum", "cksum",
+        "sort", "uniq", "cut", "tr", "awk", "jq", "tree", "diff", "cmp", "strings", "nl",
+        "column", "fold", "true", "test", "[", "git", "swift", "xcodebuild", "xcrun", "plutil",
+        "defaults", "sysctl", "ps", "lsof", "ioreg", "system_profiler", "mdfind", "mdls",
+    ]
+    private static let readOnlyGitSubcommands: Set<String> = [
+        "status", "log", "diff", "show", "branch", "rev-parse", "ls-files", "blame",
+        "describe", "remote", "tag", "stash", "shortlog", "grep", "cat-file", "config",
+    ]
+
+    /// True when every segment of `command` is a plain read (ls/cat/grep/git
+    /// status…), with no output redirection, command substitution, or
+    /// mutating flags. Lets the tool batcher run such shell calls in parallel
+    /// alongside file reads instead of serialising every `user_shell` call.
+    /// Conservative: anything unrecognised is NOT read-only.
+    static func isReadOnly(_ command: String) -> Bool {
+        let trimmed = command.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+        // Substitution / heredocs can hide writes — bail.
+        if trimmed.contains("$(") || trimmed.contains("`") || trimmed.contains("<<") { return false }
+        for rawSegment in splitOnShellSeparators(trimmed) {
+            let segment = stripPrefixWrappers(rawSegment)
+            // Backgrounded segment (`cmd &`) — can't observe its result, not a plain read.
+            if segment.hasSuffix("&") { return false }
+            let tokens = tokenize(segment)
+            guard let verb = tokens.first.map({ ($0 as NSString).lastPathComponent }) else { continue }
+            guard readOnlyVerbs.contains(verb) else { return false }
+            // Output redirection writes a file — only stderr-to-null/stdout is fine.
+            for t in tokens where t.contains(">") {
+                guard t == "2>/dev/null" || t == "2>&1" || t == ">/dev/null" || t == "&>/dev/null" else { return false }
+            }
+            switch verb {
+            case "git":
+                guard let sub = tokens.dropFirst().first(where: { !$0.hasPrefix("-") }),
+                      readOnlyGitSubcommands.contains(sub) else { return false }
+                if sub == "stash" && !(tokens.count > 2 && (tokens[2] == "list" || tokens[2] == "show")) { return false }
+                if sub == "branch" && tokens.contains(where: { $0 == "-d" || $0 == "-D" || $0 == "-m" || $0 == "-M" }) { return false }
+                if sub == "remote" && tokens.count > 2 && tokens[2] != "-v" && tokens[2] != "show" { return false }
+                if sub == "tag" && tokens.count > 2 && !tokens[2].hasPrefix("-l") { return false }
+                if sub == "config" && !tokens.contains(where: { $0 == "--get" || $0 == "--list" || $0 == "-l" }) { return false }
+            case "find", "fd":
+                if tokens.contains(where: { ["-delete", "-exec", "-execdir", "-ok", "-okdir", "-x", "-X"].contains($0) }) { return false }
+            case "swift":
+                guard tokens.count > 1, tokens[1] == "--version" || tokens[1] == "-version" else { return false }
+            case "xcodebuild":
+                guard tokens.contains(where: { $0 == "-list" || $0 == "-showsdks" || $0 == "-version" || $0 == "-showBuildSettings" }) else { return false }
+            case "xcrun":
+                guard tokens.count > 1, tokens[1] == "--find" || tokens[1] == "--show-sdk-path" || (tokens[1] == "simctl" && tokens.contains("list")) else { return false }
+            case "plutil":
+                guard tokens.contains("-p") || tokens.contains("-lint") else { return false }
+            case "defaults":
+                guard tokens.count > 1, tokens[1] == "read" else { return false }
+            case "sysctl":
+                if tokens.contains("-w") { return false }
+            default:
+                break
+            }
+        }
+        return true
+    }
+
     // MARK: - Helpers
 
     /// Strip leading `sudo` and `exec` (and chains thereof) so an attacker
