@@ -205,10 +205,16 @@ extension AgentViewModel {
                 // Async context-window fetches can land after task start — pick
                 // up the real threshold instead of a possibly-stale 32K fallback.
                 compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
-                _ = await Self.tieredCompact(&messages, state: &compactionState) { [weak self] msg in
+                let compactLog: (String) -> Void = { [weak self] msg in
                     self?.appendLog(msg)
                     self?.flushLog()
                 }
+                _ = await Self.tieredCompact(
+                    &messages,
+                    state: &compactionState,
+                    summarizer: makeCompactSummarizer(services: services, log: compactLog),
+                    log: compactLog
+                )
             }
 
             do {

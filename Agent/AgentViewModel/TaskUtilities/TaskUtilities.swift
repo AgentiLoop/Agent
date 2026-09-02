@@ -238,6 +238,24 @@ extension AgentViewModel {
 
     // MARK: - Message Pruning
 
+    /// The kept tail can begin with a user message whose tool_result blocks
+    /// refer to a tool_use in an assistant message that was dropped. Anthropic
+    /// rejects tool_result blocks with no matching tool_use, so demote those
+    /// orphans to plain text — same information, legal shape. Shared by
+    /// pruneMessages and compactWithLLM.
+    static func demoteOrphanToolResults(_ tail: inout [[String: Any]]) {
+        guard let first = tail.first,
+              first["role"] as? String == "user",
+              var blocks = first["content"] as? [[String: Any]] else { return }
+        var changed = false
+        for j in 0..<blocks.count where blocks[j]["type"] as? String == "tool_result" {
+            let content = blocks[j]["content"] as? String ?? ""
+            blocks[j] = ["type": "text", "text": "[earlier tool result] " + content]
+            changed = true
+        }
+        if changed { tail[0]["content"] = blocks }
+    }
+
     /// / Prune old messages to reduce token usage on long tasks. / Keeps the first user message and the most recent
     /// messages. / Middle messages are summarized into a compact text block.
     static func pruneMessages(_ messages: inout [[String: Any]], keepRecent: Int = 6) {
@@ -250,23 +268,7 @@ extension AgentViewModel {
         var recentMessages = Array(messages.suffix(keepRecent))
         let middleMessages = Array(messages.dropFirst(1).dropLast(keepRecent))
 
-        // The kept tail can begin with a user message whose tool_result blocks
-        // refer to a tool_use in an assistant message we are about to drop.
-        // Anthropic rejects tool_result blocks with no matching tool_use, so
-        // demote those orphans to plain text — same information, legal shape.
-        if let first = recentMessages.first,
-           first["role"] as? String == "user",
-           var blocks = first["content"] as? [[String: Any]] {
-            var changed = false
-            for j in 0..<blocks.count where blocks[j]["type"] as? String == "tool_result" {
-                let content = blocks[j]["content"] as? String ?? ""
-                blocks[j] = ["type": "text", "text": "[earlier tool result] " + content]
-                changed = true
-            }
-            if changed {
-                recentMessages[0]["content"] = blocks
-            }
-        }
+        demoteOrphanToolResults(&recentMessages)
 
         // Build compact summary of middle messages
         var summaryLines: [String] = []
