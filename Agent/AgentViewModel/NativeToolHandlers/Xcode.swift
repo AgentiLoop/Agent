@@ -209,7 +209,30 @@ extension AgentViewModel {
                     continue
                 }
                 (subName, subInput) = Self.expandConsolidatedTool(name: subName, input: subInput)
-                let output = await executeNativeTool(subName, input: subInput)
+                // read_file and friends live in handleFileTool (FileTools.swift), which
+                // dispatchTool runs BEFORE the executeNativeTool fallback. Batch must
+                // mirror that order or every file(action:"read") sub-task comes back
+                // "Tool 'read_file' not handled".
+                var output: String
+                var scratch: [[String: Any]] = []
+                let subId = "batch-\(idx)"
+                if await handleFileTool(
+                    name: subName, input: subInput, toolId: subId,
+                    appendLog: { [weak self] msg in Task { @MainActor in self?.appendLog(msg) } },
+                    appendRawOutput: { [weak self] msg in Task { @MainActor in self?.appendLog(msg) } },
+                    toolResults: &scratch
+                ) {
+                    let block = scratch.first { ($0["tool_use_id"] as? String) == subId } ?? scratch.last
+                    if let s = block?["content"] as? String {
+                        output = s
+                    } else if let nested = block?["content"] as? [[String: Any]] {
+                        output = nested.compactMap { $0["text"] as? String }.joined(separator: "\n")
+                    } else {
+                        output = "(no output)"
+                    }
+                } else {
+                    output = await executeNativeTool(subName, input: subInput)
+                }
                 completed += 1
                 batchOutput += "[\(idx + 1)] \(subName): \(output)\n"
             }
