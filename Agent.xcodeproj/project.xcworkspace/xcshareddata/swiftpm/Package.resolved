@@ -1,13 +1,13 @@
 {
-  "originHash" : "0b2060175ed52842fed6219729181779a656b3d0624fafdb9e436e489f289c36",
+  "originHash" : "c6d9dfee182867b0a65456eb166d452db7301c8659d8465e386a64874764df0c",
   "pins" : [
     {
       "identity" : "agentaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentAccess.git",
       "state" : {
-        "revision" : "a61591d92bc944833c88370d051b3ba3a67fa797",
-        "version" : "2.10.11"
+        "revision" : "ce64d06cdf714e0b94a8cc117882529e34ca27a7",
+        "version" : "2.10.12"
       }
     },
     {
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/steipete/AXorcist.git",
       "state" : {
-        "revision" : "bab3f2228bac0ce3a34786b8395b65bb36242221",
-        "version" : "0.1.8"
+        "revision" : "37d7ae82ff1443b4b36344ca6f3bf0ad33f13b12",
+        "version" : "0.1.9"
       }
     },
     {
