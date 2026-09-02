@@ -407,6 +407,59 @@ extension AgentViewModel {
     }
 
 
+    // MARK: - Post-compaction re-attachment (Tier 7.4)
+
+    /// What the model loses at compaction and needs back immediately: open
+    /// goal criteria, the active plan checklist, and the current content of
+    /// files edited this task (up to 5, ~10K tokens total). Also resets the
+    /// read-dedup cache for the tab — the file contents are no longer in
+    /// context, so a re-read is legitimate again. Returns nil when there is
+    /// nothing to re-attach.
+    func postCompactReattachment(tabID: UUID) -> String? {
+        Self.clearReadCountsForTab(tabID: tabID)
+        var parts: [String] = []
+        if let goal = GoalStateStore.shared.current, !goal.openCriteria.isEmpty {
+            parts.append(
+                "OPEN GOAL — \(goal.goal)\nRemaining criteria:\n- "
+                    + goal.openCriteria.map(\.text).joined(separator: "\n- ")
+            )
+        }
+        let plan = PlanStateStore.promptBlock(projectFolder: projectFolder)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if !plan.isEmpty { parts.append(plan) }
+
+        var budget = 40_000 // chars ≈ 10K tokens across all files
+        for path in FileBackupService.shared.snapshottedFiles().suffix(5) {
+            guard budget > 0, let content = try? String(contentsOfFile: path, encoding: .utf8) else { continue }
+            let head = String(content.prefix(min(8_000, budget)))
+            budget -= head.count
+            let scope = head.count < content.count ? "first \(head.count) of \(content.count) chars" : "full file"
+            parts.append("FILE \(path) (\(scope), current on disk):\n```\n\(head)\n```")
+        }
+        guard !parts.isEmpty else { return nil }
+        return "[Context restored after compaction]\n\n"
+            + parts.joined(separator: "\n\n")
+            + "\n\nRead-dedup was reset: you may re-read any file whose content is no longer in context."
+    }
+
+    /// Append `text` to the transcript as part of the last user message (or a
+    /// new one) so the re-attachment lives inside the frozen post-compaction
+    /// prefix instead of breaking user/assistant alternation.
+    static func appendUserText(_ text: String, to messages: inout [[String: Any]]) {
+        if let last = messages.last, last["role"] as? String == "user" {
+            var blocks: [[String: Any]]
+            if let existing = last["content"] as? [[String: Any]] {
+                blocks = existing
+            } else {
+                blocks = [["type": "text", "text": last["content"] as? String ?? ""]]
+            }
+            blocks.append(["type": "text", "text": text])
+            messages[messages.count - 1]["content"] = blocks
+        } else {
+            messages.append(["role": "user", "content": text])
+        }
+    }
+
     // MARK: - Microcompaction (clear old tool results)
 
     /// Clear old tool_result content to save tokens while preserving message structure.
