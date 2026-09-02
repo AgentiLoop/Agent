@@ -111,6 +111,7 @@ struct GoalStateStoreTests {
         #expect(done.contains("1. [x] builds"))
         #expect(!done.contains("may NOT call task_complete"))
     }
+
     @Test("criteria marked done without evidence are reported as unevidenced")
     func unevidencedCriteriaAreTracked() {
         let store = makeStore()
@@ -277,5 +278,193 @@ struct StuckGuardFingerprintTests {
         #expect(!AgentViewModel.repeatExemptTools.contains("write_file"))
         #expect(!AgentViewModel.repeatExemptTools.contains("search_files"))
         #expect(!AgentViewModel.repeatExemptTools.contains("xcode"))
+    }
+}
+
+// MARK: - FallbackChainService
+
+/// Coverage for the user-configured model fallback state machine.
+/// The singleton persists to UserDefaults, so every test snapshots and
+/// restores the persisted state to avoid leaking fake providers between tests.
+@Suite(.serialized)
+@MainActor
+struct FallbackChainServiceTests {
+    private static let chainKey = "agent.fallbackChain"
+    private static let enabledKey = "agent.fallbackEnabled"
+
+    private func withIsolatedService(_ body: (FallbackChainService) -> Void) {
+        let defaults = UserDefaults.standard
+        let originalData = defaults.data(forKey: Self.chainKey)
+        let originalEnabled = defaults.object(forKey: Self.enabledKey)
+        let service = FallbackChainService.shared
+        let originalChain = service.chain
+        let originalEnabledValue = service.enabled
+
+        service.clear()
+        service.enabled = true
+
+        defer {
+            service.clear()
+            for entry in originalChain {
+                service.add(provider: entry.provider, model: entry.model)
+                if !entry.enabled {
+                    let restored = service.chain.last
+                    if let restored {
+                        service.toggle(id: restored.id)
+                    }
+                }
+            }
+            service.enabled = originalEnabledValue
+
+            if let originalData {
+                defaults.set(originalData, forKey: Self.chainKey)
+            } else {
+                defaults.removeObject(forKey: Self.chainKey)
+            }
+            if let originalEnabled {
+                defaults.set(originalEnabled, forKey: Self.enabledKey)
+            } else {
+                defaults.removeObject(forKey: Self.enabledKey)
+            }
+        }
+
+        body(service)
+    }
+
+    @Test("first failure does not trigger fallback")
+    func firstFailureDoesNotFallback() {
+        withIsolatedService { service in
+            service.add(provider: "provider-a", model: "model-a")
+            let result = service.recordFailure()
+            #expect(result == nil)
+            #expect(service.currentIndex == -1)
+            #expect(service.consecutiveFailures == 1)
+            #expect(service.activeFallback == nil)
+        }
+    }
+
+    @Test("second failure selects the first enabled fallback")
+    func secondFailureSelectsFirstFallback() {
+        withIsolatedService { service in
+            service.add(provider: "provider-a", model: "model-a")
+            _ = service.recordFailure()
+            let result = service.recordFailure()
+            #expect(result?.provider == "provider-a")
+            #expect(result?.model == "model-a")
+            #expect(service.currentIndex == 0)
+            #expect(service.consecutiveFailures == 0)
+            #expect(service.activeFallback?.model == "model-a")
+        }
+    }
+
+    @Test("fallback chain advances to the next enabled entry")
+    func advancesThroughFallbackChain() {
+        withIsolatedService { service in
+            service.add(provider: "provider-a", model: "model-a")
+            service.add(provider: "provider-b", model: "model-b")
+            _ = service.recordFailure()
+            _ = service.recordFailure()
+            _ = service.recordFailure()
+            let result = service.recordFailure()
+            #expect(result?.provider == "provider-b")
+            #expect(result?.model == "model-b")
+            #expect(service.currentIndex == 1)
+            #expect(service.activeFallback?.model == "model-b")
+        }
+    }
+
+    @Test("disabled fallback entries are skipped")
+    func skipsDisabledEntries() {
+        withIsolatedService { service in
+            service.add(provider: "provider-disabled", model: "model-disabled")
+            service.add(provider: "provider-enabled", model: "model-enabled")
+            let entries = service.chain
+            service.toggle(id: entries[0].id)
+            _ = service.recordFailure()
+            let result = service.recordFailure()
+            #expect(result?.provider == "provider-enabled")
+            #expect(result?.model == "model-enabled")
+            #expect(service.currentIndex == 0)
+        }
+    }
+
+    @Test("disabled fallback feature never switches providers")
+    func disabledFallbackFeature() {
+        withIsolatedService { service in
+            service.enabled = false
+            service.add(provider: "provider-a", model: "model-a")
+            _ = service.recordFailure()
+            let result = service.recordFailure()
+            #expect(result == nil)
+            #expect(service.currentIndex == -1)
+            #expect(service.consecutiveFailures == 2)
+            #expect(service.activeFallback == nil)
+        }
+    }
+
+    @Test("successful call returns service to primary provider")
+    func successReturnsToPrimary() {
+        withIsolatedService { service in
+            service.add(provider: "provider-a", model: "model-a")
+            _ = service.recordFailure()
+            _ = service.recordFailure()
+            #expect(service.activeFallback != nil)
+            service.recordSuccess()
+            #expect(service.currentIndex == -1)
+            #expect(service.consecutiveFailures == 0)
+            #expect(service.activeFallback == nil)
+        }
+    }
+
+    @Test("reset clears fallback state without removing chain")
+    func resetClearsState() {
+        withIsolatedService { service in
+            service.add(provider: "provider-a", model: "model-a")
+            _ = service.recordFailure()
+            _ = service.recordFailure()
+            service.reset()
+            #expect(service.currentIndex == -1)
+            #expect(service.consecutiveFailures == 0)
+            #expect(service.activeFallback == nil)
+            #expect(service.chain.count == 1)
+        }
+    }
+
+    @Test("clear removes the chain and resets state")
+    func clearResetsEverything() {
+        withIsolatedService { service in
+            service.add(provider: "provider-a", model: "model-a")
+            _ = service.recordFailure()
+            _ = service.recordFailure()
+            service.clear()
+            #expect(service.chain.isEmpty)
+            #expect(service.currentIndex == -1)
+            #expect(service.consecutiveFailures == 0)
+            #expect(service.activeFallback == nil)
+            #expect(service.summary == "No fallback chain configured.")
+        }
+    }
+
+    @Test("summary marks the active fallback")
+    func summaryMarksActiveFallback() {
+        withIsolatedService { service in
+            service.add(provider: "provider-a", model: "model-a")
+            service.add(provider: "provider-b", model: "model-b")
+            let initialSummary = service.summary
+            #expect(initialSummary.contains("1. provider-a / model-a"))
+            #expect(initialSummary.contains("2. provider-b / model-b"))
+            _ = service.recordFailure()
+            _ = service.recordFailure()
+            #expect(service.summary.contains("→ 1. provider-a / model-a"))
+        }
+    }
+
+    @Test("FallbackEntry keeps an unknown provider raw value in its display name")
+    func unknownProviderDisplayName() {
+        withIsolatedService { _ in
+            let entry = FallbackEntry(provider: "unknown-provider", model: "model-x")
+            #expect(entry.displayName == "unknown-provider / model-x")
+            #expect(entry.enabled)
+        }
     }
 }
