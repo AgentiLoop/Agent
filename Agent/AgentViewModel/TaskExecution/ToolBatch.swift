@@ -187,12 +187,48 @@ extension AgentViewModel {
                 advisories.append(advisory)
                 appendLog(advisory)
             }
+            // Tier 9.1: oversized output is spilled NOW, not only at compaction —
+            // the model gets a preview + restore hint instead of 20K+ chars.
+            if let full = toolResults[idx]["content"] as? String,
+               let preview = Self.persistOversizedResult(tool: tool.name, toolUseID: tool.toolId, content: full)
+            {
+                toolResults[idx]["content"] = preview
+                appendLog("💾 \(tool.name) output (\(full.count) chars) persisted — preview sent, restore_tool_result recovers it")
+            }
         }
         // Plain text blocks — synthetic tool_results without a matching
         // tool_use would 400 at the API.
         for advisory in advisories {
             toolResults.append(["type": "text", "text": advisory])
         }
+    }
+
+    /// Tier 9.1: results longer than this are written to ToolResultCache at
+    /// emission and replaced by a preview. read_file is exempt (it bounds
+    /// itself and the model asked for exactly that range); restore_tool_result
+    /// is exempt so recovering a persisted result doesn't persist it again.
+    static let persistResultChars = 20_000
+    static let persistPreviewChars = 2_000
+    static let persistExemptTools: Set<String> = ["read_file", "restore_tool_result"]
+
+    /// Spill `content` when it exceeds `persistResultChars` and return the
+    /// preview block to send instead; nil when the result should go verbatim.
+    static func persistOversizedResult(tool: String, toolUseID: String, content: String) -> String? {
+        guard !persistExemptTools.contains(tool),
+              content.count > persistResultChars,
+              !content.hasPrefix("<persisted-output>") else { return nil }
+        ToolResultCache.spill(toolUseID: toolUseID, content: content)
+        guard ToolResultCache.restore(toolUseID: toolUseID) != nil else { return nil }
+        let head = String(content.prefix(persistPreviewChars))
+        return """
+            <persisted-output>
+            \(head)
+            …
+            [\(content.count) chars total — first \(persistPreviewChars) shown. \
+            Full output preserved on disk: call restore_tool_result(tool_use_id:"\(toolUseID)") to read all of it. \
+            Do NOT re-run the tool.]
+            </persisted-output>
+            """
     }
 
     /// / Vision verification: auto-screenshot after UI actions so the LLM can see the result. / OPT-IN via

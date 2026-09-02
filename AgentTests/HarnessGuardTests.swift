@@ -304,6 +304,26 @@ struct HarnessGuardTests {
         #expect(PlanStateStore.promptBlock(projectFolder: "/tmp").isEmpty)
     }
 
+    // MARK: - Tier 9.1: oversized tool results persisted at emission
+
+    @Test("Oversized shell output → preview + restore hint; small/read_file/restore pass through")
+    func persistOversizedResult() {
+        let big = (0..<3_000).map { "line \($0)" }.joined(separator: "\n") // > 20K chars
+        let id = "toolu_persist_\(UUID().uuidString.prefix(8))"
+        let preview = AgentViewModel.persistOversizedResult(tool: "user_shell", toolUseID: id, content: big)
+        #expect(preview?.hasPrefix("<persisted-output>") == true)
+        #expect(preview?.contains("restore_tool_result(tool_use_id:\"\(id)\")") == true)
+        #expect((preview?.count ?? 0) < 3_000)
+        #expect(ToolResultCache.restore(toolUseID: id) == big)
+        // Already-persisted preview never persists again
+        #expect(AgentViewModel.persistOversizedResult(tool: "user_shell", toolUseID: id, content: preview!) == nil)
+        // Under threshold → verbatim
+        #expect(AgentViewModel.persistOversizedResult(tool: "user_shell", toolUseID: id + "s", content: "short") == nil)
+        // Exempt tools → verbatim even when huge
+        #expect(AgentViewModel.persistOversizedResult(tool: "read_file", toolUseID: id + "r", content: big) == nil)
+        #expect(AgentViewModel.persistOversizedResult(tool: "restore_tool_result", toolUseID: id + "x", content: big) == nil)
+    }
+
     // MARK: - Critic gate plumbing
 
     @Test("uncommittedDiff returns empty for a non-repo folder")
