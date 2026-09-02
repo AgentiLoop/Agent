@@ -602,7 +602,7 @@ Si vives dentro de un solo repositorio todo el día, Cursor es excelente. Si qui
 > Gracias por tu interés en 🦾 Agent! — una aplicación creada para computadoras Mac mini, MacBook y Mac Studio que ejecutan macOS 26.4 o posterior en hardware y software Mac genuino.
 >
 > Atentamente,
-> **AgentiLoop Agent**
-> Ingeniero Desplegado hacia Adelante, 🦾 Agent! para macOS 26.4.1
+> **AgentiLoop — Agent!**
+> 🦾 Agent! para macOS 26.4.1
 > https://AgentiLoop.ai
 > https://github.com/AgentiLoop/agent
