@@ -17,18 +17,32 @@ struct CompactionState {
     /// Max consecutive failures before circuit breaker trips.
     static let maxFailures = 3
 
-    init(contextWindow: Int = 200_000) {
-        // Compact once the transcript passes ~55% of the model's real context
-        // window, leaving headroom for the system prompt, tool schemas and the
-        // response. Previously this argument was ignored and every model — 4K
-        // Foundation Models or 1M Claude — compacted at a hardcoded 30K.
-        self.compactThreshold = Self.threshold(for: contextWindow)
+    /// Configured max output tokens (0 = provider default). Reserved off the
+    /// top of the window so the response — and the compaction summary — fit.
+    var maxTokens: Int = 0
+    /// input_tokens from the provider's last usage report. Authoritative
+    /// when present: it counts the system prompt and tool schemas the
+    /// chars/4 estimate can't see. 0 = no report yet (or just compacted).
+    var lastReportedInputTokens: Int = 0
+    /// messages.count at the time of that report — only messages appended
+    /// after it need estimating.
+    var messageCountAtReport: Int = 0
+
+    init(contextWindow: Int = 200_000, maxTokens: Int = 0) {
+        self.maxTokens = maxTokens
+        self.compactThreshold = Self.threshold(for: contextWindow, maxTokens: maxTokens)
     }
 
-    /// 55% of the context window, clamped 2K...400K.
-    static func threshold(for contextWindow: Int) -> Int {
-        let target = Int(Double(contextWindow) * 0.55)
-        return max(2_000, min(target, 400_000))
+    /// Compact only when the transcript is about to stop fitting:
+    /// window - reserved output - safety buffer. The reserved output is the
+    /// configured max_tokens capped at 20K (enough for the summary call); the
+    /// buffer is 13K, scaled down to 10% of the window for small local models.
+    /// A 128K model now compacts at ~99K instead of 70K; Claude 1M at ~970K
+    /// instead of 400K — bigger models keep proportionally more context.
+    static func threshold(for contextWindow: Int, maxTokens: Int = 0) -> Int {
+        let reservedOutput = min(maxTokens > 0 ? maxTokens : 8_192, 20_000)
+        let buffer = min(13_000, contextWindow / 10)
+        return max(2_000, contextWindow - reservedOutput - buffer)
     }
 
     /// Re-derive the threshold from the provider's current context window.
@@ -36,7 +50,30 @@ struct CompactionState {
     /// Ollama /api/show, vLLM /v1/models) can land AFTER a task starts —
     /// without this, the first task after launch runs on the 32K fallback.
     mutating func refreshThreshold(contextWindow: Int) {
-        compactThreshold = Self.threshold(for: contextWindow)
+        compactThreshold = Self.threshold(for: contextWindow, maxTokens: maxTokens)
+    }
+
+    /// Record the provider's reported input token count for the request that
+    /// covered the first `messageCount` messages. Ignored when the provider
+    /// reports nothing (0).
+    mutating func recordUsage(inputTokens: Int, messageCount: Int) {
+        guard inputTokens > 0 else { return }
+        lastReportedInputTokens = inputTokens
+        messageCountAtReport = messageCount
+    }
+
+    /// Best available token count for `messages`: the last real usage figure
+    /// plus a chars/4 estimate of only what was appended since, or a pure
+    /// estimate when no usage has been reported yet.
+    @MainActor
+    func measuredTokens(for messages: [[String: Any]]) -> Int {
+        guard lastReportedInputTokens > 0, messageCountAtReport <= messages.count else {
+            let cheap = AgentViewModel.estimateTokens(messages: messages)
+            // chars/4 under-counts dense code (~3.3 chars/token) — inflate 25%.
+            return cheap + cheap / 4
+        }
+        let appended = Array(messages[messageCountAtReport...])
+        return lastReportedInputTokens + AgentViewModel.estimateTokens(messages: appended)
     }
 
     /// True if we should attempt compaction for the given estimated token count.
@@ -205,15 +242,26 @@ extension AgentViewModel {
         // the provider rejects it. It runs regardless of the Token Compression
         // toggle. Only Tier 1 — Apple Intelligence summarization — respects it.
         //
-        // Cheap chars/4 estimate first so an under-threshold turn costs nothing:
-        // preciseTokenCount runs an on-device model pass over the whole transcript.
-        // chars/4 under-counts dense code (~3.3 chars/token), so inflate the cheap
-        // estimate 25% — the precise check below stays authoritative.
-        let cheap = estimateTokens(messages: messages)
-        guard state.shouldCompact(estimatedTokens: cheap + cheap / 4) else { return false }
+        // Cheap check first so an under-threshold turn costs nothing. When the
+        // provider has reported input_tokens for the previous request that
+        // figure is authoritative (it includes system prompt + tool schemas);
+        // otherwise fall back to an inflated chars/4 estimate.
+        let measured = state.measuredTokens(for: messages)
+        guard state.shouldCompact(estimatedTokens: measured) else { return false }
 
-        let tokensBefore = await preciseTokenCount(messages: messages)
-        guard state.shouldCompact(estimatedTokens: tokensBefore) else { return false }
+        // Without a usage report, confirm with the on-device counter before
+        // paying for a compaction — chars/4 alone is too noisy to act on.
+        let tokensBefore: Int
+        if state.lastReportedInputTokens > 0 {
+            tokensBefore = measured
+        } else {
+            tokensBefore = await preciseTokenCount(messages: messages)
+            guard state.shouldCompact(estimatedTokens: tokensBefore) else { return false }
+        }
+        // Whatever happens below rewrites the transcript, so the last usage
+        // report no longer describes it. Estimate until the next response.
+        state.lastReportedInputTokens = 0
+        state.messageCountAtReport = 0
 
         log?("🗜️ Compacting context (\(tokensBefore) est. tokens, threshold \(state.compactThreshold))...")
 

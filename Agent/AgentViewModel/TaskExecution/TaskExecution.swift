@@ -157,7 +157,7 @@ extension AgentViewModel {
         // Token budget tracker — detects diminishing returns and prevents runaway costs
         var budgetTracker = TokenBudgetTracker(ceiling: tokenBudgetCeiling)
         // Context compaction state — token-aware triggers with circuit breaker
-        var compactionState = CompactionState(contextWindow: contextWindow(for: provider))
+        var compactionState = CompactionState(contextWindow: contextWindow(for: provider), maxTokens: mt)
         // Overnight coding guards
         var consecutiveReadOnlyCount = 0 // read guard — force stop after 10
         var unbuiltEditCount = 0 // build enforcement — nudge after edit without build
@@ -281,6 +281,9 @@ extension AgentViewModel {
                 } else {
                     throw AgentError.noAPIKey
                 }
+                // Real input_tokens drive the compaction trigger (Tier 7.2) —
+                // they include the system prompt + tool schemas the estimate can't see.
+                compactionState.recordUsage(inputTokens: response.inputTokens, messageCount: sendMessages.count)
                 // Track token usage — use reported counts or estimate from text (~4 chars/token)
                 let inTok = response.inputTokens > 0 ? response.inputTokens : Self.estimateTokens(messages: messages)
                 let outTok = response.outputTokens > 0 ? response.outputTokens : Self.estimateTokens(content: response.content)
@@ -475,7 +478,7 @@ extension AgentViewModel {
                     // (Claude 1M → local 32K); keep the old threshold and the
                     // new provider rejects the transcript before compaction
                     // ever fires.
-                    compactionState = CompactionState(contextWindow: contextWindow(for: newProvider))
+                    compactionState = CompactionState(contextWindow: contextWindow(for: newProvider), maxTokens: mt)
                     services = buildLLMServiceBundle(
                         provider: provider,
                         modelName: modelName,
