@@ -53,6 +53,8 @@ extension AgentViewModel {
         let flushLog: () -> Void = flushFn ?? { [weak self] in self?.flushLog() }
         if Task.isCancelled { return .breakLoop }
         let errMsg = error.localizedDescription
+        // Limiter key the services record Retry-After under (matches TaskExecution).
+        let limiterKey = activeService == .claude ? APIProvider.claude.rawValue : selectedProvider.rawValue
 
         // Context overflow — prune messages aggressively and retry.
         // Detection narrowed: require an "exceed/too long/too many" phrase alongside
@@ -198,12 +200,12 @@ extension AgentViewModel {
                     }
                 }
 
-                let retryDelay = TimeInterval(min(10 * timeoutRetryCount, 30)) // Exponential backoff up to 30 seconds
+                let retryDelay = LLMRateLimiter.retryDelay(attempt: timeoutRetryCount) // jittered exponential, ≤32s (Tier 10.2)
                 let retryMessage =
                     """
                     \(errorSource) timeout detected \
                     (attempt \(timeoutRetryCount)/\(maxTimeoutRetries)) — \
-                    retrying in \(Int(retryDelay)) seconds...
+                    retrying in \(String(format: "%.1f", retryDelay)) seconds...
                     """
                 appendLog(retryMessage)
                 flushLog()
@@ -250,8 +252,9 @@ extension AgentViewModel {
                 return .breakLoop
             }
         } else if let agentErr = error as? AgentError, agentErr.isRateLimited, timeoutRetryCount < maxTimeoutRetries {
-            // 429 rate-limit / "service overloaded" — exponential backoff up to 60s. Z.ai returns this with body code
-            // 1305 ("service may be temporarily overloaded"); OpenAI returns 429 with a Retry-After header. Either way the server is asking for a longer wait than the generic 10-second recoverable retry below — bumping each attempt by 15s up to a 60s ceiling.
+            // 429 rate-limit / "service overloaded". Z.ai returns this with body code 1305 ("service may be
+            // temporarily overloaded"); OpenAI/Anthropic return 429/529 with a Retry-After header that the service
+            // already recorded in LLMRateLimiter. Delay = Retry-After if present, else jittered exponential (Tier 10.2).
             timeoutRetryCount += 1
             let apiBody: String
             if case .apiError(_, let msg) = error as? AgentError { apiBody = msg } else { apiBody = errMsg }
@@ -276,29 +279,33 @@ extension AgentViewModel {
                 flushLog()
                 return .breakLoop
             }
-            let retryDelay: TimeInterval = 10
+            // Tier 10.2: Retry-After (already recorded in LLMRateLimiter by the
+            // service, waited by enforce() on the next request) wins; otherwise
+            // jittered exponential backoff. Sleep only the part enforce() won't.
+            let pending = await LLMRateLimiter.shared.pendingWait(provider: limiterKey)
+            let retryDelay = LLMRateLimiter.retryDelay(attempt: timeoutRetryCount, retryAfter: pending)
             appendLog(
                 """
                 ⏳ \(errorSource) 429: \(apiBody.prefix(200))
-                Retrying in \(Int(retryDelay))s (attempt \(timeoutRetryCount)/\(maxTimeoutRetries))
+                Retrying in \(Int(retryDelay.rounded()))s\(pending > 0 ? " (Retry-After)" : "") (attempt \(timeoutRetryCount)/\(maxTimeoutRetries))
                 """
             )
             flushLog()
             if agentReplyHandle != nil {
-                sendProgressUpdate("\(errorSource) rate limited — waiting \(Int(retryDelay))s")
+                sendProgressUpdate("\(errorSource) rate limited — waiting \(Int(retryDelay.rounded()))s")
             }
-            try? await Task.sleep(for: .seconds(retryDelay))
+            try? await Task.sleep(for: .seconds(max(0, retryDelay - pending)))
             if Task.isCancelled { return .breakLoop }
             return .continueLoop
         } else if let agentErr = error as? AgentError, agentErr.isRecoverable, timeoutRetryCount < maxTimeoutRetries {
-            // Server/network error — retry every 10 seconds
+            // Server/network error — jittered exponential backoff (Tier 10.2)
             timeoutRetryCount += 1
-            let retryDelay: TimeInterval = 10
+            let retryDelay = LLMRateLimiter.retryDelay(attempt: timeoutRetryCount)
             appendLog(
                 """
                 \(errorSource) recoverable error \
                 (attempt \(timeoutRetryCount)/\(maxTimeoutRetries)) — \
-                retrying in \(Int(retryDelay))s...
+                retrying in \(String(format: "%.1f", retryDelay))s...
                 \(errMsg)
                 """
             )

@@ -336,6 +336,23 @@ struct HarnessGuardTests {
         #expect(PlanStateStore.promptBlock(projectFolder: "/tmp").isEmpty)
     }
 
+    // MARK: - Tier 10.2: retry delay
+
+    @Test("10.2: retry delay is exponential with 25% jitter, capped at 32s; Retry-After wins")
+    func retryDelayLadder() {
+        #expect(LLMRateLimiter.retryDelay(attempt: 1, jitter: 0) == 0.5)
+        #expect(LLMRateLimiter.retryDelay(attempt: 2, jitter: 0) == 1.0)
+        #expect(LLMRateLimiter.retryDelay(attempt: 5, jitter: 0) == 8.0)
+        #expect(LLMRateLimiter.retryDelay(attempt: 10, jitter: 0) == 32.0)
+        #expect(LLMRateLimiter.retryDelay(attempt: 3, jitter: 0.25) == 2.5)
+        // Random jitter stays within [base, base*1.25]
+        let d = LLMRateLimiter.retryDelay(attempt: 4)
+        #expect(d >= 4.0 && d <= 5.0)
+        // Server-supplied Retry-After overrides the ladder
+        #expect(LLMRateLimiter.retryDelay(attempt: 1, retryAfter: 17) == 17)
+        #expect(LLMRateLimiter.parseRetryAfter("17") == 17)
+    }
+
     // MARK: - Tier 9.1: oversized tool results persisted at emission
 
     @Test("Oversized shell output → preview + restore hint; small/read_file/restore pass through")

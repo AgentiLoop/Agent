@@ -74,4 +74,15 @@ actor LLMRateLimiter {
               let seconds = Double(v) else { return 0 }
         return min(seconds, 300)
     }
+
+    /// Tier 10.2: total seconds to wait before retry `attempt` (1-based).
+    /// A server-supplied Retry-After always wins; otherwise exponential
+    /// backoff 0.5s · 2^(attempt−1) capped at 32s, plus up to 25% jitter so
+    /// parallel tabs don't retry in lockstep. Replaces the fixed 10s waits.
+    nonisolated static func retryDelay(attempt: Int, retryAfter: Double = 0, jitter: Double? = nil) -> Double {
+        if retryAfter > 0 { return retryAfter }
+        let base = min(0.5 * pow(2.0, Double(max(attempt, 1) - 1)), 32)
+        let j = jitter ?? Double.random(in: 0...0.25)
+        return base * (1 + min(max(j, 0), 0.25))
+    }
 }
