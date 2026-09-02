@@ -55,4 +55,48 @@ struct EditGateTests {
         AgentViewModel.clearEditGateForTab(tabID: tab)
         #expect(AgentViewModel.editGateError(tabID: tab, expandedPath: path, requireRead: true) != nil)
     }
+
+    @Test("8.3: external change surfaces once as a diff snippet, then the edit gate accepts the new bytes")
+    func externalChangeBlocks() {
+        let tab = UUID()
+        let path = tempFile("a\nb\nc\n")
+        defer { try? FileManager.default.removeItem(atPath: path) }
+        AgentViewModel.recordReadEmission(tabID: tab, expandedPath: path, offset: nil, limit: nil)
+
+        // Nothing changed → nothing reported
+        #expect(AgentViewModel.externalChangeBlocks(tabID: tab).isEmpty)
+
+        // Our own edit is not "external"
+        try! "a\nb\nc\nd\n".write(toFile: path, atomically: true, encoding: .utf8)
+        AgentViewModel.recordFileEdit(tabID: tab, filePath: path)
+        #expect(AgentViewModel.externalChangeBlocks(tabID: tab).isEmpty)
+
+        // Someone else rewrites line b → B
+        try! "a\nB\nc\nd\n".write(toFile: path, atomically: true, encoding: .utf8)
+        let blocks = AgentViewModel.externalChangeBlocks(tabID: tab)
+        #expect(blocks.count == 1)
+        #expect(blocks.first?.contains(path) == true)
+        #expect(blocks.first?.contains("@@ -2,1 +2,1 @@\n-b\n+B") == true)
+
+        // Reported once; the gate now accepts the new content without a re-read
+        #expect(AgentViewModel.externalChangeBlocks(tabID: tab).isEmpty)
+        #expect(AgentViewModel.editGateError(tabID: tab, expandedPath: path, requireRead: true) == nil)
+
+        // Deleted file is evicted silently
+        try? FileManager.default.removeItem(atPath: path)
+        #expect(AgentViewModel.externalChangeBlocks(tabID: tab).isEmpty)
+        #expect(AgentViewModel._lastSeenHash["\(tab.uuidString):\(path)"] == nil)
+    }
+
+    @Test("diffSnippet caps output")
+    func diffSnippetCap() {
+        let old = (1...100).map { "line \($0)" }.joined(separator: "\n")
+        let new = (1...100).map { "LINE \($0)" }.joined(separator: "\n")
+        let snippet = AgentViewModel.diffSnippet(old: old, new: new, maxLines: 10)
+        let lines = snippet.components(separatedBy: "\n")
+        #expect(lines.count == 12) // header + 10 + truncation marker
+        #expect(lines.last?.contains("190 more") == true)
+        // Identical → header only
+        #expect(AgentViewModel.diffSnippet(old: "x\ny", new: "x\ny", maxLines: 10) == "@@ -3,0 +3,0 @@")
+    }
 }
