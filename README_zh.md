@@ -1,4 +1,4 @@
-# 🦾 AgentiLoop Agent! —— 专为 macOS 26.4.1 及更高版本设计
+# 🦾 AgentiLoop Agent!
 
 ## **为你的 Mac 桌面打造的智能体 AI**
 
