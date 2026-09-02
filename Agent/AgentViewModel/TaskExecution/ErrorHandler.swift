@@ -46,7 +46,8 @@ extension AgentViewModel {
         timeoutRetryCount: inout Int,
         maxTimeoutRetries: Int,
         appendLogFn: ((String) -> Void)? = nil,
-        flushFn: (() -> Void)? = nil
+        flushFn: (() -> Void)? = nil,
+        overflowCompactor: (@MainActor (inout [[String: Any]]) async -> Bool)? = nil
     ) async -> TaskLoopErrorOutcome {
         let appendLog: (String) -> Void = appendLogFn ?? { [weak self] s in self?.appendLog(s) }
         let flushLog: () -> Void = flushFn ?? { [weak self] in self?.flushLog() }
@@ -65,9 +66,21 @@ extension AgentViewModel {
             || (errMsg.contains("context_length") && (errMsg.contains("exceed") || errMsg.contains("greater than")))
         if isOverflow {
             let beforeCount = messages.count
-            Self.pruneMessages(&messages, keepRecent: 4)
-            Self.stripOldImages(&messages)
+            let beforeTokens = Self.estimateTokens(messages: messages)
+            // Reactive compaction: the provider already rejected the transcript,
+            // so run the full compactor (LLM summary → prune) with the threshold
+            // check bypassed. Falls back to the blind prune when the caller
+            // supplied no compactor (sub-agents).
+            var compacted = false
+            if let overflowCompactor {
+                compacted = await overflowCompactor(&messages)
+            }
+            if !compacted {
+                Self.pruneMessages(&messages, keepRecent: 4)
+                Self.stripOldImages(&messages)
+            }
             let didShrink = messages.count < beforeCount
+                || Self.estimateTokens(messages: messages) < beforeTokens
             // Cap consecutive prune attempts; if pruning didn't actually shrink the
             // history, the error is misclassified or the model's limit is so small
             // even pruning can't help — either way, retrying is futile.
