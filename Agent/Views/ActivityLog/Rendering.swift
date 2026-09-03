@@ -3,6 +3,18 @@ import AppKit
 
 // MARK: - Text Attachment Cells
 
+/// Builds a MainActor-isolated value from any thread. On the main thread this is a
+/// plain `assumeIsolated`; off-main (e.g. the async full-render task) it hops to
+/// main synchronously instead of trapping in `assumeIsolated`.
+nonisolated func makeOnMain<T: Sendable>(_ body: @MainActor () -> T) -> T {
+    if Thread.isMainThread {
+        return MainActor.assumeIsolated(body)
+    }
+    return DispatchQueue.main.sync {
+        MainActor.assumeIsolated(body)
+    }
+}
+
 /// Draws a solid horizontal line for markdown thematic breaks (---).
 class HRLineCell: NSTextAttachmentCell {
     let color: NSColor

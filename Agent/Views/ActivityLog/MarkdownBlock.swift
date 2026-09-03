@@ -98,7 +98,7 @@ extension ActivityLogView.Coordinator {
             let isSourceCode = (lang.map { !shellLangs.contains($0.lowercased()) } ?? false) && !looksLikeNumberedOutput
             if isSourceCode {
                 let attach = NSTextAttachment()
-                attach.attachmentCell = MainActor.assumeIsolated { CopyButtonCell(codeText: code) }
+                attach.attachmentCell = makeOnMain { CopyButtonCell(codeText: code) }
                 let rightPara = NSMutableParagraphStyle()
                 rightPara.alignment = .right
                 let copyStr = NSMutableAttributedString(attachment: attach)
@@ -279,7 +279,7 @@ extension ActivityLogView.Coordinator {
         if MarkdownPatterns.hrPattern?.firstMatch(in: line, range: fullRange) != nil {
             let result = NSMutableAttributedString()
             let attachment = NSTextAttachment()
-            attachment.attachmentCell = MainActor.assumeIsolated { HRLineCell(color: .separatorColor) }
+            attachment.attachmentCell = makeOnMain { HRLineCell(color: .separatorColor) }
             result.append(NSAttributedString(attachment: attachment))
             return result
         }
