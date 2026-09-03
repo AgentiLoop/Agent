@@ -206,39 +206,71 @@ public func scriptMain() -> Int32 {
 
 Les deux variables sont indépendantes — ne jamais extraire le dossier de projet de `AGENT_SCRIPT_ARGS`. Équivalent Bash dans `user_shell` : `ls "$AGENT_PROJECT_FOLDER/Sources"` (le cwd y est déjà, pas besoin de `cd`).
 
-**Entrée / sortie JSON — un mécanisme SÉPARÉ des variables d'environnement.** Les variables d'environnement sont exportées par Agent! dans le processus ; les fichiers JSON sont de simples fichiers sur disque que le *script lui-même* lit et écrit avec `FileManager` / `JSONSerialization`. Agent! ne les crée pas, ne les transmet pas et ne les analyse pas — la convention ci-dessous est simplement ce que font les exemples fournis (`Hello`, `TodayEvents`, `ListReminders`, …) :
+**Conventions réelles de `AGENT_SCRIPT_ARGS` dans les scripts fournis** (`~/Documents/AgentScript/agents/Sources/Scripts/`) :
 
-- **Entrée :** `~/Documents/AgentScript/json/<Name>_input.json` — optionnel. S'il existe, le script le lit pour obtenir des options structurées (les exemples l'appliquent après les valeurs par défaut issues des variables d'environnement).
-- **Sortie :** `~/Documents/AgentScript/json/<Name>_output.json` — écrit par le script quand `json=true`, en plus de la sortie lisible sur stdout qui revient au LLM.
+| Script | `arguments:` passé par le LLM | Style |
+|---|---|---|
+| `TodayEvents` | `days=3,location=false,json=true` | `key=value,…` |
+| `CheckMail` | `unreadOnly=true,inboxCount=true,json=true` | `key=value,…` |
+| `ListReminders` | `completed=false,limit=5` | `key=value,…` |
+| `QuitApps` | `excluded=Xcode,Agent,Terminal` | `key=value` avec une liste |
+| `NowPlaying` | `json=true,artwork=true` | `key=value,…` |
+| `ArchiveXcode` | `/path/to/Project.xcodeproj MyScheme 469UCUB275` | positionnel, séparé par des espaces (scheme/teamID détectés automatiquement s'ils sont omis) |
+| `CreateDmg` | `--app /path/to/App.app --output /path/out.dmg --name "My App" --compress` | style drapeaux, séparé par des espaces, guillemets respectés |
 
-```swift
-let home = NSHomeDirectory()
-let inputPath  = "\(home)/Documents/AgentScript/json/Hello_input.json"
-let outputPath = "\(home)/Documents/AgentScript/json/Hello_output.json"
+**Entrée / sortie JSON — un mécanisme SÉPARÉ des variables d'environnement.** Les variables d'environnement sont exportées par Agent! dans le processus ; les fichiers JSON sont de simples fichiers sur disque que le *script lui-même* lit et écrit avec `FileManager` / `JSONSerialization`. Agent! ne les crée pas, ne les transmet pas et ne les analyse pas. Deux schémas réels tirés des scripts fournis :
 
-// LIRE l'entrée structurée (indépendante de AGENT_SCRIPT_ARGS)
-if let data = FileManager.default.contents(atPath: inputPath),
-   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-    if let v = json["verbose"] as? Bool { verbose = v }
-    if let j = json["json"]    as? Bool { outputJSON = j }
-}
-
-// ÉCRIRE la sortie structurée
-if outputJSON {
-    let result: [String: Any] = ["success": true, "userName": NSUserName(), "hostName": ProcessInfo.processInfo.hostName]
-    try? FileManager.default.createDirectory(atPath: "\(home)/Documents/AgentScript/json", withIntermediateDirectories: true)
-    if let out = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
-        try? out.write(to: URL(fileURLWithPath: outputPath))
-    }
-}
-```
+*1. Entrée JSON uniquement (`SendMessage`)* — aucun argument d'environnement ; le script exige `SendMessage_input.json` et renvoie `1` s'il est absent :
 
 ```json
-// Hello_input.json
-{ "verbose": true, "json": true }
+// ~/Documents/AgentScript/json/SendMessage_input.json   (écrit par le LLM via file(action:"write") avant l'exécution)
+{ "recipient": "Maman", "message": "À la maison à 18 h", "imagePath": "~/Pictures/Photos Library.photoslibrary/originals/A/IMG_0001.jpeg" }
 
-// Hello_output.json
-{ "success": true, "userName": "…", "hostName": "…", "osVersion": "…", "timestamp": "…" }
+// ~/Documents/AgentScript/json/SendMessage_output.json  (écrit par le script)
+{ "success": true, "timestamp": "2026-09-03T21:14:02Z", "recipient": "Maman", "message": "À la maison à 18 h" }
+// en cas d'échec : { "success": false, "timestamp": "…", "error": "Missing required field: recipient" }
+```
+
+```swift
+// SendMessage.swift — comment le script le lit
+let inputPath  = "\(NSHomeDirectory())/Documents/AgentScript/json/SendMessage_input.json"
+guard let inputData = FileManager.default.contents(atPath: inputPath) else {
+    writeOutput(outputPath, success: false, error: "Input file not found: \(inputPath)"); return 1
+}
+guard let json = try? JSONSerialization.jsonObject(with: inputData) as? [String: Any],
+      let recipientHandle = json["recipient"] as? String else { /* … */ return 1 }
+let message   = json["message"]   as? String
+let imagePath = json["imagePath"] as? String
+```
+
+*2. Arguments d'environnement pour les options, JSON pour la sortie structurée (`TodayEvents`, `NowPlaying`, `CheckMail`, `ListReminders`)* — les options viennent de `AGENT_SCRIPT_ARGS` (ou du fichier optionnel `<Name>_input.json`) ; avec `json=true` le script écrit `<Name>_output.json` en plus de la sortie lisible sur stdout qui revient au LLM :
+
+```json
+// agent_script(action:"run", name:"TodayEvents", arguments:"days=3,json=true")
+// → ~/Documents/AgentScript/json/TodayEvents_output.json
+{ "success": true, "timestamp": "…", "count": 2,
+  "events": [ { "summary": "Standup", "calendar": "Work", "startTime": "…", "endTime": "…", "allDay": false, "location": "…" }, … ] }
+
+// agent_script(action:"run", name:"NowPlaying", arguments:"json=true,artwork=true")
+// → ~/Documents/AgentScript/json/NowPlaying_output.json
+{ "success": true, "playerState": "playing",
+  "track": { "name": "…", "artist": "…", "album": "…", "duration": 240 },
+  "artwork": { "saved": true, "path": "~/Documents/AgentScript/images/….png", "width": 500, "height": 500 } }
+```
+
+```swift
+// TodayEvents.swift — comment le script l'écrit
+func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
+                            events: [[String: Any]]? = nil, count: Int? = nil, outputJSON: Bool) {
+    guard outputJSON else { return }
+    var result: [String: Any] = ["success": success, "timestamp": ISO8601DateFormatter().string(from: Date())]
+    if !success, let error { result["error"] = error }
+    if success { if let events { result["events"] = events }; if let count { result["count"] = count } }
+    try? FileManager.default.createDirectory(atPath: (path as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
+    if let out = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
+        try? out.write(to: URL(fileURLWithPath: path))
+    }
+}
 ```
 
 Les scripts supprimés vont dans `~/Documents/AgentScript/agents/.Trash/` (`agent_script(action:"restore")`) ; `action:"pull"` récupère la version upstream depuis le dépôt [AgentScripts](https://github.com/AgentiLoop/AgentScripts).
