@@ -150,19 +150,61 @@ public func scriptMain() -> Int32 {
 }
 ```
 
-**环境变量** —— 脚本与每条 `user_shell` / `root_shell` / `shell` 命令遵循同一约定：
+**环境变量 —— 如何被设置（SET）。** LLM 从不直接触碰环境。它只调用工具，由 Agent! 的 `ScriptService` 把变量导出到脚本进程中（`ScriptService+Execution.swift` 里的 `env["AGENT_PROJECT_FOLDER"] = cwd`、`env["AGENT_SCRIPT_ARGS"] = arguments`；进程内变体使用 `setenv(...)`）。同样这两个变量也会导出给每条 `user_shell` / `root_shell` / `shell` 命令。
+
+```text
+LLM 工具调用                                            Agent! 导出给脚本的内容
+─────────────────────────────────────────────────────  ─────────────────────────────────────────────
+agent_script(action:"run", name:"TodayEvents")         AGENT_PROJECT_FOLDER=/Users/you/Documents/GitHub/Agent
+                                                       （AGENT_SCRIPT_ARGS 不会被设置）
+
+agent_script(action:"run", name:"TodayEvents",         AGENT_PROJECT_FOLDER=/Users/you/Documents/GitHub/Agent
+             arguments:"days=3,location=false,json=true")   AGENT_SCRIPT_ARGS="days=3,location=false,json=true"
+```
 
 | 变量 | 何时设置 | 含义 |
 |---|---|---|
 | `AGENT_PROJECT_FOLDER` | 始终 | 当前标签页的项目文件夹（没有则为 `$HOME`）。运行器的 cwd 也会设为该目录。 |
-| `AGENT_SCRIPT_ARGS` | 仅当 LLM 向 `agent_script(action:"run")` 传入 `arguments:"…"` 时 | 自由格式字符串；内置示例使用 `key=value,key=value`（如 `days=3,json=true`） |
+| `AGENT_SCRIPT_ARGS` | 仅当 LLM 传入 `arguments:"…"` 时 | LLM 传入的原始字符串。内置示例采用 `key=value,key=value` 约定。 |
+
+**环境变量 —— 如何被读入（READ IN）。** 在脚本内部，二者都来自 `ProcessInfo.processInfo.environment`。下面就是 `Hello.swift` / `TodayEvents.swift` 使用的解析模式：
 
 ```swift
-let folder = ProcessInfo.processInfo.environment["AGENT_PROJECT_FOLDER"] ?? FileManager.default.currentDirectoryPath
-let args   = ProcessInfo.processInfo.environment["AGENT_SCRIPT_ARGS"] ?? ""
+import Foundation
+
+@_cdecl("script_main")
+public func scriptMain() -> Int32 {
+    let env = ProcessInfo.processInfo.environment
+
+    // 1. 项目文件夹 —— 始终存在；保险起见回退到 cwd
+    let folder = env["AGENT_PROJECT_FOLDER"] ?? FileManager.default.currentDirectoryPath
+
+    // 2. 参数 —— 除非 LLM 传入了 `arguments:"…"`，否则不存在
+    let argsString = env["AGENT_SCRIPT_ARGS"] ?? ""
+
+    // 3. 默认值，然后解析 "key=value,key=value"
+    var daysAhead    = 0
+    var showLocation = true
+    var outputJSON   = false
+
+    for pair in argsString.split(separator: ",") {
+        let parts = pair.split(separator: "=", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespaces) }
+        guard parts.count == 2 else { continue }
+        switch parts[0] {
+        case "days":     daysAhead    = Int(parts[1]) ?? 0
+        case "location": showLocation = parts[1].lowercased() == "true"
+        case "json":     outputJSON   = parts[1].lowercased() == "true"
+        default: break
+        }
+    }
+
+    print("项目文件夹：\(folder)")
+    print("days=\(daysAhead) location=\(showLocation) json=\(outputJSON)")
+    return 0
+}
 ```
 
-二者相互独立——切勿从参数中解析项目文件夹。
+这两个变量相互独立——切勿从 `AGENT_SCRIPT_ARGS` 中解析项目文件夹。`user_shell` 中的 Bash 等价写法：`ls "$AGENT_PROJECT_FOLDER/Sources"`（cwd 已在该目录，无需 `cd`）。
 
 **JSON 输入 / 输出** —— 内置示例遵循的约定：
 
