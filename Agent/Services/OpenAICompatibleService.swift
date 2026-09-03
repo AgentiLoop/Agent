@@ -713,6 +713,7 @@ final class OpenAICompatibleService {
 
         // OpenAI SSE format: lines prefixed with "data: "
         for try await line in bytes.lines {
+            try Task.checkCancellation()
             // Skip empty lines and SSE comments
             guard line.hasPrefix("data: ") else { continue }
             let payload = String(line.dropFirst(6))
@@ -722,6 +723,13 @@ final class OpenAICompatibleService {
 
             guard let data = payload.data(using: .utf8),
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { continue }
+
+            // Mid-stream error object ({"error": {"message": …}}) — surface it
+            // instead of silently ending as a truncated completion.
+            if let err = json["error"] as? [String: Any], json["choices"] == nil {
+                let msg = err["message"] as? String ?? payload
+                throw AgentError.apiError(statusCode: (err["code"] as? Int) ?? 500, message: msg)
+            }
 
             // Extract usage if present (final chunk). Most OpenAI-format providers stream the usage block in the FINAL
             // SSE event. We also surface cached_tokens here so the LLM Usage panel reflects automatic prefix-cache hits for OpenAI/Z.ai/Grok/Mistral/Gemini/Qwen/DeepSeek/etc. exactly the same way Claude's explicit cache_control hits are tracked.
