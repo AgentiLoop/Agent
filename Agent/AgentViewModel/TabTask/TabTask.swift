@@ -114,6 +114,8 @@ extension AgentViewModel {
         tab.thinkingDismissed = false
         // Reset fallback chain so this run starts on the primary provider
         FallbackChainService.shared.reset()
+        // Tier 8: edits in this task must be preceded by a read in this task.
+        Self.clearEditGateForTab(tabID: tab.id)
         if let stale = GoalStateStore.shared.clearIfStale() {
             tab.appendLog("🎯 Cleared stale goal (untouched >24h): \(stale.prefix(60))")
         }
