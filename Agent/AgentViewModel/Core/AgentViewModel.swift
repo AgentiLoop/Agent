@@ -757,6 +757,11 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(scanLinesEnabled, forKey: "scanLinesEnabled") }
     }
 
+    /// When on, the Activity Log starts below the LLM Output HUD instead of behind it.
+    var hudLogBelow: Bool = UserDefaults.standard.object(forKey: "hudLogBelow") as? Bool ?? false {
+        didSet { UserDefaults.standard.set(hudLogBelow, forKey: "hudLogBelow") }
+    }
+
     /// Terminal drip-typing effect for LLM Output. When off, text appears instantly.
     var dripEnabled: Bool = UserDefaults.standard.object(forKey: "dripEnabled") as? Bool ?? true {
         didSet { UserDefaults.standard.set(dripEnabled, forKey: "dripEnabled") }

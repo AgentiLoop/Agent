@@ -85,28 +85,18 @@ struct ContentView: View {
                 )
             }
 
-            // Activity Log with LLM Output overlaid on top — overlay doesn't push log down
-            ZStack(alignment: .top) {
-                ActivityLogView(
-                    text: viewModel.selectedTab?.activityLog ?? viewModel.activityLog,
-                    tabID: viewModel.selectedTabId,
-                    isActive: viewModel.selectedTab?.isBusy ?? viewModel.isRunning,
-                    textProvider: { [weak viewModel] in
-                        guard let vm = viewModel else { return "" }
-                        return vm.selectedTab?.activityLog ?? vm.activityLog
-                    },
-                    searchText: searchText,
-                    caseSensitive: caseSensitive,
-                    currentMatchIndex: currentMatchIndex,
-                    onMatchCount: { count in
-                        DispatchQueue.main.async {
-                            totalMatches = count
-                            if currentMatchIndex >= count { currentMatchIndex = max(0, count - 1) }
-                        }
-                    }
-                )
-
-                thinkingIndicator
+            // Activity Log with LLM Output overlaid on top — overlay doesn't push log down.
+            // When "Activity Log Below HUD" is on, the HUD sits above the log instead.
+            if viewModel.hudLogBelow {
+                VStack(spacing: 0) {
+                    thinkingIndicator
+                    activityLog
+                }
+            } else {
+                ZStack(alignment: .top) {
+                    activityLog
+                    thinkingIndicator
+                }
             }
 
             Divider()
@@ -646,6 +636,27 @@ struct ContentView: View {
     static func tabColor(for tabId: UUID, in tabs: [ScriptTab]) -> Color {
         guard let idx = tabs.firstIndex(where: { $0.id == tabId }) else { return .orange }
         return tabColors[idx % tabColors.count]
+    }
+
+    private var activityLog: some View {
+        ActivityLogView(
+            text: viewModel.selectedTab?.activityLog ?? viewModel.activityLog,
+            tabID: viewModel.selectedTabId,
+            isActive: viewModel.selectedTab?.isBusy ?? viewModel.isRunning,
+            textProvider: { [weak viewModel] in
+                guard let vm = viewModel else { return "" }
+                return vm.selectedTab?.activityLog ?? vm.activityLog
+            },
+            searchText: searchText,
+            caseSensitive: caseSensitive,
+            currentMatchIndex: currentMatchIndex,
+            onMatchCount: { count in
+                DispatchQueue.main.async {
+                    totalMatches = count
+                    if currentMatchIndex >= count { currentMatchIndex = max(0, count - 1) }
+                }
+            }
+        )
     }
 
     @ViewBuilder
