@@ -133,6 +133,52 @@ Les noms canoniques viennent de `AgentTools.Name.*` (source : le package [AgentT
 
 Référence complète par action : [docs/TECHNICAL.md](docs/TECHNICAL.md).
 
+## AgentScript — Scripts Swift avec TCC complet
+
+Les AgentScripts sont de simples fichiers Swift dans `~/Documents/AgentScript/agents/Sources/Scripts/`. Agent! compile chacun en `.dylib` avec SwiftPM (`Package.swift` liste chaque script plus les 51 ponts ScriptingBridge), puis le charge via `dlopen` avec les autorisations TCC d'Agent! lui-même — Accessibilité, Automatisation, Calendrier, Contacts, Mail, Photos, etc. Le LLM les gère avec `agent_script` (`create` / `edit` / `run` / `delete` / `restore` / `pull`) ; ~35 exemples sont fournis dans le dossier (`Hello`, `TodayEvents`, `NowPlaying`, `CheckMail`, `CreateDmg`, `ArchiveXcode`, …).
+
+**Point d'entrée** — pas de code de niveau supérieur, pas de `exit()` ; `stdout` est renvoyé au LLM, la valeur de retour est le code de sortie :
+
+```swift
+import Foundation
+import CalendarBridge   // tout `import XBridge` est câblé automatiquement — aucune modification de Package.swift
+
+@_cdecl("script_main")
+public func scriptMain() -> Int32 {
+    print("Hello from AgentScript! 👋")
+    return 0
+}
+```
+
+**Variables d'environnement** — même contrat pour les scripts et pour chaque commande `user_shell` / `root_shell` / `shell` :
+
+| Variable | Quand définie | Signification |
+|---|---|---|
+| `AGENT_PROJECT_FOLDER` | Toujours | Le dossier de projet de l'onglet actif (ou `$HOME` s'il n'y en a pas). Le cwd du runner y est aussi positionné. |
+| `AGENT_SCRIPT_ARGS` | Seulement quand le LLM passe `arguments:"…"` à `agent_script(action:"run")` | Chaîne libre ; les exemples utilisent `key=value,key=value` (ex. `days=3,json=true`) |
+
+```swift
+let folder = ProcessInfo.processInfo.environment["AGENT_PROJECT_FOLDER"] ?? FileManager.default.currentDirectoryPath
+let args   = ProcessInfo.processInfo.environment["AGENT_SCRIPT_ARGS"] ?? ""
+```
+
+Les deux sont indépendantes — ne jamais extraire le dossier de projet des arguments.
+
+**Entrée / sortie JSON** — la convention suivie par les exemples fournis :
+
+- **Entrée :** `~/Documents/AgentScript/json/<Name>_input.json` — optionnel ; ses clés priment sur `AGENT_SCRIPT_ARGS`.
+- **Sortie :** `~/Documents/AgentScript/json/<Name>_output.json` — écrit quand `json=true` (ou `"json": true` dans le fichier d'entrée), en plus de la sortie lisible sur stdout.
+
+```json
+// Hello_input.json
+{ "verbose": true, "json": true }
+
+// Hello_output.json
+{ "success": true, "userName": "…", "hostName": "…", "osVersion": "…", "timestamp": "…" }
+```
+
+Les scripts supprimés vont dans `~/Documents/AgentScript/agents/.Trash/` (`agent_script(action:"restore")`) ; `action:"pull"` récupère la version upstream depuis le dépôt [AgentScripts](https://github.com/AgentiLoop/AgentScripts).
+
 ## Confidentialité et sécurité
 
 Vos fichiers, le contenu de votre écran et vos données personnelles ne quittent jamais votre Mac — les fournisseurs cloud ne voient que le texte du prompt ; les fournisseurs locaux gardent tout hors ligne. Chaque action est journalisée.
