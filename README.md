@@ -1,6 +1,6 @@
 # 🦾 AgentiLoop Agent!
 
-### **Agentic AI for your  Mac Desktop**
+### **Agentic AI for your Mac Desktop**
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
@@ -18,91 +18,66 @@
 - [中文 (简体)](README_zh.md)
 
 ## Chess within Agent
-<img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
+<img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
 
-## Backstory and the Tech behind Agent!
-Agent! didn't come together overnight. It's the result of three years of building agentic AI apps, drawing on roughly a dozen projects developed along the way. Some of those were published under ANIE, Game Changer, BattleScript, XCF MCP Server and Client, D1F, and about eight original Swift Packages. The missing piece was achieving an intelligent autonomous time loop. Once achieved, I brought in the best of the best from the previous three years. The result is Agent! for macOS 26.4.1 or later.
-
-The original goal was to build a Cursor killer. What emerged is something more interesting: an agentic AI with real legs. Agent! is only limited by your imagination. It can write code including video games like Boss-Man, https://github.com/AgentiLoop/bossman, create apps, write poetry via AppleScript within Pages, generate disk images, and attach them to GitHub releases. It can automate most tasks on your Mac. Ask it what you want in plain English or your native language and, after some initial configuration and user approvals, it will do everything it can to carry out your wish. Agent! is relentless, and aims to please.
-
-All of Agent!'s IP is original and open source. Every Swift package dependency and the app itself were originally authored by the same person. This is a genuinely different ecosystem. Most agentic AI apps like Claude Code rely on 65 NPM packages from third parties. Agent! is 100% native, requires very little RAM, and weighs in at 35.5 uncompressed. That footprint includes Xcode automation, a Swift Syntax 6.2 package for troubleshooting native apps, Accessibility, AppleScript, AgentScript/ScriptingBridge, Safari automation, MCP Server support, and more. Out of the box.
-
-## What's New 🚀
-
-**v1.0.92 (186) — The Self-Verifying Autonomy Release** · [Full release notes →](https://github.com/AgentiLoop/Agent/releases/tag/v1.0.92.186)
-
-Agent! now proves its work. A task can't declare itself done until its success criteria are verified with evidence (`goal_state`), an opt-in critic reviews the diff before completion, and every file touched can be rolled back in one shot (`rewind_task`). Extended thinking for Claude, `reasoning_effort` for OpenAI-compatible providers, and a prompt-cache-stable context that compacts to each model's real window — recoverably, with full tool results spilled to disk. Typed tool errors carry recovery hints, sub-agents run their own models (up to 6 read-only researchers), event hooks are fully wired, and 57 passing tests keep it honest.
+## What is Agent!?
 
 **One app. Any AI. Total command over your Mac.**
 
-Agent! wires **18 LLM providers** — Claude, GPT, Gemini, Grok, Mistral, DeepSeek, Qwen, Z.ai, BigModel, Hugging Face, **OpenRouter**, Ollama (cloud and local), vLLM, LM Studio, Codestral, Mistral Vibe, and on-device **Apple Intelligence** — into a native macOS app that doesn't just talk about doing things. It does them.
+Agent! is a 100% native Swift 6.2 / SwiftUI app that wires **18 LLM providers** — Claude, GPT, Gemini, Grok, Mistral, DeepSeek, Qwen, Z.ai, BigModel, Hugging Face, OpenRouter, Ollama (cloud and local), vLLM, LM Studio, Codestral, Mistral Vibe, and on-device **Apple Intelligence** — into an autonomous task loop that actually *does things*: reads your codebase, fixes the bug, builds the Xcode project, commits the diff, drives any Mac app through the Accessibility API, runs shell commands as you or as root, texts you results over iMessage, and answers to a spoken *"Agent!"*.
 
-Watch it read your codebase, fix the bug, build the Xcode project, and commit the diff while you make coffee. Tell it to open Safari and text you the price of flights to Tokyo. Say *"Agent!"* from across the room and have it run your test suite by voice. Text your Mac from iMessage and get a polished answer before you reach your car.
+No NPM, no Electron, no subscription, no telemetry. Bring your own API key, run fully local, or run free on Apple Intelligence. Every Swift package it depends on was written by the same author. See [Backstory](#backstory) below.
 
-It edits files with surgical string-replace diffs — every change one-click undoable from a Time-Machine-style rollback. It drives any Mac app through the Accessibility API — no AppleScript required. It remembers your preferences across sessions. It spawns parallel sub-agents for work that fans out. It indexes entire codebases into a portable JSONL repo-map that any LLM can consume. It runs shell commands as you, or as root via a Launch Daemon you approve exactly once.
+## What's New 🚀
 
-Bring your own API key. Run it fully local on Ollama, vLLM, or LM Studio. Or run it free, forever, on Apple Intelligence. No subscription. No telemetry. No vendor lock-in. Your keys, your machine, your data.
+**v1.1.x — The Hardened Harness Release** · [Releases →](https://github.com/AgentiLoop/Agent/releases/latest)
 
-Download it. Say what you need. Watch it happen.
+- **Context compaction, rebuilt.** Threshold = model window − reserved output − buffer, driven by real `input_tokens`. Provider-side 9-section LLM summary replaces on-device 4K summaries; open goal, plan checklist and edited files are re-attached after every compaction. Oversized tool results are spilled to disk at emission and recoverable via `restore_tool_result`. 413 overflow routes through forced compaction with a shorter retry; `max_tokens` overruns recover by escalating, then continuing.
+- **Read-before-edit gate.** `edit_file` / `apply_diff` / `diff_apply` refuse to touch a file the LLM hasn't read this task, or that changed on disk since the last read (SHA-256). The refusal auto-reads the file so the next call is the edit. External file changes are surfaced each turn as diff snippets.
+- **Real context windows for local models.** LM Studio, Ollama and vLLM report their actual per-model context length — no more hardcoded 32K assumption.
+- **Faster turns.** Read-only tools start while the Claude response is still streaming; input-aware shell concurrency; jittered exponential retry with `Retry-After` on 429/529; mid-stream SSE errors surfaced on every provider.
+- **Defense-in-depth.** `ShellSafetyService` is now enforced daemon-side (AgentHelper + AgentUser) as well as client-side; release builds reject un-teamed XPC clients; both XPC listeners require same-team code signing derived from the app's own signature.
+- **Activity log.** No more 50K truncation or 500K relaunch trim — large logs render off-main with a "Processing tab data…" overlay; optional "Activity Log Below HUD" layout.
+- **App menu:** Check for Updates… (GitHub releases), Website, GitHub. CI Build & Test workflow on every PR; **273 passing tests**.
+- Plus: `goal_state` with evidence-verified criteria, opt-in critic diff review before completion, task-scoped `rewind_task`, extended thinking for Claude, `reasoning_effort` pass-through, sub-agents with per-agent model override (3 concurrent, 6 read-only), typed tool errors with recovery hints, event hooks.
 
 ## Quick Start (Download)
 
 1. **Download** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) and drag to Applications
-2. **Open Agent!** -- it sets up everything automatically
-3. **Pick your AI** -- Settings → choose a provider → enter API key
+2. **Open Agent!** — it sets up everything automatically
+3. **Pick your AI** — Settings → choose a provider → enter API key
 
 ## Quick Start (Build from Source)
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/AgentiLoop/agent.git
-   cd Agent
-   ```
+```bash
+git clone https://github.com/AgentiLoop/agent.git
+cd Agent
+```
 
-#### Option A: Build with Xcode (Apple Developer account)
-2. **Open `Agent.xcodeproj` in Xcode.**
-3. **Build and Run the `Agent` target.**
-4. **Approve the Helper Tool:** When prompted, authorize the privileged daemon to allow root-level command execution.
+**Option A — Xcode (Apple Developer account):** open `Agent.xcodeproj`, set your Development Team, Build & Run the `Agent` target, approve the helper when prompted.
 
-#### Option B: Build without an Apple Developer account
-2. **Run the build script** (requires only Xcode Command Line Tools):
-   ```bash
-   ./build.sh              # Debug build
-   ./build.sh Release      # Release build
-   ```
-3. The app lands in `build/DerivedData/Build/Products/Debug/Agent!.app`
-4. **Run it:** `open "build/DerivedData/Build/Products/Debug/Agent!.app"`
+**Option B — no developer account (Xcode Command Line Tools only):**
+```bash
+./build.sh              # Debug
+./build.sh Release      # Release
+open "build/DerivedData/Build/Products/Debug/Agent!.app"
+```
 
-> ⚠️ Without a developer account the app is ad-hoc signed. The Launch Agent/Daemon helpers won't register (SMAppService needs a team ID), but the LLM loop, all tools, accessibility, AppleScript, shell, and MCP all work.
+> ⚠️ Option B builds are ad-hoc signed. The Launch Agent/Daemon helpers won't register (SMAppService needs a Team ID), but the LLM loop, all tools, Accessibility, AppleScript, shell, and MCP still work.
 
-#### Then:
-5. **Configure your AI Provider:** Go to Settings and enter your API key or select a local provider like Ollama.
-
-> 💡 **Cheap GLM setup:** **GLM-5.1** runs on all four cheap providers — **Ollama**, **Hugging Face**, **Z.ai**, **BigModel** — at pennies per million tokens. New here? Start with **Z.ai** (fastest signup, GLM-5.1 is the default, nothing to provision). Running locally? Only **GLM-4.7-Turbo** (32B) fits on consumer hardware (M2/M3/M4 Mac, 64-128GB, via Ollama) — GLM-5 and GLM-5.1 are too large (~1.6TB), use them via the cloud providers above.
+> 💡 **Cheap setup:** **GLM-5.1** via **Z.ai** (fastest signup, default model) costs pennies per million tokens. Running locally? Only **GLM-4.7-Turbo** (32B) fits consumer hardware (64–128GB Apple Silicon via Ollama).
 
 ### Troubleshooting (Build from Source)
 
-First-time builders of Option B hit a few predictable snags:
-
-- **`xcode-select` points at the Command Line Tools, not full Xcode.** `./build.sh` calls `xcodebuild`; if `xcode-select -p` prints `/Library/Developer/CommandLineTools`, `xcodebuild` can fail to resolve the project. Point it at a full Xcode: `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer` (then `xcodebuild -version` to confirm).
-
-- **`BUILD FAILED` after pulling new changes (stale DerivedData).** The build caches under `build/DerivedData`. When a stale cache causes odd, unrelated errors, wipe it and rebuild: `./build.sh clean && ./build.sh`.
-
-- **The Launch Agent / Daemon helpers never register.** Expected on Option B — the script builds ad-hoc signed (`CODE_SIGN_IDENTITY="-"`, empty `DEVELOPMENT_TEAM`), and `SMAppService` needs a valid Team ID to register the helpers. The LLM loop, all tools, Accessibility, AppleScript, shell, and MCP still work. To get the helpers, use **Option A** (open `Agent.xcodeproj` in Xcode, set your own Development Team, Build & Run, and approve the helper when prompted).
-
-- **macOS / Swift version mismatch.** Agent! targets macOS 26. If `xcodebuild` reports an unsupported deployment target or missing SDK, update to the required macOS and the matching Xcode before rebuilding.
-
-- **Wrong build configuration.** The config argument is case-sensitive as the script uses it — `./build.sh` (Debug) or `./build.sh Release`. The app lands in `build/DerivedData/Build/Products/<Config>/Agent!.app`.
+- **`xcode-select` points at Command Line Tools** → `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
+- **Odd `BUILD FAILED` after pulling** → stale DerivedData: `./build.sh clean && ./build.sh`
+- **Helpers never register** → expected on Option B; use Option A for the helpers
+- **Deployment target / SDK errors** → Agent! targets macOS 26; update macOS and Xcode
+- **Config argument is case-sensitive** → `./build.sh` (Debug) or `./build.sh Release`
 
 ## What Can It Do?
 
-> *"Play my Workout playlist in Music"*
-> *"Build the Xcode project and fix any errors"*
-> *"Take a photo with Photo Booth"*
-> *"Send an iMessage to Mom saying I'll be home at 6"*
-> *"Open Safari and search for flights to Tokyo"*
-> *"Refactor this class into smaller files"*
-> *"What calendar events do I have today?"*
+> *"Build the Xcode project and fix any errors"* · *"Play my Workout playlist in Music"* · *"Take a photo with Photo Booth"* · *"Send an iMessage to Mom saying I'll be home at 6"* · *"Open Safari and search for flights to Tokyo"* · *"Refactor this class into smaller files"* · *"What calendar events do I have today?"*
 
 Just type what you want. Agent! figures out how and makes it happen.
 
@@ -110,489 +85,105 @@ Just type what you want. Agent! figures out how and makes it happen.
 
 ## Key Features
 
-### 🧠 Agentic AI Framework
-Built-in autonomous task loop that reasons, executes, and self-corrects. Agent! doesn't just run code; it observes the results, debugs errors, and iterates until the task is complete. Goal state with evidence-verified success criteria means a task can't declare itself done until it proves it.
+- **🧠 Self-verifying task loop** — reasons, executes, observes results, self-corrects. A task can't declare itself done until `goal_state` criteria are marked with evidence; an opt-in critic reviews the diff first.
+- **🛠 Agentic coding** — reads codebases, edits with string-replace diffs, builds Xcode projects natively (clickable errors), manages git, indexes repos into a portable JSONL repo-map. Every edit is snapshotted — one-click rollback or whole-task `rewind_task`.
+- **🖥 Desktop automation** — drives any Mac app through the Accessibility API ([AXorcist](https://github.com/steipete/AXorcist)), element-based with fuzzy auto-retry. Plus NSAppleScript, JXA and 51 ScriptingBridge app bridges, all in-process with TCC.
+- **📜 AgentScript** — Swift dylibs compiled at runtime and `dlopen`'d in-process with full TCC. Deleted scripts go to `.Trash` and are restorable.
+- **🛡 Privileged execution** — shell as you via a Launch Agent, or as root via a Launch Daemon you approve exactly once (SMAppService + XPC). See [docs/SECURITY.md](docs/SECURITY.md) for why SMAppService already enforces signing identity.
+- **🎙 Voice** — say **"Agent!"** followed by your task; on-device `SFSpeechRecognizer`, auto-runs after ~2.5s of silence, loops.
+- **📱 iMessage remote control** — text `Agent! next song` from your iPhone; approved senders only. Needs Full Disk Access for `chat.db`.
+- **🌐 Web** — built-in Safari automation (JavaScript + AppleScript); optional Selenium and [Playwright MCP](https://github.com/microsoft/playwright-mcp) for cross-browser.
+- **🤝 Sub-agents** — up to 3 concurrent (6 read-only) isolated agents with mailbox messaging and per-agent model override.
+- **🧩 MCP** — add any MCP server in Settings → MCP Servers; tools appear as `mcp_<server>_<tool>`. Xcode MCP: `{"mcpServers":{"xcode":{"command":"xcrun","args":["mcpbridge"],"transport":"stdio"}}}`.
+- **🗂 Tabs, history, memory, plans, skills** — each tab has its own project folder and log; persistent user memory; multi-plan checklists surfaced in every prompt.
+- **🔄 Fallback chain** — auto-switch to the next configured provider on 429/timeout/network failure.
 
-### 🛠 Agentic Coding
-Full coding environment built in. Reads codebases, edits files with precision, runs shell commands, builds Xcode projects, manages git, and auto-enables coding mode to focus the AI on development tools. Replaces Claude Code, Cursor, and Cline -- no terminal, no IDE plugins, no monthly fee. Features **Time Machine-style backups** for every file change, letting you revert any edit instantly.
+## 🤖 18 AI Providers
 
-### 🔍 Dynamic Tool Discovery
-Automatically detects and uses available tools (Xcode, Playwright, Shell, etc.) based on your prompt. No manual configuration required for core tools.
-
-### 🛡 Privileged Execution
-Securely runs root-level commands via a dedicated macOS Launch Daemon. The user approves the daemon once, then the agent can execute commands autonomously via XPC.
-
-#### Why there's no manual `setCodeSigningRequirement` on the XPC listener
-
-Users sometimes ask why `AgentHelper`'s XPC listener accepts connections without a manual `connection.setCodeSigningRequirement(...)` check. The short answer: **SMAppService already enforces signing identity one layer below your code**, so the check would be redundant.
-
-That recommendation is a holdover from the pre-SMAppService **SMJobBless era**, where launchd did not validate identity for you and the XPC server had to set a designated-requirement string itself. SMAppService changed that contract:
-
-- The app-bundle-embedded plist plus signature-gated registration **is** the code-signing requirement.
-- The Mach service names (`Agent.app.redacted.helper`, `Agent.app.redacted.user`) are namespaced to the signed bundle that registered them — no other bundle can claim them.
-- Any signature mismatch (tampering, re-signing, different Team ID, bundle swap) **breaks the XPC channel at the launchd layer** — `listener(_:shouldAcceptNewConnection:)` is never even invoked.
-
-**Empirical proof:** Agent! itself attempted to re-sign its own daemons during an experiment and immediately lost the ability to connect. `NSXPCConnection` to both Mach services failed at the launchd layer before a single byte reached the listener delegate — exactly the behavior a manual `setCodeSigningRequirement` call would enforce, except SMAppService is doing it in the kernel's XPC lookup path where it cannot be bypassed from userland.
-
-| Enforcement | Mechanism | Bypassable from userland? |
+| Provider | Cost | Best for |
 |---|---|---|
-| Helper must be in signed app bundle | Gatekeeper + SMAppService registration | No |
-| Helper must match app's Team ID (469UCUB275) | Code signing + SMAppService | No |
-| Mach service name bound to signed bundle | launchd / XPC namespace | No |
-| Helper binary hash matches registered identity | SMAppService + kernel XPC lookup | No (re-signing breaks the channel) |
-| User approved the helper | System Settings → Login Items & Extensions | No (user gesture required) |
-
-Adding `setCodeSigningRequirement` explicitly would be reasonable belt-and-braces defense-in-depth (useful only if the app were ever ported off SMAppService, or if SIP were disabled), but it is **not a gap** in the current architecture. See [docs/SECURITY.md](docs/SECURITY.md) for the full trust-anchor write-up.
-
-### 🖥 Desktop Automation (AXorcist)
-Control any Mac app through the Accessibility API. Click buttons, type into fields, navigate menus, scroll, drag -- all programmatically. Powered by [AXorcist](https://github.com/steipete/AXorcist) for reliable, fuzzy-matched element finding.
-
-### 🤖 18 AI Providers
-
-The provider picker (LLM Settings, toolbar button #7) shows 17 providers; Apple Intelligence is reached via the separate brain icon (#8). Source of truth: `AgentTools.APIProvider`.
-
-| Provider | API key | Best for |
-|---|---|---|
-| **Claude** (Anthropic) | Paid | Long autonomous tasks, complex reasoning, prompt caching |
-| **OpenAI** | Paid | General purpose, tool calling, vision |
-| **Google Gemini** | Paid (free tier) | Long context, vision, fast |
+| **Claude** | Paid | Long autonomous tasks, extended thinking, prompt caching |
+| **OpenAI** | Paid | General purpose, tool calling, vision, `reasoning_effort` |
+| **Google Gemini** | Paid (free tier) | Long context, vision |
 | **Grok** (xAI) | Paid | Real-time info |
-| **Mistral** | Paid | Open-weight cloud, fast tool calling |
-| **Codestral** (Mistral) | Paid | Code-specialized Mistral |
-| **Mistral Vibe** | Paid | Mistral's chat/agent product |
-| **DeepSeek** | Cheap | Budget cloud, strong coding, prompt cache hit reporting |
-| **Hugging Face** | Varies | Open-source models hosted serverless or on dedicated endpoints |
-| **OpenRouter** | Paid | 200+ models through one API key — Claude, GPT, Gemini, Llama, Mistral, and more. Smart protocol toggle routes Claude models via Anthropic protocol, everything else via OpenAI |
-| **Z.ai** | Cheap | GLM-5.1 via API — recommended starting point |
-| **BigModel** (Zhipu) | Cheap | GLM family via Zhipu's API |
+| **Mistral** / **Codestral** / **Mistral Vibe** | Paid | Open-weight cloud, code, agent product |
+| **DeepSeek** | Cheap | Budget coding, cache-hit reporting |
+| **Hugging Face** | Varies | Open models, serverless or dedicated endpoints |
+| **OpenRouter** | Paid | 200+ models, one key; Claude routed via Anthropic protocol |
+| **Z.ai** / **BigModel** | Cheap | GLM-5.1 — recommended starting point |
 | **Qwen** (Alibaba) | Cheap | Qwen 2.5 / 3 via Dashscope |
-| **Ollama** (cloud) | Free tier | Run open models via Ollama's hosted endpoint |
-| **Local Ollama** | Free + hardware | Self-hosted Ollama daemon — fully offline, no account |
-| **vLLM** | Free + hardware | Self-hosted vLLM server with prefix caching |
-| **LM Studio** | Free + hardware | Self-hosted, easiest GUI for local models |
-| **Apple Intelligence** | Free, on-device | Triage, summary, token compression (via brain icon, not the provider picker) |
+| **Ollama** (cloud) | Free tier | Hosted open models |
+| **Local Ollama** / **vLLM** / **LM Studio** | Free + hardware | Fully offline; real per-model context window detected |
+| **Apple Intelligence** | Free, on-device | Triage, summaries, token compression (brain icon, not the provider picker) |
 
-> 💡 **Self-hosted "free" providers (Local Ollama, vLLM, LM Studio) are only free in the API-fee sense.** Running a 30B+ model with usable speed needs an M2/M3/M4 Ultra Mac Studio (64-128GB unified memory) or a Linux box with 24GB+ VRAM. If you don't already have that hardware, the cloud paths above (Ollama Cloud, Hugging Face, Z.ai, BigModel, DeepSeek) are dramatically cheaper than buying it.
+> 💡 Self-hosted providers are free only in the API-fee sense — a usable 30B+ model needs an M2/M3/M4 Ultra Mac Studio (64–128GB). Without that hardware, the cheap cloud paths above are dramatically cheaper.
 
-## Toolbar Buttons
+## Tools
 
-The Agent! header contains **15 buttons** for quick access to settings, monitors, and tools. Each button opens a popover when clicked. Source of truth: `Agent/Views/HeaderSectionView.swift`.
+Canonical names come from `AgentTools.Name.*` (source of truth: the [AgentTools](https://github.com/AgentiLoop/AgentTools) package). Per-provider toggles can hide individual tools.
 
-| # | Icon | Name | What it does |
-|---|------|------|--------------|
-| 1 | ⚙️ | **Services** | Toggle the Launch Agent / Launch Daemon, manage project folder, scan command output |
-| 2 | 💬 | **Messages Monitor** | Toggle iMessage monitoring on/off — green when active. Opens the recipients list and approval UI |
-| 3 | ✋ | **Accessibility** | Open the Accessibility settings sheet (permission status, axorcist diagnostics) |
-| 4 | 🖥️ | **MCP Servers** | Add/remove/configure MCP (Model Context Protocol) servers — extends Agent! with `mcp_*` tools |
-| 5 | </> | **Coding Preferences** | Toggle auto-verify, visual tests, auto-PR, auto-scaffold. Green when any are on |
-| 6 | 🔧 | **Tools** | Per-provider tool toggles. Enable/disable individual built-in and MCP tools |
-| 7 | 🧠 | **LLM Settings** | Pick AI provider, model, API key, base URL. Pulses when a task is running |
-| 8 | 🧬 | **Apple Intelligence** | Configure FoundationModels (on-device Apple AI). Filled when available |
-| 9 | 🎛️ | **Agent Options** | Temperature, max iterations, vision auto-screenshot, plan-mode encouragement, etc. |
-| 10 | 🔄 | **Fallback Chain** | Configure provider fallback order — Agent! retries with the next provider when one fails |
-| 11 | 🔲 | **HUD** | Toggle the green-CRT scanline overlay on the LLM Output view |
-| 12 | 📊 | **LLM Usage** | Per-model token usage and cost tracking. Green when there's recorded usage |
-| 13 | ↩️ | **Rollback** | Time-Machine-style file backup browser. Restore any previous version of any file Agent! edited |
-| 14 | 🕐 | **History** | Past prompts, errors, and task summaries for the active tab. Re-run a previous prompt with one click |
-| 15 | 🗑️ | **Clear Log** | Delete the activity log for the active tab (or all task history when no tab is selected). Confirms first |
+| Group | Tools |
+|---|---|
+| **Core** | `done` · `list_tools` · `search` · `web_search` · `fetch` · `chat` · `memory` · `plan` · `goal_state` · `restore_tool_result` · `directory` · `skill` · `ask_user` · `index` |
+| **Code / build** | `file` (read/write/edit/diff_apply/undo/list/search/mkdir/…) · `git` · `xcode` (build/run/analyze/snippet/code_review/add_file/bump_version/…) · `agent_script` |
+| **Shell** | `user_shell` (Launch Agent) · `root_shell` (Launch Daemon) · `shell` (in-process fallback) · `batch` · `multi` |
+| **macOS automation** | `accessibility` (25 element-based actions) · `applescript` (with `lookup_sdef`) · `javascript` (JXA) |
+| **Web** | `safari` · `selenium` · `mcp_playwright_browser_*` (optional) |
+| **Sub-agents** | `spawn_agent` · `tell_agent` |
 
----
-
-### 🎙 Voice Control — "Agent!" Hotword
-**Hotword-anchored dictation via `SFSpeechRecognizer`.** Click the microphone in the input bar to start the hotword session, then say **"Agent!"** followed by your task. Transcription is on-device, runs in real time, and listens for `agent` as a complete word (not as a substring of "intelligent" or "management"). Anything you say after the wake word becomes the task — after ~2.5 seconds of silence, it auto-runs. The session loops automatically: when one task completes, it starts listening again. Click the mic to stop.
-
-### 📱 Remote Control via iMessage
-Text your Mac from your iPhone:
-```
-Agent! What song is playing?
-Agent! Check my email
-Agent! Next Song
-```
-Your Mac runs the task and texts back the result. Only approved contacts can send commands.
-
-### 🌐 Web Automation
-Drives Safari hands-free -- search Google, click links, fill forms, read pages, extract information.
-
-### 📋 Smart Planning
-For complex tasks, Agent! creates a step-by-step plan, works through each step, and checks them off in real time.
-
-### 🗂 Tabs
-Work on multiple tasks simultaneously. Each tab has its own project folder and conversation history.
-
-### 📸 Screenshot & Vision
-Take screenshots or paste images. Vision-capable AI models analyze what they see -- describe content, read text, spot UI issues.
-
-### 🌐 Safari Web Automation (Built-in)
-
-Agent! includes built-in Safari web automation via JavaScript and AppleScript. Search Google, click links, fill forms, read page content, and execute JavaScript -- all hands-free.
-
-**To enable:** Open Safari → Settings → Advanced → check "Show features for web developers". Then go to Developer menu → check "Allow JavaScript from Apple Events".
-
-### 🎭 Playwright Web Automation (Optional)
-
-Full cross-browser automation via [Microsoft Playwright MCP](https://github.com/microsoft/playwright-mcp). Click, type, screenshot, and navigate any website in Chrome, Firefox, or WebKit -- all controlled by the AI.
-
-**Setup (one-time):**
-
-```bash
-# 1. Install Node.js (if not already installed)
-brew install node
-
-# 2. Install Playwright MCP server globally
-npm install -g @playwright/mcp@latest
-
-# 3. Install browser binaries (pick one or all)
-npx playwright install chromium          # Chrome (~165MB)
-npx playwright install firefox           # Firefox (~97MB)
-npx playwright install webkit            # Safari/WebKit (~75MB)
-npx playwright install                   # All browsers
-```
-
-**Configure in Agent!:**
-
-Go to Settings → MCP Servers → Add Server, paste this JSON:
-
-```json
-{
-    "mcpServers": {
-        "playwright": {
-            "command": "npx",
-            "args": ["@playwright/mcp"],
-            "transport": "stdio"
-        }
-    }
-}
-```
-
-> **Note:** If `npx` is not found, use the full path: run `which npx` in Terminal and replace `"npx"` with the result (e.g. `"/opt/homebrew/bin/npx"`).
-
-Toggle ON and Playwright tools appear automatically. The AI can now control browsers directly.
-
-### Tools — what `list_tools` actually returns
-
-These are the canonical tool names defined in `AgentTools.Name.*` and exposed to every LLM provider via `AgentTools.tools(for:)`. Source of truth: `~/Documents/GitHub/AgentTools/Sources/AgentTools/AgentTools.swift`. The Agent app's user-pref toggles can hide individual tools per-provider, but the list below is the full set the LLM ever sees.
-
-#### Core / discovery
-
-| Tool | Actions / args | What it does |
-|---|---|---|
-| **done** | `summary` | Signal task complete. Required at end of every task |
-| **list_tools** | — | Returns the live tool list for the current provider (built-in + MCP) |
-| **search** | `query` | Web search via Exa, Tavily, or DuckDuckGo (whichever key is configured) |
-| **chat** | `write` / `transform` / `fix` / `about` | Write prose, transform/fix text, describe Agent capabilities |
-| **memory** | `read` / `write` / `append` / `clear` | Persistent user preferences. "remember X" → `append` |
-| **plan** | `create` / `update` / `read` / `list` / `delete` | Multi-plan CRUD with per-step status tracking |
-| **goal_state** | `set` / `get` / `mark` / `clear` | Persistent goal + success criteria; marking done requires evidence |
-| **restore_tool_result** | `tool_use_id` | Recover the full text of a tool result truncated by compaction |
-| **directory** | `get` / `set` / `home` / `documents` / `library` / `none` / `cd` | Project folder for the current tab |
-| **fetch** | `url` | Fetch URL, strip HTML, cap 8K chars |
-| **skill** | `list` / `invoke` / `save` / `delete` | Reusable prompt templates |
-| **ask_user** | `question` | Mid-task user dialog (waits up to 5 min) |
-
-#### Code / files / build
-
-| Tool | Actions / args | What it does |
-|---|---|---|
-| **file** | `read` / `write` / `edit` / `create` / `apply` / `undo` / `diff_apply` / `list` / `search` / `read_dir` / `mkdir` / `cd` / `if_to_switch` / `extract_function` | All file operations. `edit` = single-string replace. `diff_apply` = preferred for multi-line code edits |
-| **git** | `status` / `diff` / `log` / `commit` / `diff_patch` / `branch` / `worktree` | Git operations — use this instead of shell git |
-| **xcode** | `build` / `run` / `list_projects` / `select_project` / `add_file` / `remove_file` / `grant_permission` / `analyze` / `snippet` / `code_review` / `get_version` / `bump_version` / `bump_build` | Native Xcode integration. Errors in the activity log are clickable |
-| **agent_script** | `list` / `read` / `create` / `update` / `edit` / `run` / `delete` / `combine` / `restore` / `pull` / `list_backups` | Swift dylib scripts in `~/Documents/AgentScript/agents/` with full TCC |
-
-#### Shell / privilege tiers
-
-| Tool | Args | What it does |
-|---|---|---|
-| **user_shell** | `command` | Shell as current user via Launch Agent. Primary shell tool |
-| **root_shell** | `command` | Shell as ROOT via Launch Daemon. Admin tasks only — no sudo |
-| **shell** | `command` | Fallback in-process shell (when Launch Agent is off) |
-| **batch** | `commands` | Multiple shell commands in one call (newline-separated) |
-| **multi** | `description`, `tasks` | Multiple tool calls in one batch |
-
-#### macOS automation
-
-| Tool | Actions / args | What it does |
-|---|---|---|
-| **accessibility** | `open_app` / `find_element` / `click_element` / `type_into_element` / `scroll_to_element` / `list_windows` / `inspect_element` / `get_properties` / `perform_action` / `set_properties` / `get_focused_element` / `get_children` / `read_focused` / `wait_for_element` / `wait_adaptive` / `highlight_element` / `manage_app` / `show_menu` / `click_menu_item` / `set_window_frame` / `get_window_frame` / `screenshot` / `check_permission` / `request_permission` / `get_audit_log` | Element-based AXorcist automation. Every action takes `role`+`title`+`appBundleId` — no coordinates |
-| **applescript** | `execute` / `lookup_sdef` / `list` / `run` / `save` / `delete` | NSAppleScript in-process with TCC |
-| **javascript** | `execute` / `list` / `run` / `save` / `delete` | JXA (JavaScript for Automation) |
-
-#### Web automation
-
-| Tool | Actions / args | What it does |
-|---|---|---|
-| **safari** | `open` / `find` / `click` / `type` / `execute_js` / `get_url` / `get_title` / `read_content` / `google_search` / `scroll_to` / `select` / `submit` / `navigate` / `list_tabs` / `switch_tab` / `list_windows` / `scan` / `search` | Safari automation via JavaScript + AppleScript |
-| **selenium** | `start` / `stop` / `navigate` / `find` / `click` / `type` / `execute` / `screenshot` / `wait` | Selenium WebDriver session — use `safari` for normal Safari |
-| **mcp_playwright_browser_\*** | (see Playwright MCP) | Optional. Cross-browser automation via Playwright MCP |
-
-#### Sub-agents
-
-| Tool | Args | What it does |
-|---|---|---|
-| **spawn_agent** | `name`, `prompt`, `tools`, `model`, `max_iterations` | Spawn isolated sub-agent. 3 concurrent (up to 6 read-only). Optional model override + file-based results |
-| **tell_agent** | `to`, `message` | Send a message to a running sub-agent's mailbox |
-
-> 💡 **Note:** The on-device app filters this list per-provider — toggle individual tools in the **Tools** popover (button #6 in the toolbar above). Apple Intelligence has its own minimal default set because of its small context window. MCP tools are appended at runtime as `mcp_<server>_<tool>` and listed under "--- MCP Tools ---" by `list_tools`.
+Full per-action reference: [docs/TECHNICAL.md](docs/TECHNICAL.md).
 
 ## Privacy & Safety
 
-- **Your data stays on your Mac.** Files, screen contents, and personal data are never uploaded.
-- **Cloud AI only sees your prompt text.** Use local AI to stay 100% offline.
-- **You're in control.** Agent! shows everything it does and logs every action.
-- **Built on Apple's security model.** macOS permissions protect your system.
-
-### Defense Layers
+Your files, screen contents and personal data never leave your Mac — cloud providers only see prompt text; local providers keep everything offline. Every action is logged.
 
 | Layer | What it does |
 |---|---|
-| **Shell Safety Service** | Hard-blocks catastrophic commands (`rm -rf /`, `rm -rf ~`, `dd` to `/dev/disk`, fork bombs, `--no-preserve-root`) before the Process is even constructed. Cannot be bypassed by the LLM. |
-| **TCC In-Process Routing** | 17-keyword detector routes AppleScript, osascript, JXA, screencapture, accessibility, Shortcuts, and ScriptingBridge commands to run in-process where Agent! holds TCC grants — never through the Launch Agent/Daemon (separate bundle IDs = no TCC). |
-| **File Backup on Every Edit** | `FileBackupService` auto-snapshots every file before `write_file`, `edit_file`, and `diff_apply`. Recoverable via `file(action:"restore")` or the Rollback UI. 1-week TTL. |
-| **Agent Script .Trash** | `delete_agent` copies the script to `~/Documents/AgentScript/agents/.Trash/` before removal. Recoverable via `agent_script(action:"restore")`. |
-| **Working Directory Normalization** | Every shell execution path (`executeTCC`, `UserService`, `HelperService`) normalizes the working directory — if a file path is accidentally passed as cwd, it strips to the parent directory instead of crashing with "Not a directory". |
-| **Task Drain-Before-Start** | Starting a new task awaits the previous task's full termination before beginning — prevents orphaned retry loops from mixing log output across providers. |
-| **Fallback Chain** | When the primary LLM fails (429, timeout, network), Agent! auto-switches to the next provider in the user-configured chain after 2 failures. |
-| **Actionable Errors** | Every tool error includes a `Recovery:` hint telling the LLM exactly what to try next — no dead-end error messages that waste turns. |
-| **Read Cache Invalidation** | File read cache is invalidated on both successful edits AND failed edits, so the LLM always gets fresh content on the next read. |
-| **Basename Search** | When `read_file` or `edit_file` gets a wrong path, Agent! searches nearby directories for files with the same name and returns the correct paths inline — the LLM self-corrects in one turn. |
-| **Tool Execution Gating** | The LLM cannot fabricate tool results. All tool calls flow through the app's `dispatchTool()` → actual execution (XPC, shell, in-process) → real output returned as `tool_result`. The LLM only sees and summarizes outputs that actually happened. If a tool fails, the real error is returned — the LLM cannot claim success without a matching execution event. |
-| **action_not_performed** | Two-layer defense against false-action claims: **(1) Prompt** — system prompt instructs the LLM to say "action not performed" if no tool was called. **(2) App** — if the LLM returns text claiming "I searched/opened/clicked" but made zero tool calls that turn, a correction is injected forcing it to use the real tool. |
+| **Shell Safety Service** | Hard-blocks `rm -rf /`, `rm -rf ~`, bare-glob `rm -rf`, `--no-preserve-root` — enforced client-side **and** daemon-side. Cannot be bypassed by the LLM. |
+| **XPC client trust** | Both listeners require same-team code signing derived from the app's own signature; release builds reject un-teamed clients. |
+| **Read-before-edit gate** | Edits to unread or externally-modified files are refused (SHA-256), with auto-read on refusal. |
+| **File backups + rewind** | Every edit snapshotted (1-week TTL); Rollback UI, `file(action:"undo")`, or task-scoped `rewind_task`. |
+| **TCC in-process routing** | AppleScript/JXA/screencapture/accessibility commands run in-process where Agent! holds TCC grants, never through the daemons. |
+| **Tool execution gating** | The LLM cannot fabricate results — every call flows through `dispatchTool()` and returns real output. Tool-less "I clicked/searched…" claims get a correction injected. |
+| **Typed errors + guards** | Every failing tool result carries a recovery hint; broken-record and stuck guards nudge, then stop; completion gates cap refusals at 3 per task. |
+| **Console audit trail** | Every tool call and every helper command is logged. |
 
----
-
-## Keyboard Shortcuts
-
-Source of truth: the TextField `.onSubmit` in `Agent/Views/InputSectionView.swift` for `Return`, and the inline `NSEvent.addLocalMonitorForEvents` block in `Agent/Views/ContentView.swift` for everything else.
+## Keyboard Shortcuts & Slash Commands
 
 | Shortcut | Action |
 |---|---|
-| `Return` | Run current task (TextField submit — no modifier needed) |
-| `⌘ .` / `Escape` | Cancel running task |
-| `⌘ B` | Toggle LLM Output overlay (show/hide) |
-| `⌘ D` | Toggle both LLM chevrons on the current tab (expand/collapse) |
-| `⌘ T` | New tab |
-| `⌘ W` | Close current tab (or quit if no tabs) |
-| `⌘ 1`–`⌘ 9` | Switch tab. `⌘1` is the main tab; `⌘2`–`⌘9` are script tabs |
-| `⌘ Shift ←` / `⌘ Shift →` | Previous / next tab |
-| `⌘ F` | Toggle activity-log search bar |
-| `⌘ L` | Clear log for the active tab |
-| `⌘ V` | Paste image from clipboard |
-| `↑` / `↓` | Prompt history (in the input field) |
-| `⌘ Shift M` | Toggle Messages Monitor on/off |
-| `⌘ Shift P` | Open Settings (system prompt editor lives here) |
-| `⌘ Shift K` | Clear all (full reset) |
-| `⌘ Shift L` | Clear LLM output panel only |
-| `⌘ Shift H` | Clear prompt history |
-| `⌘ Shift J` | Clear task history |
-| `⌘ Shift U` | Clear token counters |
+| `Return` | Run task · `⌘ .` / `Esc` cancel |
+| `⌘ T` / `⌘ W` / `⌘ 1–9` / `⌘ ⇧ ←→` | New / close / switch / prev-next tab |
+| `⌘ B` / `⌘ D` | Toggle LLM Output overlay / chevrons |
+| `⌘ F` / `⌘ L` / `⌘ V` | Search log / clear log / paste image |
+| `↑` / `↓` | Prompt history |
+| `⌘ ⇧ M` / `⌘ ⇧ P` | Messages Monitor / Settings |
+| `⌘ ⇧ K` `L` `H` `J` `U` | Clear all / LLM panel / prompt history / task history / token counters |
 
-## Slash Commands
-
-Type these in the input field and press Return — they execute locally without going to any LLM. Source of truth: `AgentViewModel+RunStop.swift`.
-
-| Command | Action |
-|---|---|
-| `/clear` or `/clear log` | Clear the activity log for the current tab |
-| `/clear all` | Clear everything (log, LLM output, prompt history, task history, tokens) |
-| `/clear llm` | Clear the LLM output panel only |
-| `/clear history` | Clear prompt history |
-| `/clear tasks` | Clear task history |
-| `/clear tokens` | Reset token counters (task + session) |
-| `/memory` or `/memory show` | Print the current memory file contents to the activity log |
-| `/memory clear` | Wipe memory |
-| `/memory edit` | Open `~/Documents/AgentScript/memory.md` in the system default editor |
-| `/memory <text>` | Append `<text>` to memory (anything else after `/memory` becomes the new line) |
-
----
+Slash commands run locally: `/clear [log|all|llm|history|tasks|tokens]`, `/memory [show|clear|edit|<text>]`.
 
 ## FAQ
 
-**Do I need to know how to code?** No. Just type what you want in plain English.
+**Do I need to know how to code?** No — plain English (or your native language).
+**How much does it cost?** The app is free (MIT). You pay your provider; GLM-5.1 via Z.ai/BigModel or DeepSeek are the cheapest for serious work. Local models are free if you own the hardware.
+**What Mac do I need?** Apple Silicon, macOS 26.4.1+. Any modern Mac for cloud providers; 64GB+ for 30B local models.
+**How is this different from Siri?** Siri answers. Agent! *acts* — apps, files, code, system.
 
-**Is it safe?** Yes. Standard macOS automation, full activity logging, you approve permissions.
+More: [docs/FAQ.md](docs/FAQ.md) · [Technical Architecture](docs/TECHNICAL.md) · [Comparisons](docs/COMPARISON.md) (vs Claude Code, Cursor, Cline, OpenClaw) · [Security Model](docs/SECURITY.md)
 
-**How much does it cost?** The Agent! app itself is free (MIT License). Cloud AI providers charge for API usage — the cheapest options for serious work are GLM-5/5.1 via Z.ai, BigModel, or Hugging Face (pennies per million tokens), or DeepSeek for budget coding. Self-hosted local models (Ollama, vLLM, LM Studio) have no API fees but only make sense if you already own the hardware to run them — see the hardware note below.
+## Backstory
 
-**What Mac do I need?** macOS 26.4.1. Apple Silicon required. For cloud providers, any modern Mac works fine. For self-hosted local models (Ollama, vLLM, LM Studio): a 7B model fits in 16GB unified memory, a 13B model in 24GB, a 30B model needs 64GB+ (M2/M3/M4 Ultra Mac Studio territory). Apple Intelligence (the on-device mediator for triage / token compression) needs an Apple Silicon Mac with Apple Intelligence enabled in System Settings.
-
-**How is this different from Siri?** Siri answers questions. Agent! *performs actions* -- controls apps, manages files, builds code, automates workflows.
-
----
-
-## Documentation
-
-- [Technical Architecture](docs/TECHNICAL.md) -- Tools, scripting, developer details
-- [Comparisons](docs/COMPARISON.md) -- vs Claude Code, Cursor, Cline, OpenClaw
-- [Security Model](docs/SECURITY.md) -- XPC architecture, privilege separation
-- [FAQ](docs/FAQ.md) -- Common questions
-
----
-
-## Built-in Xcode Tools
-
-Agent! includes native Xcode integration that works without any MCP server setup. These built-in tools are often faster and more reliable than the MCP alternative since they run directly inside the app.
-
-| Tool | What It Does |
-|---|---|
-| **xcode build** | Build the current Xcode project, capture errors and warnings. Errors in the activity log are **clickable** and open directly in Xcode. |
-| **xcode run** | Build and run the app |
-| **xcode list_projects** | Discover open Xcode workspaces and projects |
-| **xcode select_project** | Switch the active project |
-| **xcode grant_permission** | Grant file access to the Xcode project folder |
-| **xcode get_version** | Read the current marketing version and build number from the Xcode project |
-| **xcode bump_version** | Bump the marketing version (major, minor, or patch), update the build number, build to verify, and auto-commit |
-| **xcode bump_build** | Increment only the build number |
-
-Just say *"bump version"* and Agent! reads the current version, asks major/minor/patch, updates Info.plist and project settings, builds to verify, and commits the change. No manual plist editing, no missed build numbers.
-
-The AI automatically uses these when you ask it to build, fix errors, or work with Xcode projects. No configuration needed -- just have your project open in Xcode.
-
-> 🚀 **iOS/iPadOS Support:** Coming soon! Native support for building, running, and testing iOS and iPadOS apps directly from Agent! is in development.
-
-> **Tip:** For most coding workflows, the built-in tools are all you need. The MCP Xcode server below adds extras like SwiftUI Preview rendering and documentation search.
-
-
----
-
-<img width="1349" height="1438" alt="Screenshot 2026-04-02 at 12 00 03 PM" src="https://github.com/user-attachments/assets/b0d9346e-f807-4089-bab3-29c7058868d8" />
-
-## Two ways to talk to Agent! — voice and iMessage
-
-Both features use the same wake word: **"Agent!"** (case-insensitive — `Agent!`, `agent!`, `AGENT!`, even just `Agent ` or `agent ` all work).
-
-### 🎤 Voice (dictation hotword)
-
-Click the microphone in the input bar and start the hotword session, then speak. Agent! transcribes in real time using `SFSpeechRecognizer` and listens for the word "agent" as a complete word (not as a substring of "intelligent" or "management"). Anything you say after "agent" becomes the task. After ~2.5 seconds of silence, the task auto-runs.
-
-Examples:
-- *"Agent, what song is playing?"*
-- *"Agent take a screenshot of Safari"*
-- *"Agent build the Xcode project"*
-
-The hotword session loops automatically — after one task completes, it goes back to listening. Click the mic again to stop.
-
-### 📱 iMessage (remote control)
-
-Text your Mac from your iPhone. Agent! polls `~/Library/Messages/chat.db` every 5 seconds for new messages and reacts to anything starting with **`Agent!`** (case-insensitive, exclamation mark optional).
-
-Examples:
-```
-Agent! What song is playing?
-agent! check my email
-AGENT! next song
-Agent  open Safari
-```
-
-Agent! sends an immediate "Working on it..." acknowledgment, runs the task on a dedicated Messages tab using your main tab's LLM config, and then texts the result back to you.
-
-**Setup (one-time):**
-
-1. **Grant Full Disk Access** — System Settings → Privacy & Security → Full Disk Access → enable Agent! (required to read `chat.db` directly via SQLite)
-2. **Open the Messages Monitor** — toolbar button #2 (chat bubble icon, turns green when on)
-3. **Approve a sender** — once a message arrives from a new contact, that contact appears in the recipients list. Toggle them on to approve.
-
-Only approved senders can run tasks. Unapproved messages are logged but ignored. Your reply is sent back via AppleScript to the same handle that sent the command, capped at 4000 characters.
-
-Outgoing replies have any leading "Agent!" stripped so the receiving Mac doesn't trigger its own command loop.
-
----
-
-Agent! supports [MCP](https://modelcontextprotocol.io) servers for extended capabilities. Configure in Settings → MCP Servers.
-
-### Xcode MCP Server
-
-Connect Agent! directly to Xcode for project-aware operations:
-
-```json
-{
-  "mcpServers" : {
-    "xcode" : {
-      "command" : "xcrun",
-      "args" : [
-        "mcpbridge"
-      ],
-      "transport" : "stdio"
-    }
-  }
-}
-```
-
-**Xcode MCP provides:**
-- Project-aware file operations (read/write/edit/delete)
-- Build and test integration
-- SwiftUI Preview rendering
-- Code snippet execution
-- Apple Developer Documentation search
-- Real-time issue tracking
-
-
----
-
-## License
-
-MIT - free and open source.
-
----
-
-<div align="center">
-
-### **Agent! for macOS 26.4.1 - Agentic AI for your  Mac Desktop**
-> Note: Claude refers to the Anthropic AI model integrated into Agent! for LLM functionality. It is not a human contributor Agent!
-</div>
-
----
-
-## Agent! vs Claude Code — Architectural Comparison
-
-Agent! is a 100% original pure Swift macOS application. It is not a port, fork, or derivative of any other project.
-
-| | Claude Code | Agent! |
-|---|---|---|
-| **Language** | TypeScript/JavaScript | Pure Swift 6.2 |
-| **UI Framework** | Ink (terminal React) | SwiftUI (native macOS) |
-| **Platform** | CLI — Linux, macOS, Windows | Native macOS 26.4.1 only |
-| **Runtime** | Node.js/Bun | Native compiled binary |
-| **Architecture** | Terminal REPL with streaming | Desktop app with XPC daemons |
-| **Accessibility** | None (CLI) | Full macOS AX via AXorcist (25 top-level actions, 30+ AX subtypes via `perform_action`) |
-| **AppleScript** | None | Full NSAppleScript + JXA in-process with TCC |
-| **Xcode Integration** | Via Bash (`xcodebuild`) | Native (build/run/analyze/snippet/add_file/bump_version/code_review — 13 actions) |
-| **Apple Intelligence** | None | FoundationModels on-device — handles greeting/small-talk triage, task summaries, error explanations, and Tier 1 token compression. UI automation is handled by the main LLM via the `accessibility` tool, not Apple AI |
-| **ScriptingBridge** | None | Full SDEF + 51 event bridges (Finder, Mail, Music, Safari, Calendar, etc.) |
-| **Vision** | Image input via API | Image input via API |
-| **Auto-screenshots** | None (no UI) | Opt-in auto-verification after UI actions (default OFF — see `visionAutoScreenshotEnabled`) |
-| **iMessage** | None | Remote agent via Messages (Full Disk Access required for `chat.db`) |
-| **Voice** | None | Hotword-anchored dictation via SFSpeechRecognizer |
-| **CRT effect** | None | Optional SwiftUI Canvas scanline overlay (toggle via HUD button) |
-| **Privilege Model** | User sandbox | XPC Launch Agent (user) + Launch Daemon (root) |
-| **Sub-agents** | Task tool (publicly documented; implementation details not stated by Anthropic) | Up to 3 concurrent (6 read-only) isolated agents with mailbox messaging and per-agent model override |
-| **MCP** | Node.js stdio/SSE | Swift AgentMCP package |
-| **Scripts** | None | Swift dylib compilation at runtime, dlopen'd in-process with full TCC |
-| **Prompt caching** | Anthropic `cache_control` ephemeral | Anthropic `cache_control` ephemeral + automatic prefix-cache hit tracking for OpenAI/Z.ai/Grok/Mistral/Gemini/Qwen/DeepSeek; Ollama `keep_alive: 30m` |
-| **Context compaction** | Cloud Claude (paid tokens; conversation re-sent to Anthropic) | Tiered: Tier 1 = on-device Apple Intelligence summarization (free, private, no API tokens). Tier 2 = aggressive prune if Apple AI unavailable. Threshold scales to the model's context window (~55%, 2K–400K), summaries memoized, 3-failure circuit breaker, full tool results spilled to disk before truncation |
-
-## Agent! vs Cursor — Quick Comparison
-
-Cursor is an excellent AI code editor. Agent! plays a different game: it's an agent for your **whole Mac**, not just your codebase.
-
-| | Cursor | Agent! |
-|---|---|---|
-| **What it is** | AI code editor (VS Code fork, Electron) | Native SwiftUI macOS agent app |
-| **Scope** | Your codebase | Your entire Mac — code, apps, files, system |
-| **Pricing** | Subscription | Free & open source (MIT) — bring your own API key or run local |
-| **Local models** | Cloud-first | Ollama, vLLM, LM Studio, on-device Apple Intelligence |
-| **Mac app automation** | None | Accessibility API, AppleScript/JXA, ScriptingBridge (51 app bridges) |
-| **Root-level admin tasks** | None | Privileged Launch Daemon via XPC (approved once) |
-| **Voice / iMessage control** | None | Hotword dictation + remote agent via Messages |
-| **Xcode integration** | Terminal `xcodebuild` | Native build/run/analyze/code-review tools |
-| **Telemetry** | Cloud account required | None — your keys, your machine, your data |
-
-If you live inside one repo all day, Cursor is great. If you want an agent that also builds your Xcode project, drives Safari, texts you results, and installs software as root — that's Agent!.
+Agent! is the result of three years of building agentic AI apps — ANIE, Game Changer, BattleScript, XCF MCP Server and Client, D1F, and about eight original Swift packages. The missing piece was an intelligent autonomous loop; once achieved, the best of those projects came together into Agent!. It has written video games ([Boss-Man](https://github.com/AgentiLoop/bossman)), created apps, written poetry into Pages via AppleScript, generated disk images and attached them to GitHub releases. Where Claude Code relies on ~65 third-party NPM packages, Agent! is 100% native, uses very little RAM, and ships Xcode automation, Swift Syntax 6.2 analysis, Accessibility, AppleScript, AgentScript/ScriptingBridge, Safari automation and MCP support out of the box.
 
 ## Contributing
 
-Want to hack on Agent!? See [CONTRIBUTING.md](./CONTRIBUTING.md) — you can build from source in about 5 minutes with just the Xcode Command Line Tools (`./build.sh`), no Apple Developer account required. Check the [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) for scoped starter tasks.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) — build from source in ~5 minutes with `./build.sh`, no developer account needed. Pull requests run the CI Build & Test workflow. Check the [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+
+## License
+
+MIT — free and open source.
 
 ---
-
 
 > ⚠️ **Legal Notice & Attribution**
 >
