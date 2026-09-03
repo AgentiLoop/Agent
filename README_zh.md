@@ -206,39 +206,71 @@ public func scriptMain() -> Int32 {
 
 这两个变量相互独立——切勿从 `AGENT_SCRIPT_ARGS` 中解析项目文件夹。`user_shell` 中的 Bash 等价写法：`ls "$AGENT_PROJECT_FOLDER/Sources"`（cwd 已在该目录，无需 `cd`）。
 
-**JSON 输入 / 输出 —— 与环境变量完全独立的另一套机制。** 环境变量由 Agent! 导出到进程中；JSON 文件则是磁盘上的普通文件，由*脚本自己*用 `FileManager` / `JSONSerialization` 读写。Agent! 不会创建、传递或解析它们——下面的约定只是内置示例（`Hello`、`TodayEvents`、`ListReminders`……）的做法：
+**内置脚本中真实的 `AGENT_SCRIPT_ARGS` 约定**（`~/Documents/AgentScript/agents/Sources/Scripts/`）：
 
-- **输入：** `~/Documents/AgentScript/json/<Name>_input.json` —— 可选。若存在，脚本从中读取结构化选项（示例在环境变量默认值之后应用它）。
-- **输出：** `~/Documents/AgentScript/json/<Name>_output.json` —— 当 `json=true` 时由脚本写入，同时仍输出返回给 LLM 的人类可读 stdout。
+| 脚本 | LLM 传入的 `arguments:` | 风格 |
+|---|---|---|
+| `TodayEvents` | `days=3,location=false,json=true` | `key=value,…` |
+| `CheckMail` | `unreadOnly=true,inboxCount=true,json=true` | `key=value,…` |
+| `ListReminders` | `completed=false,limit=5` | `key=value,…` |
+| `QuitApps` | `excluded=Xcode,Agent,Terminal` | `key=value` 带列表 |
+| `NowPlaying` | `json=true,artwork=true` | `key=value,…` |
+| `ArchiveXcode` | `/path/to/Project.xcodeproj MyScheme 469UCUB275` | 位置参数，空格分隔（省略时自动检测 scheme/teamID） |
+| `CreateDmg` | `--app /path/to/App.app --output /path/out.dmg --name "My App" --compress` | 标志风格，空格分隔，支持引号 |
 
-```swift
-let home = NSHomeDirectory()
-let inputPath  = "\(home)/Documents/AgentScript/json/Hello_input.json"
-let outputPath = "\(home)/Documents/AgentScript/json/Hello_output.json"
+**JSON 输入 / 输出 —— 与环境变量完全独立的另一套机制。** 环境变量由 Agent! 导出到进程中；JSON 文件则是磁盘上的普通文件，由*脚本自己*用 `FileManager` / `JSONSerialization` 读写。Agent! 不会创建、传递或解析它们。以下是内置脚本中的两种真实模式：
 
-// 读取结构化输入（与 AGENT_SCRIPT_ARGS 无关）
-if let data = FileManager.default.contents(atPath: inputPath),
-   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-    if let v = json["verbose"] as? Bool { verbose = v }
-    if let j = json["json"]    as? Bool { outputJSON = j }
-}
-
-// 写入结构化输出
-if outputJSON {
-    let result: [String: Any] = ["success": true, "userName": NSUserName(), "hostName": ProcessInfo.processInfo.hostName]
-    try? FileManager.default.createDirectory(atPath: "\(home)/Documents/AgentScript/json", withIntermediateDirectories: true)
-    if let out = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
-        try? out.write(to: URL(fileURLWithPath: outputPath))
-    }
-}
-```
+*1. 仅 JSON 输入（`SendMessage`）* —— 完全不用环境参数；脚本要求存在 `SendMessage_input.json`，缺失时返回 `1`：
 
 ```json
-// Hello_input.json
-{ "verbose": true, "json": true }
+// ~/Documents/AgentScript/json/SendMessage_input.json   （运行前由 LLM 通过 file(action:"write") 写入）
+{ "recipient": "妈妈", "message": "6 点到家", "imagePath": "~/Pictures/Photos Library.photoslibrary/originals/A/IMG_0001.jpeg" }
 
-// Hello_output.json
-{ "success": true, "userName": "…", "hostName": "…", "osVersion": "…", "timestamp": "…" }
+// ~/Documents/AgentScript/json/SendMessage_output.json  （由脚本写入）
+{ "success": true, "timestamp": "2026-09-03T21:14:02Z", "recipient": "妈妈", "message": "6 点到家" }
+// 失败时：{ "success": false, "timestamp": "…", "error": "Missing required field: recipient" }
+```
+
+```swift
+// SendMessage.swift —— 脚本如何读取
+let inputPath  = "\(NSHomeDirectory())/Documents/AgentScript/json/SendMessage_input.json"
+guard let inputData = FileManager.default.contents(atPath: inputPath) else {
+    writeOutput(outputPath, success: false, error: "Input file not found: \(inputPath)"); return 1
+}
+guard let json = try? JSONSerialization.jsonObject(with: inputData) as? [String: Any],
+      let recipientHandle = json["recipient"] as? String else { /* … */ return 1 }
+let message   = json["message"]   as? String
+let imagePath = json["imagePath"] as? String
+```
+
+*2. 环境参数传选项，JSON 输出结构化结果（`TodayEvents`、`NowPlaying`、`CheckMail`、`ListReminders`）* —— 选项来自 `AGENT_SCRIPT_ARGS`（或可选的 `<Name>_input.json`）；当 `json=true` 时，脚本在返回给 LLM 的人类可读 stdout 之外，再写入 `<Name>_output.json`：
+
+```json
+// agent_script(action:"run", name:"TodayEvents", arguments:"days=3,json=true")
+// → ~/Documents/AgentScript/json/TodayEvents_output.json
+{ "success": true, "timestamp": "…", "count": 2,
+  "events": [ { "summary": "Standup", "calendar": "Work", "startTime": "…", "endTime": "…", "allDay": false, "location": "…" }, … ] }
+
+// agent_script(action:"run", name:"NowPlaying", arguments:"json=true,artwork=true")
+// → ~/Documents/AgentScript/json/NowPlaying_output.json
+{ "success": true, "playerState": "playing",
+  "track": { "name": "…", "artist": "…", "album": "…", "duration": 240 },
+  "artwork": { "saved": true, "path": "~/Documents/AgentScript/images/….png", "width": 500, "height": 500 } }
+```
+
+```swift
+// TodayEvents.swift —— 脚本如何写入
+func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
+                            events: [[String: Any]]? = nil, count: Int? = nil, outputJSON: Bool) {
+    guard outputJSON else { return }
+    var result: [String: Any] = ["success": success, "timestamp": ISO8601DateFormatter().string(from: Date())]
+    if !success, let error { result["error"] = error }
+    if success { if let events { result["events"] = events }; if let count { result["count"] = count } }
+    try? FileManager.default.createDirectory(atPath: (path as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
+    if let out = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
+        try? out.write(to: URL(fileURLWithPath: path))
+    }
+}
 ```
 
 删除的脚本进入 `~/Documents/AgentScript/agents/.Trash/`（`agent_script(action:"restore")`）；`action:"pull"` 从 [AgentScripts](https://github.com/AgentiLoop/AgentScripts) 仓库获取上游版本。
