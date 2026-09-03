@@ -80,7 +80,12 @@ extension ActivityLogView.Coordinator {
             lastLength = 0
             lastRenderedText = ""
             userIsAtBottom = true
+            // A tab switch abandons any in-flight background render for the previous tab
+            cancelAsyncRender()
             // Fall through to textChanged path — same scroll behavior as first load
+        } else if asyncRenderInFlight, textChanged {
+            // Background render still running — its completion re-enters performRender to pick up new text
+            return
         }
 
         if textChanged || searchCleared {
@@ -158,6 +163,11 @@ extension ActivityLogView.Coordinator {
                 // Try instant swap from cached TextStorage (no re-layout)
                 if tabSwitched, swapToCachedStorage(for: tabID, text: text, textView: textView, scrollView: scrollView) {
                     // Cache hit — layout preserved, scroll restored
+                } else if len > Self.asyncRenderThreshold {
+                    // Big log, no cache: parse off-main behind a progress overlay. lastLength /
+                    // lastRenderedText are committed when the result lands (see finishAsyncRender).
+                    startAsyncFullRender(text: text, len: len, tabID: tabID, textView: textView, scrollView: scrollView)
+                    return
                 } else {
                     textView.textStorage?.beginEditing()
                     textView.textStorage?.setAttributedString(buildAttributedString(from: text))
@@ -203,5 +213,95 @@ extension ActivityLogView.Coordinator {
         if textGrew {
             throttledScrollToEnd(textView)
         }
+    }
+
+    // MARK: - Async Full Render
+
+    /// Moves a non-Sendable NSAttributedString across the background → main hop.
+    private struct RenderedBox: @unchecked Sendable { let value: NSAttributedString }
+
+    /// Parse a large log on a background thread, showing a centered progress overlay meanwhile.
+    /// The text view is emptied first so the previous tab's content never bleeds through.
+    func startAsyncFullRender(text: String, len: Int, tabID: UUID?, textView: NSTextView, scrollView: NSScrollView) {
+        asyncRenderGeneration += 1
+        let generation = asyncRenderGeneration
+        asyncRenderInFlight = true
+        textView.textStorage?.setAttributedString(NSAttributedString())
+        textView.alphaValue = 1
+        showLoadingOverlay(in: scrollView)
+
+        Task.detached(priority: .userInitiated) { [weak self] in
+            guard let self else { return }
+            let box = RenderedBox(value: self.buildAttributedString(from: text))
+            await MainActor.run {
+                self.finishAsyncRender(box, len: len, text: text, tabID: tabID, generation: generation)
+            }
+        }
+    }
+
+    private func finishAsyncRender(_ box: RenderedBox, len: Int, text: String, tabID: UUID?, generation: Int) {
+        // Stale: tab switched or a newer render started while this one was running
+        guard generation == asyncRenderGeneration, tabID == latestTabID else { return }
+        asyncRenderInFlight = false
+        hideLoadingOverlay()
+        guard let textView = latestTextView else { return }
+        textView.textStorage?.beginEditing()
+        textView.textStorage?.setAttributedString(box.value)
+        textView.textStorage?.endEditing()
+        lastLength = len
+        lastRenderedText = text
+        snapToEnd(textView)
+        // Pick up anything that streamed in (or a search change) while we were rendering
+        performRender()
+    }
+
+    /// Abandon an in-flight background render (tab switch). Its result is discarded on arrival.
+    func cancelAsyncRender() {
+        guard asyncRenderInFlight else { return }
+        asyncRenderGeneration += 1
+        asyncRenderInFlight = false
+        hideLoadingOverlay()
+    }
+
+    private func showLoadingOverlay(in scrollView: NSScrollView) {
+        if let overlay = loadingOverlay {
+            overlay.isHidden = false
+            return
+        }
+        let overlay = NSView(frame: scrollView.bounds)
+        overlay.autoresizingMask = [.width, .height]
+        overlay.wantsLayer = true
+        overlay.layer?.backgroundColor = NSColor.windowBackgroundColor.withAlphaComponent(0.6).cgColor
+
+        let bar = NSProgressIndicator()
+        bar.style = .bar
+        bar.isIndeterminate = true
+        bar.controlSize = .regular
+        bar.translatesAutoresizingMaskIntoConstraints = false
+        bar.widthAnchor.constraint(equalToConstant: 240).isActive = true
+        bar.startAnimation(nil)
+
+        let label = NSTextField(labelWithString: "Processing tab data…")
+        label.font = .systemFont(ofSize: 13, weight: .medium)
+        label.textColor = .secondaryLabelColor
+        label.alignment = .center
+
+        let stack = NSStackView(views: [bar, label])
+        stack.orientation = .vertical
+        stack.alignment = .centerX
+        stack.spacing = 10
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        overlay.addSubview(stack)
+        NSLayoutConstraint.activate([
+            stack.centerXAnchor.constraint(equalTo: overlay.centerXAnchor),
+            stack.centerYAnchor.constraint(equalTo: overlay.centerYAnchor)
+        ])
+
+        scrollView.addSubview(overlay, positioned: .above, relativeTo: nil)
+        loadingOverlay = overlay
+    }
+
+    private func hideLoadingOverlay() {
+        loadingOverlay?.isHidden = true
     }
 }
