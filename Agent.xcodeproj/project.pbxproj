@@ -203,6 +203,8 @@
 		EASP000000000000000001 /* SystemPromptService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EASP000000000000000002 /* SystemPromptService.swift */; };
 		EASP000000000000000003 /* SystemPromptEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EASP000000000000000004 /* SystemPromptEditor.swift */; };
 		EASS000000000000000001 /* ShellSafetyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EASS000000000000000002 /* ShellSafetyService.swift */; };
+		EASS000000000000000003 /* ShellSafetyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EASS000000000000000002 /* ShellSafetyService.swift */; };
+		EASS000000000000000004 /* ShellSafetyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EASS000000000000000002 /* ShellSafetyService.swift */; };
 		F035BAFA78E9DDFDF6DD5A1C /* TaskBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4128E21FF13BC4029D6548B /* TaskBannerView.swift */; };
 		F123A9EA71C5383EFFFF1A8A /* Rendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = C428D9A5859B0E1BB0D2FB6B /* Rendering.swift */; };
 		FA10000000000000000101 /* LoopControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000100 /* LoopControl.swift */; };
@@ -1452,6 +1454,7 @@
 				BB10000000000000000031 /* HelperProtocol.swift in Sources */,
 				DC10000000000000000001 /* DaemonCore.swift in Sources */,
 				FA10000000000000000109 /* XPCClientTrust.swift in Sources */,
+				EASS000000000000000003 /* ShellSafetyService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1463,6 +1466,7 @@
 				CC10000000000000000031 /* UserProtocol.swift in Sources */,
 				DC10000000000000000002 /* DaemonCore.swift in Sources */,
 				FA1000000000000000010A /* XPCClientTrust.swift in Sources */,
+				EASS000000000000000004 /* ShellSafetyService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

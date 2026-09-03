@@ -40,6 +40,21 @@ enum DaemonCore {
 
         AuditLog.log(auditCategory, "exec [\(instanceID)]\(workingDirectory.isEmpty ? "" : " cwd=\(workingDirectory)"): \(script.prefix(500))")
 
+        // Defense-in-depth: the app already runs this same check before
+        // dispatching, but any same-team-signed client can reach the mach
+        // service directly. Same rules as the client side — the root daemon
+        // only refuses the three catastrophic rm patterns.
+        let verdict = ShellSafetyService.check(
+            script,
+            context: auditCategory == .launchDaemon ? .rootDaemon : .userAgent
+        )
+        if !verdict.allowed {
+            let reason = verdict.reason ?? "blocked by shell safety guardrail"
+            AuditLog.denied(auditCategory, "exec [\(instanceID)] BLOCKED (\(verdict.rule ?? "?")): \(script.prefix(200))")
+            reply(126, reason)
+            return
+        }
+
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
         process.arguments = ["-c", script]
