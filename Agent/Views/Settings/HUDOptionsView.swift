@@ -55,6 +55,15 @@ struct HUDOptionsView: View {
                     .controlSize(.mini)
                     .tint(.green)
             }
+
+            HStack {
+                Text("Activity Log Below HUD").font(.caption)
+                Spacer()
+                Toggle("", isOn: $viewModel.hudLogBelow)
+                    .toggleStyle(.switch)
+                    .controlSize(.mini)
+                    .tint(.green)
+            }
         }
         .padding(16)
         .frame(width: 360)
