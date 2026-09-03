@@ -133,6 +133,52 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 完整的逐操作参考：[docs/TECHNICAL.md](docs/TECHNICAL.md)。
 
+## AgentScript —— 拥有完整 TCC 的 Swift 脚本
+
+AgentScript 就是位于 `~/Documents/AgentScript/agents/Sources/Scripts/` 的普通 Swift 文件。Agent! 用 SwiftPM 将每个脚本编译为 `.dylib`（`Package.swift` 列出了所有脚本以及 51 个 ScriptingBridge 应用桥接），再以 `dlopen` 加载，并使用 Agent! 自身的 TCC 授权——辅助功能、自动化、日历、通讯录、邮件、照片等。LLM 通过 `agent_script`（`create` / `edit` / `run` / `delete` / `restore` / `pull`）管理它们；文件夹内自带约 35 个示例（`Hello`、`TodayEvents`、`NowPlaying`、`CheckMail`、`CreateDmg`、`ArchiveXcode`……）。
+
+**入口点** —— 没有顶层代码，不调用 `exit()`；`stdout` 会返回给 LLM，返回值即退出状态：
+
+```swift
+import Foundation
+import CalendarBridge   // 任何 `import XBridge` 都会自动接线——无需修改 Package.swift
+
+@_cdecl("script_main")
+public func scriptMain() -> Int32 {
+    print("Hello from AgentScript! 👋")
+    return 0
+}
+```
+
+**环境变量** —— 脚本与每条 `user_shell` / `root_shell` / `shell` 命令遵循同一约定：
+
+| 变量 | 何时设置 | 含义 |
+|---|---|---|
+| `AGENT_PROJECT_FOLDER` | 始终 | 当前标签页的项目文件夹（没有则为 `$HOME`）。运行器的 cwd 也会设为该目录。 |
+| `AGENT_SCRIPT_ARGS` | 仅当 LLM 向 `agent_script(action:"run")` 传入 `arguments:"…"` 时 | 自由格式字符串；内置示例使用 `key=value,key=value`（如 `days=3,json=true`） |
+
+```swift
+let folder = ProcessInfo.processInfo.environment["AGENT_PROJECT_FOLDER"] ?? FileManager.default.currentDirectoryPath
+let args   = ProcessInfo.processInfo.environment["AGENT_SCRIPT_ARGS"] ?? ""
+```
+
+二者相互独立——切勿从参数中解析项目文件夹。
+
+**JSON 输入 / 输出** —— 内置示例遵循的约定：
+
+- **输入：** `~/Documents/AgentScript/json/<Name>_input.json` —— 可选；其中的键会覆盖 `AGENT_SCRIPT_ARGS`。
+- **输出：** `~/Documents/AgentScript/json/<Name>_output.json` —— 当 `json=true`（或输入文件中 `"json": true`）时写入，同时仍输出人类可读的 stdout。
+
+```json
+// Hello_input.json
+{ "verbose": true, "json": true }
+
+// Hello_output.json
+{ "success": true, "userName": "…", "hostName": "…", "osVersion": "…", "timestamp": "…" }
+```
+
+删除的脚本进入 `~/Documents/AgentScript/agents/.Trash/`（`agent_script(action:"restore")`）；`action:"pull"` 从 [AgentScripts](https://github.com/AgentiLoop/AgentScripts) 仓库获取上游版本。
+
 ## 隐私与安全
 
 你的文件、屏幕内容和个人数据永远不会离开你的 Mac——云端提供商只看到提示词文本；本地提供商让一切保持离线。每个操作都有记录。
