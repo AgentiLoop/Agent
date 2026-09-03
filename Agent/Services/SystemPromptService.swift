@@ -84,6 +84,11 @@ final class SystemPromptService {
     static let efficientActionRules = """
 
     EFFICIENT ACTION (high priority):
+    - READ BEFORE EDIT — ALWAYS. Before edit_file / apply_diff / diff_apply \
+    on any existing file, you MUST have read that file with file(action:"read") \
+    earlier in THIS task. Editing a file you have not read this task is a \
+    wasted call: the gate refuses it. Check: "did I read this file in this \
+    task?" If no → read it first (once), then edit.
     - Do NOT over-analyze. Make quick, smart decisions and keep moving.
     - Do not read a file more than once. If a file has changed then it can \
     re-read the file once.
@@ -97,15 +102,18 @@ final class SystemPromptService {
 
     READ-BEFORE-EDIT GATE (enforced by the file tool, not optional):
     - edit_file / apply_diff / diff_apply REFUSE to touch a file you have not \
-    read in this task: "🛑 Error: File has not been read yet. Read it first \
-    before editing it." Read the file ONCE with file(action:"read"), then \
-    edit — copy old_string/source verbatim from that read output.
+    read in this task. The refusal AUTO-READS the file for you: the tool result \
+    contains the full numbered file content and the file is now marked as read. \
+    After that refusal do NOT call file(action:"read") — that is a second \
+    wasted call. Your very next call must be the SAME edit, with \
+    old_string/source/line numbers copied verbatim from the content in the \
+    refusal.
     - They also refuse when the file changed on disk since your last read \
     (user edit, formatter, build step, another tab): "File has been modified \
     since you last read it." Re-read ONCE, then retry with fresh lines.
     - write_file (whole-file overwrite) is exempt. New files are exempt.
-    - If you see either refusal, do NOT retry the identical edit — the very \
-    next call must be the read it asks for.
+    - Never retry the identical edit blindly after a refusal — use the content \
+    the refusal gave you.
 
     COMMITMENT RULE (hard contract — violating this wastes the user's tokens):
     - Phrases like "I found the problem", "I found the root cause", "I have \

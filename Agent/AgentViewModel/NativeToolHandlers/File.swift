@@ -141,24 +141,37 @@ extension AgentViewModel {
         return lines.joined(separator: "\n")
     }
 
+    /// Why an edit was refused by the read-before-edit gate.
+    /// `.unread`: the model never read the file this task. The gate has ALREADY
+    /// recorded the file as seen, so the caller should return the file content
+    /// inline and the model's next call can be the edit itself — no separate
+    /// read round-trip.
+    /// `.modified`: the file changed on disk since the model last saw it.
+    enum EditGateRefusal {
+        case unread
+        case modified(String)
+    }
+
     /// Refuse an edit when the model never read the file this task, or when
     /// the file changed on disk since it last saw it (user edit, formatter,
-    /// another tab). Returns the error text, or nil when the edit may proceed.
+    /// another tab). Returns nil when the edit may proceed.
     /// New files (nothing on disk) are always allowed. `requireRead` is false
     /// for write_file so whole-file overwrites of unread files still work.
-    static nonisolated func editGateError(tabID: UUID, expandedPath: String, requireRead: Bool) -> String? {
+    static nonisolated func editGateRefusal(tabID: UUID, expandedPath: String, requireRead: Bool) -> EditGateRefusal? {
         guard FileManager.default.fileExists(atPath: expandedPath) else { return nil }
         _readCountLock.lock()
         defer { _readCountLock.unlock() }
         guard let seen = _lastSeenHash["\(tabID.uuidString):\(expandedPath)"] else {
             guard requireRead else { return nil }
-            return "Error: File has not been read yet. Read it first before editing it — "
-                + "file(action:\"read\", file_path:\"\(expandedPath)\") — then copy old_string/source verbatim from that output."
+            // Auto-read: mark the file as seen now so the retry passes the gate.
+            rememberSeenContent(tabID: tabID, path: expandedPath)
+            return .unread
         }
         guard let current = computeFileHash(path: expandedPath), current != seen else { return nil }
-        return "Error: File has been modified since you last read it (by the user, a formatter, a build step, or another tab). "
+        return .modified(
+            "Error: File has been modified since you last read it (by the user, a formatter, a build step, or another tab). "
             + "Read it again before editing: file(action:\"read\", file_path:\"\(expandedPath)\"). "
-            + "Do not retry the same edit blindly — the line numbers and old_string you have are stale."
+            + "Do not retry the same edit blindly — the line numbers and old_string you have are stale.")
     }
 
     /// Clear all read-dedup state for a tab (called when the tab's conversation resets).
