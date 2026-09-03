@@ -175,6 +175,8 @@ extension WebAutomationService {
 
     func cleanExpiredCache() {
         let now = Date()
+        cacheLock.lock()
+        defer { cacheLock.unlock() }
         elementCache = elementCache.filter { now.timeIntervalSince($0.value.timestamp) <= cacheTTL }
     }
 
