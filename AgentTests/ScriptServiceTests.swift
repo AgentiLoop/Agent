@@ -2,6 +2,9 @@ import Testing
 import Foundation
 @testable import Agent_
 
+// NOTE: `createScript` normalizes names to UpperCamelCase ("test_hello" → "TestHello").
+// read/update/delete/compileCommand do NOT normalize, so tests use CamelCase names
+// throughout to match the file actually written to Sources/Scripts/.
 @Suite("ScriptService")
 @MainActor
 struct ScriptServiceTests {
@@ -11,40 +14,51 @@ struct ScriptServiceTests {
 
     @Test("Create script produces Sources/Scripts/{name}.swift")
     func createScript() {
-        let result = service.createScript(name: "test_hello", content: "print(\"hello\")")
-        #expect(result.contains("Created test_hello"))
+        let result = service.createScript(name: "TestHello", content: "print(\"hello\")")
+        #expect(result.contains("Created TestHello"))
 
-        let source = service.readScript(name: "test_hello")
+        let source = service.readScript(name: "TestHello")
         #expect(source == "print(\"hello\")")
 
-        _ = service.deleteScript(name: "test_hello")
+        _ = service.deleteScript(name: "TestHello")
+    }
+
+    @Test("Create script converts snake_case name to UpperCamelCase")
+    func createScriptCamelCasesName() {
+        let result = service.createScript(name: "camel_case_test", content: "// camel")
+        #expect(result.contains("Created CamelCaseTest"))
+
+        let source = service.readScript(name: "CamelCaseTest")
+        #expect(source == "// camel")
+
+        _ = service.deleteScript(name: "CamelCaseTest")
     }
 
     @Test("Create script strips .swift suffix from name")
     func createScriptStripsSuffix() {
-        let result = service.createScript(name: "suffix_test.swift", content: "// test")
-        #expect(result.contains("Created suffix_test"))
+        let result = service.createScript(name: "SuffixTest.swift", content: "// test")
+        #expect(result.contains("Created SuffixTest"))
 
-        let source = service.readScript(name: "suffix_test")
+        let source = service.readScript(name: "SuffixTest")
         #expect(source == "// test")
 
-        _ = service.deleteScript(name: "suffix_test")
+        _ = service.deleteScript(name: "SuffixTest")
     }
 
     @Test("Create duplicate script returns error")
     func createDuplicateScript() {
-        _ = service.createScript(name: "dup_test", content: "// first")
-        let result = service.createScript(name: "dup_test", content: "// second")
+        _ = service.createScript(name: "DupTest", content: "// first")
+        let result = service.createScript(name: "DupTest", content: "// second")
         #expect(result.contains("already exists"))
 
-        _ = service.deleteScript(name: "dup_test")
+        _ = service.deleteScript(name: "DupTest")
     }
 
     // MARK: - Read
 
     @Test("Read nonexistent script returns nil")
     func readNonexistent() {
-        let source = service.readScript(name: "does_not_exist_\(UUID().uuidString)")
+        let source = service.readScript(name: "DoesNotExist\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))")
         #expect(source == nil)
     }
 
@@ -52,19 +66,19 @@ struct ScriptServiceTests {
 
     @Test("Update existing script changes content")
     func updateScript() {
-        _ = service.createScript(name: "update_test", content: "// v1")
-        let result = service.updateScript(name: "update_test", content: "// v2")
-        #expect(result.contains("Updated update_test"))
+        _ = service.createScript(name: "UpdateTest", content: "// v1")
+        let result = service.updateScript(name: "UpdateTest", content: "// v2")
+        #expect(result.contains("Updated UpdateTest"))
 
-        let source = service.readScript(name: "update_test")
+        let source = service.readScript(name: "UpdateTest")
         #expect(source == "// v2")
 
-        _ = service.deleteScript(name: "update_test")
+        _ = service.deleteScript(name: "UpdateTest")
     }
 
     @Test("Update nonexistent script returns error")
     func updateNonexistent() {
-        let result = service.updateScript(name: "no_such_script_\(UUID().uuidString)", content: "// x")
+        let result = service.updateScript(name: "NoSuchScript\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))", content: "// x")
         #expect(result.contains("not found"))
     }
 
@@ -72,46 +86,48 @@ struct ScriptServiceTests {
 
     @Test("Delete existing script succeeds")
     func deleteScript() {
-        _ = service.createScript(name: "delete_me", content: "// bye")
-        let result = service.deleteScript(name: "delete_me")
-        #expect(result.contains("Deleted delete_me"))
+        _ = service.createScript(name: "DeleteMe", content: "// bye")
+        let result = service.deleteScript(name: "DeleteMe")
+        #expect(result.contains("Deleted DeleteMe"))
 
-        let source = service.readScript(name: "delete_me")
+        let source = service.readScript(name: "DeleteMe")
         #expect(source == nil)
     }
 
-    @Test("Delete nonexistent script returns error")
+    @Test("Delete nonexistent script is idempotent")
     func deleteNonexistent() {
-        let result = service.deleteScript(name: "ghost_script_\(UUID().uuidString)")
-        #expect(result.contains("not found"))
+        let name = "GhostScript\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
+        let result = service.deleteScript(name: name)
+        // deleteScript is idempotent: it succeeds even if the file is already gone.
+        #expect(result.contains("Deleted \(name)"))
     }
 
     // MARK: - List
 
     @Test("List scripts includes created script")
     func listScripts() {
-        _ = service.createScript(name: "list_test", content: "// listed")
+        _ = service.createScript(name: "ListTest", content: "// listed")
         let scripts = service.listScripts()
         let names = scripts.map(\.name)
-        #expect(names.contains("list_test"))
+        #expect(names.contains("ListTest"))
 
-        _ = service.deleteScript(name: "list_test")
+        _ = service.deleteScript(name: "ListTest")
     }
 
     // MARK: - Compile Command
 
     @Test("compileCommand returns swift build command")
     func compileCommand() {
-        _ = service.createScript(name: "cmd_test", content: "print(\"hi\")")
-        let cmd = service.compileCommand(name: "cmd_test")
-        #expect(cmd?.contains("swift build --product 'cmd_test'") == true)
+        _ = service.createScript(name: "CmdTest", content: "print(\"hi\")")
+        let cmd = service.compileCommand(name: "CmdTest")
+        #expect(cmd?.contains("swift build --product 'CmdTest'") == true)
 
-        _ = service.deleteScript(name: "cmd_test")
+        _ = service.deleteScript(name: "CmdTest")
     }
 
     @Test("compileCommand returns nil for missing script")
     func compileCommandMissing() {
-        let cmd = service.compileCommand(name: "no_such_\(UUID().uuidString)")
+        let cmd = service.compileCommand(name: "NoSuch\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))")
         #expect(cmd == nil)
     }
 
@@ -143,11 +159,11 @@ struct ScriptServiceTests {
             }
         }
         """
-        _ = service.createScript(name: "test_args", content: script)
-        defer { _ = service.deleteScript(name: "test_args") }
+        _ = service.createScript(name: "TestArgs", content: script)
+        defer { _ = service.deleteScript(name: "TestArgs") }
 
         // Compile
-        guard let cmd = service.compileCommand(name: "test_args") else {
+        guard let cmd = service.compileCommand(name: "TestArgs") else {
             Issue.record("compileCommand returned nil")
             return
         }
@@ -158,7 +174,7 @@ struct ScriptServiceTests {
         }
 
         // Run with arguments
-        let result = await service.loadAndRunScript(name: "test_args", arguments: "/Applications/Safari.app")
+        let result = await service.loadAndRunScript(name: "TestArgs", arguments: "/Applications/Safari.app")
         #expect(result.output.contains("ARGS:/Applications/Safari.app"))
         #expect(result.status == 0)
     }
@@ -182,10 +198,10 @@ struct ScriptServiceTests {
             }
         }
         """
-        _ = service.createScript(name: "test_noargs", content: script)
-        defer { _ = service.deleteScript(name: "test_noargs") }
+        _ = service.createScript(name: "TestNoArgs", content: script)
+        defer { _ = service.deleteScript(name: "TestNoArgs") }
 
-        guard let cmd = service.compileCommand(name: "test_noargs") else {
+        guard let cmd = service.compileCommand(name: "TestNoArgs") else {
             Issue.record("compileCommand returned nil")
             return
         }
@@ -195,7 +211,7 @@ struct ScriptServiceTests {
             return
         }
 
-        let result = await service.loadAndRunScript(name: "test_noargs", arguments: "")
+        let result = await service.loadAndRunScript(name: "TestNoArgs", arguments: "")
         #expect(result.output.contains("ARGS:none"))
         #expect(result.status == 0)
     }
@@ -211,10 +227,10 @@ struct ScriptServiceTests {
             return 0
         }
         """
-        _ = service.createScript(name: "test_cleanup", content: script)
-        defer { _ = service.deleteScript(name: "test_cleanup") }
+        _ = service.createScript(name: "TestCleanup", content: script)
+        defer { _ = service.deleteScript(name: "TestCleanup") }
 
-        guard let cmd = service.compileCommand(name: "test_cleanup") else {
+        guard let cmd = service.compileCommand(name: "TestCleanup") else {
             Issue.record("compileCommand returned nil")
             return
         }
@@ -224,7 +240,7 @@ struct ScriptServiceTests {
             return
         }
 
-        _ = await service.loadAndRunScript(name: "test_cleanup", arguments: "secret_data")
+        _ = await service.loadAndRunScript(name: "TestCleanup", arguments: "secret_data")
 
         // After the call, env var should be unset
         let envVal = ProcessInfo.processInfo.environment["AGENT_SCRIPT_ARGS"]
@@ -245,7 +261,7 @@ struct ScriptServiceTests {
         defer {
             try? FileManager.default.removeItem(atPath: inputPath)
             try? FileManager.default.removeItem(atPath: outputPath)
-            _ = service.deleteScript(name: "test_json_io")
+            _ = service.deleteScript(name: "TestJsonIo")
         }
 
         // Write input JSON
@@ -292,9 +308,9 @@ struct ScriptServiceTests {
             print("JSON processed")
         }
         """
-        _ = service.createScript(name: "test_json_io", content: script)
+        _ = service.createScript(name: "TestJsonIo", content: script)
 
-        guard let cmd = service.compileCommand(name: "test_json_io") else {
+        guard let cmd = service.compileCommand(name: "TestJsonIo") else {
             Issue.record("compileCommand returned nil")
             return
         }
@@ -304,7 +320,7 @@ struct ScriptServiceTests {
             return
         }
 
-        let result = await service.loadAndRunScript(name: "test_json_io")
+        let result = await service.loadAndRunScript(name: "TestJsonIo")
         #expect(result.status == 0)
         #expect(result.output.contains("JSON processed"))
 
@@ -328,7 +344,7 @@ struct ScriptServiceTests {
 
         // Make sure input doesn't exist
         try? FileManager.default.removeItem(atPath: inputPath)
-        defer { _ = service.deleteScript(name: "test_missing_json") }
+        defer { _ = service.deleteScript(name: "TestMissingJson") }
 
         let script = """
         import Foundation
@@ -349,9 +365,9 @@ struct ScriptServiceTests {
             return 0
         }
         """
-        _ = service.createScript(name: "test_missing_json", content: script)
+        _ = service.createScript(name: "TestMissingJson", content: script)
 
-        guard let cmd = service.compileCommand(name: "test_missing_json") else {
+        guard let cmd = service.compileCommand(name: "TestMissingJson") else {
             Issue.record("compileCommand returned nil")
             return
         }
@@ -361,7 +377,7 @@ struct ScriptServiceTests {
             return
         }
 
-        let result = await service.loadAndRunScript(name: "test_missing_json")
+        let result = await service.loadAndRunScript(name: "TestMissingJson")
         #expect(result.output.contains("ERROR:input_not_found"))
         #expect(result.status == 1)
     }
