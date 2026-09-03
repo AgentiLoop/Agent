@@ -37,13 +37,19 @@ enum XPCClientTrust {
     }
 
     /// Apply the same-team requirement to a connection. Returns false when the
-    /// connection must be rejected. Unsigned/ad-hoc builds get no requirement
-    /// (there is nothing to pin to, and the helpers never register with
-    /// launchd in that configuration) — a warning is logged instead.
+    /// connection must be rejected. Unsigned/ad-hoc builds have nothing to pin
+    /// to: DEBUG builds accept with a logged warning so local development
+    /// still works; release builds refuse — a registered daemon with no
+    /// signing requirement would be a root shell for any local process.
     static func harden(_ connection: NSXPCConnection, label: String) -> Bool {
         guard let requirement = sameTeamRequirement() else {
-            AuditLog.denied(.permission, "\(label): no team identifier on own signature — accepting connection WITHOUT code-signing requirement (ad-hoc/dev build)")
+            #if DEBUG
+            AuditLog.denied(.permission, "\(label): no team identifier on own signature — accepting connection WITHOUT code-signing requirement (DEBUG build)")
             return true
+            #else
+            AuditLog.denied(.permission, "\(label): no team identifier on own signature — REJECTING connection (release build must be team-signed)")
+            return false
+            #endif
         }
         connection.setCodeSigningRequirement(requirement)
         AuditLog.log(.permission, "\(label): connection accepted with same-team code-signing requirement")
