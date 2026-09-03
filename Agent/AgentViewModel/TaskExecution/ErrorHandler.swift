@@ -174,6 +174,8 @@ extension AgentViewModel {
 
                         do {
                             try healthCheckTask.run()
+                            // Drain before waiting — /api/tags JSON can exceed the 64KB pipe buffer.
+                            _ = pipe.fileHandleForReading.readDataToEndOfFile()
                             healthCheckTask.waitUntilExit()
                             return healthCheckTask.terminationStatus
                         } catch {
