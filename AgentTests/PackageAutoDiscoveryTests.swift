@@ -23,9 +23,11 @@ struct PackageAutoDiscoveryTests {
         process.standardOutput = pipe
         process.standardError = FileHandle.nullDevice
         try? process.run()
+        // Drain stdout BEFORE waitUntilExit — dump-package output exceeds the 64KB
+        // pipe buffer, so waiting first deadlocks (child blocks on write, we block on wait).
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
         guard process.terminationStatus == 0 else { return nil }
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
         return try? JSONSerialization.jsonObject(with: data) as? [String: Any]
     }
 

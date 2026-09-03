@@ -376,8 +376,9 @@ struct ScriptServiceTests {
         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
         process.arguments = ["-c", command]
         try? process.run()
-        process.waitUntilExit()
+        // Read before waitUntilExit — otherwise a >64KB compile log deadlocks the pipe.
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
         let output = String(data: data, encoding: .utf8) ?? ""
         return (output, process.terminationStatus)
     }

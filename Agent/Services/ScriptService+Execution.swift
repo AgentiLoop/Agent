@@ -68,6 +68,9 @@ extension ScriptService {
 
         do {
             try process.run()
+            // Drain the pipe BEFORE waitUntilExit — swiftc diagnostics can exceed the
+            // 64KB pipe buffer, and waiting first deadlocks (child blocks on write).
+            _ = pipe.fileHandleForReading.readDataToEndOfFile()
             process.waitUntilExit()
             return process.terminationStatus == 0
         } catch {
