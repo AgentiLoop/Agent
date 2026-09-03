@@ -25,16 +25,33 @@ extension AgentViewModel {
 
         // Tier 8 edit gate: an existing file may only be edited after it was
         // read this task, and only if it hasn't changed on disk since.
+        // An unread file is auto-read here: the refusal carries the full file
+        // content and marks it seen, so the model's NEXT call can be the edit
+        // itself — no separate read_file round-trip.
         let editGatedTools: Set<String> = ["edit_file", "apply_diff", "diff_and_apply", "write_file"]
         if editGatedTools.contains(name), let fp = input["file_path"] as? String, !fp.isEmpty {
             let expandedGate = (fp as NSString).expandingTildeInPath
-            if let gate = Self.editGateError(
-                tabID: selectedTabId ?? Self.mainTabID,
+            let gateTab = selectedTabId ?? Self.mainTabID
+            if let gate = Self.editGateRefusal(
+                tabID: gateTab,
                 expandedPath: expandedGate,
                 requireRead: name != "write_file"
             ) {
-                appendLog("🛑 \(name) refused: \(gate.prefix(90))…")
-                toolResults.append(["type": "tool_result", "tool_use_id": toolId, "content": gate])
+                switch gate {
+                case .unread:
+                    let content = await Self.offMain { CodingService.readFile(path: expandedGate, offset: nil, limit: nil) }
+                    Self.recordReadEmission(tabID: gateTab, expandedPath: expandedGate, offset: nil, limit: nil)
+                    let msg = "Error: \(name) refused — this file had not been read this task. "
+                        + "It has now been read FOR YOU and is marked as read. Do NOT call file(action:\"read\") on it. "
+                        + "Your very next call must be the same \(name), with old_string/source/line numbers copied verbatim "
+                        + "from the content below.\n\n\(expandedGate):\n" + content
+                    appendLog("🛑 \(name) refused: file not read yet — auto-read \(fp); retry the edit now (no read call needed)")
+                    appendLog(Self.codeFence(Self.preview(content, lines: readFilePreviewLines), language: Self.langFromPath(expandedGate)))
+                    toolResults.append(["type": "tool_result", "tool_use_id": toolId, "content": msg])
+                case .modified(let text):
+                    appendLog("🛑 \(name) refused: \(text.prefix(90))…")
+                    toolResults.append(["type": "tool_result", "tool_use_id": toolId, "content": text])
+                }
                 return true
             }
         }
