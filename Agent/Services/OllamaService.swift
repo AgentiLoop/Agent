@@ -22,13 +22,6 @@ final class OllamaService {
         await LLMRateLimiter.shared.enforce(provider: provider.rawValue)
     }
 
-    nonisolated static func recordRetryAfter(_ seconds: Double, for provider: APIProvider) async {
-        await LLMRateLimiter.shared.recordRetryAfter(seconds, provider: provider.rawValue)
-    }
-
-    nonisolated static func parseRetryAfter(_ headerValue: String?) -> Double {
-        LLMRateLimiter.parseRetryAfter(headerValue)
-    }
 
     var onStreamText: (@MainActor @Sendable (String) -> Void)?
 
@@ -384,12 +377,7 @@ final class OllamaService {
 
         guard httpResponse.statusCode == 200 else {
             // Ollama Cloud/Pro/Max can return 429. Local doesn't rate-limit but same path handles it. Default 30s if Retry-After missing.
-            if httpResponse.statusCode == 429 {
-                let header = httpResponse.value(forHTTPHeaderField: "Retry-After")
-                let parsed = parseRetryAfter(header)
-                let waitSeconds = parsed > 0 ? parsed : 30
-                await Self.recordRetryAfter(waitSeconds, for: provider)
-            }
+            await LLMRateLimiter.shared.recordIfRateLimited(httpResponse, provider: provider.rawValue)
             let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
             throw AgentError.apiError(statusCode: httpResponse.statusCode, message: errorBody)
         }
@@ -538,12 +526,7 @@ final class OllamaService {
 
         guard httpResponse.statusCode == 200 else {
             // 429 Retry-After capture — see performRequest for rationale.
-            if httpResponse.statusCode == 429 {
-                let header = httpResponse.value(forHTTPHeaderField: "Retry-After")
-                let parsed = parseRetryAfter(header)
-                let waitSeconds = parsed > 0 ? parsed : 30
-                await Self.recordRetryAfter(waitSeconds, for: provider)
-            }
+            await LLMRateLimiter.shared.recordIfRateLimited(httpResponse, provider: provider.rawValue)
             var errorData = Data()
             for try await byte in bytes {
                 errorData.append(byte)

@@ -52,6 +52,15 @@ actor LLMRateLimiter {
         retryAfterUntil[provider] = CFAbsoluteTimeGetCurrent() + seconds
     }
 
+    /// One-call 429/529 handling for every service's non-200 path: parses the
+    /// Retry-After header (default 30s when missing — Z.ai and Ollama Cloud
+    /// send none) and records it. No-op for any other status code.
+    func recordIfRateLimited(_ response: HTTPURLResponse, provider: String, statusCodes: Set<Int> = [429]) {
+        guard statusCodes.contains(response.statusCode) else { return }
+        let parsed = Self.parseRetryAfter(response.value(forHTTPHeaderField: "Retry-After"))
+        recordRetryAfter(parsed > 0 ? parsed : 30, provider: provider)
+    }
+
     /// Drop any stale 429 backoff for `provider` so a new task doesn't inherit it.
     func clearRetryAfter(provider: String) {
         retryAfterUntil.removeValue(forKey: provider)

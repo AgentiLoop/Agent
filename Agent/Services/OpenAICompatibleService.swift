@@ -391,13 +391,6 @@ final class OpenAICompatibleService {
         await LLMRateLimiter.shared.enforce(provider: provider.rawValue)
     }
 
-    nonisolated static func recordRetryAfter(_ seconds: Double, for provider: APIProvider) async {
-        await LLMRateLimiter.shared.recordRetryAfter(seconds, provider: provider.rawValue)
-    }
-
-    nonisolated static func parseRetryAfter(_ headerValue: String?) -> Double {
-        LLMRateLimiter.parseRetryAfter(headerValue)
-    }
 
     func send(
         messages: [[String: Any]],
@@ -491,13 +484,8 @@ final class OpenAICompatibleService {
             throw AgentError.invalidResponse
         }
         guard httpResponse.statusCode == 200 else {
-              // On 429, parse Retry-After — seed retryAfterUntil so next call's enforceRateLimit waits the right amount. Default 30s if header missing (Z.ai returns 429 with no Retry-After).
-            if httpResponse.statusCode == 429 {
-                let header = httpResponse.value(forHTTPHeaderField: "Retry-After")
-                let parsed = parseRetryAfter(header)
-                let waitSeconds = parsed > 0 ? parsed : 30
-                await Self.recordRetryAfter(waitSeconds, for: provider)
-            }
+            // On 429, parse Retry-After — seed retryAfterUntil so next call's enforceRateLimit waits the right amount. Default 30s if header missing (Z.ai returns 429 with no Retry-After).
+            await LLMRateLimiter.shared.recordIfRateLimited(httpResponse, provider: provider.rawValue)
             let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
             throw AgentError.apiError(statusCode: httpResponse.statusCode, message: errorBody)
         }
@@ -654,12 +642,7 @@ final class OpenAICompatibleService {
 
         guard httpResponse.statusCode == 200 else {
             // On 429, parse Retry-After header — recording here means even if exponential backoff is shorter, next call's enforceRateLimit pads it out.
-            if httpResponse.statusCode == 429 {
-                let header = httpResponse.value(forHTTPHeaderField: "Retry-After")
-                let parsed = parseRetryAfter(header)
-                let waitSeconds = parsed > 0 ? parsed : 30
-                await Self.recordRetryAfter(waitSeconds, for: provider)
-            }
+            await LLMRateLimiter.shared.recordIfRateLimited(httpResponse, provider: provider.rawValue)
             var errorData = Data()
             for try await byte in bytes {
                 errorData.append(byte)
