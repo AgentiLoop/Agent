@@ -37,11 +37,23 @@ struct PackageAutoDiscoveryTests {
         return targets.compactMap { $0["name"] as? String }
     }
 
+    /// Helper: extract dependency names from a dump-package target.
+    /// Handles both `.product(name:package:)` (emitted as `product`) and `.byName` shapes.
+    private func dependencyNames(of target: [String: Any]) -> [String] {
+        let deps = target["dependencies"] as? [[String: Any]] ?? []
+        return deps.compactMap { dep -> String? in
+            if let product = dep["product"] as? [Any?] { return product.first as? String }
+            if let byName = dep["byName"] as? [Any?] { return byName.first as? String }
+            if let target = dep["target"] as? [Any?] { return target.first as? String }
+            return nil
+        }
+    }
+
     // MARK: - Auto-Discovery Tests
 
     @Test("New script is auto-discovered without Package.swift edits")
     func newScriptAutoDiscovered() {
-        let name = "auto_discover_test_\(Int.random(in: 1000...9999))"
+        let name = "AutoDiscoverTest\(Int.random(in: 1000...9999))"
         _ = service.createScript(name: name, content: "import Foundation\nprint(\"hello\")")
         defer { _ = service.deleteScript(name: name) }
 
@@ -52,7 +64,7 @@ struct PackageAutoDiscoveryTests {
 
     @Test("Deleted script is removed from auto-discovery")
     func deletedScriptRemoved() {
-        let name = "auto_remove_test_\(Int.random(in: 1000...9999))"
+        let name = "AutoRemoveTest\(Int.random(in: 1000...9999))"
         _ = service.createScript(name: name, content: "print(\"bye\")")
         _ = service.deleteScript(name: name)
 
@@ -63,7 +75,7 @@ struct PackageAutoDiscoveryTests {
 
     @Test("Script with bridge import gets correct dependency")
     func bridgeImportDetected() {
-        let name = "auto_dep_test_\(Int.random(in: 1000...9999))"
+        let name = "AutoDepTest\(Int.random(in: 1000...9999))"
         let content = """
         import Foundation
         import MusicBridge
@@ -82,19 +94,13 @@ struct PackageAutoDiscoveryTests {
             #expect(Bool(false), "\(name) not found in targets")
             return
         }
-        let deps = target["dependencies"] as? [[String: Any]] ?? []
-        let depNames = deps.compactMap { dep -> String? in
-            if let byName = dep["byName"] as? [Any?] {
-                return byName.first as? String
-            }
-            return nil
-        }
+        let depNames = dependencyNames(of: target)
         #expect(depNames.contains("MusicBridge"), "Expected MusicBridge in deps: \(depNames)")
     }
 
     @Test("Script with multiple bridge imports gets all dependencies")
     func multipleBridgeImports() {
-        let name = "auto_multi_dep_\(Int.random(in: 1000...9999))"
+        let name = "AutoMultiDep\(Int.random(in: 1000...9999))"
         let content = """
         import Foundation
         import MailBridge
@@ -111,20 +117,14 @@ struct PackageAutoDiscoveryTests {
             #expect(Bool(false), "\(name) not found in targets")
             return
         }
-        let deps = target["dependencies"] as? [[String: Any]] ?? []
-        let depNames = deps.compactMap { dep -> String? in
-            if let byName = dep["byName"] as? [Any?] {
-                return byName.first as? String
-            }
-            return nil
-        }
+        let depNames = dependencyNames(of: target)
         #expect(depNames.contains("MailBridge"), "Expected MailBridge in deps: \(depNames)")
         #expect(depNames.contains("CalendarBridge"), "Expected CalendarBridge in deps: \(depNames)")
     }
 
     @Test("Script with no bridge imports has no bridge dependencies")
     func noBridgeImports() {
-        let name = "auto_no_dep_\(Int.random(in: 1000...9999))"
+        let name = "AutoNoDep\(Int.random(in: 1000...9999))"
         let content = """
         import Foundation
 
@@ -139,20 +139,14 @@ struct PackageAutoDiscoveryTests {
             #expect(Bool(false), "\(name) not found in targets")
             return
         }
-        let deps = target["dependencies"] as? [[String: Any]] ?? []
-        let depNames = deps.compactMap { dep -> String? in
-            if let byName = dep["byName"] as? [Any?] {
-                return byName.first as? String
-            }
-            return nil
-        }
+        let depNames = dependencyNames(of: target)
         let bridgeDeps = depNames.filter { $0.hasSuffix("Bridge") }
         #expect(bridgeDeps.isEmpty, "Expected no bridge deps but got: \(bridgeDeps)")
     }
 
     @Test("Script with ScriptingBridgeCommon import gets common dependency")
     func commonImportDetected() {
-        let name = "auto_common_dep_\(Int.random(in: 1000...9999))"
+        let name = "AutoCommonDep\(Int.random(in: 1000...9999))"
         let content = """
         import Foundation
         import ScriptingBridgeCommon
@@ -169,13 +163,7 @@ struct PackageAutoDiscoveryTests {
             #expect(Bool(false), "\(name) not found in targets")
             return
         }
-        let deps = target["dependencies"] as? [[String: Any]] ?? []
-        let depNames = deps.compactMap { dep -> String? in
-            if let byName = dep["byName"] as? [Any?] {
-                return byName.first as? String
-            }
-            return nil
-        }
+        let depNames = dependencyNames(of: target)
         #expect(depNames.contains("ScriptingBridgeCommon"), "Expected ScriptingBridgeCommon in deps: \(depNames)")
         #expect(depNames.contains("MailBridge"), "Expected MailBridge in deps: \(depNames)")
     }
