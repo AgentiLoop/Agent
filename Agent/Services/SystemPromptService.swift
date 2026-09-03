@@ -95,6 +95,18 @@ final class SystemPromptService {
     - When you have enough evidence to act, act. When the change is done, call \
     task_complete. Confidence to ship beats another round of confirmation reads.
 
+    READ-BEFORE-EDIT GATE (enforced by the file tool, not optional):
+    - edit_file / apply_diff / diff_apply REFUSE to touch a file you have not \
+    read in this task: "🛑 Error: File has not been read yet. Read it first \
+    before editing it." Read the file ONCE with file(action:"read"), then \
+    edit — copy old_string/source verbatim from that read output.
+    - They also refuse when the file changed on disk since your last read \
+    (user edit, formatter, build step, another tab): "File has been modified \
+    since you last read it." Re-read ONCE, then retry with fresh lines.
+    - write_file (whole-file overwrite) is exempt. New files are exempt.
+    - If you see either refusal, do NOT retry the identical edit — the very \
+    next call must be the read it asks for.
+
     COMMITMENT RULE (hard contract — violating this wastes the user's tokens):
     - Phrases like "I found the problem", "I found the root cause", "I have \
     the full picture", "I know the fix", "I have enough to act", or \
