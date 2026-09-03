@@ -206,10 +206,32 @@ public func scriptMain() -> Int32 {
 
 这两个变量相互独立——切勿从 `AGENT_SCRIPT_ARGS` 中解析项目文件夹。`user_shell` 中的 Bash 等价写法：`ls "$AGENT_PROJECT_FOLDER/Sources"`（cwd 已在该目录，无需 `cd`）。
 
-**JSON 输入 / 输出** —— 内置示例遵循的约定：
+**JSON 输入 / 输出 —— 与环境变量完全独立的另一套机制。** 环境变量由 Agent! 导出到进程中；JSON 文件则是磁盘上的普通文件，由*脚本自己*用 `FileManager` / `JSONSerialization` 读写。Agent! 不会创建、传递或解析它们——下面的约定只是内置示例（`Hello`、`TodayEvents`、`ListReminders`……）的做法：
 
-- **输入：** `~/Documents/AgentScript/json/<Name>_input.json` —— 可选；其中的键会覆盖 `AGENT_SCRIPT_ARGS`。
-- **输出：** `~/Documents/AgentScript/json/<Name>_output.json` —— 当 `json=true`（或输入文件中 `"json": true`）时写入，同时仍输出人类可读的 stdout。
+- **输入：** `~/Documents/AgentScript/json/<Name>_input.json` —— 可选。若存在，脚本从中读取结构化选项（示例在环境变量默认值之后应用它）。
+- **输出：** `~/Documents/AgentScript/json/<Name>_output.json` —— 当 `json=true` 时由脚本写入，同时仍输出返回给 LLM 的人类可读 stdout。
+
+```swift
+let home = NSHomeDirectory()
+let inputPath  = "\(home)/Documents/AgentScript/json/Hello_input.json"
+let outputPath = "\(home)/Documents/AgentScript/json/Hello_output.json"
+
+// 读取结构化输入（与 AGENT_SCRIPT_ARGS 无关）
+if let data = FileManager.default.contents(atPath: inputPath),
+   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+    if let v = json["verbose"] as? Bool { verbose = v }
+    if let j = json["json"]    as? Bool { outputJSON = j }
+}
+
+// 写入结构化输出
+if outputJSON {
+    let result: [String: Any] = ["success": true, "userName": NSUserName(), "hostName": ProcessInfo.processInfo.hostName]
+    try? FileManager.default.createDirectory(atPath: "\(home)/Documents/AgentScript/json", withIntermediateDirectories: true)
+    if let out = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
+        try? out.write(to: URL(fileURLWithPath: outputPath))
+    }
+}
+```
 
 ```json
 // Hello_input.json

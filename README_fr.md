@@ -206,10 +206,32 @@ public func scriptMain() -> Int32 {
 
 Les deux variables sont indépendantes — ne jamais extraire le dossier de projet de `AGENT_SCRIPT_ARGS`. Équivalent Bash dans `user_shell` : `ls "$AGENT_PROJECT_FOLDER/Sources"` (le cwd y est déjà, pas besoin de `cd`).
 
-**Entrée / sortie JSON** — la convention suivie par les exemples fournis :
+**Entrée / sortie JSON — un mécanisme SÉPARÉ des variables d'environnement.** Les variables d'environnement sont exportées par Agent! dans le processus ; les fichiers JSON sont de simples fichiers sur disque que le *script lui-même* lit et écrit avec `FileManager` / `JSONSerialization`. Agent! ne les crée pas, ne les transmet pas et ne les analyse pas — la convention ci-dessous est simplement ce que font les exemples fournis (`Hello`, `TodayEvents`, `ListReminders`, …) :
 
-- **Entrée :** `~/Documents/AgentScript/json/<Name>_input.json` — optionnel ; ses clés priment sur `AGENT_SCRIPT_ARGS`.
-- **Sortie :** `~/Documents/AgentScript/json/<Name>_output.json` — écrit quand `json=true` (ou `"json": true` dans le fichier d'entrée), en plus de la sortie lisible sur stdout.
+- **Entrée :** `~/Documents/AgentScript/json/<Name>_input.json` — optionnel. S'il existe, le script le lit pour obtenir des options structurées (les exemples l'appliquent après les valeurs par défaut issues des variables d'environnement).
+- **Sortie :** `~/Documents/AgentScript/json/<Name>_output.json` — écrit par le script quand `json=true`, en plus de la sortie lisible sur stdout qui revient au LLM.
+
+```swift
+let home = NSHomeDirectory()
+let inputPath  = "\(home)/Documents/AgentScript/json/Hello_input.json"
+let outputPath = "\(home)/Documents/AgentScript/json/Hello_output.json"
+
+// LIRE l'entrée structurée (indépendante de AGENT_SCRIPT_ARGS)
+if let data = FileManager.default.contents(atPath: inputPath),
+   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+    if let v = json["verbose"] as? Bool { verbose = v }
+    if let j = json["json"]    as? Bool { outputJSON = j }
+}
+
+// ÉCRIRE la sortie structurée
+if outputJSON {
+    let result: [String: Any] = ["success": true, "userName": NSUserName(), "hostName": ProcessInfo.processInfo.hostName]
+    try? FileManager.default.createDirectory(atPath: "\(home)/Documents/AgentScript/json", withIntermediateDirectories: true)
+    if let out = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
+        try? out.write(to: URL(fileURLWithPath: outputPath))
+    }
+}
+```
 
 ```json
 // Hello_input.json
