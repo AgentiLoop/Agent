@@ -49,15 +49,17 @@ final class XcodeService: @unchecked Sendable {
 
         do {
             try process.run()
+            // Drain both pipes before waiting so a chatty child can't fill a
+            // 64 KB pipe buffer and deadlock against waitUntilExit().
+            let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            let errData = errorPipe.fileHandleForReading.readDataToEndOfFile()
             process.waitUntilExit()
 
             if process.terminationStatus != 0 {
-                let errData = errorPipe.fileHandleForReading.readDataToEndOfFile()
                 let errStr = String(data: errData, encoding: .utf8) ?? "Unknown error"
                 return "Grant failed: \(errStr)"
             }
 
-            let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
             return String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
                 ?? "Permission granted"
         } catch {

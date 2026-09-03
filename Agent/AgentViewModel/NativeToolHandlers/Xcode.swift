@@ -51,8 +51,10 @@ extension AgentViewModel {
                             p.currentDirectoryURL = URL(fileURLWithPath: dir)
                             let pipe = Pipe()
                             p.standardOutput = pipe; p.standardError = pipe
-                            try? p.run(); p.waitUntilExit()
-                            return String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+                            try? p.run()
+                            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                            p.waitUntilExit()
+                            return String(data: data, encoding: .utf8) ?? ""
                         }
                         if !check.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                             _ = await Self.offMain {
@@ -85,8 +87,10 @@ extension AgentViewModel {
                     p.currentDirectoryURL = URL(fileURLWithPath: dir)
                     let pipe = Pipe()
                     p.standardOutput = pipe; p.standardError = pipe
-                    try? p.run(); p.waitUntilExit()
-                    return String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+                    try? p.run()
+                    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                    p.waitUntilExit()
+                    return String(data: data, encoding: .utf8) ?? ""
                 }
                 if !checkResult.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     _ = await Self.offMain {
