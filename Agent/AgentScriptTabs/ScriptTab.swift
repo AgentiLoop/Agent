@@ -215,8 +215,6 @@ final class ScriptTab: Identifiable {
         self.thinkingDismissed = record.rawLLMOutput.isEmpty ? true : record.thinkingDismissed
         self.tabInputTokens = record.tabInputTokens
         self.tabOutputTokens = record.tabOutputTokens
-        // Trim main/script tab logs on relaunch (skip Messages/automation tabs)
-        if !isMessagesTab { activityLog = Self.capActivityLog(activityLog, cap: Self.restoreLogCap) }
     }
 
     // MARK: - Logging
@@ -284,10 +282,6 @@ final class ScriptTab: Identifiable {
     /// Large enough that a normal session never trims; ActivityLogView renders
     /// append-only so log size no longer drives per-flush cost.
     nonisolated static let logCap = 5_000_000
-
-    /// Smaller cap used when restoring a persisted tab log on relaunch, so the
-    /// one-time full render at startup stays fast.
-    nonisolated static let restoreLogCap = 500_000
 
     /// Banner inserted when the log is trimmed; ActivityLogView styles it with a yellow background.
     nonisolated static let trimBanner = "··· earlier output trimmed ···\n\n"
