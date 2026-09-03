@@ -167,6 +167,18 @@ struct ActivityLogView: NSViewRepresentable {
         var tableAnchorText: Int?
         var tableAnchorStorage: Int?
 
+        // MARK: - Async full-render state (consumed by Update.swift)
+
+        /// Full rebuilds of logs longer than this (UTF-16 length) are parsed off the main thread
+        /// behind a "Processing tab data…" overlay instead of beach-balling the UI.
+        static let asyncRenderThreshold = 100_000
+        /// True while a background full render is running — text-change renders are deferred until it lands.
+        var asyncRenderInFlight = false
+        /// Bumped on every async render start / tab switch so stale results are discarded.
+        var asyncRenderGeneration = 0
+        /// Centered progress overlay shown over the scroll view during an async render.
+        weak var loadingOverlay: NSView?
+
         /// True if `prefix` is a byte-exact UTF-8 prefix of `text`. memcmp-speed, no allocation
         /// (native Swift strings expose contiguous UTF-8).
         nonisolated static func utf8HasPrefix(_ text: String, _ prefix: String) -> Bool {
