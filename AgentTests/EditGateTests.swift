@@ -14,17 +14,22 @@ struct EditGateTests {
         return path
     }
 
-    @Test("edit of an unread existing file is refused; new file is allowed")
+    @Test("edit of an unread existing file is refused (and auto-marked read); new file is allowed")
     func unreadFileRefused() {
         let tab = UUID()
         let path = tempFile("hello\n")
         defer { try? FileManager.default.removeItem(atPath: path) }
-        let err = AgentViewModel.editGateError(tabID: tab, expandedPath: path, requireRead: true)
-        #expect(err?.contains("has not been read yet") == true)
+        let gate = AgentViewModel.editGateRefusal(tabID: tab, expandedPath: path, requireRead: true)
+        guard case .unread = gate else {
+            Issue.record("expected .unread, got \(String(describing: gate))")
+            return
+        }
+        // The refusal auto-reads: the file is now marked seen, so the retry passes.
+        #expect(AgentViewModel.editGateRefusal(tabID: tab, expandedPath: path, requireRead: true) == nil)
         // write_file may overwrite an unread file
-        #expect(AgentViewModel.editGateError(tabID: tab, expandedPath: path, requireRead: false) == nil)
+        #expect(AgentViewModel.editGateRefusal(tabID: UUID(), expandedPath: path, requireRead: false) == nil)
         // A path with nothing on disk is always allowed (file creation)
-        #expect(AgentViewModel.editGateError(tabID: tab, expandedPath: path + ".missing", requireRead: true) == nil)
+        #expect(AgentViewModel.editGateRefusal(tabID: UUID(), expandedPath: path + ".missing", requireRead: true) == nil)
     }
 
     @Test("read → edit allowed; external change → refused; own edit → allowed again")
@@ -34,26 +39,30 @@ struct EditGateTests {
         defer { try? FileManager.default.removeItem(atPath: path) }
 
         AgentViewModel.recordReadEmission(tabID: tab, expandedPath: path, offset: nil, limit: nil)
-        #expect(AgentViewModel.editGateError(tabID: tab, expandedPath: path, requireRead: true) == nil)
+        #expect(AgentViewModel.editGateRefusal(tabID: tab, expandedPath: path, requireRead: true) == nil)
 
         // Someone else (formatter / user / other tab) rewrites the file
         try! "line one\nline two\n".write(toFile: path, atomically: true, encoding: .utf8)
-        let err = AgentViewModel.editGateError(tabID: tab, expandedPath: path, requireRead: true)
-        #expect(err?.contains("modified since you last read it") == true)
+        let gate = AgentViewModel.editGateRefusal(tabID: tab, expandedPath: path, requireRead: true)
+        guard case .modified(let text) = gate else {
+            Issue.record("expected .modified, got \(String(describing: gate))")
+            return
+        }
+        #expect(text.contains("modified since you last read it"))
 
         // The model re-reads → allowed; then its own edit refreshes the gate
         AgentViewModel.recordReadEmission(tabID: tab, expandedPath: path, offset: nil, limit: nil)
-        #expect(AgentViewModel.editGateError(tabID: tab, expandedPath: path, requireRead: true) == nil)
+        #expect(AgentViewModel.editGateRefusal(tabID: tab, expandedPath: path, requireRead: true) == nil)
         try! "line one\nline two\nline three\n".write(toFile: path, atomically: true, encoding: .utf8)
         AgentViewModel.recordFileEdit(tabID: tab, filePath: path)
-        #expect(AgentViewModel.editGateError(tabID: tab, expandedPath: path, requireRead: true) == nil)
+        #expect(AgentViewModel.editGateRefusal(tabID: tab, expandedPath: path, requireRead: true) == nil)
 
         // A different tab never read it
-        #expect(AgentViewModel.editGateError(tabID: UUID(), expandedPath: path, requireRead: true) != nil)
+        #expect(AgentViewModel.editGateRefusal(tabID: UUID(), expandedPath: path, requireRead: true) != nil)
 
         // Task start forgets everything for the tab
         AgentViewModel.clearEditGateForTab(tabID: tab)
-        #expect(AgentViewModel.editGateError(tabID: tab, expandedPath: path, requireRead: true) != nil)
+        #expect(AgentViewModel.editGateRefusal(tabID: tab, expandedPath: path, requireRead: true) != nil)
     }
 
     @Test("8.3: external change surfaces once as a diff snippet, then the edit gate accepts the new bytes")
@@ -80,7 +89,7 @@ struct EditGateTests {
 
         // Reported once; the gate now accepts the new content without a re-read
         #expect(AgentViewModel.externalChangeBlocks(tabID: tab).isEmpty)
-        #expect(AgentViewModel.editGateError(tabID: tab, expandedPath: path, requireRead: true) == nil)
+        #expect(AgentViewModel.editGateRefusal(tabID: tab, expandedPath: path, requireRead: true) == nil)
 
         // Deleted file is evicted silently
         try? FileManager.default.removeItem(atPath: path)

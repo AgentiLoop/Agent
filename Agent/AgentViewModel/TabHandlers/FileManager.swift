@@ -17,6 +17,42 @@ extension AgentViewModel {
             input["file_path"] = (base as NSString).appendingPathComponent(fp)
         }
 
+        // Tier 8 edit gate — same rules as the main loop (FileTools.swift):
+        // an existing file may only be edited after it was read this task,
+        // and only if it hasn't changed on disk since. An unread file is
+        // auto-read here: the refusal carries the full file content and marks
+        // it seen, so the model's NEXT call can be the edit itself.
+        let editGatedTools: Set<String> = ["edit_file", "apply_diff", "diff_and_apply", "write_file"]
+        if editGatedTools.contains(name), let fp = input["file_path"] as? String, !fp.isEmpty {
+            let expandedGate = (fp as NSString).expandingTildeInPath
+            if let gate = Self.editGateRefusal(
+                tabID: tab.id,
+                expandedPath: expandedGate,
+                requireRead: name != "write_file"
+            ) {
+                let text: String
+                switch gate {
+                case .unread:
+                    let content = await Self.offMain { CodingService.readFile(path: expandedGate, offset: nil, limit: nil) }
+                    Self.recordReadEmission(tabID: tab.id, expandedPath: expandedGate, offset: nil, limit: nil)
+                    text = "Error: \(name) refused — this file had not been read this task. "
+                        + "It has now been read FOR YOU and is marked as read. Do NOT call file(action:\"read\") on it. "
+                        + "Your very next call must be the same \(name), with old_string/source/line numbers copied verbatim "
+                        + "from the content below.\n\n\(expandedGate):\n" + content
+                    tab.appendLog("🛑 \(name) refused: file not read yet — auto-read \(fp); retry the edit now (no read call needed)")
+                    tab.appendLog(Self.codeFence(Self.preview(content, lines: readFilePreviewLines), language: Self.langFromPath(expandedGate)))
+                case .modified(let msg):
+                    text = msg
+                    tab.appendLog("🛑 \(name) refused: \(msg.prefix(90))…")
+                }
+                tab.flush()
+                return TabToolResult(
+                    toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": text],
+                    isComplete: false
+                )
+            }
+        }
+
         switch name {
         case "copy_image":
             let src = (input["source"] as? String ?? input["file_path"] as? String ?? "").trimmingCharacters(in: .whitespaces)
@@ -35,6 +71,9 @@ extension AgentViewModel {
             let limit = input["limit"] as? Int
             tab.appendLog("📖 Read: \(filePath)")
             let output = await Self.offMain { CodingService.readFile(path: filePath, offset: offset, limit: limit) }
+            if !output.hasPrefix("Error:") {
+                Self.recordReadEmission(tabID: tab.id, expandedPath: (filePath as NSString).expandingTildeInPath, offset: offset, limit: limit)
+            }
             let lang = Self.langFromPath(filePath)
             tab.appendLog(Self.codeFence(Self.preview(output, lines: readFilePreviewLines), language: lang))
             tab.flush()
@@ -50,6 +89,7 @@ extension AgentViewModel {
             FileBackupService.shared.snapshot(filePath: expandedWrite, tabID: tab.id)
             tab.appendLog("📝 Write: \(filePath)")
             let output = await Self.offMain { CodingService.writeFile(path: filePath, content: content) }
+            if !output.hasPrefix("Error") { Self.recordFileEdit(tabID: tab.id, filePath: expandedWrite) }
 
             tab.appendLog(output)
             let lang = Self.langFromPath(filePath)
@@ -85,6 +125,7 @@ extension AgentViewModel {
             // to fetch fresh in case the model's context has stale content (which is usually why the edit failed in the first place).
 
             if !output.hasPrefix("Error"), let original = originalContent {
+                Self.recordFileEdit(tabID: tab.id, filePath: expandedPath)
                 DiffStore.shared.recordEdit(filePath: expandedPath, originalContent: original)
                 let diff = MultiLineDiff.createDiff(source: oldString, destination: newString, includeMetadata: true)
                 let d1f = MultiLineDiff.displayDiff(diff: diff, source: oldString, format: .ai)
@@ -173,7 +214,7 @@ extension AgentViewModel {
                     throw DiffError.invalidDiff
                 }
                 try patched.write(to: URL(fileURLWithPath: expandedPath), atomically: true, encoding: .utf8)
-    
+                Self.recordFileEdit(tabID: tab.id, filePath: expandedPath)
                 DiffStore.shared.recordEdit(filePath: expandedPath, originalContent: source)
                 let verifyResult = MultiLineDiff.createDiff(source: source, destination: patched, includeMetadata: true)
                 let verified = MultiLineDiff.verifyDiff(verifyResult)
@@ -320,6 +361,7 @@ extension AgentViewModel {
                 }
 
                 try finalContent.write(to: URL(fileURLWithPath: expanded), atomically: true, encoding: .utf8)
+                Self.recordFileEdit(tabID: tab.id, filePath: expanded)
                 DiffStore.shared.recordApply(diffId: diffId, filePath: expanded, originalContent: fullText)
 
                 let verifyDiff = MultiLineDiff.createDiff(source: source, destination: patched, includeMetadata: true)
