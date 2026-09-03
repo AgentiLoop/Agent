@@ -584,6 +584,7 @@ final class ClaudeService {
         var outputTokens = 0
 
         for try await line in bytes.lines {
+            try Task.checkCancellation()
             guard line.hasPrefix("data: ") else { continue }
             let jsonStr = String(line.dropFirst(6))
             guard let data = jsonStr.data(using: .utf8),
@@ -591,6 +592,15 @@ final class ClaudeService {
                   let type = event["type"] as? String else { continue }
 
             switch type {
+            case "error":
+                // Mid-stream API error (overloaded_error, rate_limit_error, …).
+                // Without this it fell into `default` and looked like a normal
+                // truncated completion.
+                let err = event["error"] as? [String: Any]
+                let msg = err?["message"] as? String ?? jsonStr
+                let kind = err?["type"] as? String ?? "error"
+                throw AgentError.apiError(statusCode: kind == "overloaded_error" ? 529 : 500, message: "\(kind): \(msg)")
+
             case "message_start":
                 if let message = event["message"] as? [String: Any],
                    let usage = message["usage"] as? [String: Any]
