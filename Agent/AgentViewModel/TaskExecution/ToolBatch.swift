@@ -69,8 +69,12 @@ extension AgentViewModel {
         env["AGENT_PROJECT_FOLDER"] = workDir
         env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:" + (env["PATH"] ?? "")
         p.environment = env; p.standardOutput = pipe; p.standardError = pipe
-        try? p.run(); p.waitUntilExit()
-        return String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+        // Read BEFORE waiting: if the child writes >64 KB the pipe fills and
+        // waitUntilExit() would deadlock against a blocked writer.
+        try? p.run()
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        p.waitUntilExit()
+        return String(data: data, encoding: .utf8) ?? ""
     }
 
     /// Tier 9.3: read-only tools started while the response is still

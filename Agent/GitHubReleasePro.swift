@@ -102,9 +102,9 @@ public func scriptMain() -> Int32 {
     
     do {
         try task.run()
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
         task.waitUntilExit()
         
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
         if let output = String(data: data, encoding: .utf8) {
             print(output)
         }
