@@ -24,13 +24,6 @@ final class ClaudeService {
         await LLMRateLimiter.shared.enforce(provider: APIProvider.claude.rawValue)
     }
 
-    nonisolated static func recordRetryAfter(_ seconds: Double) async {
-        await LLMRateLimiter.shared.recordRetryAfter(seconds, provider: APIProvider.claude.rawValue)
-    }
-
-    nonisolated static func parseRetryAfter(_ headerValue: String?) -> Double {
-        LLMRateLimiter.parseRetryAfter(headerValue)
-    }
 
     let historyContext: String
     let userHome: String
@@ -452,12 +445,7 @@ final class ClaudeService {
 
         guard httpResponse.statusCode == 200 else {
             // 429 = rate limit, 529 = Anthropic "Overloaded". Both include Retry-After header (integer seconds); record it so next call's enforceRateLimit pads the wait. Default 30s if header missing.
-            if httpResponse.statusCode == 429 || httpResponse.statusCode == 529 {
-                let header = httpResponse.value(forHTTPHeaderField: "Retry-After")
-                let parsed = Self.parseRetryAfter(header)
-                let waitSeconds = parsed > 0 ? parsed : 30
-                await Self.recordRetryAfter(waitSeconds)
-            }
+            await LLMRateLimiter.shared.recordIfRateLimited(httpResponse, provider: APIProvider.claude.rawValue, statusCodes: [429, 529])
             let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
             throw AgentError.apiError(statusCode: httpResponse.statusCode, message: errorBody)
         }
@@ -554,12 +542,7 @@ final class ClaudeService {
 
         guard httpResponse.statusCode == 200 else {
             // 429/529 Retry-After capture — see performRequest for rationale.
-            if httpResponse.statusCode == 429 || httpResponse.statusCode == 529 {
-                let header = httpResponse.value(forHTTPHeaderField: "Retry-After")
-                let parsed = Self.parseRetryAfter(header)
-                let waitSeconds = parsed > 0 ? parsed : 30
-                await Self.recordRetryAfter(waitSeconds)
-            }
+            await LLMRateLimiter.shared.recordIfRateLimited(httpResponse, provider: APIProvider.claude.rawValue, statusCodes: [429, 529])
             var errorData = Data()
             for try await byte in bytes {
                 errorData.append(byte)
