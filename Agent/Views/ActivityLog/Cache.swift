@@ -9,20 +9,26 @@ extension ActivityLogView.Coordinator {
     func cachedAttributedString(for tabID: UUID?, text: String) -> NSAttributedString? {
         guard let cache = tabCaches[tabID] else { return nil }
         let len = (text as NSString).length
-        let hash = text.hashValue
-        guard cache.textLength == len, cache.textHash == hash else { return nil }
+        guard cache.textLength == len, Self.utf8HasPrefix(text, cache.text) else { return nil }
         return cache.textStorage
     }
 
     /// Swap to a cached NSTextStorage for instant tab switch (no re-layout).
+    /// If the tab's log only grew while it was in the background (cached text is a prefix of the
+    /// current text), swap and append just the delta instead of rebuilding the whole log.
     /// Returns true if cache was used.
     func swapToCachedStorage(for tabID: UUID?, text: String, textView: NSTextView, scrollView: NSScrollView) -> Bool {
         guard let cache = tabCaches[tabID] else { return false }
         let len = (text as NSString).length
-        let hash = text.hashValue
-        guard cache.textLength == len, cache.textHash == hash else { return false }
+        guard cache.textLength <= len, Self.utf8HasPrefix(text, cache.text) else { return false }
         // Swap the textStorage on the layout manager — instant, no re-layout
         textView.layoutManager?.replaceTextStorage(cache.textStorage)
+        if cache.textLength < len {
+            let delta = (text as NSString).substring(from: cache.textLength)
+            cache.textStorage.beginEditing()
+            cache.textStorage.append(renderMarkdownOnly(delta))
+            cache.textStorage.endEditing()
+        }
         // Restore scroll position
         scrollView.contentView.scroll(to: NSPoint(x: 0, y: cache.scrollY))
         scrollView.reflectScrolledClipView(scrollView.contentView)
@@ -33,11 +39,10 @@ extension ActivityLogView.Coordinator {
     func cacheAttributedString(_ attrStr: NSAttributedString, for tabID: UUID?, text: String) {
         guard let scrollView = latestScrollView else { return }
         let len = (text as NSString).length
-        let hash = text.hashValue
         let scrollY = scrollView.contentView.bounds.origin.y
         // Copy into a new NSTextStorage so the cached one is independent
         let storage = NSTextStorage(attributedString: attrStr)
-        tabCaches[tabID] = ActivityLogView.Coordinator.TabCache(textStorage: storage, textLength: len, textHash: hash, scrollY: scrollY)
+        tabCaches[tabID] = ActivityLogView.Coordinator.TabCache(textStorage: storage, textLength: len, text: text, scrollY: scrollY)
     }
 
     /// Invalidate cache for a specific tab
