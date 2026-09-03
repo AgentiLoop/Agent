@@ -161,6 +161,23 @@ struct ActivityLogView: NSViewRepresentable {
         var forceTabSwitch = false
         /// Separate length tracker for updateNSView dedup (independent of performRender's lastLength)
         var updateNSViewLastLength = 0
+        /// Start of the table block currently being streamed — text (UTF-16) offset and matching
+        /// NSTextStorage offset. Lets a growing table be re-rendered from its first row instead of
+        /// rebuilding the entire log. nil when the tail isn't a table.
+        var tableAnchorText: Int?
+        var tableAnchorStorage: Int?
+
+        /// True if `prefix` is a byte-exact UTF-8 prefix of `text`. memcmp-speed, no allocation
+        /// (native Swift strings expose contiguous UTF-8).
+        nonisolated static func utf8HasPrefix(_ text: String, _ prefix: String) -> Bool {
+            var a = text, b = prefix
+            return a.withUTF8 { ab in
+                b.withUTF8 { bb in
+                    guard ab.count >= bb.count, let ap = ab.baseAddress, let bp = bb.baseAddress else { return bb.isEmpty }
+                    return memcmp(ap, bp, bb.count) == 0
+                }
+            }
+        }
         /// Polls the text source directly — bypasses SwiftUI observation
         var textProvider: (@MainActor () -> String)?
         /// Notification observer for activityLog changes
@@ -198,7 +215,8 @@ struct ActivityLogView: NSViewRepresentable {
         struct TabCache {
             let textStorage: NSTextStorage
             let textLength: Int
-            let textHash: Int
+            /// Source text the storage was rendered from (CoW share, not a copy) — used for prefix matching.
+            let text: String
             let scrollY: CGFloat
         }
         var tabCaches: [UUID?: TabCache] = [:]

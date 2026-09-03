@@ -216,7 +216,7 @@ final class ScriptTab: Identifiable {
         self.tabInputTokens = record.tabInputTokens
         self.tabOutputTokens = record.tabOutputTokens
         // Trim main/script tab logs on relaunch (skip Messages/automation tabs)
-        if !isMessagesTab { activityLog = Self.capActivityLog(activityLog) }
+        if !isMessagesTab { activityLog = Self.capActivityLog(activityLog, cap: Self.restoreLogCap) }
     }
 
     // MARK: - Logging
@@ -280,9 +280,14 @@ final class ScriptTab: Identifiable {
         try? await Task.sleep(for: .milliseconds(50))
     }
 
-    /// Hard cap for activityLog — applied at every mutation site.
-    /// 50K is small enough for ActivityLogView to render without beach-balling.
-    nonisolated static let logCap = 50_000
+    /// Safety-valve cap for activityLog — applied at every mutation site.
+    /// Large enough that a normal session never trims; ActivityLogView renders
+    /// append-only so log size no longer drives per-flush cost.
+    nonisolated static let logCap = 5_000_000
+
+    /// Smaller cap used when restoring a persisted tab log on relaunch, so the
+    /// one-time full render at startup stays fast.
+    nonisolated static let restoreLogCap = 500_000
 
     /// Banner inserted when the log is trimmed; ActivityLogView styles it with a yellow background.
     nonisolated static let trimBanner = "··· earlier output trimmed ···\n\n"
@@ -291,7 +296,8 @@ final class ScriptTab: Identifiable {
     /// enforces the byte cap. Always idempotent. Prepends `trimBanner` once.
     /// - Parameter keepRecentTasks: if set, keep only the last N task sections
     ///   (split by `AgentViewModel.newTaskMarker`). If nil, only byte cap applies.
-    nonisolated static func capActivityLog(_ log: String, keepRecentTasks: Int? = nil) -> String {
+    /// - Parameter cap: character cap (defaults to `logCap`).
+    nonisolated static func capActivityLog(_ log: String, keepRecentTasks: Int? = nil, cap: Int = logCap) -> String {
         var result = log
 
         // Pass 1: task-count cap (when set). Drops oldest whole task sections.
@@ -306,8 +312,10 @@ final class ScriptTab: Identifiable {
         }
 
         // Pass 2: byte cap. Snaps to next newline so we never start mid-line.
-        guard result.count > logCap else { return result }
-        let target = max(0, logCap - trimBanner.count)
+        // utf8.count is O(1) for native strings and >= character count, so the
+        // common under-cap path never walks the string.
+        guard result.utf8.count > cap, result.count > cap else { return result }
+        let target = max(0, cap - trimBanner.count)
         var trimmed = String(result.dropFirst(result.count - target))
         if let nl = trimmed.firstIndex(of: "\n") {
             trimmed = String(trimmed[trimmed.index(after: nl)...])
@@ -319,7 +327,8 @@ final class ScriptTab: Identifiable {
         logFlushTask?.cancel()
         logFlushTask = nil
         if !logBuffer.isEmpty {
-            activityLog = Self.capActivityLog(activityLog + logBuffer)
+            activityLog.append(logBuffer)
+            activityLog = Self.capActivityLog(activityLog)
             logBuffer = ""
             NotificationCenter.default.post(name: .activityLogDidChange, object: id)
         }
