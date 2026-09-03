@@ -568,11 +568,17 @@ final class OllamaService {
 
         // Ollama streaming returns NDJSON: one JSON object per line
         for try await line in bytes.lines {
+            try Task.checkCancellation()
             guard !line.isEmpty,
                   let data = line.data(using: .utf8),
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else
             {
                 continue
+            }
+
+            // Ollama reports errors as {"error": "..."} on the stream.
+            if let err = json["error"] as? String {
+                throw AgentError.apiError(statusCode: 500, message: err)
             }
 
             // Reasoning models (deepseek-r1, qwen3, ...) stream a separate
