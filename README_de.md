@@ -150,19 +150,61 @@ public func scriptMain() -> Int32 {
 }
 ```
 
-**Umgebungsvariablen** — derselbe Vertrag für Skripte und für jeden `user_shell`- / `root_shell`- / `shell`-Befehl:
+**Umgebungsvariablen — wie sie GESETZT werden.** Das LLM fasst die Umgebung nie selbst an. Es ruft das Tool auf, und Agent!s `ScriptService` exportiert die Variablen in den Prozess des Skripts (`env["AGENT_PROJECT_FOLDER"] = cwd`, `env["AGENT_SCRIPT_ARGS"] = arguments` in `ScriptService+Execution.swift`; `setenv(...)` für die In-Process-Variante). Dieselben zwei Variablen werden in jeden `user_shell`- / `root_shell`- / `shell`-Befehl exportiert.
+
+```text
+LLM-Tool-Aufruf                                        Was Agent! ins Skript exportiert
+─────────────────────────────────────────────────────  ─────────────────────────────────────────────
+agent_script(action:"run", name:"TodayEvents")         AGENT_PROJECT_FOLDER=/Users/du/Documents/GitHub/Agent
+                                                       (AGENT_SCRIPT_ARGS ist NICHT gesetzt)
+
+agent_script(action:"run", name:"TodayEvents",         AGENT_PROJECT_FOLDER=/Users/du/Documents/GitHub/Agent
+             arguments:"days=3,location=false,json=true")   AGENT_SCRIPT_ARGS="days=3,location=false,json=true"
+```
 
 | Variable | Wann gesetzt | Bedeutung |
 |---|---|---|
 | `AGENT_PROJECT_FOLDER` | Immer | Der Projektordner des aktiven Tabs (oder `$HOME`, falls keiner). Auch das cwd des Runners wird darauf gesetzt. |
-| `AGENT_SCRIPT_ARGS` | Nur wenn das LLM `arguments:"…"` an `agent_script(action:"run")` übergibt | Freier String; die Beispiele nutzen `key=value,key=value` (z. B. `days=3,json=true`) |
+| `AGENT_SCRIPT_ARGS` | Nur wenn das LLM `arguments:"…"` übergibt | Genau der String, den das LLM übergeben hat. Die Beispiele nutzen die Konvention `key=value,key=value`. |
+
+**Umgebungsvariablen — wie sie EINGELESEN werden.** Im Skript kommen beide aus `ProcessInfo.processInfo.environment`. Das ist exakt das Parsing-Muster aus `Hello.swift` / `TodayEvents.swift`:
 
 ```swift
-let folder = ProcessInfo.processInfo.environment["AGENT_PROJECT_FOLDER"] ?? FileManager.default.currentDirectoryPath
-let args   = ProcessInfo.processInfo.environment["AGENT_SCRIPT_ARGS"] ?? ""
+import Foundation
+
+@_cdecl("script_main")
+public func scriptMain() -> Int32 {
+    let env = ProcessInfo.processInfo.environment
+
+    // 1. Projektordner — immer vorhanden; zur Sicherheit auf cwd zurückfallen
+    let folder = env["AGENT_PROJECT_FOLDER"] ?? FileManager.default.currentDirectoryPath
+
+    // 2. Argumente — fehlen, sofern das LLM nicht `arguments:"…"` übergeben hat
+    let argsString = env["AGENT_SCRIPT_ARGS"] ?? ""
+
+    // 3. Standardwerte, dann "key=value,key=value" parsen
+    var daysAhead    = 0
+    var showLocation = true
+    var outputJSON   = false
+
+    for pair in argsString.split(separator: ",") {
+        let parts = pair.split(separator: "=", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespaces) }
+        guard parts.count == 2 else { continue }
+        switch parts[0] {
+        case "days":     daysAhead    = Int(parts[1]) ?? 0
+        case "location": showLocation = parts[1].lowercased() == "true"
+        case "json":     outputJSON   = parts[1].lowercased() == "true"
+        default: break
+        }
+    }
+
+    print("Projektordner: \(folder)")
+    print("days=\(daysAhead) location=\(showLocation) json=\(outputJSON)")
+    return 0
+}
 ```
 
-Beide sind unabhängig — den Projektordner nie aus den Argumenten herauslesen.
+Beide Variablen sind unabhängig — den Projektordner nie aus `AGENT_SCRIPT_ARGS` herauslesen. Bash-Äquivalent in `user_shell`: `ls "$AGENT_PROJECT_FOLDER/Sources"` (cwd ist bereits dort, kein `cd` nötig).
 
 **JSON-Eingabe / -Ausgabe** — die Konvention der mitgelieferten Beispiele:
 
