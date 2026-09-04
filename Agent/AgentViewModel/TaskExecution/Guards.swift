@@ -15,6 +15,14 @@ extension AgentViewModel {
     private static var recentEditFiles: [[String]] = []
     private static let cycleDetectionWindow = 6 // Number of turns to look back
 
+    /// Clear the edit-cycle window. Call at every task start (main loop and
+    /// tab loop) — the window is a static, so without this the files edited
+    /// by the previous task (or another tab) count toward the next task's
+    /// "you're alternating between the same files" nudge.
+    static func resetEditCycleTracking() {
+        recentEditFiles.removeAll()
+    }
+
     /// Detect cyclic edit patterns across multiple files. If the same 2-3 files
     /// keep alternating, emit a nudge to break the cycle.
     static func detectEditCycle(filePath: String, toolResults: inout [[String: Any]], appendNudge: (String, inout [[String: Any]]) -> Void) {
