@@ -308,7 +308,13 @@ extension AgentViewModel {
 
         // Verification gate: if Xcode project + auto-verify + edits were made,
         // build must pass before task_complete is allowed
-        let editCommands = commandsRun.filter { $0.hasPrefix("write_file") || $0.hasPrefix("edit_file") || $0.hasPrefix("diff_apply") }
+        // Match the names FileTools actually records in commandsRun:
+        // "write_file: …", "edit_file: …", "diff_and_apply: …" (file(action:"diff_apply")),
+        // "apply_diff: …", "create_diff: …", "apply_patch: …". The old filter only
+        // knew "diff_apply", so a task that edited solely via diff_apply/apply_diff
+        // skipped the verify build and could complete with a broken build.
+        let editPrefixes = ["write_file", "edit_file", "diff_apply", "diff_and_apply", "apply_diff", "create_diff", "apply_patch"]
+        let editCommands = commandsRun.filter { cmd in editPrefixes.contains { cmd.hasPrefix($0) } }
         if autoVerifyEnabled && Self.isXcodeProject(projectFolder) && !editCommands.isEmpty {
             appendLog("🔍 Verify gate: building before allowing completion...")
             flushLog()
