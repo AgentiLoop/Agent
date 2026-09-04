@@ -380,7 +380,12 @@ extension AgentViewModel {
                 appBundleId: app, x: x, y: y,
                 properties: input["properties"] as? [String: Any] ?? [:])
         case "clipboard":
-            let clipAction = input["action"] as? String ?? "read"
+            // By the time we get here the ax_ dispatcher above has set
+            // input["action"] = "clipboard" and moved the verb (read/write/paste/
+            // copy_image) into sub_action — same shape as manage_app. Reading
+            // "action" here always yielded "clipboard" → "Unknown clipboard action".
+            let clipAction = input["sub_action"] as? String
+                ?? { let a = input["action"] as? String ?? "read"; return a == "clipboard" ? "read" : a }()
             switch clipAction {
             case "read":
                 let pb = NSPasteboard.general
