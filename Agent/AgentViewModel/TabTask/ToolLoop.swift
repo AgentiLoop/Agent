@@ -121,13 +121,21 @@ extension AgentViewModel {
                     // Overnight coding guards — the same battery the main loop runs
                     // (Guards.swift). Tab tasks previously had NO build enforcement,
                     // no edit-cycle detection, and no failure budget.
+                    // Same resolution as executeTabTask: a tab with no folder of its
+                    // own inherits the main project folder. The old check looked for
+                    // a hardcoded "Agent.xcodeproj" under the raw tab folder, so the
+                    // build-enforcement / error-budget guards never fired for any
+                    // other Xcode project (or for tabs inheriting the main folder).
+                    let guardFolder = Self.resolvedWorkingDirectory(
+                        tab.projectFolder.isEmpty ? projectFolder : tab.projectFolder
+                    )
                     let guardShouldBreak = runOvernightCodingGuards(
                         pendingTools: [(toolId: toolId, name: name, input: input)],
                         toolResults: &toolResults,
                         unbuiltEditCount: &unbuiltEditCount,
                         consecutiveBuildFailures: &consecutiveBuildFailures,
                         stuckFiles: &stuckFiles,
-                        isXcode: FileManager.default.fileExists(atPath: tab.projectFolder + "/Agent.xcodeproj")
+                        isXcode: Self.isXcodeProject(guardFolder)
                     )
                     if guardShouldBreak {
                         tab.appendLog("🛑 Guard: error budget exceeded — stopping tab task")
