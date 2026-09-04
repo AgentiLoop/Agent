@@ -138,9 +138,14 @@ final class XcodeService: @unchecked Sendable {
 
         // Never report success on a status the build system didn't call succeeded.
         // A cancelled/failed/errored build can finish with zero collectible issues.
+        // The uppercase markers are what every consumer keys on: the verify gate
+        // and error-budget guard look for "BUILD FAILED", the build handler's
+        // auto-checkpoint / auto-verify / buildFailure hook look for
+        // "BUILD SUCCEEDED". The old "Build succeeded" / "Build failed" text
+        // matched none of them, so a broken build could pass the verify gate.
         let status = buildResult.status ?? .notYetStarted
         guard status == .succeeded else {
-            var failure = "Build \(statusDescription(status))"
+            var failure = "BUILD FAILED (\(statusDescription(status)))"
             if let message = buildResult.errorMessage, !message.isEmpty {
                 failure += ": \(message)"
             }
@@ -150,7 +155,7 @@ final class XcodeService: @unchecked Sendable {
             return failure
         }
 
-        return output.isEmpty ? "Build succeeded" : output
+        return output.isEmpty ? "BUILD SUCCEEDED" : "BUILD SUCCEEDED\n\(output)"
     }
 
     /// True when Xcode is actually launched. Prevents ScriptingBridge from silently
@@ -180,7 +185,7 @@ final class XcodeService: @unchecked Sendable {
         let resolvedPath = autoSelectProject() ?? projectPath
         // Build first to check for errors (matching xcf's pattern)
         let buildOutput = buildProject(projectPath: resolvedPath)
-        guard buildOutput == "Build succeeded" else {
+        guard buildOutput == "BUILD SUCCEEDED" else {
             return buildOutput
         }
 
