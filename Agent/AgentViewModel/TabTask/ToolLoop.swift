@@ -62,18 +62,6 @@ extension AgentViewModel {
                     filesEditedThisTask.insert(filePath)
                 }
 
-                if name == "task_complete" {
-                    completionSummary = input["summary"] as? String ?? "Done"
-                    // Show task complete in the LLM Output HUD so the user sees the result. Append to rawLLMOutput and
-                    // let the drip task pick up the new chars naturally — DO NOT sync displayedLLMOutput, that would skip the drip.
-                    let trimmedRaw = tab.rawLLMOutput.trimmingCharacters(in: .whitespacesAndNewlines)
-                    if trimmedRaw.isEmpty {
-                        tab.rawLLMOutput = "✅ \(completionSummary)"
-                    } else if !trimmedRaw.contains(completionSummary) {
-                        tab.rawLLMOutput += "\n\n✅ \(completionSummary)"
-                    }
-                    tab.startDripIfNeeded()
-                }
                 let toolStart = CFAbsoluteTimeGetCurrent()
                 let result = await handleTabToolCall(
                     tab: tab, name: name, input: input, toolId: toolId
@@ -84,6 +72,19 @@ extension AgentViewModel {
                     tab.flush()
                 }
                 if result.isComplete {
+                    if name == "task_complete" {
+                        completionSummary = input["summary"] as? String ?? "Done"
+                        // Show task complete in the LLM Output HUD only once the completion
+                        // gates accepted it. Append to rawLLMOutput and let the drip task pick
+                        // up the new chars naturally — DO NOT sync displayedLLMOutput, that would skip the drip.
+                        let trimmedRaw = tab.rawLLMOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if trimmedRaw.isEmpty {
+                            tab.rawLLMOutput = "✅ \(completionSummary)"
+                        } else if !trimmedRaw.contains(completionSummary) {
+                            tab.rawLLMOutput += "\n\n✅ \(completionSummary)"
+                        }
+                        tab.startDripIfNeeded()
+                    }
                     return .complete(summary: completionSummary)
                 }
                 if var toolResult = result.toolResult {

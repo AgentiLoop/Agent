@@ -13,6 +13,24 @@ extension AgentViewModel {
 
         switch name {
         case "task_complete":
+            // Same completion gates the main loop runs (goal / build / evidence /
+            // physical files / critic). Blocked → feed the refusal back as this
+            // tool's result and keep the tab task looping instead of ending it.
+            if let blocker = await completionGateBlocker() {
+                tab.appendLog("⛔ task_complete refused by completion gate")
+                tab.flush()
+                return TabToolResult(
+                    toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": blocker],
+                    isComplete: false
+                )
+            }
+            // Gates passed → the goal is verified. GoalStateStore is a global
+            // singleton; leaving it set here blocked the NEXT main-loop task's
+            // task_complete on criteria that belonged to this tab.
+            if GoalStateStore.shared.current != nil {
+                GoalStateStore.shared.clear()
+                tab.appendLog("🎯 Goal verified — cleared")
+            }
             let summary = input["summary"] as? String ?? "Done"
             tab.appendLog("✅ Completed: \(summary)")
             tab.flush()
