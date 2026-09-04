@@ -80,7 +80,11 @@ extension ActivityLogView.Coordinator {
 
     /// / Build attributed string from text. Converts image/HTML paths to clickable links. / Source `activityLog` is
     /// bounded by `ScriptTab.logCap` via `ScriptTab.capActivityLog`, / so this view never trims — it just renders and styles the trim banner literal yellow.
-    nonisolated func buildAttributedString(from text: String) -> NSAttributedString {
+    /// `progress`: optional 0…1 reporter (chars consumed / total) for the background full render.
+    nonisolated func buildAttributedString(
+        from text: String,
+        progress: (@Sendable (Double) -> Void)? = nil
+    ) -> NSAttributedString {
         let baseAttrs: [NSAttributedString.Key: Any] = [
             .font: font,
             .foregroundColor: NSColor.labelColor
@@ -100,11 +104,12 @@ extension ActivityLogView.Coordinator {
 
         let nsText = cleanText as NSString
         let fullRange = NSRange(location: 0, length: nsText.length)
+        let reporter = progress.map { RenderProgress(total: nsText.length, base: 0, report: $0) }
         let imageMatches = MarkdownPatterns.imagePathPattern?.matches(in: cleanText, range: fullRange) ?? []
         let htmlMatches = MarkdownPatterns.htmlPathPattern?.matches(in: cleanText, range: fullRange) ?? []
 
         guard !imageMatches.isEmpty || !htmlMatches.isEmpty else {
-            let rendered = renderMarkdown(cleanText)
+            let rendered = renderMarkdown(cleanText, progress: reporter)
             return Self.styleTrimBanner(rendered, font: font)
         }
 
@@ -133,7 +138,7 @@ extension ActivityLogView.Coordinator {
         allMatches.sort { $0.range.location < $1.range.location }
 
         guard !allMatches.isEmpty else {
-            let rendered = renderMarkdown(cleanText)
+            let rendered = renderMarkdown(cleanText, progress: reporter)
             return Self.styleTrimBanner(rendered, font: font)
         }
 
@@ -145,7 +150,7 @@ extension ActivityLogView.Coordinator {
             if match.range.location > lastEnd {
                 let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
                 let beforeText = nsText.substring(with: beforeRange)
-                result.append(renderMarkdown(beforeText))
+                result.append(renderMarkdown(beforeText, progress: reporter?.offset(by: lastEnd)))
             }
 
             // Add the path as a clickable link
@@ -165,7 +170,7 @@ extension ActivityLogView.Coordinator {
         // Add remaining text after last match
         if lastEnd < nsText.length {
             let remainingRange = NSRange(location: lastEnd, length: nsText.length - lastEnd)
-            result.append(renderMarkdown(nsText.substring(with: remainingRange)))
+            result.append(renderMarkdown(nsText.substring(with: remainingRange), progress: reporter?.offset(by: lastEnd)))
         }
 
         return Self.styleTrimBanner(result, font: font)
