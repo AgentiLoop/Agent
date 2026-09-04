@@ -418,25 +418,23 @@ extension AgentViewModel {
                         messages.append(["role": "user", "content": toolResults])
                         tab.llmMessages = messages
                     } else if !hasToolUse {
-                        // Check if model wrote task_complete as text instead of a tool call
+                        // Check if model wrote task_complete as text instead of a tool call.
+                        // Only a fully-formed `task_complete(summary: "…")` / `done(summary: "…")`
+                        // counts — a bare mention of the word is narration and falls
+                        // through to the text-only nudge below.
                         let responseText = response.content.compactMap { $0["text"] as? String }.joined()
-                        if responseText.contains("task_complete") || responseText.contains("done(summary") {
-                            // Extract summary from task_complete/done(summary: "...") or (summary="...")
-                            if let match = responseText.range(
-                                of: #"(?:task_complete|done)\(summary[=:]\s*"([^"]+)""#,
-                                options: .regularExpression
-                            ) {
-                                let raw = String(responseText[match])
-                                completionSummary = raw
-                                    .replacingOccurrences(
-                                        of: #"(?:task_complete|done)\(summary[=:]\s*""#,
-                                        with: "",
-                                        options: .regularExpression
-                                    )
-                                    .replacingOccurrences(of: "\"", with: "")
-                            } else {
-                                completionSummary = String(responseText.prefix(500))
-                            }
+                        if let match = responseText.range(
+                            of: #"(?:task_complete|done)\(summary[=:]\s*"([^"]+)""#,
+                            options: .regularExpression
+                        ) {
+                            let raw = String(responseText[match])
+                            completionSummary = raw
+                                .replacingOccurrences(
+                                    of: #"(?:task_complete|done)\(summary[=:]\s*""#,
+                                    with: "",
+                                    options: .regularExpression
+                                )
+                                .replacingOccurrences(of: "\"", with: "")
                             tab.appendLog("✅ Completed: \(completionSummary)")
                             tab.flush()
                             break mainLoop
