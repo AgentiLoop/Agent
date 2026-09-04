@@ -63,10 +63,15 @@ extension AgentViewModel {
                 }
                 flushLog()
             } else if type == "tool_use" {
+                // Every tool_use with an id MUST get a tool_result, or the next
+                // request 400s ("tool_use ids found without tool_result"). So the
+                // id is the only hard requirement; a missing name or unparsable
+                // input still becomes a pending tool whose handler reports the
+                // problem back as its result.
+                guard let toolId = block["id"] as? String else { continue }
                 hasToolUse = true
-                guard let toolId = block["id"] as? String,
-                      var name = block["name"] as? String,
-                      var input = block["input"] as? [String: Any] else { continue }
+                var name = block["name"] as? String ?? "unknown_tool"
+                var input = Self.parseToolUseInput(block["input"])
 
                 // Expand consolidated CRUDL tools into legacy tool names
                 (name, input) = Self.expandConsolidatedTool(name: name, input: input)
@@ -178,6 +183,21 @@ extension AgentViewModel {
             taskCompleted: false,
             blockedCompletion: blockedCompletion
         )
+    }
+
+    /// Coerce a tool_use `input` into a dictionary. Accepts a dictionary as-is,
+    /// decodes a JSON-string input (some OpenAI-compatible providers emit
+    /// arguments as a string), and falls back to an empty dictionary so the
+    /// block still gets dispatched — and therefore still gets a tool_result —
+    /// instead of being skipped and orphaning its tool_use id.
+    nonisolated static func parseToolUseInput(_ raw: Any?) -> [String: Any] {
+        if let dict = raw as? [String: Any] { return dict }
+        if let str = raw as? String,
+           let data = str.data(using: .utf8),
+           let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            return dict
+        }
+        return [:]
     }
 
     /// Format a tool call for the activity log in the same shape Apple AI uses:
