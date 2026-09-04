@@ -116,6 +116,7 @@ extension AgentViewModel {
         FallbackChainService.shared.reset()
         // Tier 8: edits in this task must be preceded by a read in this task.
         Self.clearEditGateForTab(tabID: tab.id)
+        Self.resetEditCycleTracking()
         if let stale = GoalStateStore.shared.clearIfStale() {
             tab.appendLog("🎯 Cleared stale goal (untouched >24h): \(stale.prefix(60))")
         }
