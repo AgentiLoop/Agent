@@ -38,10 +38,15 @@ extension AgentViewModel {
             if type == "text" {
                 // Text goes to LLM output only — streaming delta already shows it there
             } else if type == "tool_use" {
+                // Every tool_use with an id MUST get a tool_result, or the next
+                // request 400s ("tool_use ids found without tool_result"). The id
+                // is the only hard requirement — a missing name or unparsable
+                // input still gets dispatched so the handler reports the problem
+                // back as this block's result. Mirrors parseLLMResponseContent.
+                guard let toolId = block["id"] as? String else { continue }
                 hasToolUse = true
-                guard let toolId = block["id"] as? String,
-                      let rawName = block["name"] as? String,
-                      let rawInput = block["input"] as? [String: Any] else { continue }
+                let rawName = block["name"] as? String ?? "unknown_tool"
+                let rawInput = Self.parseToolUseInput(block["input"])
 
                 // Expand consolidated CRUDL tools into legacy tool names
                 let (name, input) = Self.expandConsolidatedTool(name: rawName, input: rawInput)
