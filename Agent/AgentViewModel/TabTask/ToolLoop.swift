@@ -52,6 +52,10 @@ extension AgentViewModel {
                 let (name, input) = Self.expandConsolidatedTool(name: rawName, input: rawInput)
 
                 commandsRun.append(name)
+                // Mirror onto the tab so the completion gates (run inside the
+                // task_complete handler, which only sees `tab`) verify THIS
+                // task's edits instead of the main loop's commandsRun.
+                tab.taskCommandsRun = commandsRun
 
                 // Plans are encouraged but never required. Track edited files for task summary purposes. No mid-stream
                 // blocking — the LLM decides whether to plan up front.

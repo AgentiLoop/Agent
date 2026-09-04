@@ -16,7 +16,13 @@ extension AgentViewModel {
             // Same completion gates the main loop runs (goal / build / evidence /
             // physical files / critic). Blocked → feed the refusal back as this
             // tool's result and keep the tab task looping instead of ending it.
-            if let blocker = await completionGateBlocker() {
+            let gateFolder = Self.resolvedWorkingDirectory(
+                tab.projectFolder.isEmpty ? projectFolder : tab.projectFolder
+            )
+            if let blocker = await completionGateBlocker(
+                commandsRun: tab.taskCommandsRun,
+                projectFolder: gateFolder
+            ) {
                 tab.appendLog("⛔ task_complete refused by completion gate")
                 tab.flush()
                 return TabToolResult(

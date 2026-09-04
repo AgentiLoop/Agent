@@ -276,18 +276,28 @@ extension AgentViewModel {
     /// Refusals are capped per task (`maxCompletionGateRefusals`): after that many
     /// the gates step aside and log it, so a criterion the model can't satisfy
     /// doesn't loop the task all the way to the iteration cap.
-    func completionGateBlocker() async -> String? {
+    /// `commandsRun` / `projectFolder` default to the main loop's state. The tab
+    /// loop keeps its own local commandsRun and may have its own folder, so it
+    /// passes both explicitly — otherwise the verify build never saw tab edits
+    /// and the critic diffed the wrong folder.
+    func completionGateBlocker(
+        commandsRun overrideCommands: [String]? = nil,
+        projectFolder overrideFolder: String? = nil
+    ) async -> String? {
         guard completionGateRefusals < Self.maxCompletionGateRefusals else {
             appendLog("⚠️ Completion gates refused \(completionGateRefusals)× this task — allowing task_complete")
             flushLog()
             return nil
         }
-        guard let blocker = await runCompletionGates() else { return nil }
+        guard let blocker = await runCompletionGates(
+            commandsRun: overrideCommands ?? commandsRun,
+            projectFolder: overrideFolder ?? projectFolder
+        ) else { return nil }
         completionGateRefusals += 1
         return blocker
     }
 
-    private func runCompletionGates() async -> String? {
+    private func runCompletionGates(commandsRun: [String], projectFolder: String) async -> String? {
         // Goal gate: every verification criterion must be marked done
         if let goal = GoalStateStore.shared.current, !goal.allCriteriaDone {
             let open = goal.openCriteria
@@ -382,7 +392,7 @@ extension AgentViewModel {
         }
 
         // Critic gate (opt-in, one-shot): LLM review of the task's diff.
-        if let criticBlock = await criticReviewBlocker() { return criticBlock }
+        if let criticBlock = await criticReviewBlocker(projectFolder: projectFolder) { return criticBlock }
 
         return nil
     }

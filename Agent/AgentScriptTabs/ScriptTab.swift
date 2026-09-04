@@ -86,6 +86,10 @@ final class ScriptTab: Identifiable {
     var taskQueue: [String] = []
     var currentTaskPrompt: String = ""
     var currentAppleAIPrompt: String = ""
+    /// Tool names recorded by the running tab task (mirrors the tab loop's local
+    /// `commandsRun`). Read by the completion gates so the verify build sees the
+    /// tab's edits, not the main loop's.
+    var taskCommandsRun: [String] = []
 
     // MARK: - Per-Tab Project Folder
 

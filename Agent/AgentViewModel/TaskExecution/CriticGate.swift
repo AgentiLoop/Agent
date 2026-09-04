@@ -13,13 +13,14 @@ extension AgentViewModel {
     /// Returns a `CANNOT COMPLETE — ...` blocker when the critic finds issues,
     /// or nil when completion may proceed (disabled, no edits, already ran,
     /// clean diff, or critic passed / failed to answer).
-    func criticReviewBlocker() async -> String? {
+    func criticReviewBlocker(projectFolder overrideFolder: String? = nil) async -> String? {
         guard criticReviewEnabled, !criticReviewDone else { return nil }
         guard !FileBackupService.shared.snapshottedFiles().isEmpty else { return nil }
         // One shot only — the next task_complete passes this gate regardless.
         criticReviewDone = true
 
-        let folder = projectFolder.isEmpty ? NSHomeDirectory() : projectFolder
+        let base = overrideFolder ?? projectFolder
+        let folder = base.isEmpty ? NSHomeDirectory() : base
         let diff = await Self.offMain { Self.uncommittedDiff(folder: folder) }
         guard !diff.isEmpty else { return nil }
 
