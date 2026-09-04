@@ -5,8 +5,28 @@ import AgentColorSyntax
 // MARK: - Coordinator: Block-Level Markdown Rendering Fenced code blocks, headers, bullets, blockquotes, horizontal
 // rules, and NSTextTable-backed markdown tables.
 
+/// Progress reporting for a background full render (see `startAsyncFullRender`).
+/// The unit of progress is UTF-16 characters consumed of the whole log: `base` is
+/// the offset of the segment currently being rendered, `total` the full length.
+/// `report` is called from the render thread with a monotonic 0…1 fraction.
+struct RenderProgress: Sendable {
+    let total: Int
+    let base: Int
+    let report: @Sendable (Double) -> Void
+
+    /// Same reporter, re-based for a sub-segment starting `delta` chars into this one.
+    func offset(by delta: Int) -> RenderProgress {
+        RenderProgress(total: total, base: base + delta, report: report)
+    }
+
+    /// Report that `localOffset` chars of the current segment are done.
+    func consumed(_ localOffset: Int) {
+        report(min(1, Double(base + localOffset) / Double(max(total, 1))))
+    }
+}
+
 extension ActivityLogView.Coordinator {
-    nonisolated func renderMarkdown(_ text: String) -> NSAttributedString {
+    nonisolated func renderMarkdown(_ text: String, progress: RenderProgress? = nil) -> NSAttributedString {
         let baseAttrs: [NSAttributedString.Key: Any] = [
             .font: font,
             .foregroundColor: NSColor.labelColor
@@ -75,7 +95,7 @@ extension ActivityLogView.Coordinator {
         let fences = fenceRx.matches(in: text, range: fullRange)
 
         guard !fences.isEmpty else {
-            return renderInlineMarkdown(text)
+            return renderInlineMarkdown(text, progress: progress)
         }
 
         let result = NSMutableAttributedString()
@@ -84,7 +104,7 @@ extension ActivityLogView.Coordinator {
         for fence in fences {
             if fence.range.location > cursor {
                 let seg = nsText.substring(with: NSRange(location: cursor, length: fence.range.location - cursor))
-                result.append(renderInlineMarkdown(seg))
+                result.append(renderInlineMarkdown(seg, progress: progress?.offset(by: cursor)))
             }
 
             let lang = fence.range(at: 1).length > 0 ? nsText.substring(with: fence.range(at: 1)) : nil
@@ -119,10 +139,14 @@ extension ActivityLogView.Coordinator {
             result.append(block)
 
             cursor = fence.range.location + fence.range.length
+            progress?.consumed(cursor)
         }
 
         if cursor < nsText.length {
-            result.append(renderInlineMarkdown(nsText.substring(with: NSRange(location: cursor, length: nsText.length - cursor))))
+            result.append(renderInlineMarkdown(
+                nsText.substring(with: NSRange(location: cursor, length: nsText.length - cursor)),
+                progress: progress?.offset(by: cursor)
+            ))
         }
 
         return result
@@ -130,12 +154,18 @@ extension ActivityLogView.Coordinator {
 
     /// Splits text into lines and renders block-level markdown (headers, lists, rules, tables)
     /// then delegates inline rendering (bold, italic, code) per line.
-    nonisolated func renderInlineMarkdown(_ text: String) -> NSAttributedString {
+    /// `progress` (background full renders only) is fed the running UTF-16 offset every
+    /// `progressLineStride` lines — this walk is where the bulk of render time goes.
+    nonisolated func renderInlineMarkdown(_ text: String, progress: RenderProgress? = nil) -> NSAttributedString {
         guard !text.isEmpty else { return NSAttributedString() }
 
         let result = NSMutableAttributedString()
         let lines = text.components(separatedBy: "\n")
         var i = 0
+        // UTF-16 chars consumed so far (lines + the "\n" separators between them)
+        var consumed = 0
+        var linesSinceReport = 0
+        let progressLineStride = 200
 
         while i < lines.count {
             // Detect markdown table blocks (consecutive lines starting with |)
@@ -150,6 +180,14 @@ extension ActivityLogView.Coordinator {
                    let tableAttr = renderMarkdownTable(tableLines)
                 {
                     result.append(tableAttr)
+                    if let progress {
+                        consumed += tableLines.reduce(0) { $0 + $1.utf16.count + 1 }
+                        linesSinceReport += tableLines.count
+                        if linesSinceReport >= progressLineStride {
+                            progress.consumed(consumed)
+                            linesSinceReport = 0
+                        }
+                    }
                     i = j
                     continue
                 }
@@ -159,6 +197,14 @@ extension ActivityLogView.Coordinator {
             result.append(renderMarkdownLine(lines[i]))
             if i < lines.count - 1 {
                 result.append(NSAttributedString(string: "\n", attributes: [.font: font]))
+            }
+            if let progress {
+                consumed += lines[i].utf16.count + 1
+                linesSinceReport += 1
+                if linesSinceReport >= progressLineStride {
+                    progress.consumed(consumed)
+                    linesSinceReport = 0
+                }
             }
             i += 1
         }
