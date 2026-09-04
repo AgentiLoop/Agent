@@ -222,6 +222,9 @@ extension ActivityLogView.Coordinator {
 
     /// Parse a large log on a background thread, showing a centered progress overlay meanwhile.
     /// The text view is emptied first so the previous tab's content never bleeds through.
+    /// The bar is determinate while the parse runs (chars consumed / total, reported by
+    /// `buildAttributedString`), then flips to indeterminate for the final TextKit layout,
+    /// which gives no progress and would otherwise look frozen at 100 %.
     func startAsyncFullRender(text: String, len: Int, tabID: UUID?, textView: NSTextView, scrollView: NSScrollView) {
         asyncRenderGeneration += 1
         let generation = asyncRenderGeneration
@@ -229,30 +232,51 @@ extension ActivityLogView.Coordinator {
         textView.textStorage?.setAttributedString(NSAttributedString())
         textView.alphaValue = 1
         showLoadingOverlay(in: scrollView)
+        setLoadingBarDeterminate(true)
 
         Task.detached(priority: .userInitiated) { [weak self] in
             guard let self else { return }
-            let box = RenderedBox(value: self.buildAttributedString(from: text))
+            let box = RenderedBox(value: self.buildAttributedString(from: text) { fraction in
+                Task { @MainActor [weak self] in
+                    self?.updateLoadingProgress(fraction, generation: generation)
+                }
+            })
             await MainActor.run {
                 self.finishAsyncRender(box, len: len, text: text, tabID: tabID, generation: generation)
             }
         }
     }
 
+    /// Push a background-parse progress value to the bar. Stale generations are ignored;
+    /// values that move the bar <1 % are dropped so a 200-line stride can't flood main.
+    private func updateLoadingProgress(_ fraction: Double, generation: Int) {
+        guard generation == asyncRenderGeneration, asyncRenderInFlight, let bar = loadingBar else { return }
+        guard fraction - lastReportedProgress >= 0.01 || fraction >= 1 else { return }
+        lastReportedProgress = fraction
+        bar.doubleValue = fraction
+    }
+
     private func finishAsyncRender(_ box: RenderedBox, len: Int, text: String, tabID: UUID?, generation: Int) {
         // Stale: tab switched or a newer render started while this one was running
         guard generation == asyncRenderGeneration, tabID == latestTabID else { return }
-        asyncRenderInFlight = false
-        hideLoadingOverlay()
-        guard let textView = latestTextView else { return }
-        textView.textStorage?.beginEditing()
-        textView.textStorage?.setAttributedString(box.value)
-        textView.textStorage?.endEditing()
-        lastLength = len
-        lastRenderedText = text
-        snapToEnd(textView)
-        // Pick up anything that streamed in (or a search change) while we were rendering
-        performRender()
+        // Parse done — the remaining work is TextKit layout, which reports nothing.
+        // Flip the bar to indeterminate and give AppKit one runloop turn to draw
+        // that before the synchronous setAttributedString blocks main.
+        setLoadingBarDeterminate(false)
+        DispatchQueue.main.async { [weak self] in
+            guard let self, generation == self.asyncRenderGeneration, tabID == self.latestTabID else { return }
+            self.asyncRenderInFlight = false
+            guard let textView = self.latestTextView else { self.hideLoadingOverlay(); return }
+            textView.textStorage?.beginEditing()
+            textView.textStorage?.setAttributedString(box.value)
+            textView.textStorage?.endEditing()
+            self.hideLoadingOverlay()
+            self.lastLength = len
+            self.lastRenderedText = text
+            self.snapToEnd(textView)
+            // Pick up anything that streamed in (or a search change) while we were rendering
+            self.performRender()
+        }
     }
 
     /// Abandon an in-flight background render (tab switch). Its result is discarded on arrival.
@@ -275,11 +299,14 @@ extension ActivityLogView.Coordinator {
 
         let bar = NSProgressIndicator()
         bar.style = .bar
+        bar.minValue = 0
+        bar.maxValue = 1
         bar.isIndeterminate = true
         bar.controlSize = .regular
         bar.translatesAutoresizingMaskIntoConstraints = false
         bar.widthAnchor.constraint(equalToConstant: 240).isActive = true
         bar.startAnimation(nil)
+        loadingBar = bar
 
         let label = NSTextField(labelWithString: "Processing tab data…")
         label.font = .systemFont(ofSize: 13, weight: .medium)
@@ -303,5 +330,20 @@ extension ActivityLogView.Coordinator {
 
     private func hideLoadingOverlay() {
         loadingOverlay?.isHidden = true
+    }
+
+    /// Determinate (0…1, driven by `updateLoadingProgress`) for the background parse;
+    /// indeterminate for phases that can't report progress (final TextKit layout).
+    private func setLoadingBarDeterminate(_ determinate: Bool) {
+        guard let bar = loadingBar else { return }
+        lastReportedProgress = 0
+        if determinate {
+            bar.stopAnimation(nil)
+            bar.isIndeterminate = false
+            bar.doubleValue = 0
+        } else {
+            bar.isIndeterminate = true
+            bar.startAnimation(nil)
+        }
     }
 }

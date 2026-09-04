@@ -178,6 +178,11 @@ struct ActivityLogView: NSViewRepresentable {
         var asyncRenderGeneration = 0
         /// Centered progress overlay shown over the scroll view during an async render.
         weak var loadingOverlay: NSView?
+        /// The overlay's bar — determinate (0…1) while the background parse reports
+        /// progress, indeterminate again for the final main-thread layout.
+        weak var loadingBar: NSProgressIndicator?
+        /// Last progress value pushed to the bar; updates are dropped unless they move ≥1%.
+        var lastReportedProgress: Double = 0
 
         /// True if `prefix` is a byte-exact UTF-8 prefix of `text`. memcmp-speed, no allocation
         /// (native Swift strings expose contiguous UTF-8).
