@@ -280,32 +280,48 @@ extension AgentViewModel {
     /// loop keeps its own local commandsRun and may have its own folder, so it
     /// passes both explicitly — otherwise the verify build never saw tab edits
     /// and the critic diffed the wrong folder.
+    /// `skipGoalGates`: the goal store is a global singleton, so a tab task's
+    /// task_complete would otherwise be blocked on criteria the MAIN task set.
+    /// Tab tasks pass `true` (they also pass `openCriteria: []` to routeStopReason
+    /// for the same reason). `log` routes the gate's log lines — tab tasks pass
+    /// `tab.appendLog` so the refusal reason lands in the tab's log, not the main one.
     func completionGateBlocker(
         commandsRun overrideCommands: [String]? = nil,
-        projectFolder overrideFolder: String? = nil
+        projectFolder overrideFolder: String? = nil,
+        skipGoalGates: Bool = false,
+        log: ((String) -> Void)? = nil
     ) async -> String? {
+        let log: (String) -> Void = log ?? { [weak self] line in
+            self?.appendLog(line)
+            self?.flushLog()
+        }
         guard completionGateRefusals < Self.maxCompletionGateRefusals else {
-            appendLog("⚠️ Completion gates refused \(completionGateRefusals)× this task — allowing task_complete")
-            flushLog()
+            log("⚠️ Completion gates refused \(completionGateRefusals)× this task — allowing task_complete")
             return nil
         }
         guard let blocker = await runCompletionGates(
             commandsRun: overrideCommands ?? commandsRun,
-            projectFolder: overrideFolder ?? projectFolder
+            projectFolder: overrideFolder ?? projectFolder,
+            skipGoalGates: skipGoalGates,
+            log: log
         ) else { return nil }
         completionGateRefusals += 1
         return blocker
     }
 
-    private func runCompletionGates(commandsRun: [String], projectFolder: String) async -> String? {
+    private func runCompletionGates(
+        commandsRun: [String],
+        projectFolder: String,
+        skipGoalGates: Bool,
+        log: (String) -> Void
+    ) async -> String? {
         // Goal gate: every verification criterion must be marked done
-        if let goal = GoalStateStore.shared.current, !goal.allCriteriaDone {
+        if !skipGoalGates, let goal = GoalStateStore.shared.current, !goal.allCriteriaDone {
             let open = goal.openCriteria
                 .enumerated()
                 .map { "\($0.offset + 1). \($0.element.text)" }
                 .joined(separator: "\n")
-            appendLog("🎯 Goal gate: \(goal.openCriteria.count) unverified criteria — blocking completion")
-            flushLog()
+            log("🎯 Goal gate: \(goal.openCriteria.count) unverified criteria — blocking completion")
             return """
                 CANNOT COMPLETE — the active goal still has unverified criteria:
 
@@ -326,8 +342,7 @@ extension AgentViewModel {
         let editPrefixes = ["write_file", "edit_file", "diff_apply", "diff_and_apply", "apply_diff", "create_diff", "apply_patch"]
         let editCommands = commandsRun.filter { cmd in editPrefixes.contains { cmd.hasPrefix($0) } }
         if autoVerifyEnabled && Self.isXcodeProject(projectFolder) && !editCommands.isEmpty {
-            appendLog("🔍 Verify gate: building before allowing completion...")
-            flushLog()
+            log("🔍 Verify gate: building before allowing completion...")
             let buildResult = await Self.offMain { XcodeService.shared.buildProject(projectPath: "") }
             if buildResult.contains("BUILD FAILED") || buildResult.contains("error:") {
                 // Extract first 5 errors
@@ -335,8 +350,7 @@ extension AgentViewModel {
                     .filter { $0.contains("error:") }
                     .prefix(5)
                     .joined(separator: "\n")
-                appendLog("❌ Verify gate: build failed — sending errors back to LLM")
-                flushLog()
+                log("❌ Verify gate: build failed — sending errors back to LLM")
                 return """
                     CANNOT COMPLETE — build failed. \
                     Fix these errors first:
@@ -346,16 +360,15 @@ extension AgentViewModel {
                     After fixing, call task_complete again.
                     """
             }
-            appendLog("✅ Verify gate: build passed")
-            flushLog()
+            log("✅ Verify gate: build passed")
         }
 
         // Criteria marked done but with no evidence cited are self-reported,
         // not verified. Block completion the same way open criteria do.
-        let unevidenced = GoalStateStore.shared.unevidencedCriteria
+        // Same global-store caveat as the goal gate above → skipped for tab tasks.
+        let unevidenced = skipGoalGates ? [] : GoalStateStore.shared.unevidencedCriteria
         if !unevidenced.isEmpty {
-            appendLog("❌ Verify gate: \(unevidenced.count) criterion/criteria marked done without evidence")
-            flushLog()
+            log("❌ Verify gate: \(unevidenced.count) criterion/criteria marked done without evidence")
             return """
                 CANNOT COMPLETE — these criteria are marked done but cite no evidence:
 
@@ -378,8 +391,7 @@ extension AgentViewModel {
             }
         }
         if !brokenFiles.isEmpty {
-            appendLog("❌ Verify gate: \(brokenFiles.count) edited file(s) missing or empty")
-            flushLog()
+            log("❌ Verify gate: \(brokenFiles.count) edited file(s) missing or empty")
             return """
                 CANNOT COMPLETE — these files were edited this task but are now \
                 missing or empty:
