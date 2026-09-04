@@ -229,19 +229,20 @@ extension AgentViewModel {
     ) -> TurnDecision {
         if hasToolUse && hasToolResults { return .continueLoop }
         if !hasToolUse {
-            if responseText.contains("task_complete") || responseText.contains("done(summary") {
-                var summary = ""
-                if let match = responseText.range(
-                    of: #"(?:task_complete|done)\(summary[=:]\s*"([^"]+)""#,
+            // Only a fully-formed `task_complete(summary: "…")` / `done(summary: "…")`
+            // written as text counts as a completion command. A bare mention of the
+            // word ("I'll build, then call task_complete") is narration — fall through
+            // to the text-only nudge instead of ending the task with work undone.
+            if let match = responseText.range(
+                of: #"(?:task_complete|done)\(summary[=:]\s*"([^"]+)""#,
+                options: .regularExpression
+            ) {
+                let raw = String(responseText[match])
+                let summary = raw.replacingOccurrences(
+                    of: #"(?:task_complete|done)\(summary[=:]\s*""#,
+                    with: "",
                     options: .regularExpression
-                ) {
-                    let raw = String(responseText[match])
-                    summary = raw.replacingOccurrences(
-                        of: #"(?:task_complete|done)\(summary[=:]\s*""#,
-                        with: "",
-                        options: .regularExpression
-                    ).replacingOccurrences(of: "\"", with: "")
-                }
+                ).replacingOccurrences(of: "\"", with: "")
                 return .completeTextCommand(summary: summary)
             }
             let lower = responseText.lowercased()
