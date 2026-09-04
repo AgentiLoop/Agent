@@ -35,6 +35,13 @@ extension AgentViewModel {
     /// Mirrors the stuck-file block in runOvernightCodingGuards but
     /// for the tab-task path. Thresholds match Guards.swift: nudge at 2,
     /// give up at 4.
+    ///
+    /// Nudges are appended ONTO the triggering tool_result's content (via
+    /// `appendNudge`), never as a separate `text` block. Anthropic requires
+    /// every tool_result in a user message to precede any text block; the
+    /// tab loop dispatches tool_use blocks one at a time, so an interleaved
+    /// text block on a multi-tool turn produced [tool_result, text,
+    /// tool_result] and a 400.
     func appendStuckFileNudgeIfNeeded(
         tab: ScriptTab,
         name: String,
@@ -48,6 +55,7 @@ extension AgentViewModel {
               let path = input["file_path"] as? String ?? input["path"] as? String,
               let output = toolResult["content"] as? String
         else { return }
+        let toolId = toolResult["tool_use_id"] as? String ?? ""
         if Self.isToolFailure(output: output) {
             stuckFiles[path, default: 0] += 1
             let count = stuckFiles[path]!
@@ -63,7 +71,7 @@ extension AgentViewModel {
                 5. **REWIND**: file(action:"restore", file_path:"\(path)") recovers the most recent FileBackupService snapshot from before your edits. Backups are auto-created on every write_file/edit_file call.
                 6. If you keep failing, switch tools — write_file to overwrite the whole file is a valid last resort.
                 """
-                toolResults.append(["type": "text", "text": nudge])
+                appendNudge(&toolResults, toolId: toolId, nudge: nudge)
                 tab.appendLog("⚠️ Stuck nudge: 2 failures on \((path as NSString).lastPathComponent)")
                 tab.flush()
             } else if count >= 4 {
@@ -72,7 +80,7 @@ extension AgentViewModel {
                     this file. Move on to the next part of your task \
                     or call done with what you've completed so far.
                     """
-                toolResults.append(["type": "text", "text": nudge])
+                appendNudge(&toolResults, toolId: toolId, nudge: nudge)
                 tab.appendLog("🛑 Stuck-out: 4 failures on \((path as NSString).lastPathComponent)")
                 tab.flush()
                 stuckFiles[path] = 0
@@ -142,7 +150,10 @@ extension AgentViewModel {
             task_complete and report what is still unknown.
             """
         }
-        toolResults.append(["type": "text", "text": nudge])
+        // Onto the last tool_result (this call's — it was appended just before
+        // we were invoked), not a separate text block: see the ordering note on
+        // appendStuckFileNudgeIfNeeded.
+        appendNudgeToLastToolResult(&toolResults, nudge: nudge)
         tab.appendLog("🔁 Repeat guard: \(name) ×\(count)")
         tab.flush()
     }
