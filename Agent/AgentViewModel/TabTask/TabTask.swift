@@ -418,7 +418,15 @@ extension AgentViewModel {
                     if hasToolUse && !toolResults.isEmpty {
                         messages.append(["role": "user", "content": toolResults])
                         tab.llmMessages = messages
-                    } else if !hasToolUse {
+                    } else {
+                        // No tool_use at all, OR tool_use blocks that produced no
+                        // results (server-side tools only). Both are effectively a
+                        // text-only turn and get the same treatment. The old separate
+                        // branch for the second case ended the task on bare
+                        // substrings ("task is complete", "task_complete", …) with
+                        // completionSummary = "Done" — and left the transcript ending
+                        // on an assistant turn.
+                        //
                         // Check if model wrote task_complete as text instead of a tool call.
                         // Only a fully-formed `task_complete(summary: "…")` / `done(summary: "…")`
                         // counts — a bare mention of the word is narration and falls
@@ -450,14 +458,6 @@ extension AgentViewModel {
                             "role": "user",
                             "content": "Continue with the next step. When you are completely done, call task_complete(summary: \"...\")."
                         ])
-                    } else {
-                        // Check if LLM signaled it's done via text even though it made tool calls
-                        let allText = response.content.compactMap { $0["text"] as? String }.joined().lowercased()
-                        let stopPhrases = ["no more content", "no further action", "task is complete", "nothing more to do", "task_complete"]
-                        if stopPhrases.contains(where: { allText.contains($0) }) && completionSummary.isEmpty {
-                            completionSummary = "Done"
-                            break mainLoop
-                        }
                     }
                 }
 
