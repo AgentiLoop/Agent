@@ -71,10 +71,22 @@ final class XcodeService: @unchecked Sendable {
 
     /// Build a project via ScriptingBridge. Blocks until build completes.
     /// Returns errors/warnings in file:line:col [Error] message format with code snippets.
-    nonisolated func buildProject(projectPath: String) -> String {
+    /// `folder`: when given, only an open project related to that folder is
+    /// built (see autoSelectProject). Used by the verify gate so a tab editing
+    /// a different repo isn't "verified" against the main project.
+    nonisolated func buildProject(projectPath: String, folder: String? = nil) -> String {
         AuditLog.log(.xcode, "build: \(projectPath)")
-        // Always auto-detect from open Xcode projects — ignore model's guessed path
-        let resolvedPath = autoSelectProject() ?? projectPath
+        let resolvedPath: String
+        if let folder, !folder.isEmpty {
+            guard let match = autoSelectProject(preferringFolder: folder) else {
+                return "Error: No open Xcode project under \(folder). Open it in Xcode first, "
+                    + "then retry xcode (action: build)."
+            }
+            resolvedPath = match
+        } else {
+            // Always auto-detect from open Xcode projects — ignore model's guessed path
+            resolvedPath = autoSelectProject() ?? projectPath
+        }
         guard isValidProjectPath(resolvedPath) else {
             return
                 "Error: Invalid project path '\(resolvedPath)'. "
@@ -276,14 +288,24 @@ final class XcodeService: @unchecked Sendable {
     }
 
     /// Auto-select the first open .xcodeproj project (not .xcworkspace wrappers).
-    private nonisolated func autoSelectProject() -> String? {
+    /// With `preferringFolder`, only open projects that live in that folder, a
+    /// parent of it, or a sub-folder of it qualify — so a verify build runs
+    /// against the project actually being edited, not whatever else Xcode has open.
+    private nonisolated func autoSelectProject(preferringFolder folder: String? = nil) -> String? {
         guard let xcode = xcodeApp() else { return nil }
         guard let documents = xcode.documents?() else { return nil }
+
+        let related: (String) -> Bool = { path in
+            guard let folder, !folder.isEmpty else { return true }
+            let dir = URL(fileURLWithPath: path).deletingLastPathComponent().standardizedFileURL.path
+            let f = URL(fileURLWithPath: folder).standardizedFileURL.path
+            return dir == f || f.hasPrefix(dir + "/") || dir.hasPrefix(f + "/")
+        }
 
         var projects: [String] = []
         for case let document as XcodeDocument in documents {
             guard let name = document.name, let path = document.path else { continue }
-            if name.hasSuffix(".xcodeproj") {
+            if name.hasSuffix(".xcodeproj"), related(path) {
                 projects.append(path)
             }
         }
@@ -292,7 +314,7 @@ final class XcodeService: @unchecked Sendable {
         // Fallback to any workspace
         for case let document as XcodeDocument in documents {
             guard let name = document.name, let path = document.path else { continue }
-            if name.hasSuffix(".xcworkspace") { return path }
+            if name.hasSuffix(".xcworkspace"), related(path) { return path }
         }
         return nil
     }

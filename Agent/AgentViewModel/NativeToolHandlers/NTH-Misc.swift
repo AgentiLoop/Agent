@@ -343,7 +343,15 @@ extension AgentViewModel {
         let editCommands = commandsRun.filter { cmd in editPrefixes.contains { cmd.hasPrefix($0) } }
         if autoVerifyEnabled && Self.isXcodeProject(projectFolder) && !editCommands.isEmpty {
             log("🔍 Verify gate: building before allowing completion...")
-            let buildResult = await Self.offMain { XcodeService.shared.buildProject(projectPath: "") }
+            // Build the project that belongs to THIS task's folder, not whatever
+            // Xcode happens to have open first (a tab on another repo used to be
+            // verified against the main project). No open project under the
+            // folder → "Error: …" which the check below treats as not-a-failure,
+            // same as Xcode-not-running.
+            let buildResult = await Self.offMain { XcodeService.shared.buildProject(projectPath: "", folder: projectFolder) }
+            if buildResult.hasPrefix("Error:") {
+                log("⚠️ Verify gate: skipped — \(buildResult.prefix(160))")
+            }
             if buildResult.contains("BUILD FAILED") || buildResult.contains("error:") {
                 // Extract first 5 errors
                 let errors = buildResult.components(separatedBy: "\n")
