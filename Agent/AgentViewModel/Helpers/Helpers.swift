@@ -344,7 +344,10 @@ extension AgentViewModel {
             case "apply": return ("apply_diff", newInput)
             case "list": return ("list_files", newInput)
             case "search": return ("search_files", newInput)
-            case "read_dir": return ("list_files", newInput)
+            // Dedicated handler (ToolDispatch.handleReadDir / File.swift "read_dir")
+            // honours detail:"more" → ls -la. Mapping to list_files silently
+            // dropped `detail` and returned a find-tree instead.
+            case "read_dir": return ("read_dir", newInput)
             case "if_to_switch": return ("if_to_switch", newInput)
             case "extract_function": return ("extract_function", newInput)
             case "undo": return ("undo_edit", newInput)
