@@ -399,7 +399,11 @@ extension AgentViewModel {
             case "switch_tab": return ("web_switch_tab", newInput)
             case "list_windows": return ("web_list_windows", newInput)
             case "scan": return ("web_scan", newInput)
-            case "search": return ("web_search", newInput)
+            // "search" is the safari tool's in-browser search. It used to map to
+            // "web_search", which is the name of the Tavily handler — so
+            // safari(action:"search", query:) silently ran a Tavily API search
+            // instead of searching in Safari. Route to the Safari leaf.
+            case "search": return ("web_google_search", newInput)
             default: return ("web_open", newInput)
             }
 
