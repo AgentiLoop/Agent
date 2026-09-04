@@ -238,8 +238,6 @@ extension AgentViewModel {
         case completeDoneSignal(summary: String)
         /// Text-only response with no completion signal — complete immediately.
         case completeTextOnly(summary: String)
-        /// Stop-phrase while tools ran — complete without a log line.
-        case completeStopPhrase
     }
 
     nonisolated static func turnDecision(
@@ -248,54 +246,42 @@ extension AgentViewModel {
         hasToolResults: Bool
     ) -> TurnDecision {
         if hasToolUse && hasToolResults { return .continueLoop }
-        if !hasToolUse {
-            // Only a fully-formed `task_complete(summary: "…")` / `done(summary: "…")`
-            // written as text counts as a completion command. A bare mention of the
-            // word ("I'll build, then call task_complete") is narration — fall through
-            // to the text-only nudge instead of ending the task with work undone.
-            if let match = responseText.range(
-                of: #"(?:task_complete|done)\(summary[=:]\s*"([^"]+)""#,
+        // Either no tool_use at all, or tool_use blocks that produced no results
+        // (server-side tools only, nothing dispatched). Both are effectively a
+        // text-only turn and get the same treatment: a fully-formed text
+        // task_complete completes, a done-signal completes with a summary,
+        // anything else is nudged once (completeTextOnly) rather than ended
+        // on a bare stop phrase like "let me know if" with an empty summary.
+
+        // Only a fully-formed `task_complete(summary: "…")` / `done(summary: "…")`
+        // written as text counts as a completion command. A bare mention of the
+        // word ("I'll build, then call task_complete") is narration — fall through
+        // to the text-only nudge instead of ending the task with work undone.
+        if let match = responseText.range(
+            of: #"(?:task_complete|done)\(summary[=:]\s*"([^"]+)""#,
+            options: .regularExpression
+        ) {
+            let raw = String(responseText[match])
+            let summary = raw.replacingOccurrences(
+                of: #"(?:task_complete|done)\(summary[=:]\s*""#,
+                with: "",
                 options: .regularExpression
-            ) {
-                let raw = String(responseText[match])
-                let summary = raw.replacingOccurrences(
-                    of: #"(?:task_complete|done)\(summary[=:]\s*""#,
-                    with: "",
-                    options: .regularExpression
-                ).replacingOccurrences(of: "\"", with: "")
-                return .completeTextCommand(summary: summary)
-            }
-            let lower = responseText.lowercased()
-            let doneSignals = [
-                "conclude this task",
-                "i'll conclude",
-                "task is complete",
-                "no further action",
-                "nothing more to do",
-                "no more content"
-            ]
-            if doneSignals.contains(where: { lower.contains($0) }) {
-                return .completeDoneSignal(summary: String(responseText.prefix(300)))
-            }
-            return .completeTextOnly(summary: String(responseText.prefix(300)))
+            ).replacingOccurrences(of: "\"", with: "")
+            return .completeTextCommand(summary: summary)
         }
-        // Tool calls happened but no results made it back — check stop phrases.
-        let allText = responseText.lowercased()
-        let stopPhrases = [
-            "no more content",
-            "no further action",
-            "task is complete",
-            "nothing more to do",
-            "task_complete",
+        let lower = responseText.lowercased()
+        let doneSignals = [
             "conclude this task",
             "i'll conclude",
-            "feel free to ask",
-            "let me know if"
+            "task is complete",
+            "no further action",
+            "nothing more to do",
+            "no more content"
         ]
-        if stopPhrases.contains(where: { allText.contains($0) }) {
-            return .completeStopPhrase
+        if doneSignals.contains(where: { lower.contains($0) }) {
+            return .completeDoneSignal(summary: String(responseText.prefix(300)))
         }
-        return .continueLoop
+        return .completeTextOnly(summary: String(responseText.prefix(300)))
     }
 
     /// / Post-tool-dispatch handling: append the assistant turn to the / conversation, append tool results on the user
@@ -371,8 +357,6 @@ extension AgentViewModel {
             dripDisplayIndex = rawLLMOutput.unicodeScalars.count
             appendLog("✅ Completed: \(summary)")
             flushLog()
-            return true
-        case .completeStopPhrase:
             return true
         }
     }

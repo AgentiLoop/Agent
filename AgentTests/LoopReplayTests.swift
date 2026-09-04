@@ -161,12 +161,19 @@ struct TurnDecisionTests {
         #expect(d == .completeTextOnly(summary: "The build setting lives in project.pbxproj."))
     }
 
-    @Test("stop phrase alongside tool calls completes silently")
-    func stopPhraseWithTools() {
-        let d = AgentViewModel.turnDecision(
+    @Test("tool calls with no results are treated like a text-only turn")
+    func toolUseWithoutResultsFallsThrough() {
+        // Done-signal phrasing still completes with a summary…
+        let signal = AgentViewModel.turnDecision(
             responseText: "Nothing more to do here.",
             hasToolUse: true, hasToolResults: false)
-        #expect(d == .completeStopPhrase)
+        guard case .completeDoneSignal = signal else { Issue.record("expected doneSignal, got \(signal)"); return }
+        // …but a bare stop phrase like "let me know if" no longer ends the task
+        // silently — it's nudged as text-only, same as a tool-less turn.
+        let bare = AgentViewModel.turnDecision(
+            responseText: "Let me know if you want anything else.",
+            hasToolUse: true, hasToolResults: false)
+        #expect(bare == .completeTextOnly(summary: "Let me know if you want anything else."))
     }
 }
 
