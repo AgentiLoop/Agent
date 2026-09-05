@@ -157,8 +157,7 @@ extension ActivityLogView.Coordinator {
             let looksLikeNumberedOutput = firstLine.range(of: #"^\s*\d+\s+"#, options: .regularExpression) != nil
             let isSourceCode = (lang.map { !shellLangs.contains($0.lowercased()) } ?? false) && !looksLikeNumberedOutput
             if isSourceCode {
-                let attach = NSTextAttachment()
-                attach.attachmentCell = makeOnMain { CopyButtonCell(codeText: code) }
+                let attach = makeAttachmentOnMain { [code] in CopyButtonCell(codeText: code) }
                 let rightPara = NSMutableParagraphStyle()
                 rightPara.alignment = .right
                 let copyStr = NSMutableAttributedString(attachment: attach)
@@ -371,8 +370,7 @@ extension ActivityLogView.Coordinator {
         // Horizontal rule (check before bullet since --- could conflict)
         if MarkdownPatterns.hrPattern?.firstMatch(in: line, range: fullRange) != nil {
             let result = NSMutableAttributedString()
-            let attachment = NSTextAttachment()
-            attachment.attachmentCell = makeOnMain { HRLineCell(color: .separatorColor) }
+            let attachment = makeAttachmentOnMain { HRLineCell(color: .separatorColor) }
             result.append(NSAttributedString(attachment: attachment))
             return result
         }
