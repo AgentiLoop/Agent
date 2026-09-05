@@ -90,9 +90,9 @@ extension ActivityLogView.Coordinator {
             .foregroundColor: NSColor.labelColor
         ]
 
-        // Strip ANSI escape codes from the text
+        // Strip ANSI escape codes from the text (skip the whole-string regex when there are none)
         let cleanText: String
-        if let rx = MarkdownPatterns.ansiEscapePattern {
+        if text.utf8.contains(0x1B), let rx = MarkdownPatterns.ansiEscapePattern {
             cleanText = rx.stringByReplacingMatches(
                 in: text,
                 range: NSRange(location: 0, length: (text as NSString).length),
@@ -103,13 +103,33 @@ extension ActivityLogView.Coordinator {
         }
 
         let nsText = cleanText as NSString
-        let fullRange = NSRange(location: 0, length: nsText.length)
-        let reporter = progress.map { RenderProgress(total: nsText.length, base: 0, report: $0) }
-        let imageMatches = MarkdownPatterns.imagePathPattern?.matches(in: cleanText, range: fullRange) ?? []
-        let htmlMatches = MarkdownPatterns.htmlPathPattern?.matches(in: cleanText, range: fullRange) ?? []
+        let total = nsText.length
+        let reporter = progress.map { RenderProgress(total: total, base: 0, report: $0) }
+        // The path scans are whole-string regex passes that report nothing on their own, and on a
+        // multi-MB log they run for seconds — so run them in newline-aligned chunks and give them
+        // the first slice of the bar. The markdown render owns the rest.
+        let scan = reporter?.phase(0, 0.15)
+        let render = reporter?.phase(0.15, 1)
+        scan?.consumed(0)
+        var imageMatches: [NSTextCheckingResult] = []
+        var htmlMatches: [NSTextCheckingResult] = []
+        let chunkSize = 65_536
+        var chunkStart = 0
+        while chunkStart < total {
+            var chunkEnd = min(chunkStart + chunkSize, total)
+            if chunkEnd < total {
+                let nl = nsText.range(of: "\n", options: .backwards, range: NSRange(location: chunkStart, length: chunkEnd - chunkStart))
+                if nl.location != NSNotFound, nl.location > chunkStart { chunkEnd = nl.location + 1 }
+            }
+            let chunk = NSRange(location: chunkStart, length: chunkEnd - chunkStart)
+            if let rx = MarkdownPatterns.imagePathPattern { imageMatches += rx.matches(in: cleanText, range: chunk) }
+            if let rx = MarkdownPatterns.htmlPathPattern { htmlMatches += rx.matches(in: cleanText, range: chunk) }
+            chunkStart = chunkEnd
+            scan?.consumed(chunkStart)
+        }
 
         guard !imageMatches.isEmpty || !htmlMatches.isEmpty else {
-            let rendered = renderMarkdown(cleanText, progress: reporter)
+            let rendered = renderMarkdown(cleanText, progress: render)
             return Self.styleTrimBanner(rendered, font: font)
         }
 
@@ -138,7 +158,7 @@ extension ActivityLogView.Coordinator {
         allMatches.sort { $0.range.location < $1.range.location }
 
         guard !allMatches.isEmpty else {
-            let rendered = renderMarkdown(cleanText, progress: reporter)
+            let rendered = renderMarkdown(cleanText, progress: render)
             return Self.styleTrimBanner(rendered, font: font)
         }
 
@@ -150,7 +170,7 @@ extension ActivityLogView.Coordinator {
             if match.range.location > lastEnd {
                 let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
                 let beforeText = nsText.substring(with: beforeRange)
-                result.append(renderMarkdown(beforeText, progress: reporter?.offset(by: lastEnd)))
+                result.append(renderMarkdown(beforeText, progress: render?.offset(by: lastEnd)))
             }
 
             // Add the path as a clickable link
@@ -170,7 +190,7 @@ extension ActivityLogView.Coordinator {
         // Add remaining text after last match
         if lastEnd < nsText.length {
             let remainingRange = NSRange(location: lastEnd, length: nsText.length - lastEnd)
-            result.append(renderMarkdown(nsText.substring(with: remainingRange), progress: reporter?.offset(by: lastEnd)))
+            result.append(renderMarkdown(nsText.substring(with: remainingRange), progress: render?.offset(by: lastEnd)))
         }
 
         return Self.styleTrimBanner(result, font: font)

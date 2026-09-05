@@ -83,10 +83,6 @@ extension ActivityLogView.Coordinator {
 
         // Detect source code output (e.g. from cat command) — look for Swift/code patterns Skip this heuristic if text
         // contains markdown indicators (headers, fences, bullets) to avoid treating markdown summaries with embedded code as raw code output
-        let hasMarkdownStructure = lines.contains { line in
-            let t = line.trimmingCharacters(in: .whitespaces)
-            return t.hasPrefix("#") || t.hasPrefix("```") || t.hasPrefix("- ") || t.hasPrefix("* ")
-        }
         let codeIndicators = [
             "import ",
             "func ",
@@ -102,8 +98,15 @@ extension ActivityLogView.Coordinator {
             "public ",
             "extension "
         ]
-        let codeLineCount = lines
-            .filter { line in codeIndicators.contains(where: { line.trimmingCharacters(in: .whitespaces).hasPrefix($0) }) }.count
+        // Single walk, one trim per line (was 14 trims per line — seconds on a big log), reporting as it goes.
+        var hasMarkdownStructure = false
+        var codeLineCount = 0
+        for (idx, line) in lines.enumerated() {
+            let t = line.trimmingCharacters(in: .whitespaces)
+            if t.hasPrefix("#") || t.hasPrefix("```") || t.hasPrefix("- ") || t.hasPrefix("* ") { hasMarkdownStructure = true }
+            if codeIndicators.contains(where: { t.hasPrefix($0) }) { codeLineCount += 1 }
+            if idx % 2000 == 0 { prep?.consumed(segLength / 4 * idx / max(lines.count, 1)) }
+        }
         let isCodeOutput = !hasMarkdownStructure && lines.count >= 3 && codeLineCount >= 2
 
         if isCodeOutput {
