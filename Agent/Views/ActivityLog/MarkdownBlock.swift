@@ -8,21 +8,44 @@ import AgentColorSyntax
 /// Progress reporting for a background full render (see `startAsyncFullRender`).
 /// The unit of progress is UTF-16 characters consumed of the whole log: `base` is
 /// the offset of the segment currently being rendered, `total` the full length.
-/// `report` is called from the render thread with a monotonic 0…1 fraction.
+/// That 0…1 char fraction is mapped into the `lower`…`upper` window so each render
+/// phase (ANSI strip, path scans, fence scan, line walk) owns a slice of the bar and
+/// the bar keeps moving from start to finish instead of sitting at 0 % while the
+/// whole-string passes run. `report` is called from the render thread.
 struct RenderProgress: Sendable {
     let total: Int
     let base: Int
+    let lower: Double
+    let upper: Double
     let report: @Sendable (Double) -> Void
+
+    init(total: Int, base: Int, lower: Double = 0, upper: Double = 1, report: @escaping @Sendable (Double) -> Void) {
+        self.total = total
+        self.base = base
+        self.lower = lower
+        self.upper = upper
+        self.report = report
+    }
 
     /// Same reporter, re-based for a sub-segment starting `delta` chars into this one.
     func offset(by delta: Int) -> RenderProgress {
-        RenderProgress(total: total, base: base + delta, report: report)
+        RenderProgress(total: total, base: base + delta, lower: lower, upper: upper, report: report)
+    }
+
+    /// Same reporter, restricted to the `from`…`to` slice (0…1) of this one's window.
+    func phase(_ from: Double, _ to: Double) -> RenderProgress {
+        let span = upper - lower
+        return RenderProgress(total: total, base: base, lower: lower + from * span, upper: lower + to * span, report: report)
     }
 
     /// Report that `localOffset` chars of the current segment are done.
     func consumed(_ localOffset: Int) {
-        report(min(1, Double(base + localOffset) / Double(max(total, 1))))
+        let fraction = min(1, Double(base + localOffset) / Double(max(total, 1)))
+        report(lower + fraction * (upper - lower))
     }
+
+    /// Chars between reports for the line walk — ~0.5 % of the log, never finer than 2 KB.
+    var charStride: Int { max(total / 200, 2048) }
 }
 
 extension ActivityLogView.Coordinator {
@@ -31,6 +54,11 @@ extension ActivityLogView.Coordinator {
             .font: font,
             .foregroundColor: NSColor.labelColor
         ]
+        // Whole-segment passes (line split, code heuristics, fence scan) own the first
+        // slice of this segment's bar window; the line walk gets the rest.
+        let prep = progress?.phase(0, 0.08)
+        let walk = progress?.phase(0.08, 1)
+        let segLength = (text as NSString).length
 
         // Check if the text is read_file output (strictly matches "NN |" at the start of lines)
         // This check MUST come before markdown processing to preserve backticks in code
@@ -49,6 +77,7 @@ extension ActivityLogView.Coordinator {
                 value: CodeBlockTheme.bg,
                 range: NSRange(location: 0, length: block.length)
             )
+            progress?.consumed(segLength)
             return block
         }
 
@@ -85,17 +114,28 @@ extension ActivityLogView.Coordinator {
                 value: CodeBlockTheme.bg,
                 range: NSRange(location: 0, length: block.length)
             )
+            progress?.consumed(segLength)
             return block
         }
+        // Line split + code heuristics are done — first visible movement for this segment.
+        prep?.consumed(segLength / 4)
 
         // Handle code fences (```lang\n...\n```) first
         guard let fenceRx = MarkdownPatterns.fencePattern else { return NSAttributedString(string: text, attributes: baseAttrs) }
         let nsText = text as NSString
         let fullRange = NSRange(location: 0, length: nsText.length)
-        let fences = fenceRx.matches(in: text, range: fullRange)
+        // Enumerate rather than `matches(in:)` so a fence-heavy multi-MB log reports as the
+        // scan advances instead of going quiet until the last match is found.
+        var fences: [NSTextCheckingResult] = []
+        fenceRx.enumerateMatches(in: text, range: fullRange) { match, _, _ in
+            guard let match else { return }
+            fences.append(match)
+            prep?.consumed(segLength / 4 + (match.range.location + match.range.length) * 3 / 4)
+        }
+        prep?.consumed(segLength)
 
         guard !fences.isEmpty else {
-            return renderInlineMarkdown(text, progress: progress)
+            return renderInlineMarkdown(text, progress: walk)
         }
 
         let result = NSMutableAttributedString()
@@ -104,7 +144,7 @@ extension ActivityLogView.Coordinator {
         for fence in fences {
             if fence.range.location > cursor {
                 let seg = nsText.substring(with: NSRange(location: cursor, length: fence.range.location - cursor))
-                result.append(renderInlineMarkdown(seg, progress: progress?.offset(by: cursor)))
+                result.append(renderInlineMarkdown(seg, progress: walk?.offset(by: cursor)))
             }
 
             let lang = fence.range(at: 1).length > 0 ? nsText.substring(with: fence.range(at: 1)) : nil
@@ -139,13 +179,13 @@ extension ActivityLogView.Coordinator {
             result.append(block)
 
             cursor = fence.range.location + fence.range.length
-            progress?.consumed(cursor)
+            walk?.consumed(cursor)
         }
 
         if cursor < nsText.length {
             result.append(renderInlineMarkdown(
                 nsText.substring(with: NSRange(location: cursor, length: nsText.length - cursor)),
-                progress: progress?.offset(by: cursor)
+                progress: walk?.offset(by: cursor)
             ))
         }
 
@@ -155,7 +195,8 @@ extension ActivityLogView.Coordinator {
     /// Splits text into lines and renders block-level markdown (headers, lists, rules, tables)
     /// then delegates inline rendering (bold, italic, code) per line.
     /// `progress` (background full renders only) is fed the running UTF-16 offset every
-    /// `progressLineStride` lines — this walk is where the bulk of render time goes.
+    /// `progressLineStride` lines or `charStride` chars (whichever comes first, so a few
+    /// huge lines still move the bar) — this walk is where the bulk of render time goes.
     nonisolated func renderInlineMarkdown(_ text: String, progress: RenderProgress? = nil) -> NSAttributedString {
         guard !text.isEmpty else { return NSAttributedString() }
 
@@ -165,7 +206,10 @@ extension ActivityLogView.Coordinator {
         // UTF-16 chars consumed so far (lines + the "\n" separators between them)
         var consumed = 0
         var linesSinceReport = 0
+        var consumedAtReport = 0
         let progressLineStride = 200
+        let progressCharStride = progress?.charStride ?? Int.max
+        progress?.consumed(0)
 
         while i < lines.count {
             // Detect markdown table blocks (consecutive lines starting with |)
@@ -183,9 +227,10 @@ extension ActivityLogView.Coordinator {
                     if let progress {
                         consumed += tableLines.reduce(0) { $0 + $1.utf16.count + 1 }
                         linesSinceReport += tableLines.count
-                        if linesSinceReport >= progressLineStride {
+                        if linesSinceReport >= progressLineStride || consumed - consumedAtReport >= progressCharStride {
                             progress.consumed(consumed)
                             linesSinceReport = 0
+                            consumedAtReport = consumed
                         }
                     }
                     i = j
@@ -201,13 +246,15 @@ extension ActivityLogView.Coordinator {
             if let progress {
                 consumed += lines[i].utf16.count + 1
                 linesSinceReport += 1
-                if linesSinceReport >= progressLineStride {
+                if linesSinceReport >= progressLineStride || consumed - consumedAtReport >= progressCharStride {
                     progress.consumed(consumed)
                     linesSinceReport = 0
+                    consumedAtReport = consumed
                 }
             }
             i += 1
         }
+        progress?.consumed(consumed)
 
         return result
     }
