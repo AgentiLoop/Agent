@@ -331,13 +331,13 @@ MIT — kostenlos und Open Source.
 >
 > ### Markenhinweis
 >
-> „🦾 Agent! for macOS26" ist ein unabhängiges Softwareprojekt und **nicht** mit Apple Inc. verbunden, von Apple genehmigt, gesponsert oder anderweitig assoziiert. „Apple", „Mac", „Mac mini", „MacBook", „macOS" und verwandte Marken sind Marken von Apple Inc., eingetragen in den USA und anderen Ländern. Alle anderen hier erwähnten Marken, Dienstleistungsmarken und Handelsnamen sind Eigentum ihrer jeweiligen Inhaber und werden nur zu Identifikationszwecken verwendet.
+> „AgentiLoop Agent! for Mac" ist ein unabhängiges Softwareprojekt und **nicht** mit Apple Inc. verbunden, von Apple genehmigt, gesponsert oder anderweitig assoziiert. „Apple", „Mac", „Mac mini", „MacBook", „macOS" und verwandte Marken sind Marken von Apple Inc., eingetragen in den USA und anderen Ländern. Alle anderen hier erwähnten Marken, Dienstleistungsmarken und Handelsnamen sind Eigentum ihrer jeweiligen Inhaber und werden nur zu Identifikationszwecken verwendet.
 >
 > „🦾 Agent!" und das 🦾-Agent!-Logo sind Marken von AgentiLoop Agent. Die Nutzung dieser Marken erfordert vorherige schriftliche Genehmigung. Die untenstehende MIT-Lizenz gewährt Rechte nur am Quellcode — sie gewährt **keine** Markenrechte.
 >
 > ### Quellcode-Lizenz (MIT)
 >
-> Der Quellcode von „🦾 Agent! for macOS26" ist Open Source und unter der **MIT-Lizenz** lizenziert. Es steht dir frei, Kopien des Quellcodes zu nutzen, zu kopieren, zu modifizieren, zusammenzuführen, zu veröffentlichen, zu verteilen, unterzulizenzieren und/oder zu verkaufen, vorbehaltlich der Bedingungen in der [LICENSE](./LICENSE)-Datei (Beibehaltung des Copyright-Hinweises und des MIT-Genehmigungshinweises in allen Kopien oder wesentlichen Teilen der Software).
+> Der Quellcode von „AgentiLoop Agent! for Mac" ist Open Source und unter der **MIT-Lizenz** lizenziert. Es steht dir frei, Kopien des Quellcodes zu nutzen, zu kopieren, zu modifizieren, zusammenzuführen, zu veröffentlichen, zu verteilen, unterzulizenzieren und/oder zu verkaufen, vorbehaltlich der Bedingungen in der [LICENSE](./LICENSE)-Datei (Beibehaltung des Copyright-Hinweises und des MIT-Genehmigungshinweises in allen Kopien oder wesentlichen Teilen der Software).
 >
 > ### Kompilierte Binärdateien & Releases
 >

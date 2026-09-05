@@ -331,13 +331,13 @@ MIT — gratis y de código abierto.
 >
 > ### Aviso de Marca Registrada
 >
-> "🦾 Agent! for macOS26" es un proyecto de software independiente y **no** está afiliado con, respaldado por, patrocinado por, ni asociado de ninguna otra forma con Apple Inc. "Apple," "Mac," "Mac mini," "MacBook," "macOS," y las marcas relacionadas son marcas registradas de Apple Inc., registradas en EE. UU. y otros países. Todas las demás marcas registradas, marcas de servicio y nombres comerciales mencionados aquí son propiedad de sus respectivos dueños y se usan solo con fines de identificación.
+> "AgentiLoop Agent! for Mac" es un proyecto de software independiente y **no** está afiliado con, respaldado por, patrocinado por, ni asociado de ninguna otra forma con Apple Inc. "Apple," "Mac," "Mac mini," "MacBook," "macOS," y las marcas relacionadas son marcas registradas de Apple Inc., registradas en EE. UU. y otros países. Todas las demás marcas registradas, marcas de servicio y nombres comerciales mencionados aquí son propiedad de sus respectivos dueños y se usan solo con fines de identificación.
 >
 > "🦾 Agent!" y el logo de 🦾 Agent! son marcas registradas de AgentiLoop Agent. El uso de estas marcas requiere permiso previo por escrito. La licencia MIT a continuación otorga derechos solo sobre el código fuente — **no** otorga ningún derecho de marca registrada.
 >
 > ### Licencia del Código Fuente (MIT)
 >
-> El código fuente de "🦾 Agent! for macOS26" es de código abierto y está licenciado bajo la **Licencia MIT**. Eres libre de usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender copias del código fuente, sujeto a las condiciones del archivo [LICENSE](./LICENSE) (conservar el aviso de copyright y el aviso de permiso MIT en todas las copias o partes sustanciales del software).
+> El código fuente de "AgentiLoop Agent! for Mac" es de código abierto y está licenciado bajo la **Licencia MIT**. Eres libre de usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender copias del código fuente, sujeto a las condiciones del archivo [LICENSE](./LICENSE) (conservar el aviso de copyright y el aviso de permiso MIT en todas las copias o partes sustanciales del software).
 >
 > ### Binarios Compilados y Releases
 >
