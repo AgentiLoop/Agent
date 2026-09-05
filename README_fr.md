@@ -331,13 +331,13 @@ MIT — gratuit et open source.
 >
 > ### Avis de Marque Déposée
 >
-> « 🦾 Agent! for macOS26 » est un projet logiciel indépendant et n'est **pas** affilié à, approuvé par, sponsorisé par, ni autrement associé à Apple Inc. « Apple », « Mac », « Mac mini », « MacBook », « macOS », et les marques associées sont des marques déposées d'Apple Inc., enregistrées aux États-Unis et dans d'autres pays. Toutes les autres marques déposées, marques de service et noms commerciaux mentionnés ici sont la propriété de leurs détenteurs respectifs et sont utilisés à des fins d'identification uniquement.
+> « AgentiLoop Agent! for Mac » est un projet logiciel indépendant et n'est **pas** affilié à, approuvé par, sponsorisé par, ni autrement associé à Apple Inc. « Apple », « Mac », « Mac mini », « MacBook », « macOS », et les marques associées sont des marques déposées d'Apple Inc., enregistrées aux États-Unis et dans d'autres pays. Toutes les autres marques déposées, marques de service et noms commerciaux mentionnés ici sont la propriété de leurs détenteurs respectifs et sont utilisés à des fins d'identification uniquement.
 >
 > « 🦾 Agent! » et le logo 🦾 Agent! sont des marques déposées de AgentiLoop Agent. L'utilisation de ces marques nécessite une autorisation écrite préalable. La licence MIT ci-dessous accorde des droits uniquement sur le code source — elle **n'accorde aucun** droit de marque.
 >
 > ### Licence du Code Source (MIT)
 >
-> Le code source de « 🦾 Agent! for macOS26 » est open source et sous licence **MIT**. Vous êtes libre d'utiliser, copier, modifier, fusionner, publier, distribuer, sous-licencier et/ou vendre des copies du code source, sous réserve des conditions du fichier [LICENSE](./LICENSE) (conserver l'avis de copyright et l'avis de permission MIT dans toutes les copies ou parties substantielles du logiciel).
+> Le code source de « AgentiLoop Agent! for Mac » est open source et sous licence **MIT**. Vous êtes libre d'utiliser, copier, modifier, fusionner, publier, distribuer, sous-licencier et/ou vendre des copies du code source, sous réserve des conditions du fichier [LICENSE](./LICENSE) (conserver l'avis de copyright et l'avis de permission MIT dans toutes les copies ou parties substantielles du logiciel).
 >
 > ### Binaires Compilés et Releases
 >
