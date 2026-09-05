@@ -15,6 +15,24 @@ nonisolated func makeOnMain<T: Sendable>(_ body: @MainActor () -> T) -> T {
     }
 }
 
+/// Builds an `NSTextAttachment` whose cell is created AND attached on the main thread.
+/// `NSTextAttachment.attachmentCell`'s setter calls `NSTextAttachmentCell.setAttachment:`,
+/// which the Main Thread Checker requires on main — so both steps must happen there.
+nonisolated func makeAttachmentOnMain(_ makeCell: @escaping @MainActor () -> NSTextAttachmentCell) -> NSTextAttachment {
+    nonisolated(unsafe) var attachment: NSTextAttachment?
+    let work: @MainActor () -> Void = {
+        let a = NSTextAttachment()
+        a.attachmentCell = makeCell()
+        attachment = a
+    }
+    if Thread.isMainThread {
+        MainActor.assumeIsolated(work)
+    } else {
+        DispatchQueue.main.sync { MainActor.assumeIsolated(work) }
+    }
+    return attachment!
+}
+
 /// Draws a solid horizontal line for markdown thematic breaks (---).
 class HRLineCell: NSTextAttachmentCell {
     let color: NSColor
