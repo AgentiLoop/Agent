@@ -333,7 +333,7 @@ MIT — gratuit et open source.
 >
 > « AgentiLoop Agent! for Mac » est un projet logiciel indépendant et n'est **pas** affilié à, approuvé par, sponsorisé par, ni autrement associé à Apple Inc. « Apple », « Mac », « Mac mini », « MacBook », « macOS », et les marques associées sont des marques déposées d'Apple Inc., enregistrées aux États-Unis et dans d'autres pays. Toutes les autres marques déposées, marques de service et noms commerciaux mentionnés ici sont la propriété de leurs détenteurs respectifs et sont utilisés à des fins d'identification uniquement.
 >
-> « 🦾 Agent! » et le logo 🦾 Agent! sont des marques déposées de AgentiLoop Agent. L'utilisation de ces marques nécessite une autorisation écrite préalable. La licence MIT ci-dessous accorde des droits uniquement sur le code source — elle **n'accorde aucun** droit de marque.
+> « AgentiLoop Agent! » et le logo AgentiLoop Agent! sont des marques déposées de AgentiLoop Agent. L'utilisation de ces marques nécessite une autorisation écrite préalable. La licence MIT ci-dessous accorde des droits uniquement sur le code source — elle **n'accorde aucun** droit de marque.
 >
 > ### Licence du Code Source (MIT)
 >
@@ -341,11 +341,11 @@ MIT — gratuit et open source.
 >
 > ### Binaires Compilés et Releases
 >
-> Les binaires compilés, installateurs, builds signés, et artefacts de release distribués via les GitHub Releases de ce projet, [AgentiLoop.ai](https://AgentiLoop.ai), ou tout autre canal officiel, sont l'œuvre protégée par le droit d'auteur de AgentiLoop Agent et **ne sont pas** couverts par la licence MIT qui régit le code source. Tous les droits sur les binaires officiels — y compris le nom « 🦾 Agent! », le logo, l'identité de signature de code, et le Developer ID — sont réservés.
+> Les binaires compilés, installateurs, builds signés, et artefacts de release distribués via les GitHub Releases de ce projet, [AgentiLoop.ai](https://AgentiLoop.ai), ou tout autre canal officiel, sont l'œuvre protégée par le droit d'auteur de AgentiLoop Agent et **ne sont pas** couverts par la licence MIT qui régit le code source. Tous les droits sur les binaires officiels — y compris le nom « AgentiLoop Agent! », le logo, l'identité de signature de code, et le Developer ID — sont réservés.
 >
 > Copyright © 2000, 2023–2026 AgentiLoop Agent, Tous Droits Réservés.
 >
-> Vous êtes libre de compiler vos propres binaires à partir des sources sous la licence MIT, à condition de ne pas utiliser le nom « 🦾 Agent! », le logo, ou la marque pour identifier votre produit.
+> Vous êtes libre de compiler vos propres binaires à partir des sources sous la licence MIT, à condition de ne pas utiliser le nom « AgentiLoop Agent! », le logo, ou la marque pour identifier votre produit.
 >
 > ### Clause de Non-Garantie
 >
@@ -353,7 +353,7 @@ MIT — gratuit et open source.
 >
 > ---
 >
-> Merci de votre intérêt pour 🦾 Agent! — une application conçue pour les ordinateurs Mac mini, MacBook, et Mac Studio fonctionnant sous macOS 26.4 ou ultérieur sur du matériel et logiciel Mac authentique.
+> Merci de votre intérêt pour AgentiLoop Agent! — une application conçue pour les ordinateurs Mac mini, MacBook, et Mac Studio fonctionnant sous macOS 26.4 ou ultérieur sur du matériel et logiciel Mac authentique.
 >
 > - Website: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent
