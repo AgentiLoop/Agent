@@ -269,7 +269,7 @@ extension AgentViewModel {
             // Tier 9.1: oversized output is spilled NOW, not only at compaction —
             // the model gets a preview + restore hint instead of 20K+ chars.
             if let full = toolResults[idx]["content"] as? String,
-               let preview = Self.persistOversizedResult(tool: tool.name, toolUseID: tool.toolId, content: full)
+               let preview = Self.persistOversizedResult(tool: tool.name, toolUseID: tool.toolId, content: full, input: tool.input)
             {
                 toolResults[idx]["content"] = preview
                 appendLog("💾 \(tool.name) output (\(full.count) chars) persisted — preview sent, restore_tool_result recovers it")
@@ -292,11 +292,11 @@ extension AgentViewModel {
 
     /// Spill `content` when it exceeds `persistResultChars` and return the
     /// preview block to send instead; nil when the result should go verbatim.
-    static func persistOversizedResult(tool: String, toolUseID: String, content: String) -> String? {
+    static func persistOversizedResult(tool: String, toolUseID: String, content: String, input: [String: Any] = [:]) -> String? {
         guard !persistExemptTools.contains(tool),
               content.count > persistResultChars,
               !content.hasPrefix("<persisted-output>") else { return nil }
-        ToolResultCache.spill(toolUseID: toolUseID, content: content)
+        ToolResultCache.spill(toolUseID: toolUseID, content: content, toolUse: ["name": tool, "input": input])
         guard ToolResultCache.restore(toolUseID: toolUseID) != nil else { return nil }
         let head = String(content.prefix(persistPreviewChars))
         return """

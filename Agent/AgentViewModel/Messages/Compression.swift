@@ -310,12 +310,22 @@ extension AgentViewModel {
 
         // The dropped middle may hold tool results the model will want back —
         // spill them so restore_tool_result still works after compaction.
+        // Block-array results (screenshots) are flattened to their text: this
+        // tier runs BEFORE microcompact, so nothing else would spill them.
+        let toolUses = toolUseIndex(messages)
         for msg in middle {
             guard let blocks = msg["content"] as? [[String: Any]] else { continue }
             for block in blocks where block["type"] as? String == "tool_result" {
-                if let content = block["content"] as? String {
-                    ToolResultCache.spill(toolUseID: block["tool_use_id"] as? String, content: content)
+                let id = block["tool_use_id"] as? String
+                let content: String
+                if let s = block["content"] as? String {
+                    content = s
+                } else if let nested = block["content"] as? [[String: Any]] {
+                    content = nested.compactMap { $0["text"] as? String }.joined(separator: "\n")
+                } else {
+                    continue
                 }
+                ToolResultCache.spill(toolUseID: id, content: content, toolUse: id.flatMap { toolUses[$0] })
             }
         }
         demoteOrphanToolResults(&tail)
@@ -519,20 +529,24 @@ extension AgentViewModel {
         "memory", "restore_tool_result", "spawn_agent", "tell_agent", "skill"
     ]
 
+    /// tool_use id → the originating `tool_use` block (name + input), so spills
+    /// can record provenance and protected results can be skipped.
+    static func toolUseIndex(_ messages: [[String: Any]]) -> [String: [String: Any]] {
+        var index: [String: [String: Any]] = [:]
+        for msg in messages where msg["role"] as? String == "assistant" {
+            guard let blocks = msg["content"] as? [[String: Any]] else { continue }
+            for block in blocks where block["type"] as? String == "tool_use" {
+                if let id = block["id"] as? String { index[id] = block }
+            }
+        }
+        return index
+    }
+
     static func microcompact(_ messages: inout [[String: Any]], keepRecent: Int = 3) {
         // No toggle gate — clearing stale tool results (spilled to ToolResultCache
         // first, so nothing is lost) is structural recovery, not an Apple
         // Intelligence feature.
-        // Map tool_use id → tool name so protected results can be skipped.
-        var toolNames: [String: String] = [:]
-        for msg in messages where msg["role"] as? String == "assistant" {
-            guard let blocks = msg["content"] as? [[String: Any]] else { continue }
-            for block in blocks where block["type"] as? String == "tool_use" {
-                if let id = block["id"] as? String, let name = block["name"] as? String {
-                    toolNames[id] = name
-                }
-            }
-        }
+        let toolUses = toolUseIndex(messages)
         // Find all tool_result indices
         var toolResultIndices: [(msgIdx: Int, blockIdx: Int)] = []
         for (i, msg) in messages.enumerated() {
@@ -540,7 +554,7 @@ extension AgentViewModel {
                 for (j, block) in blocks.enumerated() {
                     guard block["type"] as? String == "tool_result" else { continue }
                     if let id = block["tool_use_id"] as? String,
-                       let name = toolNames[id],
+                       let name = toolUses[id]?["name"] as? String,
                        microcompactProtectedTools.contains(name)
                     {
                         continue
@@ -568,14 +582,14 @@ extension AgentViewModel {
                 // Spill before clearing — otherwise this content is unrecoverable.
                 if let content = blocks[j]["content"] as? String {
                     let id = blocks[j]["tool_use_id"] as? String
-                    ToolResultCache.spill(toolUseID: id, content: content)
+                    ToolResultCache.spill(toolUseID: id, content: content, toolUse: id.flatMap { toolUses[$0] })
                     blocks[j]["content"] = clearedStub(content: content, toolUseID: id)
                 } else if let nested = blocks[j]["content"] as? [[String: Any]] {
                     // Flatten block-array content: spill the text, drop images.
                     let text = nested.compactMap { $0["text"] as? String }.joined(separator: "\n")
                     let imageCount = nested.filter { $0["type"] as? String == "image" }.count
                     let id = blocks[j]["tool_use_id"] as? String
-                    ToolResultCache.spill(toolUseID: id, content: text)
+                    ToolResultCache.spill(toolUseID: id, content: text, toolUse: id.flatMap { toolUses[$0] })
                     let header = imageCount > 0 ? "[\(imageCount) image(s) removed]\n" : ""
                     let recoverable = text.utf8.count >= ToolResultCache.minSpillBytes
                     blocks[j]["content"] = clearedStub(content: header + text, toolUseID: recoverable ? id : nil)

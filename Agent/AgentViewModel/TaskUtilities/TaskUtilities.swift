@@ -271,6 +271,7 @@ extension AgentViewModel {
         demoteOrphanToolResults(&recentMessages)
 
         // Build compact summary of middle messages
+        let toolUses = toolUseIndex(messages)
         var summaryLines: [String] = []
         for msg in middleMessages {
             let role = msg["role"] as? String ?? "?"
@@ -282,11 +283,19 @@ extension AgentViewModel {
                     if type == "tool_use", let name = block["name"] as? String {
                         summaryLines.append("tool: \(name)")
                     } else if type == "tool_result" {
-                        let content = block["content"] as? String ?? ""
+                        // Block-array (screenshot) results flatten to their text.
+                        let content: String
+                        if let s = block["content"] as? String {
+                            content = s
+                        } else if let nested = block["content"] as? [[String: Any]] {
+                            content = nested.compactMap { $0["text"] as? String }.joined(separator: "\n")
+                        } else {
+                            content = ""
+                        }
                         // Spill before destroying — same recovery path as
                         // microcompact, so pruning is no longer lossy.
                         let id = block["tool_use_id"] as? String
-                        ToolResultCache.spill(toolUseID: id, content: content)
+                        ToolResultCache.spill(toolUseID: id, content: content, toolUse: id.flatMap { toolUses[$0] })
                         let preview = content.hasPrefix("Error") ? String(content.prefix(100)) : "OK"
                         if let id, !id.isEmpty, content.utf8.count >= ToolResultCache.minSpillBytes {
                             summaryLines.append("result: \(preview) — recover via restore_tool_result(tool_use_id:\"\(id)\")")

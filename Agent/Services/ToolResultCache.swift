@@ -48,7 +48,10 @@ enum ToolResultCache {
 
     /// Write the full tool result to disk. No-op for short content or a missing id.
     /// Never overwrites — the first (uncompressed) version is the one worth keeping.
-    static func spill(toolUseID: String?, content: String) {
+    /// `toolUse` is the originating `tool_use` block (name + input); when given,
+    /// a `.meta` sidecar records provenance so `restore` can report what
+    /// produced the result and whether the source file changed since.
+    static func spill(toolUseID: String?, content: String, toolUse: [String: Any]? = nil) {
         guard let toolUseID, let name = fileName(for: toolUseID) else { return }
         guard content.utf8.count >= minSpillBytes else { return }
 
@@ -59,10 +62,23 @@ enum ToolResultCache {
         do {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
             try content.write(to: file, atomically: true, encoding: .utf8)
+            if let toolUse {
+                var meta: [String: Any] = ["spilled": Date().timeIntervalSince1970]
+                if let tool = toolUse["name"] as? String { meta["tool"] = tool }
+                if let input = toolUse["input"] as? [String: Any],
+                   JSONSerialization.isValidJSONObject(input) { meta["input"] = input }
+                if let data = try? JSONSerialization.data(withJSONObject: meta) {
+                    try? data.write(to: metaURL(for: name))
+                }
+            }
             evictIfNeeded(dir: dir)
         } catch {
             // Spilling is best-effort — a failure must never break compaction.
         }
+    }
+
+    private static func metaURL(for name: String) -> URL {
+        cacheDir().appendingPathComponent(String(name.dropLast(4)) + ".meta")
     }
 
     /// Evict oldest spill files until the cache is back under maxCacheBytes.
@@ -81,6 +97,7 @@ enum ToolResultCache {
         guard total > maxCacheBytes else { return }
         for e in entries.sorted(by: { $0.date < $1.date }) {
             try? fm.removeItem(at: e.url)
+            try? fm.removeItem(at: e.url.deletingPathExtension().appendingPathExtension("meta"))
             total -= e.size
             if total <= maxCacheBytes { break }
         }
@@ -90,6 +107,50 @@ enum ToolResultCache {
     static func restore(toolUseID: String) -> String? {
         guard let name = fileName(for: toolUseID) else { return nil }
         return try? String(contentsOf: cacheDir().appendingPathComponent(name), encoding: .utf8)
+    }
+
+    /// Age + provenance line(s) for a spilled result, for the model to judge
+    /// freshness: when it was captured, which tool produced it, and — for file
+    /// reads — whether the file on disk changed after the capture. A restored
+    /// result preserves bytes, not currency; this header keeps the model from
+    /// presenting an old read as current evidence.
+    static func provenanceHeader(toolUseID: String) -> String? {
+        guard let name = fileName(for: toolUseID) else { return nil }
+        let txt = cacheDir().appendingPathComponent(name)
+        let spilledAt = (try? txt.resourceValues(forKeys: [.contentModificationDateKey]))?
+            .contentModificationDate
+        var tool = "unknown tool"
+        var input: [String: Any] = [:]
+        var captured = spilledAt
+        if let data = try? Data(contentsOf: metaURL(for: name)),
+           let meta = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        {
+            if let t = meta["tool"] as? String { tool = t }
+            if let i = meta["input"] as? [String: Any] { input = i }
+            if let s = meta["spilled"] as? Double { captured = Date(timeIntervalSince1970: s) }
+        }
+        var lines: [String] = []
+        var desc = "[restored tool result \(toolUseID) — produced by \(tool)"
+        if let path = input["file_path"] as? String ?? input["path"] as? String { desc += " on \(path)" }
+        if let captured { desc += ", captured \(ageString(since: captured))" }
+        lines.append(desc + "]")
+
+        if let captured,
+           let path = input["file_path"] as? String ?? input["path"] as? String,
+           let mtime = (try? FileManager.default.attributesOfItem(atPath: path))?[.modificationDate] as? Date,
+           mtime > captured
+        {
+            lines.append("[⚠️ STALE: \(path) was modified \(ageString(since: mtime)), AFTER this result was captured. "
+                + "The content below is the OLD version — re-read the file if you need current contents.]")
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    private static func ageString(since date: Date) -> String {
+        let secs = Int(Date().timeIntervalSince(date))
+        if secs < 60 { return "\(secs)s ago" }
+        if secs < 3_600 { return "\(secs / 60)m ago" }
+        return "\(secs / 3_600)h \(secs % 3_600 / 60)m ago"
     }
 
     /// Every spilled id currently on disk, for listing in the restore tool's error text.
