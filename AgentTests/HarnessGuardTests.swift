@@ -478,5 +478,51 @@ struct StreamPrefetchTests {
         #expect(byId.count == 2)
         #expect(orphan.isCancelled)
     }
+
+    // MARK: - Recoverable compaction: restore provenance + stale detection
+
+    @Test("Restoring a spilled read after the file changed is flagged STALE")
+    func restoreAfterEditIsStale() {
+        let dir = tempDir()
+        defer { try? FileManager.default.removeItem(atPath: dir) }
+        ToolResultCache.setProjectFolder(dir)
+        defer { ToolResultCache.clear(); ToolResultCache.setProjectFolder(nil) }
+
+        let path = dir + "/source.swift"
+        let original = String(repeating: "let x = 1\n", count: 40)
+        try! original.write(toFile: path, atomically: true, encoding: .utf8)
+
+        // 1. Spill the read (what compaction does before truncating).
+        let id = "toolu_stale_\(UUID().uuidString.prefix(8))"
+        ToolResultCache.spill(toolUseID: id, content: original,
+                              toolUse: ["name": "read_file", "input": ["file_path": path]])
+
+        // Fresh: restore returns bytes + provenance, no STALE flag.
+        #expect(ToolResultCache.restore(toolUseID: id) == original)
+        let fresh = ToolResultCache.provenanceHeader(toolUseID: id) ?? ""
+        #expect(fresh.contains("produced by read_file"))
+        #expect(fresh.contains(path))
+        #expect(!fresh.contains("STALE"))
+
+        // 2. Modify the file after the capture (push mtime clearly past the spill time).
+        try! (original + "let y = 2\n").write(toFile: path, atomically: true, encoding: .utf8)
+        try! FileManager.default.setAttributes([.modificationDate: Date().addingTimeInterval(5)],
+                                               ofItemAtPath: path)
+
+        // 3. Restore still yields the OLD bytes, but the header warns it's stale.
+        #expect(ToolResultCache.restore(toolUseID: id) == original)
+        let stale = ToolResultCache.provenanceHeader(toolUseID: id) ?? ""
+        #expect(stale.contains("STALE"))
+        #expect(stale.contains("re-read the file"))
+    }
+
+    @Test("Restore of a never-spilled id is a cache miss")
+    func restoreUnknownIDIsNil() {
+        let dir = tempDir()
+        defer { try? FileManager.default.removeItem(atPath: dir) }
+        ToolResultCache.setProjectFolder(dir)
+        defer { ToolResultCache.setProjectFolder(nil) }
+        #expect(ToolResultCache.restore(toolUseID: "toolu_never_spilled") == nil)
+    }
 }
 
