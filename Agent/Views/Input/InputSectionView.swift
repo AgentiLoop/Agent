@@ -104,7 +104,7 @@ struct InputSectionView: View {
                     axis: .vertical
                 )
                 .textFieldStyle(.plain)
-                .font(.system(size: 14, design: .rounded))
+                .font(.system(size: 14))
                 .padding(.vertical, 5)
                 .padding(.horizontal, 7)
                 .background(Color(nsColor: .controlBackgroundColor))
@@ -198,7 +198,7 @@ struct InputSectionView: View {
                 TextField("Enter task...", text: $viewModel.taskInput, axis: .vertical)
                     .focused($isTaskFieldFocused)
                     .textFieldStyle(.plain)
-                    .font(.system(size: 14, design: .rounded))
+                    .font(.system(size: 14))
                     .padding(.vertical, 5)
                     .padding(.horizontal, 7)
                     .background(Color(nsColor: .controlBackgroundColor))
