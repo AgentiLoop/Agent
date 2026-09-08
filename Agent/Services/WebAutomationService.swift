@@ -374,8 +374,8 @@ final class WebAutomationService: @unchecked Sendable {
             )
         }
         
-        // Check if found
-        if result.contains("\"success\": true") {
+        // Check if found (successJSON emits compact `"success":true` — parse, don't substring-match)
+        if AccessibilityService.isSuccessJSON(result) {
             // Parse JSON result
             if let data = result.data(using: .utf8),
                let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
