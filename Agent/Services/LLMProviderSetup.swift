@@ -1,3 +1,4 @@
+import Foundation
 import AgentLLM
 
 /// All Agent! LLM provider configurations — defined in the app, not the package.
