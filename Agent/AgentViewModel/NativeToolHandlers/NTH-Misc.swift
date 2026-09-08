@@ -48,13 +48,19 @@ extension AgentViewModel {
             let id = input["tool_use_id"] as? String ?? ""
             guard !id.isEmpty else { return "Error: 'tool_use_id' is required." }
             if let restored = ToolResultCache.restore(toolUseID: id) {
+                // Age + provenance first: a restored result preserves bytes,
+                // not currency. Flag file reads whose file changed since.
+                if let header = ToolResultCache.provenanceHeader(toolUseID: id) {
+                    return header + "\n\n" + restored
+                }
                 return restored
             }
             let available = ToolResultCache.availableIDs()
             if available.isEmpty {
                 return "No spilled tool result for '\(id)'. Nothing has been compacted yet."
             }
-            return "No spilled tool result for '\(id)'. Available ids:\n"
+            return "No spilled tool result for '\(id)' — it was never spilled, or was evicted from the "
+                + "\(ToolResultCache.maxCacheBytes / 1_000_000)MB project cache. Re-run the original tool. Available ids:\n"
                 + available.joined(separator: "\n")
         // Skills — reusable prompt templates
         case "invoke_skill":
