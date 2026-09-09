@@ -326,6 +326,7 @@ private struct FolderTreePopover: View {
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .clipShape(Capsule())
+                .help("Done")
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)

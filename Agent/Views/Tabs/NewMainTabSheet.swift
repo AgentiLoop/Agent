@@ -248,6 +248,7 @@ struct NewMainTabSheet: View {
             .buttonStyle(.bordered)
             .controlSize(.small)
             .disabled(isFetching)
+            .help("Refresh Models")
         }
     }
 
@@ -277,6 +278,7 @@ struct NewMainTabSheet: View {
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
+            .help("Refresh Ollama Models")
         }
     }
 

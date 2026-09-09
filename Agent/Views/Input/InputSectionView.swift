@@ -88,6 +88,7 @@ struct InputSectionView: View {
                     .buttonStyle(.borderedProminent)
                     .clipShape(Capsule())
                     .controlSize(.small)
+                    .help("Run task")
                     .accessibilityLabel("Run task")
                     .disabled(tab.taskInput.isEmpty || {
                         let provider = tab.llmConfig?.provider ?? viewModel.selectedProvider
@@ -191,6 +192,7 @@ struct InputSectionView: View {
                     .buttonStyle(.borderedProminent)
                     .clipShape(Capsule())
                     .controlSize(.small)
+                    .help("Run task")
                     .accessibilityLabel("Run task")
                     .disabled(viewModel.taskInput.isEmpty || (viewModel.selectedProvider == .claude && viewModel.apiKey.isEmpty))
                 }

@@ -94,6 +94,7 @@ private struct TabItem: View {
                 }
                 .buttonStyle(.plain)
                 .opacity(isHovering || isSelected || isRunning ? 1 : 0)
+                .help("Close Tab")
             }
             if isRunning {
                 ProgressView()
