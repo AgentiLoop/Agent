@@ -53,15 +53,19 @@ final class OpenAICompatibleService {
     /// the error and the user turns it off.
     var reasoningEffort: String = ""
 
-    /// Value actually sent as `reasoning_effort`, or nil to omit the key.
-    /// Reasoning "Off" must be an explicit `"none"` for real OpenAI: newer models
-    /// (gpt-6-astra) default to a non-none effort server-side and reject function
-    /// tools on /v1/chat/completions unless `reasoning_effort` is "none".
-    /// Other OpenAI-compatible providers may reject unknown values, so they keep
-    /// omitting the key when reasoning is off.
-    private var effectiveReasoningEffort: String? {
-        if !reasoningEffort.isEmpty { return reasoningEffort }
-        return provider == .openAI ? "none" : nil
+    /// Real OpenAI goes through `/v1/responses`. Current OpenAI models
+    /// (gpt-6-astra) reject function tools on `/v1/chat/completions` unless
+    /// `reasoning_effort` is "none" — and then reject "none" as unsupported —
+    /// so chat/completions is a dead end for tool use. Responses accepts tools
+    /// with reasoning on or off. Other OpenAI-compatible providers keep
+    /// chat/completions.
+    private var usesResponsesAPI: Bool { provider == .openAI && !isNativeFormat }
+
+    /// `/v1/chat/completions` → `/v1/responses` on the configured host.
+    private var responsesURL: URL {
+        let s = baseURL.absoluteString
+        guard let range = s.range(of: "/chat/completions") else { return baseURL }
+        return URL(string: s.replacingCharacters(in: range, with: "/responses")) ?? baseURL
     }
     var compactTools: Bool = false
     /// Key name for the messages array in the request body.
@@ -431,6 +435,9 @@ final class OpenAICompatibleService {
     ) async throws
         -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int)
     {
+        if usesResponsesAPI {
+            return try await sendViaResponses(messages: messages, activeGroups: activeGroups, onTextDelta: { _ in })
+        }
         await enforceRateLimit()
         let payload = buildMessagesPayload(messages)
 
@@ -442,7 +449,7 @@ final class OpenAICompatibleService {
         ]
         if !isNativeFormat {
             if maxTokens > 0 { body["max_tokens"] = maxTokens }
-            if let effort = effectiveReasoningEffort { body["reasoning_effort"] = effort }
+            if !reasoningEffort.isEmpty { body["reasoning_effort"] = reasoningEffort }
             let toolDefs = toolsForIteration(messages, activeGroups: activeGroups)
             if !toolDefs.isEmpty {
                 body["tools"] = toolDefs
@@ -466,6 +473,9 @@ final class OpenAICompatibleService {
         activeGroups: Set<String>? = nil,
         onTextDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
+        if usesResponsesAPI {
+            return try await sendViaResponses(messages: messages, activeGroups: activeGroups, onTextDelta: onTextDelta)
+        }
         await enforceRateLimit()
         let payload = buildMessagesPayload(messages)
 
@@ -477,7 +487,7 @@ final class OpenAICompatibleService {
         ]
         if !isNativeFormat {
             if maxTokens > 0 { body["max_tokens"] = maxTokens }
-            if let effort = effectiveReasoningEffort { body["reasoning_effort"] = effort }
+            if !reasoningEffort.isEmpty { body["reasoning_effort"] = reasoningEffort }
             let toolDefs = toolsForIteration(messages, activeGroups: activeGroups)
             if !toolDefs.isEmpty {
                 body["tools"] = toolDefs
@@ -498,6 +508,66 @@ final class OpenAICompatibleService {
             onTextDelta: onTextDelta
         )
     }
+    // MARK: - OpenAI Responses API
+
+    /// OpenAI `/v1/responses` with an API key. Reuses CodexService's
+    /// message/tool converters and SSE parser — same wire format, different
+    /// host and auth. Reasoning "Off" omits `reasoning` entirely (model
+    /// default); Low/Medium/High map to `reasoning.effort`.
+    private func sendViaResponses(
+        messages: [[String: Any]],
+        activeGroups: Set<String>? = nil,
+        onTextDelta: @escaping @Sendable (String) -> Void
+    ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
+        await enforceRateLimit()
+        ToolResultCache.setProjectFolder(projectFolder)
+        let toolDefs = AgentTools.claudeFormat(
+            activeGroups: activeGroups,
+            compact: compactTools,
+            projectFolder: projectFolder
+        )
+        var body: [String: Any] = [
+            "model": model,
+            "instructions": systemPrompt,
+            "input": CodexService.buildInput(withFolderPrefix(messages)),
+            "store": false,
+            "stream": true
+        ]
+        // 1.0 is OpenAI's default; sending it explicitly trips reasoning models
+        // that reject any `temperature` value.
+        if temperature != 1.0 { body["temperature"] = temperature }
+        if maxTokens > 0 { body["max_output_tokens"] = maxTokens }
+        if !reasoningEffort.isEmpty {
+            body["reasoning"] = ["effort": reasoningEffort, "summary": "auto"]
+        }
+        let tools = CodexService.buildTools(toolDefs, includeNative: false)
+        if !tools.isEmpty {
+            body["tools"] = tools
+            body["tool_choice"] = "auto"
+        }
+        let bodyData = try JSONSerialization.data(withJSONObject: body, options: [.sortedKeys])
+
+        var request = URLRequest(url: responsesURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.httpBody = bodyData
+        request.timeoutInterval = llmAPITimeout
+
+        let (bytes, response) = try await URLSession.shared.bytes(for: request)
+        guard let http = response as? HTTPURLResponse else { throw AgentError.invalidResponse }
+        guard http.statusCode == 200 else {
+            await LLMRateLimiter.shared.recordIfRateLimited(http, provider: provider.rawValue)
+            var errBody = ""
+            for try await line in bytes.lines { errBody += line + "\n"; if errBody.count > 1200 { break } }
+            AuditLog.log(.api, "OpenAI /responses \(http.statusCode): \(errBody.prefix(800))")
+            throw AgentError.apiError(statusCode: http.statusCode, message: errBody)
+        }
+        return try await CodexService.parseResponsesStream(bytes, onDelta: { onTextDelta($0) })
+    }
+
+
 
     // MARK: - Non-Streaming Request
 
