@@ -22,6 +22,15 @@ enum LogLimits {
     /// resolution). Keeps the merged-config block from blowing up the prompt.
     static let configMergeChars = 4_000
 
+    /// Cap for the chat-history block injected into the system prompt
+    /// (`ChatHistoryStore.buildLLMContext`). The recent task's full activity
+    /// log used to go in uncapped — a big prior task produced a multi-MB
+    /// system prompt that message compaction/pruning could never shrink.
+    static let historyContextChars = 40_000
+
+    /// Per-line cap for older-task prompt/summary lines in that block.
+    static let historyLineChars = 500
+
     // MARK: - Shared trim helper
 
     /// Trim text to cap chars with a truncation banner if over.
