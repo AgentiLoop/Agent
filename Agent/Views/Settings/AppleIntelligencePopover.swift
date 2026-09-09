@@ -93,7 +93,7 @@ struct AppleIntelligencePopover: View {
                         VStack(alignment: .leading) {
                             Text("Token compression")
                                 .font(.caption)
-                            Text("Tier 1 of context compaction — Apple AI summarizes old messages on-device when context exceeds 30K tokens. Free, private, no API tokens consumed")
+                            Text("Fallback tier of context compaction — when the active model can't produce a summary (or for sub-agents), Apple AI summarizes old messages on-device at the model's context threshold. Free, private, no API tokens consumed")
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }

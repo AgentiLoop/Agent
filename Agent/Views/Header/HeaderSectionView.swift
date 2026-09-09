@@ -103,6 +103,7 @@ struct HeaderToolbarButtons: View {
                 .foregroundStyle(llmIconColor)
                 .symbolEffect(.pulse, isActive: isLLMActive)
         }
+        .help("LLM Settings: \(isLLMActive ? "Active" : "Idle")")
         .accessibilityLabel("LLM Settings")
         .accessibilityValue(isLLMActive ? "Active" : "Idle")
         .popover(isPresented: $showSettings, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
@@ -123,6 +124,7 @@ struct HeaderToolbarButtons: View {
             Image(systemName: "clock.arrow.circlepath")
                 .foregroundStyle(viewModel.historyIconColor)
         }
+        .help("History: Prompts, Errors & Task Summaries")
         .accessibilityLabel("History")
         .popover(isPresented: $showHistory, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
             HistoryView(
@@ -160,6 +162,7 @@ struct HeaderToolbarButtons: View {
             Image(systemName: "wrench.and.screwdriver")
                 .foregroundStyle(viewModel.toolsIconColor)
         }
+        .help("Tools: Enable / Disable Agent Tools")
         .accessibilityLabel("Tools")
         .popover(isPresented: $showTools, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
             ToolsView(selectedProvider: $viewModel.selectedProvider, viewModel: viewModel)
@@ -169,6 +172,7 @@ struct HeaderToolbarButtons: View {
             Image(systemName: "slider.horizontal.3")
                 .foregroundStyle(.green)
         }
+        .help("Agent Options")
         .accessibilityLabel("Options")
         .popover(isPresented: $showOptions, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
             AgentOptionsView(viewModel: viewModel)
@@ -212,6 +216,7 @@ struct HeaderToolbarButtons: View {
             Image(systemName: "server.rack")
                 .foregroundStyle(viewModel.mcpIconColor)
         }
+        .help("MCP Servers")
         .accessibilityLabel("MCP Servers")
         .popover(isPresented: $showMCPServers, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
             MCPServersView()
@@ -242,6 +247,7 @@ struct HeaderToolbarButtons: View {
             Image(systemName: "hand.raised")
                 .foregroundStyle(viewModel.accessibilityIconColor)
         }
+        .help("Accessibility Settings")
         .accessibilityLabel("Accessibility")
         .popover(isPresented: $showAccessibility, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
             AccessibilitySettingsView()
@@ -261,6 +267,7 @@ struct HeaderToolbarButtons: View {
             Image(systemName: "trash")
                 .foregroundStyle(.primary)
         }
+        .help(viewModel.selectedTabId != nil ? "Clear This Tab's Log" : "Clear All Task History")
         .accessibilityLabel("Clear Log")
         .alert("Clear Log", isPresented: $showClearConfirm) {
             Button("Clear", role: .destructive) { viewModel.clearSelectedLog() }
