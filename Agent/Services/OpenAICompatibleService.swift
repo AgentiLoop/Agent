@@ -52,6 +52,17 @@ final class OpenAICompatibleService {
     /// Opt-in via the Reasoning setting — providers that reject the param surface
     /// the error and the user turns it off.
     var reasoningEffort: String = ""
+
+    /// Value actually sent as `reasoning_effort`, or nil to omit the key.
+    /// Reasoning "Off" must be an explicit `"none"` for real OpenAI: newer models
+    /// (gpt-6-astra) default to a non-none effort server-side and reject function
+    /// tools on /v1/chat/completions unless `reasoning_effort` is "none".
+    /// Other OpenAI-compatible providers may reject unknown values, so they keep
+    /// omitting the key when reasoning is off.
+    private var effectiveReasoningEffort: String? {
+        if !reasoningEffort.isEmpty { return reasoningEffort }
+        return provider == .openAI ? "none" : nil
+    }
     var compactTools: Bool = false
     /// Key name for the messages array in the request body.
     /// OpenAI uses "messages", LM Studio Native uses "input".
@@ -431,7 +442,7 @@ final class OpenAICompatibleService {
         ]
         if !isNativeFormat {
             if maxTokens > 0 { body["max_tokens"] = maxTokens }
-            if !reasoningEffort.isEmpty { body["reasoning_effort"] = reasoningEffort }
+            if let effort = effectiveReasoningEffort { body["reasoning_effort"] = effort }
             let toolDefs = toolsForIteration(messages, activeGroups: activeGroups)
             if !toolDefs.isEmpty {
                 body["tools"] = toolDefs
@@ -466,7 +477,7 @@ final class OpenAICompatibleService {
         ]
         if !isNativeFormat {
             if maxTokens > 0 { body["max_tokens"] = maxTokens }
-            if !reasoningEffort.isEmpty { body["reasoning_effort"] = reasoningEffort }
+            if let effort = effectiveReasoningEffort { body["reasoning_effort"] = effort }
             let toolDefs = toolsForIteration(messages, activeGroups: activeGroups)
             if !toolDefs.isEmpty {
                 body["tools"] = toolDefs
