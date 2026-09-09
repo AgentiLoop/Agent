@@ -103,6 +103,7 @@ struct FallbackChainView: View {
                                     .foregroundStyle(.red.opacity(0.7))
                             }
                             .buttonStyle(.plain)
+                            .help("Remove from Fallback Chain")
                         }
                         .padding(.vertical, 6)
                         .padding(.horizontal)
@@ -160,6 +161,7 @@ struct FallbackChainView: View {
                             .foregroundStyle(.green)
                     }
                     .buttonStyle(.plain)
+                    .help("Add to Fallback Chain")
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal)

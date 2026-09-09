@@ -265,6 +265,7 @@ struct MCPServersView: View {
                     Image(systemName: "pencil")
                 }
                 .buttonStyle(.bordered).controlSize(.mini)
+                .help("Edit server")
 
                 Button(role: .destructive) {
                     let serverId = server.id
@@ -276,6 +277,7 @@ struct MCPServersView: View {
                     Image(systemName: "trash")
                 }
                 .buttonStyle(.bordered).controlSize(.mini)
+                .help("Remove server")
             }
         }
         .padding(8)

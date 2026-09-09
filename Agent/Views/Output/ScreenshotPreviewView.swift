@@ -30,6 +30,7 @@ struct ScreenshotPreviewView: View {
                         }
                         .buttonStyle(.plain)
                         .offset(x: 4, y: -4)
+                        .help("Remove Image")
                     }
                 }
                 Text("\(images.count) image(s)")

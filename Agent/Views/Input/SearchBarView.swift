@@ -37,6 +37,7 @@ struct SearchBarView: View {
                 .clipShape(Capsule())
                 .controlSize(.small)
                 .disabled(searchText.isEmpty || totalMatches == 0)
+                .help("Previous Match")
 
                 Button { nextMatch() } label: {
                     Image(systemName: "chevron.down")
@@ -46,6 +47,7 @@ struct SearchBarView: View {
                 .clipShape(Capsule())
                 .controlSize(.small)
                 .disabled(searchText.isEmpty || totalMatches == 0)
+                .help("Next Match")
 
                 Button { onClose() } label: {
                     Image(systemName: "xmark.circle.fill")
@@ -55,6 +57,7 @@ struct SearchBarView: View {
                 .buttonStyle(.bordered)
                 .clipShape(Capsule())
                 .controlSize(.small)
+                .help("Close Search")
 
                 Text(searchText.isEmpty ? "" : (totalMatches > 0 ? "\(currentMatchIndex + 1)/\(totalMatches)" : "0 results"))
                     .font(.caption)
