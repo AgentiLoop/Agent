@@ -103,9 +103,16 @@ extension AgentViewModel {
             // even pruning can't help — either way, retrying is futile.
             timeoutRetryCount += 1
             if !didShrink || timeoutRetryCount > 3 {
+                // Tiny transcript + overflow = the bloat is outside `messages`
+                // (system prompt: chat history, config, tool schemas) — pruning
+                // can never fix that, so say so instead of "didn't help".
+                let remaining = Self.estimateTokens(messages: messages)
+                let hint = remaining < 5_000
+                    ? "\nTranscript is only ~\(remaining) tokens — the overflow is in the system prompt (chat history / config), not the messages. Clearing chat history will resolve it."
+                    : ""
                 appendLog(
                     """
-                    ⚠️ Context overflow — pruning to \(messages.count) messages didn't help. Stopping.
+                    ⚠️ Context overflow — pruning to \(messages.count) messages didn't help. Stopping.\(hint)
                     Original error: \(errMsg.prefix(300))
                     """
                 )

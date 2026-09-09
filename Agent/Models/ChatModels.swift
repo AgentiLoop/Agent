@@ -368,34 +368,38 @@ final class ChatHistoryStore {
         let olderTasks = allTasks.dropFirst(recentFullTasks).prefix(maxOlderSummaries).reversed()
         for task in olderTasks {
             let time = formatter.string(from: task.startTime)
+            let prompt = String(task.prompt.prefix(LogLimits.historyLineChars))
             if let summary = task.summary, !summary.isEmpty {
-                result += "[\(time)] Task: \(task.prompt) → \(summary)\n"
+                result += "[\(time)] Task: \(prompt) → \(summary.prefix(LogLimits.historyLineChars))\n"
             } else {
-                result += "[\(time)] Task: \(task.prompt)\n"
+                result += "[\(time)] Task: \(prompt)\n"
             }
         }
 
-        // Most recent task(s): include full messages so the LLM has detailed context
-        let recentTasks = allTasks.prefix(recentFullTasks).reversed()
-        for task in recentTasks {
-            result += "--- Recent Task ---\n"
-            result += "[\(formatter.string(from: task.startTime))] Task: \(task.prompt)\n"
+        // Most recent task(s): include full messages so the LLM has detailed context.
+        // Capped — this block lives in the system prompt, where neither compaction
+        // nor overflow pruning can reach it. Keep the TAIL (newest lines).
+        for task in allTasks.prefix(recentFullTasks).reversed() {
+            var body = ""
             let sorted = task.messages.sorted {
                 if $0.ordinal != $1.ordinal { return $0.ordinal < $1.ordinal }
                 return $0.timestamp < $1.timestamp
             }
             for msg in sorted {
-                if msg.isStreaming {
-                    result += msg.content
-                } else {
-                    result += msg.content
-                    if !msg.content.hasSuffix("\n") {
-                        result += "\n"
-                    }
+                body += msg.content
+                if !msg.isStreaming, !msg.content.hasSuffix("\n") {
+                    body += "\n"
                 }
             }
+            if body.count > LogLimits.historyContextChars {
+                let dropped = body.count - LogLimits.historyContextChars
+                body = "[... \(dropped) chars of earlier log omitted]\n" + String(body.suffix(LogLimits.historyContextChars))
+            }
+            result += "--- Recent Task ---\n"
+            result += "[\(formatter.string(from: task.startTime))] Task: \(task.prompt.prefix(LogLimits.historyLineChars))\n"
+            result += body
             if let summary = task.summary {
-                result += "Result: \(summary)\n"
+                result += "Result: \(summary.prefix(LogLimits.historyLineChars))\n"
             }
         }
 
