@@ -186,12 +186,14 @@ final class CodexService {
     /// Filters out cross-provider web_search variants in favor of Codex's
     /// native `{type:"web_search"}` (billed against the ChatGPT subscription,
     /// runs server-side with URL annotations).
-    nonisolated static func buildTools(_ anthropicTools: [[String: Any]]) -> [[String: Any]] {
+    /// `includeNative: false` (OpenAI API-key /v1/responses) keeps Agent!'s own
+    /// `web_search` function tool and skips the Codex-only hosted tools.
+    nonisolated static func buildTools(_ anthropicTools: [[String: Any]], includeNative: Bool = true) -> [[String: Any]] {
         var tools: [[String: Any]] = anthropicTools.compactMap { t in
             guard let name = t["name"] as? String else { return nil }
-            // Skip every web_search variant — Codex's native one is added below.
+            // Skip Claude's server-side web_search; with native tools, skip ours too — Codex's is added below.
             if (t["type"] as? String) == "web_search_20250305" { return nil }
-            if name == "web_search" { return nil }
+            if includeNative && name == "web_search" { return nil }
             var out: [String: Any] = [
                 "type": "function",
                 "name": name,
@@ -205,7 +207,7 @@ final class CodexService {
             return out
         }
         // Codex-native tools (apply_patch + web_search) appended last.
-        tools.append(contentsOf: codexNativeTools())
+        if includeNative { tools.append(contentsOf: codexNativeTools()) }
         return tools
     }
 
@@ -444,6 +446,16 @@ final class CodexService {
             let friendly = Self.friendlyError(status: http.statusCode, body: errBody)
             throw AgentError.apiError(statusCode: http.statusCode, message: friendly)
         }
+        return try await parseResponsesStream(bytes, onDelta: onDelta)
+    }
+
+    /// Parse a Responses API SSE stream into Anthropic-shaped content.
+    /// Shared by the Codex OAuth path and OpenAI's API-key `/v1/responses`
+    /// path (OpenAICompatibleService) — the wire format is identical.
+    nonisolated static func parseResponsesStream(
+        _ bytes: URLSession.AsyncBytes,
+        onDelta: @MainActor @Sendable @escaping (String) -> Void
+    ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
 
         // Assistant text accumulated per output item (keyed by item_id).
         var textByItem: [String: String] = [:]
