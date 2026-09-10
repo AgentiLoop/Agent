@@ -243,5 +243,154 @@ struct LLMCompactionTests {
             overflowCompactor: { _ in true })
         guard case .breakLoop = stop else { Issue.record("expected breakLoop, got \(stop)"); return }
     }
+
+    // MARK: - Apple AI (Tier 1) vs non-Apple (Tier 0 / Tier 2) compaction ladder
+
+    /// Flip the Apple Intelligence token-compression toggle for one test and restore it.
+    private func withAppleCompression<T>(_ enabled: Bool, _ body: () async -> T) async -> T {
+        let saved = AppleIntelligenceMediator.shared.tokenCompressionEnabled
+        AppleIntelligenceMediator.shared.tokenCompressionEnabled = enabled
+        defer { AppleIntelligenceMediator.shared.tokenCompressionEnabled = saved }
+        return await body()
+    }
+
+    /// Plain-text transcript for the on-device summarizer: long user turns in
+    /// the middle, a short one, and a `keepRecent` tail.
+    private func proseSample(rounds: Int) -> [[String: Any]] {
+        var messages: [[String: Any]] = [["role": "user", "content": "do the task"]]
+        for i in 0..<rounds {
+            messages.append(["role": "assistant", "content": "Reading file \(i)."])
+            let long = (0..<8).map {
+                "Line \($0) of /tmp/f\(i).swift: func compute\(i)() adds the totals and returns the sum as an Int."
+            }.joined(separator: "\n")
+            messages.append(["role": "user", "content": long])
+        }
+        return messages
+    }
+
+    private func serialized(_ messages: [[String: Any]]) -> Data {
+        (try? JSONSerialization.data(withJSONObject: messages, options: [.sortedKeys])) ?? Data()
+    }
+
+    @Test("non-Apple: forced tieredCompact with a summarizer takes Tier 0 and never reaches Apple AI or prune")
+    func nonAppleLadderUsesLLMSummary() async {
+        await withAppleCompression(true) {
+            var messages = sample(rounds: 20)
+            // 40K window → keepRecent floors at 6
+            var state = CompactionState(contextWindow: 40_000)
+            var logs: [String] = []
+            var summarizerCalls = 0
+            let ok = await AgentViewModel.tieredCompact(
+                &messages, state: &state,
+                summarizer: { _ in summarizerCalls += 1; return "1. Primary Request: do the task" },
+                force: true, log: { logs.append($0) })
+            #expect(ok)
+            #expect(summarizerCalls == 1)
+            #expect(logs.contains { $0.hasPrefix("🗜️ LLM compaction:") })
+            #expect(!logs.contains { $0.contains("Apple AI compaction") })
+            #expect(!logs.contains { $0.hasPrefix("🗜️ Pruned context") })
+            // [first] + [summary] + [ack] + 6 tail
+            #expect(messages.count == 9)
+            #expect((messages[1]["content"] as? String ?? "").contains("continued from a previous conversation"))
+            #expect(state.lastReportedInputTokens == 0)
+            #expect(state.lastCompactSucceeded)
+        }
+    }
+
+    @Test("non-Apple: toggle off + no summarizer skips Tier 1 and lands on the Tier 2 prune")
+    func nonAppleLadderFallsToPrune() async {
+        await withAppleCompression(false) {
+            var messages = sample(rounds: 20)
+            var state = CompactionState(contextWindow: 40_000)
+            var logs: [String] = []
+            let ok = await AgentViewModel.tieredCompact(&messages, state: &state, force: true, log: { logs.append($0) })
+            #expect(ok)
+            #expect(logs.contains { $0.hasPrefix("🗜️ Pruned context") })
+            #expect(!logs.contains { $0.contains("Apple AI compaction") })
+            #expect(!logs.contains { $0.hasPrefix("🗜️ LLM compaction:") })
+            #expect(messages.count == 9)
+            #expect((messages[1]["content"] as? String ?? "").hasPrefix("Summary of previous 34 messages:"))
+            #expect(serialized(messages).range(of: Data("[summary] ".utf8)) == nil)
+        }
+    }
+
+    @Test("non-Apple: Tier 0 failure falls through the ladder instead of aborting")
+    func nonAppleLadderTier0FailureFallsThrough() async {
+        await withAppleCompression(false) {
+            var messages = sample(rounds: 20)
+            var state = CompactionState(contextWindow: 40_000)
+            var logs: [String] = []
+            let ok = await AgentViewModel.tieredCompact(
+                &messages, state: &state, summarizer: { _ in nil }, force: true, log: { logs.append($0) })
+            #expect(ok)
+            #expect(logs.contains { $0.contains("LLM compaction summary failed") })
+            #expect(logs.contains { $0.hasPrefix("🗜️ Pruned context") })
+            #expect(messages.count == 9)
+        }
+    }
+
+    @Test("Apple AI: summarizeOldMessages is a no-op when the toggle is off, even if the model is available")
+    func appleSummarizeRespectsToggle() async {
+        await withAppleCompression(false) {
+            var messages = proseSample(rounds: 6)
+            let before = serialized(messages)
+            await AgentViewModel.summarizeOldMessages(&messages, keepRecent: 4)
+            #expect(serialized(messages) == before)
+        }
+    }
+
+    @Test("Apple AI: summarizeOldMessages rewrites only long middle user turns (no-op when the model is unavailable)")
+    func appleSummarizeMiddleOnly() async {
+        await withAppleCompression(true) {
+            var messages = proseSample(rounds: 6)
+            messages.insert(["role": "user", "content": "short note"], at: 3)
+            messages.insert(["role": "assistant", "content": "noted"], at: 4)
+            let before = serialized(messages)
+            let originalMiddle = messages[2]["content"] as? String ?? ""
+            await AgentViewModel.summarizeOldMessages(&messages, keepRecent: 4)
+
+            guard FoundationModelService.isAvailable else {
+                #expect(serialized(messages) == before)
+                return
+            }
+            #expect(messages.count == 15)
+            // First prompt, the short note, and the last 4 are untouched
+            #expect(messages[0]["content"] as? String == "do the task")
+            #expect(messages[3]["content"] as? String == "short note")
+            for i in 11..<15 {
+                #expect(!(messages[i]["content"] as? String ?? "").hasPrefix("[summary] "))
+            }
+            let rewritten = messages[2]["content"] as? String ?? ""
+            #expect(rewritten.hasPrefix("[summary] "))
+            #expect(rewritten != originalMiddle)
+            #expect(rewritten.count < originalMiddle.count)
+        }
+    }
+
+    @Test("Apple AI: forced tieredCompact without a summarizer takes Tier 1 when available, Tier 2 otherwise")
+    func appleLadderTier1() async {
+        await withAppleCompression(true) {
+            var messages = sample(rounds: 8)
+            var state = CompactionState(contextWindow: 40_000)
+            var logs: [String] = []
+            let ok = await AgentViewModel.tieredCompact(&messages, state: &state, force: true, log: { logs.append($0) })
+            #expect(ok)
+            #expect(!logs.contains { $0.hasPrefix("🗜️ LLM compaction:") })
+            if FoundationModelService.isAvailable {
+                #expect(logs.contains { $0.hasPrefix("🗜️ Apple AI compaction:") })
+                #expect(!logs.contains { $0.hasPrefix("🗜️ Pruned context") })
+                // Structure survives: 17 messages, oldest 2 tool results cleared by microcompact
+                #expect(messages.count == 17)
+                let oldest = (messages[2]["content"] as? [[String: Any]])?.first?["content"] as? String ?? ""
+                #expect(oldest.hasPrefix("[cleared"))
+                #expect(serialized(messages).range(of: Data("[summary] ".utf8)) != nil)
+            } else {
+                #expect(!logs.contains { $0.contains("Apple AI compaction") })
+                #expect(logs.contains { $0.hasPrefix("🗜️ Pruned context") })
+                #expect(messages.count == 9)
+            }
+        }
+    }
 }
+
 
