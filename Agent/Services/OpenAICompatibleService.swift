@@ -161,7 +161,18 @@ final class OpenAICompatibleService {
         // Keep the spill cache pointed at the current project so restore_tool_result
         // reads back from the same .agent/toolcache the compactor wrote to.
         ToolResultCache.setProjectFolder(projectFolder)
-        return AgentTools.ollamaTools(for: provider, activeGroups: activeGroups, compact: compact, projectFolder: projectFolder)
+        let defs = AgentTools.ollamaTools(for: provider, activeGroups: activeGroups, compact: compact, projectFolder: projectFolder)
+        // DashScope rejects the reserved function name "search" (400 InvalidParameter:
+        // "Tool names are not allowed to be [search]"). Send it as "web_search", which
+        // ToolDispatch already handles directly — no reverse mapping needed.
+        guard provider == .qwen else { return defs }
+        return defs.map { tool in
+            guard var fn = tool["function"] as? [String: Any], fn["name"] as? String == "search" else { return tool }
+            fn["name"] = "web_search"
+            var renamed = tool
+            renamed["function"] = fn
+            return renamed
+        }
     }
 
     /// Prepend project folder to the last user message (only on first message).
