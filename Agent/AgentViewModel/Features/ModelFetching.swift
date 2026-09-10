@@ -741,21 +741,6 @@ extension AgentViewModel {
         )
     }
 
-    func fetchCodestralModels() {
-        // Codestral key works on codestral.mistral.ai/v1/models.
-        // Filter out embed models — keep only chat/completion models.
-        fetchProviderModels(
-            key: codestralAPIKey,
-            endpoint: "https://codestral.mistral.ai/v1/models",
-            defaults: Self.defaultCodestralModels,
-            fallbackModel: "codestral-latest",
-            isFetching: \.isFetchingCodestralModels,
-            models: \.codestralModels,
-            selected: \.codestralModel,
-            providerName: "Codestral",
-            filter: { $0.filter { !$0.id.lowercased().contains("embed") } }
-        )
-    }
 
     func fetchVibeModels() {
         // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
@@ -929,7 +914,6 @@ extension AgentViewModel {
         case .gemini: if force || geminiModels.isEmpty { fetchGeminiModels() }
         case .grok: if force || grokModels.isEmpty { fetchGrokModels() }
         case .mistral: if force || mistralModels.isEmpty { fetchMistralModels() }
-        case .codestral: if force || codestralModels.isEmpty { fetchCodestralModels() }
         case .vibe: if force || vibeModels.isEmpty { fetchVibeModels() }
         case .miniMax: if force || miniMaxModels.isEmpty { fetchMiniMaxModels() }
         case .openRouter: if force || openRouterModels.isEmpty { fetchOpenRouterModels() }

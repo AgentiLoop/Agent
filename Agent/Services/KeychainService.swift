@@ -23,7 +23,6 @@ final class KeychainService: Sendable {
         case gemini = "com.agent.gemini-api-key"
         case grok = "com.agent.grok-api-key"
         case mistral = "com.agent.mistral-api-key"
-        case codestral = "com.agent.codestral-api-key"
         case vibe = "com.agent.vibe-api-key"
         case bigModel = "com.agent.bigmodel-api-key"
         case qwen = "com.agent.qwen-api-key"

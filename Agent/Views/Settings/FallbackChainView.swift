@@ -249,7 +249,6 @@ struct FallbackChainView: View {
         case .gemini: if !viewModel.geminiModel.isEmpty { return viewModel.geminiModel }
         case .grok: if !viewModel.grokModel.isEmpty { return viewModel.grokModel }
         case .mistral: if !viewModel.mistralModel.isEmpty { return viewModel.mistralModel }
-        case .codestral: if !viewModel.codestralModel.isEmpty { return viewModel.codestralModel }
         case .vibe: if !viewModel.vibeModel.isEmpty { return viewModel.vibeModel }
         case .bigModel: if !viewModel.bigModelModel.isEmpty { return viewModel.bigModelModel }
         case .miniMax: if !viewModel.miniMaxModel.isEmpty { return viewModel.miniMaxModel }

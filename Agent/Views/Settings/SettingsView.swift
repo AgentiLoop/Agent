@@ -24,7 +24,6 @@ struct SettingsView: View {
         case .gemini: return $viewModel.geminiTemperature
         case .grok: return $viewModel.grokTemperature
         case .mistral: return $viewModel.openAITemperature
-        case .codestral: return $viewModel.openAITemperature
         case .vibe: return $viewModel.openAITemperature
         case .foundationModel: return $viewModel.claudeTemperature // unused
         }
@@ -573,46 +572,6 @@ struct SettingsView: View {
                             .buttonStyle(.bordered)
                             .controlSize(.small)
                             .disabled(viewModel.isFetchingMistralModels)
-                            .help("Fetch available models")
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .codestral {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Codestral")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(
-                            text: $viewModel.codestralAPIKey,
-                            placeholder: "Codestral API key",
-                            lockKey: "lock.codestralAPIKey"
-                        )
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            Picker("", selection: $viewModel.codestralModel) {
-                                ForEach(viewModel.codestralModels, id: \.id) { model in
-                                    Text(model.name.isEmpty ? model.id : model.name).tag(model.id)
-                                }
-                            }
-                            .labelsHidden()
-
-                            Button {
-                                viewModel.fetchCodestralModels()
-                            } label: {
-                                if viewModel.isFetchingCodestralModels {
-                                    ProgressView().controlSize(.mini)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.isFetchingCodestralModels)
                             .help("Fetch available models")
                         }
                     }

@@ -149,7 +149,6 @@ struct ToolsView: View {
         case .gemini: return $viewModel.geminiModel
         case .grok: return $viewModel.grokModel
         case .mistral: return $viewModel.mistralModel
-        case .codestral: return $viewModel.codestralModel
         case .vibe: return $viewModel.vibeModel
         case .miniMax: return $viewModel.miniMaxModel
         case .openRouter: return $viewModel.openRouterModel
@@ -180,7 +179,6 @@ struct ToolsView: View {
         case .gemini: return oai(viewModel.geminiModels, AgentViewModel.defaultGeminiModels)
         case .grok: return oai(viewModel.grokModels, AgentViewModel.defaultGrokModels)
         case .mistral: return oai(viewModel.mistralModels, AgentViewModel.defaultMistralModels)
-        case .codestral: return oai(viewModel.codestralModels, AgentViewModel.defaultCodestralModels)
         case .vibe: return oai(viewModel.vibeModels, AgentViewModel.defaultVibeModels)
         case .ollama:
             let models = viewModel.ollamaModels.isEmpty ? AgentViewModel.defaultOllamaModels : viewModel.ollamaModels

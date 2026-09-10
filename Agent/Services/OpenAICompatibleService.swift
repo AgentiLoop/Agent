@@ -336,7 +336,7 @@ final class OpenAICompatibleService {
             }
         }
         // Mistral requires strict tool message ordering: tool messages follow assistant with tool_calls, response count equals tool_calls count
-        if provider == .mistral || provider == .codestral || provider == .vibe {
+        if provider == .mistral || provider == .vibe {
             var cleaned: [[String: Any]] = []
             var i = 0
             while i < chatMessages.count {
@@ -466,7 +466,7 @@ final class OpenAICompatibleService {
                 body["tools"] = toolDefs
                 body["tool_choice"] = "auto"
                 // Mistral: disable parallel tool calls — our loop handles one at a time
-                if provider == .mistral || provider == .codestral || provider == .vibe {
+                if provider == .mistral || provider == .vibe {
                     body["parallel_tool_calls"] = false
                 }
             }
@@ -503,7 +503,7 @@ final class OpenAICompatibleService {
             if !toolDefs.isEmpty {
                 body["tools"] = toolDefs
                 body["tool_choice"] = "auto"
-                if provider == .mistral || provider == .codestral || provider == .vibe {
+                if provider == .mistral || provider == .vibe {
                     body["parallel_tool_calls"] = false
                 }
             }
