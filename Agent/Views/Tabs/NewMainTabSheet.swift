@@ -195,9 +195,6 @@ struct NewMainTabSheet: View {
                 fetch: { viewModel.fetchMistralModels() }
             )
 
-        case .codestral:
-            TextField("Model (e.g. codestral-latest)", text: $selectedModelId)
-                .textFieldStyle(.roundedBorder)
 
         case .vibe:
             TextField("Model (e.g. devstral-small-2507)", text: $selectedModelId)
@@ -316,7 +313,6 @@ struct NewMainTabSheet: View {
         case .gemini: return viewModel.geminiModel
         case .grok: return viewModel.grokModel
         case .mistral: return "mistral-large-latest"
-        case .codestral: return "codestral-latest"
         case .vibe: return "devstral-small-2507"
         case .foundationModel: return "Apple Intelligence"
         }

@@ -243,7 +243,7 @@ extension AgentViewModel {
             - NEVER loop endlessly. If stuck after 3 attempts, stop and ask.
 
             MULTI-PROVIDER AI:
-            Claude, OpenAI, Gemini, Grok, Mistral, Codestral, Mistral Vibe, \
+            Claude, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, \
             DeepSeek, Hugging Face, Z.ai, BigModel, Qwen, Ollama, LM Studio, \
             and Apple Intelligence — all with tool calling, streaming, and vision.
 

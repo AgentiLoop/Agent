@@ -79,7 +79,6 @@ extension AgentViewModel {
         case .gemini: return geminiModel
         case .grok: return grokModel
         case .mistral: return mistralModel
-        case .codestral: return codestralModel
         case .vibe: return vibeModel
         case .foundationModel: return "Apple Intelligence"
         }
@@ -105,7 +104,6 @@ extension AgentViewModel {
         case .gemini: return geminiAPIKey
         case .grok: return grokAPIKey
         case .mistral: return mistralAPIKey
-        case .codestral: return codestralAPIKey
         case .vibe: return vibeAPIKey
         case .foundationModel: return ""
         }
@@ -164,8 +162,7 @@ extension AgentViewModel {
                 ?? Self.defaultGrokModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .mistral:
             return modelId
-        case .codestral:
-            return modelId
+
         case .vibe:
             return modelId
         case .foundationModel:

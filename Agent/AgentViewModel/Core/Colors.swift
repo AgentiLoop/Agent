@@ -125,7 +125,6 @@ extension AgentViewModel {
         case .gemini: return geminiTemperature
         case .grok: return grokTemperature
         case .mistral: return openAITemperature
-        case .codestral: return openAITemperature
         case .vibe: return openAITemperature
         case .foundationModel: return claudeTemperature
         }

@@ -107,9 +107,7 @@ extension AgentViewModel {
         case .mistral:
             modelName = mistralModel
             isVision = true
-        case .codestral:
-            modelName = codestralModel
-            isVision = false
+
         case .vibe:
             modelName = vibeModel
             isVision = false
