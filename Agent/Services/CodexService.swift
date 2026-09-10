@@ -45,8 +45,8 @@ final class CodexService {
     /// without these, /models returns 400 and /responses may reject the body.
     /// Bump to match the published Codex CLI version periodically.
     /// `nonisolated` so it's reachable from `performRequest` (off main actor).
-    nonisolated static let clientVersion = "1.0.0"
-    nonisolated static let userAgent = "codex_cli_rs/1.0.0"
+    nonisolated static let clientVersion = "0.154.0"
+    nonisolated static let userAgent = "codex_cli_rs/0.154.0"
 
     /// OpenAI's published identity instruction. Codex's OAuth gate rejects
     /// requests whose `instructions` don't start with this exact prefix —
@@ -364,15 +364,19 @@ final class CodexService {
         guard let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any],
               let items = obj["models"] as? [[String: Any]]
         else { throw AgentError.invalidResponse }
-        // Shape: { "models": [ { "slug": "gpt-5.2", "display_name": "gpt-5.2", "visibility": "list", ... } ] }
-        // Filter to visible models only.
-        return items.compactMap { item -> ModelInfo? in
-            guard let slug = item["slug"] as? String else { return nil }
-            if let vis = item["visibility"] as? String, vis == "hidden" { return nil }
-            let display = (item["display_name"] as? String) ?? slug
-            let ctx = (item["context_window"] as? Int) ?? 0
-            return ModelInfo(id: slug, display: display, contextWindow: ctx)
-        }
+        // Shape: { "models": [ { "slug": "gpt-5.2", "display_name": "gpt-5.2", "visibility": "list", "priority": 12, ... } ] }
+        // Only `visibility == "list"` models are user-selectable; the server
+        // marks internal ones (gpt-reserve, codex-auto-review) as "hide".
+        // Sort by the server's `priority` so the newest model comes first.
+        return items
+            .filter { ($0["visibility"] as? String) == "list" }
+            .sorted { (($0["priority"] as? Int) ?? Int.max) < (($1["priority"] as? Int) ?? Int.max) }
+            .compactMap { item -> ModelInfo? in
+                guard let slug = item["slug"] as? String else { return nil }
+                let display = (item["display_name"] as? String) ?? slug
+                let ctx = (item["context_window"] as? Int) ?? 0
+                return ModelInfo(id: slug, display: display, contextWindow: ctx)
+            }
     }
 
     /// Translate a raw Codex error body into a message the user can act on.
