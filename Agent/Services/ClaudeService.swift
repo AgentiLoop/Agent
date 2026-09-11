@@ -142,6 +142,24 @@ final class ClaudeService {
         return t
     }
 
+    /// Old or cross-provider history can contain unsigned reasoning. It cannot
+    /// be replayed as Claude thinking; preserve valid signed blocks unchanged.
+    nonisolated static func removingUnsignedThinking(_ messages: [[String: Any]]) -> [[String: Any]] {
+        messages.compactMap { message in
+            guard let blocks = message["content"] as? [[String: Any]] else { return message }
+            let filtered = blocks.filter { block in
+                guard block["type"] as? String == "thinking" else { return true }
+                guard let signature = block["signature"] as? String else { return false }
+                return !signature.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            }
+            guard filtered.count != blocks.count else { return message }
+            guard !filtered.isEmpty else { return nil }
+            var cleaned = message
+            cleaned["content"] = filtered
+            return cleaned
+        }
+    }
+
     /// Strip orphan `tool_result` blocks (no matching `tool_use` in the prior
     /// assistant message). Anthropic returns 400 on these. Also drop user messages
     /// that become empty after stripping. Mirrors the logic in MessageSanitizer
@@ -320,7 +338,7 @@ final class ClaudeService {
             "max_tokens": maxTokens > 0 ? maxTokens : 16384,
             "temperature": temperature,
             "system": systemBlock,
-            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(messages)))
+            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(Self.removingUnsignedThinking(messages))))
         ]
         // Skip tools only for actual localhost servers (LM Studio's Claude-compat
         // mode often mis-handles native Anthropic tool format). Remote
@@ -497,7 +515,7 @@ final class ClaudeService {
             "model": model,
             "max_tokens": maxTokens > 0 ? maxTokens : 16384,
             "system": systemBlock,
-            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(messages))),
+            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(Self.removingUnsignedThinking(messages)))),
             "stream": true
         ]
         if !isLocalhostEndpoint {
