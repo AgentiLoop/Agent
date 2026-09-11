@@ -174,14 +174,25 @@ extension AgentViewModel {
                                 toolId: tool.toolId, name: tool.name, input: tool.input, projectFolder: capturedPF)
                         }
                         await withTaskGroup(of: (String, String).self) { group in
-                            for (i, payload) in payloads.enumerated() where i < maxConcurrency {
+                            var remaining = payloads.makeIterator()
+                            for _ in 0..<maxConcurrency {
+                                guard let payload = remaining.next() else { break }
                                 let tabID = capturedTabID
                                 let workDirLocal = workDir
                                 group.addTask {
                                     (payload.toolId, Self.runReadPrefetch(payload, tabID: tabID, workDir: workDirLocal))
                                 }
                             }
-                            for await (id, result) in group { preResults[id] = result }
+                            for await (id, result) in group {
+                                preResults[id] = result
+                                if let payload = remaining.next() {
+                                    let tabID = capturedTabID
+                                    let workDirLocal = workDir
+                                    group.addTask {
+                                        (payload.toolId, Self.runReadPrefetch(payload, tabID: tabID, workDir: workDirLocal))
+                                    }
+                                }
+                            }
                         }
                     }
                     // Consume the pre-executed results and dispatch everything else
