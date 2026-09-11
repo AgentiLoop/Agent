@@ -71,10 +71,18 @@ extension AgentViewModel {
         p.environment = env; p.standardOutput = pipe; p.standardError = pipe
         // Read BEFORE waiting: if the child writes >64 KB the pipe fills and
         // waitUntilExit() would deadlock against a blocked writer.
-        try? p.run()
+        do {
+            try p.run()
+        } catch {
+            return "Error: Failed to launch read-only command: \(error.localizedDescription)"
+        }
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         p.waitUntilExit()
-        return String(data: data, encoding: .utf8) ?? ""
+        let output = String(data: data, encoding: .utf8) ?? ""
+        guard p.terminationStatus == 0 else {
+            return "Error: Read-only command exited with status \(p.terminationStatus).\n\(output)"
+        }
+        return output
     }
 
     /// Tier 9.3: read-only tools started while the response is still
