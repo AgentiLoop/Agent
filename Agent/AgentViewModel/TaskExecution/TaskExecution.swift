@@ -196,20 +196,22 @@ extension AgentViewModel {
             // turns after the nudge (provider-agnostic — every provider routes
             // through this loop): one to finish the in-flight edit, one to write
             // the handoff doc. Hard stop at maxIterations + 1.
+            // Nudges join the trailing tool-result user message (appendUserText)
+            // instead of opening a second consecutive user turn.
             if iterations == maxIterations {
                 appendLog("⏱ Iteration \(iterations)/\(maxIterations) — nudging LLM to wrap up (2 turns left)")
                 flushLog()
-                messages.append([
-                    "role": "user",
-                    "content": "You have reached the iteration limit. You have TWO final turns. Turn 1: make ONE tool call to finish any in-flight edit. Turn 2: make ONE tool call to write a status/handoff document (e.g. STATUS.md) describing what is done and what remains, then call task_complete with a summary. Do not start any new work."
-                ])
+                Self.appendUserText(
+                    "You have reached the iteration limit. You have TWO final turns. Turn 1: make ONE tool call to finish any in-flight edit. Turn 2: make ONE tool call to write a status/handoff document (e.g. STATUS.md) describing what is done and what remains, then call task_complete with a summary. Do not start any new work.",
+                    to: &messages
+                )
             } else if iterations == maxIterations + 1 {
                 appendLog("⏱ Iteration \(iterations)/\(maxIterations) — final turn")
                 flushLog()
-                messages.append([
-                    "role": "user",
-                    "content": "This is your FINAL turn. Make ONE last tool call to write your status/handoff document, then call task_complete with a summary of what you accomplished and what remains."
-                ])
+                Self.appendUserText(
+                    "This is your FINAL turn. Make ONE last tool call to write your status/handoff document, then call task_complete with a summary of what you accomplished and what remains.",
+                    to: &messages
+                )
             }
             if iterations > maxIterations + 1 {
                 let summary = completionSummary.isEmpty
@@ -442,6 +444,10 @@ extension AgentViewModel {
                     messages.append(["role": "user", "content": correction])
                     continue taskLoop
                 }
+                // A real tool call is forward progress — re-arm the corrective
+                // bounces so a later malformed call / premature end_turn still
+                // gets nudged instead of silently completing once 3 were spent.
+                if hasToolUse { stopRouteRetries = 0 }
 
                 // Execute pending tools — partition into read/write batches
                 // Consecutive read-only tools run in parallel; write tools serialize
@@ -503,14 +509,18 @@ extension AgentViewModel {
                     flushLog()
                 }
 
-                // Token budget checks — nudge LLM or auto-stop if budget exhausted / diminishing returns
+                // Token budget checks — nudge LLM or auto-stop if budget exhausted / diminishing returns.
+                // Auto-stops defer the break until after finalize so the assistant
+                // turn + the tool results it already produced land in `messages`
+                // (and therefore lastTaskMessages) instead of being dropped.
+                var stopAfterTurn = false
                 if budgetTracker.shouldStop {
                     let reason = budgetTracker.isDiminishing ? "diminishing returns detected" : "token budget exhausted"
                     appendLog("⚠️ Auto-stopping: \(reason) (\(budgetTracker.statusDescription))")
                     flushLog()
-                    break
+                    stopAfterTurn = true
                 }
-                if budgetTracker.shouldNudge && !toolResults.isEmpty {
+                if budgetTracker.shouldNudge && !stopAfterTurn && !toolResults.isEmpty {
                     // NOTE: must be a `text` block, not a synthetic `tool_result`.
                     // Anthropic rejects `tool_result` blocks whose `tool_use_id` has no
                     // matching `tool_use` in the prior assistant message.
@@ -531,7 +541,7 @@ extension AgentViewModel {
                     let max = String(format: "$%.2f", TokenUsageStore.shared.maxTaskCost)
                     appendLog("⚠️ Auto-stopping: estimated cost \(cost) exceeds limit \(max)")
                     flushLog()
-                    break
+                    stopAfterTurn = true
                 }
 
                 // Overnight coding guards — read/build/error-budget/stuck-file nudges.
@@ -543,7 +553,7 @@ extension AgentViewModel {
                     stuckFiles: &stuckFiles,
                     isXcode: isXcode
                 )
-                if guardShouldBreak { break }
+                if guardShouldBreak { stopAfterTurn = true }
 
                 // Collect completed sub-agent notifications and inject into tool results
                 let subAgentNotifs = collectSubAgentNotifications()
@@ -561,7 +571,7 @@ extension AgentViewModel {
                     textOnlyNudges: &textOnlyNudges
 
                 )
-                if finalizeShouldBreak { break taskLoop }
+                if finalizeShouldBreak || stopAfterTurn { break taskLoop }
 
             } catch {
                 let activeService: ActiveLLMService
