@@ -121,6 +121,7 @@ extension AgentViewModel {
         case .bigModel: return zAITemperature
         case .miniMax: return miniMaxTemperature
         case .openRouter: return openAITemperature
+        case .requesty: return openAITemperature
         case .qwen: return openAITemperature
         case .gemini: return geminiTemperature
         case .grok: return grokTemperature
