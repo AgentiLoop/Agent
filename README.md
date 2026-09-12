@@ -111,7 +111,7 @@ Just type what you want. Agent! figures out how and makes it happen.
 | **DeepSeek** | Cheap | Budget coding, cache-hit reporting |
 | **Hugging Face** | Varies | Open models, serverless or dedicated endpoints |
 | **Z.ai** / **BigModel** | Cheap | GLM-5.3 — recommended starting point |
-| **Qwen** (Alibaba) | Cheap | Qwen 2.5 / 3 via Dashscope |
+| **Qwen** (Alibaba) | Cheap | Qwen 3.8 via Dashscope |
 | **MiniMax** | Cheap | 1M-token context |
 | **OpenRouter** | Paid | 200+ models, one key; Claude routed via Anthropic protocol |
 | **Ollama** (cloud) | Free tier | Hosted open models |

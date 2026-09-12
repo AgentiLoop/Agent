@@ -112,7 +112,7 @@ Tapez simplement ce que vous voulez. Agent! trouve comment et le réalise.
 | **Hugging Face** | Variable | Modèles ouverts, serverless ou endpoints dédiés |
 | **OpenRouter** | Payant | 200+ modèles, une clé ; Claude routé via le protocole Anthropic |
 | **Z.ai** / **BigModel** | Bon marché | GLM-5.3 — point de départ recommandé |
-| **Qwen** (Alibaba) | Bon marché | Qwen 2.5 / 3 via Dashscope |
+| **Qwen** (Alibaba) | Bon marché | Qwen 3.8 via Dashscope |
 | **MiniMax** | Bon marché | Contexte de 1M tokens |
 | **Ollama** (cloud) | Offre gratuite | Modèles ouverts hébergés |
 | **Ollama local** / **vLLM** / **LM Studio** | Gratuit + matériel | Entièrement hors ligne ; vraie fenêtre de contexte par modèle détectée |
