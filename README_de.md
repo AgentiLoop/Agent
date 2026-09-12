@@ -102,7 +102,7 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 
 | Anbieter | Kosten | Am besten für |
 |---|---|---|
-| **Claude** | Kostenpflichtig | Lange autonome Aufgaben, Extended Thinking, Prompt-Caching |
+| **Claude** | Pro Token (API-Key) oder Abo (OAuth) | Lange autonome Aufgaben, Extended Thinking, Prompt-Caching |
 | **Codex** | ChatGPT-Abo | OpenAI-Modelle über ChatGPT-OAuth — kein API-Key, keine Token-Kosten |
 | **OpenAI** | Kostenpflichtig | Allzweck, Tool-Calling, Vision, `reasoning_effort` |
 | **Google Gemini** | Kostenpflichtig (Free Tier) | Langer Kontext, Vision |
