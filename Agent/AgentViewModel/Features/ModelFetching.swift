@@ -136,30 +136,6 @@ extension AgentViewModel {
         }
     }
 
-    // MARK: - OpenAI Model Fetching
-
-    func fetchOpenAIModels() {
-        guard !apiKeys[.openAI].isEmpty else {
-            modelLists[.openAI] = Self.defaultOpenAIModels
-            return
-        }
-        fetchingModels.insert(.openAI)
-        Task {
-            defer { fetchingModels.remove(.openAI) }
-            do {
-                let models = try await Self.fetchOpenAIModelsFromAPI(apiKey: apiKeys[.openAI])
-                modelLists[.openAI] = models.isEmpty ? Self.defaultOpenAIModels : models
-                let ids = modelLists[.openAI].map(\.id)
-                if self.models[.openAI].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.openAI])) {
-                    self.models[.openAI] = ids.first ?? ""
-                }
-            } catch {
-                appendLog("Failed to fetch OpenAI models: \(error.localizedDescription)")
-                modelLists[.openAI] = Self.defaultOpenAIModels
-            }
-        }
-    }
-
     /// Fetch Codex models via ChatGPT OAuth. Falls back silently to an empty
     /// list if not signed in (user should run `codex login` or click Sign In).
     func fetchCodexModels() {
@@ -346,39 +322,6 @@ extension AgentViewModel {
     }
 
     // MARK: - Static API Fetch Helpers
-
-    private nonisolated static func fetchOpenAIModelsFromAPI(apiKey: String) async throws -> [OpenAIModelInfo] {
-        guard let url = URL(string: "https://api.openai.com/v1/models") else {
-            throw AgentError.invalidURL
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.timeoutInterval = llmAPITimeout
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
-            throw AgentError.apiError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0, message: "OpenAI API error")
-        }
-
-        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let modelsArray = json["data"] as? [[String: Any]] else
-        {
-            return defaultOpenAIModels
-        }
-
-        // No filtering — return every model ID the OpenAI API reports. The
-        // picker shows the raw list so new models appear the moment OpenAI
-        // publishes them, and users can choose legacy models if they want.
-        let models = modelsArray
-            .compactMap { model -> OpenAIModelInfo? in
-                guard let id = model["id"] as? String, !id.isEmpty else { return nil }
-                return OpenAIModelInfo(id: id, name: id)
-            }
-            .sorted { $0.name < $1.name }
-
-        return models.isEmpty ? defaultOpenAIModels : models
-    }
 
     private nonisolated static func fetchHuggingFaceModelsFromAPI(apiKey: String) async throws -> [OpenAIModelInfo] {
         // Use the router endpoint which returns inference-ready models (OpenAI-compatible)
@@ -876,7 +819,6 @@ extension AgentViewModel {
         switch provider {
         case .claude: Task { await fetchClaudeModels() }
         case .codex: fetchCodexModels()
-        case .openAI: fetchOpenAIModels()
         case .ollama: fetchOllamaModels()
         case .localOllama: fetchLocalOllamaModels()
         case .huggingFace: fetchHuggingFaceModels()
@@ -890,7 +832,7 @@ extension AgentViewModel {
             // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
             fetchProviderModels(.vibe, defaults: [],
                 filter: { $0.filter { $0.id.lowercased().contains("devstral") && $0.id.contains("latest") } })
-        case .deepSeek, .gemini, .grok, .mistral, .miniMax:
+        case .openAI, .deepSeek, .gemini, .grok, .mistral, .miniMax:
             fetchProviderModels(provider, defaults: [])
         case .bigModel, .foundationModel: break
         }

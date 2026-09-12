@@ -5,7 +5,6 @@
 // provider's live /models endpoint. These arrays stay empty so the picker
 // shows nothing until a real fetch succeeds.
 extension AgentViewModel {
-    nonisolated static let defaultOpenAIModels: [OpenAIModelInfo] = []
     nonisolated static let defaultZAIModels: [OpenAIModelInfo] = []
     nonisolated static let defaultQwenModels: [OpenAIModelInfo] = []
     nonisolated static let defaultHuggingFaceModels: [OpenAIModelInfo] = []
