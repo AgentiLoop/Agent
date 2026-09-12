@@ -473,16 +473,9 @@ extension AgentViewModel {
                 }
 
             } catch {
-                let active: ActiveLLMService
-                if services.claude != nil { active = .claude }
-                else if services.openAICompatible != nil { active = .openAICompatible }
-                else if services.ollama != nil { active = .ollama }
-                else if services.foundationModel != nil { active = .foundationModel }
-                else { active = .none }
                 let outcome = await handleTaskLoopError(
                     error,
-                    activeService: active,
-                    providerDisplayName: provider.displayName,
+                    provider: provider,
                     messages: &messages,
                     timeoutRetryCount: &timeoutRetryCount,
                     maxTimeoutRetries: maxRetries,
