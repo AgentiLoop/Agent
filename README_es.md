@@ -24,7 +24,7 @@
 
 **Una app. Cualquier IA. Control total de tu Mac.**
 
-Agent! es una app 100 % nativa en Swift 6.2 / SwiftUI que conecta **18 proveedores de LLM** — Claude, GPT, Gemini, Grok, Mistral, DeepSeek, Qwen, Z.ai, BigModel, Hugging Face, OpenRouter, Ollama (nube y local), vLLM, LM Studio, Codestral, Mistral Vibe y **Apple Intelligence** en el dispositivo — a un bucle de tareas autónomo que realmente *hace cosas*: lee tu código, corrige el bug, compila el proyecto de Xcode, hace commit del diff, controla cualquier app de Mac mediante la API de Accesibilidad, ejecuta comandos de shell como tú o como root, te envía los resultados por iMessage y responde a un *«Agent!»* hablado.
+Agent! es una app 100 % nativa en Swift 6.2 / SwiftUI que conecta **18 proveedores de LLM** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Qwen, MiniMax, OpenRouter, Ollama (nube y local), vLLM y LM Studio — más **Apple Intelligence** en el dispositivo — a un bucle de tareas autónomo que realmente *hace cosas*: lee tu código, corrige el bug, compila el proyecto de Xcode, hace commit del diff, controla cualquier app de Mac mediante la API de Accesibilidad, ejecuta comandos de shell como tú o como root, te envía los resultados por iMessage y responde a un *«Agent!»* hablado.
 
 Sin NPM, sin Electron, sin suscripción, sin telemetría. Trae tu propia clave de API, ejecútalo totalmente en local o gratis con Apple Intelligence. Cada paquete Swift del que depende fue escrito por el mismo autor. Consulta la [Historia](#historia) más abajo.
 
@@ -103,15 +103,17 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 | Proveedor | Coste | Ideal para |
 |---|---|---|
 | **Claude** | De pago | Tareas autónomas largas, pensamiento extendido, caché de prompts |
+| **Codex** | Suscripción ChatGPT | Modelos de OpenAI vía OAuth de ChatGPT — sin clave API, sin cobro por token |
 | **OpenAI** | De pago | Uso general, llamadas a herramientas, visión, `reasoning_effort` |
 | **Google Gemini** | De pago (nivel gratuito) | Contexto largo, visión |
 | **Grok** (xAI) | De pago | Información en tiempo real |
-| **Mistral** / **Codestral** / **Mistral Vibe** | De pago | Nube de pesos abiertos, código, producto agente |
+| **Mistral** / **Mistral Vibe** | De pago | Nube de pesos abiertos, código, producto agente |
 | **DeepSeek** | Barato | Programación económica, informe de aciertos de caché |
 | **Hugging Face** | Varía | Modelos abiertos, serverless o endpoints dedicados |
 | **OpenRouter** | De pago | 200+ modelos, una clave; Claude enrutado por protocolo Anthropic |
 | **Z.ai** / **BigModel** | Barato | GLM-5.1 — punto de partida recomendado |
 | **Qwen** (Alibaba) | Barato | Qwen 2.5 / 3 vía Dashscope |
+| **MiniMax** | Barato | Contexto de 1M tokens |
 | **Ollama** (nube) | Nivel gratuito | Modelos abiertos alojados |
 | **Ollama local** / **vLLM** / **LM Studio** | Gratis + hardware | Totalmente offline; ventana de contexto real por modelo detectada |
 | **Apple Intelligence** | Gratis, en el dispositivo | Triaje, resúmenes, compresión de tokens (icono del cerebro, no el selector de proveedor) |

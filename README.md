@@ -24,7 +24,7 @@
 
 **One app. Any AI. Total command over your Mac.**
 
-Agent! is a 100% native Swift 6.2 / SwiftUI app that wires **18 LLM providers** — Claude, GPT, Gemini, Grok, Mistral, DeepSeek, Qwen, Z.ai, BigModel, Hugging Face, OpenRouter, Ollama (cloud and local), vLLM, LM Studio, Codestral, Mistral Vibe, and on-device **Apple Intelligence** — into an autonomous task loop that actually *does things*: reads your codebase, fixes the bug, builds the Xcode project, commits the diff, drives any Mac app through the Accessibility API, runs shell commands as you or as root, texts you results over iMessage, and answers to a spoken *"Agent!"*.
+Agent! is a 100% native Swift 6.2 / SwiftUI app that wires **18 LLM providers** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Qwen, MiniMax, OpenRouter, Ollama (cloud and local), vLLM, and LM Studio — plus on-device **Apple Intelligence** — into an autonomous task loop that actually *does things*: reads your codebase, fixes the bug, builds the Xcode project, commits the diff, drives any Mac app through the Accessibility API, runs shell commands as you or as root, texts you results over iMessage, and answers to a spoken *"Agent!"*.
 
 No NPM, no Electron, no subscription, no telemetry. Bring your own API key, run fully local, or run free on Apple Intelligence. Every Swift package it depends on was written by the same author. See [Backstory](#backstory) below.
 
@@ -103,15 +103,17 @@ Just type what you want. Agent! figures out how and makes it happen.
 | Provider | Cost | Best for |
 |---|---|---|
 | **Claude** | Paid | Long autonomous tasks, extended thinking, prompt caching |
+| **Codex** | ChatGPT subscription | OpenAI models via ChatGPT OAuth — no API key, no per-token charges |
 | **OpenAI** | Paid | General purpose, tool calling, vision, `reasoning_effort` |
 | **Google Gemini** | Paid (free tier) | Long context, vision |
 | **Grok** (xAI) | Paid | Real-time info |
-| **Mistral** / **Codestral** / **Mistral Vibe** | Paid | Open-weight cloud, code, agent product |
+| **Mistral** / **Mistral Vibe** | Paid | Open-weight cloud, code, agent product |
 | **DeepSeek** | Cheap | Budget coding, cache-hit reporting |
 | **Hugging Face** | Varies | Open models, serverless or dedicated endpoints |
-| **OpenRouter** | Paid | 200+ models, one key; Claude routed via Anthropic protocol |
 | **Z.ai** / **BigModel** | Cheap | GLM-5.1 — recommended starting point |
 | **Qwen** (Alibaba) | Cheap | Qwen 2.5 / 3 via Dashscope |
+| **MiniMax** | Cheap | 1M-token context |
+| **OpenRouter** | Paid | 200+ models, one key; Claude routed via Anthropic protocol |
 | **Ollama** (cloud) | Free tier | Hosted open models |
 | **Local Ollama** / **vLLM** / **LM Studio** | Free + hardware | Fully offline; real per-model context window detected |
 | **Apple Intelligence** | Free, on-device | Triage, summaries, token compression (brain icon, not the provider picker) |
