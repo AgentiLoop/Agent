@@ -164,7 +164,7 @@ extension AgentViewModel {
                 apiKey: openRouterAPIKey, model: modelName,
                 historyContext: historyContext,
                 projectFolder: projectFolder,
-                baseURL: OpenRouterProtocol.anthropic.endpoint, maxTokens: mt
+                baseURL: LLMProviderSetup.openRouterAnthropicChatURL, maxTokens: mt
             )
         } else {
             claude = nil

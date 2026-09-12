@@ -1,5 +1,6 @@
 import SwiftUI
 import AgentTools
+import AgentLLM
 
 struct SettingsView: View {
     @Bindable var viewModel: AgentViewModel
@@ -358,7 +359,7 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Protocol").font(.caption).foregroundStyle(.secondary)
                         Picker("Protocol", selection: $viewModel.openRouterProtocol) {
-                            ForEach(OpenRouterProtocol.allCases, id: \.self) { proto in
+                            ForEach(APIProvider.openRouter.config.supportedProtocols, id: \.self) { proto in
                                 Text(proto.displayName).tag(proto)
                             }
                         }

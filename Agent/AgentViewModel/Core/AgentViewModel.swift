@@ -424,9 +424,9 @@ final class AgentViewModel {
     var openRouterModels: [OpenAIModelInfo] = []
     var isFetchingOpenRouterModels = false
 
-    var openRouterProtocol: OpenRouterProtocol = {
+    var openRouterProtocol: LLMAPIProtocol = {
         let raw = UserDefaults.standard.string(forKey: "openRouterProtocol") ?? "openAI"
-        return OpenRouterProtocol(rawValue: raw) ?? .openAI
+        return LLMAPIProtocol(rawValue: raw) ?? .openAI
     }() {
         didSet { UserDefaults.standard.set(openRouterProtocol.rawValue, forKey: "openRouterProtocol") }
     }
