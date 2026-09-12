@@ -9,32 +9,20 @@ final class KeychainService: Sendable {
 
     private init() {}
 
-    /// Every stored credential, keyed by its exact legacy keychain account
-    /// string so existing stored keys keep working.
+    /// Non-provider credentials, keyed by their exact legacy keychain account
+    /// string so existing stored keys keep working. Provider API keys are
+    /// addressed by `APIProvider.keychainAccount` instead.
     enum APIKey: String, CaseIterable, Sendable {
-        case claude = "agent.claudeAPIKey"
-        case ollama = "agent.ollamaAPIKey"
         case tavily = "agent.tavilyAPIKey"
-        case openAI = "agent.openAIAPIKey"
-        case deepSeek = "agent.deepSeekAPIKey"
-        case huggingFace = "agent.huggingFaceAPIKey"
-        case vLLM = "agent.vLLMAPIKey"
-        case zAI = "com.agent.zai-api-key"
-        case gemini = "com.agent.gemini-api-key"
-        case grok = "com.agent.grok-api-key"
-        case mistral = "com.agent.mistral-api-key"
-        case vibe = "com.agent.vibe-api-key"
-        case bigModel = "com.agent.bigmodel-api-key"
-        case qwen = "com.agent.qwen-api-key"
-        case miniMax = "com.agent.minimax-api-key"
-        case openRouter = "com.agent.openrouter-api-key"
-        case requesty = "com.agent.requesty-api-key"
         case exa = "com.agent.exa-api-key"
-        case lmStudio = "com.agent.lmstudio-api-key"
     }
 
     func set(_ apiKey: APIKey, _ value: String) { set(key: apiKey.rawValue, value: value) }
     func get(_ apiKey: APIKey) -> String? { get(key: apiKey.rawValue) }
+
+    func set(_ provider: APIProvider, _ value: String) { set(key: provider.keychainAccount, value: value) }
+    func get(_ provider: APIProvider) -> String? { get(key: provider.keychainAccount) }
+
 
     private func set(key: String, value: String) {
         guard let data = value.data(using: .utf8) else { return }
