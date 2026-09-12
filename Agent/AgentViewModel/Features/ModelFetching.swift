@@ -299,6 +299,54 @@ extension AgentViewModel {
         return filtered.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
+    func fetchA2AgentModels() {
+        fetchingModels.insert(.a2Agent)
+        Task {
+            defer { fetchingModels.remove(.a2Agent) }
+            do {
+                let models = try await Self.fetchA2AgentCatalog(apiKey: apiKeys[.a2Agent])
+                modelLists[.a2Agent] = models
+                let ids = models.map(\.id)
+                if self.models[.a2Agent].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.a2Agent])) {
+                    self.models[.a2Agent] = ids.first ?? ""
+                }
+            } catch {
+                appendLog("Failed to fetch A2Agent models: \(error.localizedDescription)")
+                modelLists[.a2Agent] = []
+            }
+        }
+    }
+
+    /// Fetch A2Agent's /models catalog. The list is plain OpenAI shape (`data[].id`) plus an
+    /// optional `display_name`; there is no context/tool metadata to filter on, and the
+    /// gateway only returns models the account can call. Non-200 responses are surfaced
+    /// in the log (bad key, rate limit) instead of silently yielding an empty picker.
+    private nonisolated static func fetchA2AgentCatalog(apiKey: String) async throws -> [OpenAIModelInfo] {
+        guard let url = URL(string: "https://api.a2agent.me/v1/models") else { throw AgentError.invalidURL }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        let key = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !key.isEmpty {
+            request.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
+        }
+        request.timeoutInterval = llmAPITimeout
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            let body = String(data: data, encoding: .utf8)?.prefix(200) ?? ""
+            throw AgentError.apiError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0, message: "A2Agent /models error \(body)")
+        }
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let entries = json["data"] as? [[String: Any]] else { return [] }
+
+        let parsed = entries.compactMap { entry -> OpenAIModelInfo? in
+            guard let id = entry["id"] as? String, !id.isEmpty else { return nil }
+            let displayName = (entry["display_name"] as? String).map { $0.isEmpty ? id : $0 } ?? id
+            return OpenAIModelInfo(id: id, name: displayName)
+        }
+        return parsed.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
+
     func fetchHuggingFaceModels() {
         guard !apiKeys[.huggingFace].isEmpty else {
             modelLists[.huggingFace] = Self.defaultHuggingFaceModels
@@ -828,11 +876,12 @@ extension AgentViewModel {
         case .qwen: fetchQwenModels()
         case .openRouter: fetchOpenRouterModels()
         case .requesty: fetchRequestyModels()
+        case .a2Agent: fetchA2AgentModels()
         case .vibe:
             // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
             fetchProviderModels(.vibe, defaults: [],
                 filter: { $0.filter { $0.id.lowercased().contains("devstral") && $0.id.contains("latest") } })
-        case .openAI, .deepSeek, .gemini, .grok, .mistral, .miniMax, .a2Agent:
+        case .openAI, .deepSeek, .gemini, .grok, .mistral, .miniMax:
             fetchProviderModels(provider, defaults: [])
         case .bigModel, .foundationModel: break
         }
