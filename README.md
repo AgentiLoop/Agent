@@ -65,7 +65,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 > ⚠️ Option B builds are ad-hoc signed. The Launch Agent/Daemon helpers won't register (SMAppService needs a Team ID), but the LLM loop, all tools, Accessibility, AppleScript, shell, and MCP still work.
 
-> 💡 **Cheap setup:** **GLM-5.1** via **Z.ai** (fastest signup, default model) costs pennies per million tokens. Running locally? Only **GLM-4.7-Turbo** (32B) fits consumer hardware (64–128GB Apple Silicon via Ollama).
+> 💡 **Cheap setup:** **GLM-5.3** via **Z.ai** (fastest signup, default model) costs pennies per million tokens. Running locally? Only **GLM-4.7-Turbo** (32B) fits consumer hardware (64–128GB Apple Silicon via Ollama).
 
 ### Troubleshooting (Build from Source)
 
@@ -110,7 +110,7 @@ Just type what you want. Agent! figures out how and makes it happen.
 | **Mistral** / **Mistral Vibe** | Paid | Open-weight cloud, code, agent product |
 | **DeepSeek** | Cheap | Budget coding, cache-hit reporting |
 | **Hugging Face** | Varies | Open models, serverless or dedicated endpoints |
-| **Z.ai** / **BigModel** | Cheap | GLM-5.1 — recommended starting point |
+| **Z.ai** / **BigModel** | Cheap | GLM-5.3 — recommended starting point |
 | **Qwen** (Alibaba) | Cheap | Qwen 2.5 / 3 via Dashscope |
 | **MiniMax** | Cheap | 1M-token context |
 | **OpenRouter** | Paid | 200+ models, one key; Claude routed via Anthropic protocol |
@@ -309,7 +309,7 @@ Slash commands run locally: `/clear [log|all|llm|history|tasks|tokens]`, `/memor
 ## FAQ
 
 **Do I need to know how to code?** No — plain English (or your native language).
-**How much does it cost?** The app is free (MIT). You pay your provider; GLM-5.1 via Z.ai/BigModel or DeepSeek are the cheapest for serious work. Local models are free if you own the hardware.
+**How much does it cost?** The app is free (MIT). You pay your provider; GLM-5.3 via Z.ai/BigModel or DeepSeek are the cheapest for serious work. Local models are free if you own the hardware.
 **What Mac do I need?** Apple Silicon, macOS 26.4.1+. Any modern Mac for cloud providers; 64GB+ for 30B local models.
 **How is this different from Siri?** Siri answers. Agent! *acts* — apps, files, code, system.
 

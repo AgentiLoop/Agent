@@ -65,7 +65,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 > ⚠️ Las builds de la Opción B están firmadas ad-hoc. Los helpers Launch Agent/Daemon no se registrarán (SMAppService necesita un Team ID), pero el bucle LLM, todas las herramientas, Accesibilidad, AppleScript, shell y MCP siguen funcionando.
 
-> 💡 **Configuración barata:** **GLM-5.1** vía **Z.ai** (registro más rápido, modelo por defecto) cuesta céntimos por millón de tokens. ¿En local? Solo **GLM-4.7-Turbo** (32B) cabe en hardware de consumo (Apple Silicon de 64–128 GB vía Ollama).
+> 💡 **Configuración barata:** **GLM-5.3** vía **Z.ai** (registro más rápido, modelo por defecto) cuesta céntimos por millón de tokens. ¿En local? Solo **GLM-4.7-Turbo** (32B) cabe en hardware de consumo (Apple Silicon de 64–128 GB vía Ollama).
 
 ### Solución de problemas (Compilar desde el código fuente)
 
@@ -111,7 +111,7 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 | **DeepSeek** | Barato | Programación económica, informe de aciertos de caché |
 | **Hugging Face** | Varía | Modelos abiertos, serverless o endpoints dedicados |
 | **OpenRouter** | De pago | 200+ modelos, una clave; Claude enrutado por protocolo Anthropic |
-| **Z.ai** / **BigModel** | Barato | GLM-5.1 — punto de partida recomendado |
+| **Z.ai** / **BigModel** | Barato | GLM-5.3 — punto de partida recomendado |
 | **Qwen** (Alibaba) | Barato | Qwen 2.5 / 3 vía Dashscope |
 | **MiniMax** | Barato | Contexto de 1M tokens |
 | **Ollama** (nube) | Nivel gratuito | Modelos abiertos alojados |
@@ -309,7 +309,7 @@ Los comandos slash se ejecutan en local: `/clear [log|all|llm|history|tasks|toke
 ## FAQ
 
 **¿Necesito saber programar?** No — español llano (o tu idioma nativo).
-**¿Cuánto cuesta?** La app es gratis (MIT). Pagas a tu proveedor; GLM-5.1 vía Z.ai/BigModel o DeepSeek son los más baratos para trabajo serio. Los modelos locales son gratis si tienes el hardware.
+**¿Cuánto cuesta?** La app es gratis (MIT). Pagas a tu proveedor; GLM-5.3 vía Z.ai/BigModel o DeepSeek son los más baratos para trabajo serio. Los modelos locales son gratis si tienes el hardware.
 **¿Qué Mac necesito?** Apple Silicon, macOS 26.4.1+. Cualquier Mac moderno para proveedores en la nube; 64 GB+ para modelos locales de 30B.
 **¿En qué se diferencia de Siri?** Siri responde. Agent! *actúa* — apps, archivos, código, sistema.
 

@@ -65,7 +65,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 > ⚠️ 方案 B 的构建为临时签名。Launch Agent/Daemon helper 无法注册（SMAppService 需要 Team ID），但 LLM 循环、所有工具、辅助功能、AppleScript、shell 和 MCP 仍可正常使用。
 
-> 💡 **低成本方案：** 通过 **Z.ai** 使用 **GLM-5.1**（注册最快，默认模型），每百万 token 只需几分钱。本地运行？只有 **GLM-4.7-Turbo**（32B）能在消费级硬件上运行（64–128GB Apple Silicon，通过 Ollama）。
+> 💡 **低成本方案：** 通过 **Z.ai** 使用 **GLM-5.3**（注册最快，默认模型），每百万 token 只需几分钱。本地运行？只有 **GLM-4.7-Turbo**（32B）能在消费级硬件上运行（64–128GB Apple Silicon，通过 Ollama）。
 
 ### 故障排除（从源码构建）
 
@@ -111,7 +111,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **DeepSeek** | 便宜 | 低成本编码、缓存命中报告 |
 | **Hugging Face** | 不定 | 开源模型，serverless 或专用端点 |
 | **OpenRouter** | 付费 | 200+ 模型，一把密钥；Claude 经 Anthropic 协议路由 |
-| **Z.ai** / **BigModel** | 便宜 | GLM-5.1 —— 推荐起点 |
+| **Z.ai** / **BigModel** | 便宜 | GLM-5.3 —— 推荐起点 |
 | **Qwen**（阿里巴巴） | 便宜 | 通过 Dashscope 使用 Qwen 2.5 / 3 |
 | **MiniMax** | 便宜 | 1M token 上下文 |
 | **Ollama**（云端） | 免费额度 | 托管的开源模型 |
@@ -309,7 +309,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 ## 常见问题
 
 **需要会编程吗？** 不需要——用自然语言（或你的母语）即可。
-**费用多少？** 应用免费（MIT）。你只需支付提供商费用；正经工作最便宜的是通过 Z.ai/BigModel 使用 GLM-5.1 或 DeepSeek。拥有硬件的话本地模型免费。
+**费用多少？** 应用免费（MIT）。你只需支付提供商费用；正经工作最便宜的是通过 Z.ai/BigModel 使用 GLM-5.3 或 DeepSeek。拥有硬件的话本地模型免费。
 **需要什么 Mac？** Apple Silicon，macOS 26.4.1+。云端提供商任何现代 Mac 都行；30B 本地模型需要 64GB+。
 **和 Siri 有什么不同？** Siri 回答问题。Agent! *执行操作*——应用、文件、代码、系统。
 
