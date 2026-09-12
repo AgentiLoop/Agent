@@ -54,35 +54,42 @@ extension AgentViewModel {
     func resolveInitialProviderConfig() -> (provider: APIProvider, modelName: String, isVision: Bool) {
         let provider = selectedProvider
         let modelName = globalModelForProvider(provider)
-        var isVision: Bool
+        return (provider, modelName, resolveVision(provider: provider, modelName: modelName))
+    }
+
+    /// Whether the given provider/model pair accepts images (honours `forceVision`).
+    func resolveVision(provider: APIProvider, modelName: String) -> Bool {
+        if forceVision { return true }
         switch provider {
         case .claude, .codex, .openAI, .gemini, .mistral:
-            isVision = true // every current model on these providers accepts images
+            return true // every current model on these providers accepts images
         case .miniMax, .vibe, .foundationModel:
-            isVision = false
+            return false
         case .zAI, .bigModel:
-            isVision = models[provider].hasSuffix(":v")
+            return models[provider].hasSuffix(":v")
         case .ollama:
-            isVision = selectedOllamaSupportsVision || Self.isVisionModel(modelName)
+            return selectedOllamaSupportsVision || Self.isVisionModel(modelName)
         case .localOllama:
-            isVision = selectedLocalOllamaSupportsVision || Self.isVisionModel(modelName)
+            return selectedLocalOllamaSupportsVision || Self.isVisionModel(modelName)
         default:
-            isVision = Self.isVisionModel(modelName)
+            return Self.isVisionModel(modelName)
         }
-        if forceVision { isVision = true }
-        return (provider, modelName, isVision)
     }
 
 
     /// / Builds the LLM service bundle for a given provider/model/vision combo. / Called at task start and again
-    /// whenever the fallback chain swaps providers / mid-task. Mirrors the original inline `buildLLMServices` closure exactly.
+    /// whenever the fallback chain swaps providers / mid-task. Also used by tab tasks, the critic gate and sub-agents.
+    /// `isVision` defaults to `resolveVision`; `projectFolder` defaults to the app's current project folder.
     func buildLLMServiceBundle(
         provider: APIProvider,
         modelName: String,
-        isVision: Bool,
+        isVision: Bool? = nil,
         historyContext: String,
+        projectFolder folderOverride: String? = nil,
         maxTokens mt: Int
     ) -> LLMServiceBundle {
+        let projectFolder = folderOverride ?? self.projectFolder
+        let isVision = isVision ?? resolveVision(provider: provider, modelName: modelName)
         var claude: ClaudeService?
         var codex: CodexService?
         var openAICompatible: OpenAICompatibleService?
@@ -106,7 +113,7 @@ extension AgentViewModel {
             )
         } else if provider == .lmStudio && lmStudioProtocol == .anthropic {
             claude = ClaudeService(
-                apiKey: apiKeys[.lmStudio], model: models[.lmStudio],
+                apiKey: apiKeys[.lmStudio], model: modelName,
                 historyContext: historyContext,
                 projectFolder: projectFolder,
                 baseURL: lmStudioEndpoint, maxTokens: mt

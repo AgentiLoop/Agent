@@ -87,9 +87,9 @@ extension AgentViewModel {
         let messages: [[String: Any]] = [["role": "user", "content": userMessage]]
 
         let (criticProvider, criticModel, _) = resolveInitialProviderConfig()
-        let services = buildTabLLMServices(
+        let services = buildLLMServiceBundle(
             provider: criticProvider,
-            modelId: criticModel,
+            modelName: criticModel,
             historyContext: "",
             projectFolder: projectFolder,
             maxTokens: 2048
