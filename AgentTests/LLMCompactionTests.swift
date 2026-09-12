@@ -203,7 +203,7 @@ struct LLMCompactionTests {
         var compactorCalls = 0
         var logs: [String] = []
         let outcome = await vm.handleTaskLoopError(
-            OverflowError(), activeService: .claude, providerDisplayName: "Claude",
+            OverflowError(), provider: .claude,
             messages: &messages, timeoutRetryCount: &retries, maxTimeoutRetries: 3,
             appendLogFn: { logs.append($0) }, flushFn: {},
             overflowCompactor: { msgs in
@@ -226,7 +226,7 @@ struct LLMCompactionTests {
         var messages = sample(rounds: 10)
         var retries = 0
         let outcome = await vm.handleTaskLoopError(
-            OverflowError(), activeService: .claude, providerDisplayName: "Claude",
+            OverflowError(), provider: .claude,
             messages: &messages, timeoutRetryCount: &retries, maxTimeoutRetries: 3,
             appendLogFn: { _ in }, flushFn: {},
             overflowCompactor: { _ in false })
@@ -237,7 +237,7 @@ struct LLMCompactionTests {
         var frozen: [[String: Any]] = [["role": "user", "content": "x"]]
         var retries2 = 0
         let stop = await vm.handleTaskLoopError(
-            OverflowError(), activeService: .claude, providerDisplayName: "Claude",
+            OverflowError(), provider: .claude,
             messages: &frozen, timeoutRetryCount: &retries2, maxTimeoutRetries: 3,
             appendLogFn: { _ in }, flushFn: {},
             overflowCompactor: { _ in true })
