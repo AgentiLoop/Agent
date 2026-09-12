@@ -50,77 +50,29 @@ extension AgentViewModel {
     }
 
     /// / Resolves the initial `(provider, modelName, isVision)` triple for a new task / from the currently-selected
-    /// provider and per-provider model/vision settings. / Matches the original inline switch exactly.
+    /// provider and per-provider model/vision settings.
     func resolveInitialProviderConfig() -> (provider: APIProvider, modelName: String, isVision: Bool) {
         let provider = selectedProvider
-        let modelName: String
+        let modelName = globalModelForProvider(provider)
         var isVision: Bool
         switch provider {
-        case .claude:
-            modelName = selectedModel
-            isVision = true // Claude Sonnet/Opus/Haiku all support vision
-        case .codex:
-            modelName = models[.codex]
-            isVision = true // GPT-5 codex supports vision via input_image blocks
-        case .openAI:
-            modelName = models[.openAI]
-            isVision = true // GPT-4o, GPT-4 Turbo support vision
-        case .deepSeek:
-            modelName = models[.deepSeek]
-            isVision = Self.isVisionModel(models[.deepSeek])
-        case .huggingFace:
-            modelName = models[.huggingFace]
-            isVision = Self.isVisionModel(models[.huggingFace])
+        case .claude, .codex, .openAI, .gemini, .mistral:
+            isVision = true // every current model on these providers accepts images
+        case .miniMax, .vibe, .foundationModel:
+            isVision = false
+        case .zAI, .bigModel:
+            isVision = models[provider].hasSuffix(":v")
         case .ollama:
-            modelName = models[.ollama]
-            isVision = selectedOllamaSupportsVision || Self.isVisionModel(models[.ollama])
+            isVision = selectedOllamaSupportsVision || Self.isVisionModel(modelName)
         case .localOllama:
-            modelName = models[.localOllama]
-            isVision = selectedLocalOllamaSupportsVision || Self.isVisionModel(models[.localOllama])
-        case .vLLM:
-            modelName = models[.vLLM]
-            isVision = Self.isVisionModel(models[.vLLM])
-        case .lmStudio:
-            modelName = models[.lmStudio]
-            isVision = Self.isVisionModel(models[.lmStudio])
-        case .zAI:
-            isVision = models[.zAI].hasSuffix(":v")
-            modelName = models[.zAI].replacingOccurrences(of: ":v", with: "")
-        case .bigModel:
-            isVision = models[.bigModel].hasSuffix(":v")
-            modelName = models[.bigModel].replacingOccurrences(of: ":v", with: "")
-        case .miniMax:
-            modelName = models[.miniMax]
-            isVision = false
-        case .openRouter:
-            modelName = models[.openRouter]
-            isVision = Self.isVisionModel(models[.openRouter])
-        case .requesty:
-            modelName = models[.requesty]
-            isVision = Self.isVisionModel(models[.requesty])
-        case .qwen:
-            modelName = models[.qwen]
-            isVision = Self.isVisionModel(models[.qwen])
-        case .gemini:
-            modelName = models[.gemini]
-            isVision = true // Gemini supports vision
-        case .grok:
-            modelName = models[.grok]
-            isVision = Self.isVisionModel(models[.grok])
-        case .mistral:
-            modelName = models[.mistral]
-            isVision = true
-
-        case .vibe:
-            modelName = models[.vibe]
-            isVision = false
-        case .foundationModel:
-            modelName = "Apple Intelligence"
-            isVision = false // Apple Intelligence doesn't support image input
+            isVision = selectedLocalOllamaSupportsVision || Self.isVisionModel(modelName)
+        default:
+            isVision = Self.isVisionModel(modelName)
         }
         if forceVision { isVision = true }
         return (provider, modelName, isVision)
     }
+
 
     /// / Builds the LLM service bundle for a given provider/model/vision combo. / Called at task start and again
     /// whenever the fallback chain swaps providers / mid-task. Mirrors the original inline `buildLLMServices` closure exactly.

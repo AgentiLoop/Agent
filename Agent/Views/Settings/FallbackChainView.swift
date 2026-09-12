@@ -192,30 +192,9 @@ struct FallbackChainView: View {
         .frame(width: 380)
     }
 
-    /// (id, display) pairs for the model picker. `id` is stored/sent to API,
-    /// `display` is shown in the UI (e.g. Z.ai coding models show `-Code` suffix).
+    /// (id, display) pairs for the model picker, from the view model's per-provider catalog.
     private func modelOptionsForProvider(_ provider: APIProvider) -> [(id: String, display: String)] {
-        func oai(_ list: [AgentViewModel.OpenAIModelInfo]) -> [(id: String, display: String)] {
-            list.map { ($0.id, $0.name) }
-        }
-        switch provider {
-        case .claude: return viewModel.availableClaudeModels.map { ($0.id, $0.formattedDisplayName) }
-        case .openAI: return oai(viewModel.modelLists[.openAI])
-        case .ollama: return viewModel.ollamaModels.map { ($0.name, $0.name) }
-        case .localOllama: return viewModel.localOllamaModels.map { ($0.name, $0.name) }
-        case .deepSeek: return oai(viewModel.modelLists[.deepSeek])
-        case .huggingFace: return oai(viewModel.modelLists[.huggingFace])
-        case .vLLM: return oai(viewModel.modelLists[.vLLM])
-        case .lmStudio: return oai(viewModel.modelLists[.lmStudio])
-        case .zAI: return oai(viewModel.modelLists[.zAI])
-        case .qwen: return oai(viewModel.modelLists[.qwen])
-        case .gemini: return oai(viewModel.modelLists[.gemini])
-        case .grok: return oai(viewModel.modelLists[.grok])
-        case .mistral: return oai(viewModel.modelLists[.mistral])
-        case .openRouter: return oai(viewModel.modelLists[.openRouter])
-        case .requesty: return oai(viewModel.modelLists[.requesty])
-        default: return []
-        }
+        viewModel.modelOptions(for: provider).map { ($0.id, $0.name) }
     }
 
     private func modelsForProvider(_ provider: APIProvider) -> [String] {
@@ -231,33 +210,11 @@ struct FallbackChainView: View {
         return clean
     }
 
-    /// / Default model for a provider — uses the user's currently-selected model for that / provider (read from the
-    /// ViewModel), falling back to the first dynamically-fetched / model. Never hardcoded — model strings change frequently across provider updates.
+    /// Default model for a provider — the model the user is actively using for that provider,
+    /// falling back to the first dynamically-fetched model. Never hardcoded.
     private func defaultModel(for provider: APIProvider) -> String {
-        // Prefer the model the user is actively using for that provider
-        switch provider {
-        case .claude: if !viewModel.selectedModel.isEmpty { return viewModel.selectedModel }
-        case .codex: if !viewModel.models[.codex].isEmpty { return viewModel.models[.codex] }
-        case .openAI: if !viewModel.models[.openAI].isEmpty { return viewModel.models[.openAI] }
-        case .ollama: if !viewModel.models[.ollama].isEmpty { return viewModel.models[.ollama] }
-        case .localOllama: if !viewModel.models[.localOllama].isEmpty { return viewModel.models[.localOllama] }
-        case .deepSeek: if !viewModel.models[.deepSeek].isEmpty { return viewModel.models[.deepSeek] }
-        case .huggingFace: if !viewModel.models[.huggingFace].isEmpty { return viewModel.models[.huggingFace] }
-        case .vLLM: if !viewModel.models[.vLLM].isEmpty { return viewModel.models[.vLLM] }
-        case .lmStudio: if !viewModel.models[.lmStudio].isEmpty { return viewModel.models[.lmStudio] }
-        case .zAI: if !viewModel.models[.zAI].isEmpty { return viewModel.models[.zAI] }
-        case .qwen: if !viewModel.models[.qwen].isEmpty { return viewModel.models[.qwen] }
-        case .gemini: if !viewModel.models[.gemini].isEmpty { return viewModel.models[.gemini] }
-        case .grok: if !viewModel.models[.grok].isEmpty { return viewModel.models[.grok] }
-        case .mistral: if !viewModel.models[.mistral].isEmpty { return viewModel.models[.mistral] }
-        case .vibe: if !viewModel.models[.vibe].isEmpty { return viewModel.models[.vibe] }
-        case .bigModel: if !viewModel.models[.bigModel].isEmpty { return viewModel.models[.bigModel] }
-        case .miniMax: if !viewModel.models[.miniMax].isEmpty { return viewModel.models[.miniMax] }
-        case .openRouter: if !viewModel.models[.openRouter].isEmpty { return viewModel.models[.openRouter] }
-        case .requesty: if !viewModel.models[.requesty].isEmpty { return viewModel.models[.requesty] }
-        case .foundationModel: return "Apple Intelligence"
-        }
-        // Fall back to the first dynamically-fetched model for this provider
+        let current = viewModel.models[provider]
+        if !current.isEmpty { return current }
         return modelsForProvider(provider).first ?? ""
     }
 

@@ -88,124 +88,15 @@ struct NewMainTabSheet: View {
             }
             .labelsHidden()
 
-        case .codex:
-            TextField("gpt-5", text: $selectedModelId)
-                .textFieldStyle(.roundedBorder)
-                .labelsHidden()
-
-        case .openAI:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.openAI],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.openAI),
-                fetch: { viewModel.fetchModelsIfNeeded(for: .openAI, force: true) }
-            )
-
-        case .deepSeek:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.deepSeek],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.deepSeek),
-                fetch: { viewModel.fetchModelsIfNeeded(for: .deepSeek, force: true) }
-            )
-
-        case .huggingFace:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.huggingFace],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.huggingFace),
-                fetch: { viewModel.fetchModelsIfNeeded(for: .huggingFace, force: true) }
-            )
-
         case .ollama:
             ollamaModelPicker(models: viewModel.ollamaModels, fetch: { viewModel.fetchModelsIfNeeded(for: .ollama, force: true) })
 
         case .localOllama:
             ollamaModelPicker(models: viewModel.localOllamaModels, fetch: { viewModel.fetchModelsIfNeeded(for: .localOllama, force: true) })
 
-        case .vLLM:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.vLLM],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.vLLM),
-                fetch: { viewModel.fetchModelsIfNeeded(for: .vLLM, force: true) }
-            )
-
-        case .lmStudio:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.lmStudio],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.lmStudio),
-                fetch: { viewModel.fetchModelsIfNeeded(for: .lmStudio, force: true) }
-            )
-
-        case .zAI:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.zAI],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.zAI),
-                fetch: { viewModel.fetchModelsIfNeeded(for: .zAI, force: true) }
-            )
-
         case .bigModel:
+            // No /models endpoint — free-form id.
             TextField("Model (e.g. glm-4.7)", text: $selectedModelId)
-                .textFieldStyle(.roundedBorder)
-
-        case .miniMax:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.miniMax],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.miniMax),
-                fetch: { viewModel.fetchModelsIfNeeded(for: .miniMax, force: true) }
-            )
-
-        case .openRouter:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.openRouter],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.openRouter),
-                fetch: { viewModel.fetchModelsIfNeeded(for: .openRouter, force: true) }
-            )
-
-        case .requesty:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.requesty],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.requesty),
-                fetch: { viewModel.fetchModelsIfNeeded(for: .requesty, force: true) }
-            )
-
-        case .qwen:
-            TextField("Model (e.g. qwen-plus)", text: $selectedModelId)
-                .textFieldStyle(.roundedBorder)
-
-        case .gemini:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.gemini],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.gemini),
-                fetch: { viewModel.fetchGeminiModels() }
-            )
-
-        case .grok:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.grok],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.grok),
-                fetch: { viewModel.fetchGrokModels() }
-            )
-
-        case .mistral:
-            modelPickerWithFetch(
-                models: viewModel.modelLists[.mistral],
-                fallbackBinding: $selectedModelId,
-                isFetching: viewModel.fetchingModels.contains(.mistral),
-                fetch: { viewModel.fetchMistralModels() }
-            )
-
-
-        case .vibe:
-            TextField("Model (e.g. devstral-small-2507)", text: $selectedModelId)
                 .textFieldStyle(.roundedBorder)
 
         case .foundationModel:
@@ -214,6 +105,14 @@ struct NewMainTabSheet: View {
                     .foregroundStyle(.secondary)
                 Spacer()
             }
+
+        default:
+            modelPickerWithFetch(
+                models: viewModel.modelLists[provider],
+                fallbackBinding: $selectedModelId,
+                isFetching: viewModel.fetchingModels.contains(provider),
+                fetch: { [provider] in viewModel.fetchModelsIfNeeded(for: provider, force: true) }
+            )
         }
     }
 
