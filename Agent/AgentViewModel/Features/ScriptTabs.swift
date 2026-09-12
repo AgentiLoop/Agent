@@ -62,52 +62,17 @@ extension AgentViewModel {
     /// Return the current global model ID for the given provider.
     func globalModelForProvider(_ provider: APIProvider) -> String {
         switch provider {
-        case .claude: return selectedModel
-        case .codex: return models[.codex]
-        case .openAI: return models[.openAI]
-        case .deepSeek: return models[.deepSeek]
-        case .huggingFace: return models[.huggingFace]
-        case .ollama: return models[.ollama]
-        case .localOllama: return models[.localOllama]
-        case .vLLM: return models[.vLLM]
-        case .lmStudio: return models[.lmStudio]
-        case .zAI: return models[.zAI].replacingOccurrences(of: ":v", with: "")
-        case .bigModel: return models[.bigModel].replacingOccurrences(of: ":v", with: "")
-        case .miniMax: return models[.miniMax]
-        case .openRouter: return models[.openRouter]
-        case .requesty: return models[.requesty]
-        case .qwen: return models[.qwen]
-        case .gemini: return models[.gemini]
-        case .grok: return models[.grok]
-        case .mistral: return models[.mistral]
-        case .vibe: return models[.vibe]
-        case .foundationModel: return "Apple Intelligence"
+        case .zAI, .bigModel: return models[provider].replacingOccurrences(of: ":v", with: "")
+        default: return models[provider]
         }
     }
 
-    /// Return the API key for the given provider.
+    /// Return the API key for the given provider. Codex (OAuth file) and keyless local
+    /// providers have no key.
     func apiKeyForProvider(_ provider: APIProvider) -> String {
         switch provider {
-        case .claude: return apiKey
-        case .codex: return "" // auth comes from ~/.codex/auth.json, no UI key
-        case .openAI: return apiKeys[.openAI]
-        case .deepSeek: return apiKeys[.deepSeek]
-        case .huggingFace: return apiKeys[.huggingFace]
-        case .ollama: return apiKeys[.ollama]
-        case .localOllama: return ""
-        case .vLLM: return apiKeys[.vLLM]
-        case .lmStudio: return apiKeys[.lmStudio]
-        case .zAI: return apiKeys[.zAI]
-        case .bigModel: return apiKeys[.bigModel]
-        case .miniMax: return apiKeys[.miniMax]
-        case .openRouter: return apiKeys[.openRouter]
-        case .requesty: return apiKeys[.requesty]
-        case .qwen: return apiKeys[.qwen]
-        case .gemini: return apiKeys[.gemini]
-        case .grok: return apiKeys[.grok]
-        case .mistral: return apiKeys[.mistral]
-        case .vibe: return apiKeys[.vibe]
-        case .foundationModel: return ""
+        case .codex, .localOllama, .foundationModel: return ""
+        default: return apiKeys[provider]
         }
     }
 
@@ -125,54 +90,29 @@ extension AgentViewModel {
         switch provider {
         case .claude:
             return availableClaudeModels.first(where: { $0.id == modelId })?.displayName ?? modelId
-        case .codex:
-            return modelId
-        case .openAI:
-            return modelLists[.openAI].first(where: { $0.id == modelId })?.name
-                ?? Self.defaultOpenAIModels.first(where: { $0.id == modelId })?.name ?? modelId
-        case .deepSeek:
-            return modelLists[.deepSeek].first(where: { $0.id == modelId })?.name
-                ?? Self.defaultDeepSeekModels.first(where: { $0.id == modelId })?.name ?? modelId
-        case .huggingFace:
-            return modelLists[.huggingFace].first(where: { $0.id == modelId })?.name
-                ?? Self.defaultHuggingFaceModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .ollama:
             return ollamaModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .localOllama:
             return localOllamaModels.first(where: { $0.id == modelId })?.name ?? modelId
-        case .vLLM:
-            return modelLists[.vLLM].first(where: { $0.id == modelId })?.name ?? modelId
-        case .lmStudio:
-            return modelLists[.lmStudio].first(where: { $0.id == modelId })?.name ?? modelId
-        case .zAI:
-            return modelLists[.zAI].first(where: { $0.id == modelId })?.name
-                ?? Self.defaultZAIModels.first(where: { $0.id == modelId })?.name ?? modelId
-        case .bigModel:
-            return modelId
-        case .miniMax:
-            return modelLists[.miniMax].first(where: { $0.id == modelId })?.name
-                ?? Self.defaultMiniMaxModels.first(where: { $0.id == modelId })?.name ?? modelId
-        case .openRouter:
-            return modelLists[.openRouter].first(where: { $0.id == modelId })?.name ?? modelId
-        case .requesty:
-            return modelLists[.requesty].first(where: { $0.id == modelId })?.name ?? modelId
-        case .qwen:
-            return modelId
-        case .gemini:
-            return modelLists[.gemini].first(where: { $0.id == modelId })?.name
-                ?? Self.defaultGeminiModels.first(where: { $0.id == modelId })?.name ?? modelId
-        case .grok:
-            return modelLists[.grok].first(where: { $0.id == modelId })?.name
-                ?? Self.defaultGrokModels.first(where: { $0.id == modelId })?.name ?? modelId
-        case .mistral:
-            return modelId
-
-        case .vibe:
-            return modelId
         case .foundationModel:
             return "Apple Intelligence"
+        default:
+            return modelLists[provider].first(where: { $0.id == modelId })?.name ?? modelId
         }
     }
+
+    /// (id, name) pairs for a model picker. `id` is what gets stored/sent to the API,
+    /// `name` is what the UI shows (e.g. Z.ai coding models carry a `-Code` suffix).
+    func modelOptions(for provider: APIProvider) -> [(id: String, name: String)] {
+        switch provider {
+        case .claude: return availableClaudeModels.map { ($0.id, $0.formattedDisplayName) }
+        case .ollama: return ollamaModels.map { ($0.name, $0.name) }
+        case .localOllama: return localOllamaModels.map { ($0.name, $0.name) }
+        case .foundationModel: return [("Apple Intelligence", "Apple Intelligence")]
+        default: return modelLists[provider].map { ($0.id, $0.name) }
+        }
+    }
+
 
     func closeScriptTab(id: UUID) {
         if let tab = tab(for: id) {

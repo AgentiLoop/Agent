@@ -103,31 +103,11 @@ extension AgentViewModel {
     // MARK: - Temperature helpers
 
     /// Current provider's temperature value.
-    var currentTemperature: Double { temperatureForProvider(selectedProvider) }
+    var currentTemperature: Double { temperatures[selectedProvider] }
 
-    /// Get temperature for the current provider.
+    /// Get temperature for the given provider.
     func temperatureForProvider(_ provider: APIProvider) -> Double {
-        switch provider {
-        case .claude: return temperatures[.claude]
-        case .codex: return temperatures[.openAI]
-        case .ollama: return temperatures[.ollama]
-        case .openAI: return temperatures[.openAI]
-        case .deepSeek: return temperatures[.deepSeek]
-        case .huggingFace: return temperatures[.huggingFace]
-        case .localOllama: return temperatures[.localOllama]
-        case .vLLM: return temperatures[.vLLM]
-        case .lmStudio: return temperatures[.lmStudio]
-        case .zAI: return temperatures[.zAI]
-        case .bigModel: return temperatures[.zAI]
-        case .miniMax: return temperatures[.miniMax]
-        case .openRouter: return temperatures[.openAI]
-        case .requesty: return temperatures[.openAI]
-        case .qwen: return temperatures[.openAI]
-        case .gemini: return temperatures[.gemini]
-        case .grok: return temperatures[.grok]
-        case .mistral: return temperatures[.openAI]
-        case .vibe: return temperatures[.openAI]
-        case .foundationModel: return temperatures[.claude]
-        }
+        temperatures[provider]
     }
 }
+
