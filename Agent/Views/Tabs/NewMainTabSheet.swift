@@ -132,7 +132,7 @@ struct NewMainTabSheet: View {
                     ForEach(models) { model in
                         HStack(spacing: 4) {
                             Text(model.name)
-                            if model.id.hasSuffix(":v") {
+                            if viewModel.showsVisionBadge(provider: provider, modelId: model.id) {
                                 Image(systemName: "eye")
                                     .foregroundStyle(.blue)
                                     .font(.caption2)
