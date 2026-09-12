@@ -201,29 +201,10 @@ struct NewMainTabSheet: View {
         return ""
     }
 
+    /// The model the user last picked for this provider, falling back to the registry default.
     private func defaultModelId(for provider: APIProvider) -> String {
-        switch provider {
-        case .claude: return viewModel.selectedModel
-        case .codex: return viewModel.models[.codex]
-        case .openAI: return viewModel.models[.openAI]
-        case .deepSeek: return viewModel.models[.deepSeek]
-        case .huggingFace: return viewModel.models[.huggingFace]
-        case .ollama: return viewModel.models[.ollama]
-        case .localOllama: return viewModel.models[.localOllama]
-        case .vLLM: return viewModel.models[.vLLM]
-        case .lmStudio: return viewModel.models[.lmStudio]
-        case .zAI: return viewModel.models[.zAI]
-        case .bigModel: return "glm-4.7"
-        case .miniMax: return viewModel.models[.miniMax].isEmpty ? "MiniMax-M3" : viewModel.models[.miniMax]
-        case .openRouter: return viewModel.models[.openRouter]
-        case .requesty: return viewModel.models[.requesty]
-        case .qwen: return "qwen-plus"
-        case .gemini: return viewModel.models[.gemini]
-        case .grok: return viewModel.models[.grok]
-        case .mistral: return "mistral-large-latest"
-        case .vibe: return "devstral-small-2507"
-        case .foundationModel: return "Apple Intelligence"
-        }
+        let current = viewModel.models[provider]
+        return current.isEmpty ? provider.config.model : current
     }
 
     private func ensureModelsLoaded(for provider: APIProvider) {

@@ -5,30 +5,10 @@ import AgentLLM
 struct SettingsView: View {
     @Bindable var viewModel: AgentViewModel
 
-    /// Per-provider temperature binding so the slider always edits the active model's temp.
+    /// Per-provider temperature binding so the slider always edits the active provider's temp
+    /// (the same `temperatures[selectedProvider]` slot that requests read from).
     private var llmTemperatureBinding: Binding<Double> {
-        switch viewModel.selectedProvider {
-        case .claude: return $viewModel.temperatures[.claude]
-        case .codex: return $viewModel.temperatures[.openAI]
-        case .ollama: return $viewModel.temperatures[.ollama]
-        case .openAI: return $viewModel.temperatures[.openAI]
-        case .deepSeek: return $viewModel.temperatures[.deepSeek]
-        case .huggingFace: return $viewModel.temperatures[.huggingFace]
-        case .localOllama: return $viewModel.temperatures[.localOllama]
-        case .vLLM: return $viewModel.temperatures[.vLLM]
-        case .lmStudio: return $viewModel.temperatures[.lmStudio]
-        case .zAI: return $viewModel.temperatures[.zAI]
-        case .bigModel: return $viewModel.temperatures[.zAI]
-        case .miniMax: return $viewModel.temperatures[.miniMax]
-        case .openRouter: return $viewModel.temperatures[.openAI]
-        case .requesty: return $viewModel.temperatures[.openAI]
-        case .qwen: return $viewModel.temperatures[.openAI]
-        case .gemini: return $viewModel.temperatures[.gemini]
-        case .grok: return $viewModel.temperatures[.grok]
-        case .mistral: return $viewModel.temperatures[.openAI]
-        case .vibe: return $viewModel.temperatures[.openAI]
-        case .foundationModel: return $viewModel.temperatures[.claude] // unused
-        }
+        $viewModel.temperatures[viewModel.selectedProvider]
     }
 
     var body: some View {
