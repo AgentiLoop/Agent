@@ -38,6 +38,7 @@
 		5BHUDA001FC0A98734393F229 /* HUDOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFHUDA001556805C0F5ABC260 /* HUDOptionsView.swift */; };
 		5BLLMOUT01FC0A98734393F230 /* LLMOutputTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFLLMOUT01556805C0F5ABC261 /* LLMOutputTextView.swift */; };
 		5C2EF53DF60353170D36ACC1 /* SubAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC0549F9001505AC8375592 /* SubAgent.swift */; };
+		741D62A344F93FECB53C8C65 /* ProviderParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245995D0756C349D623788CC /* ProviderParserTests.swift */; };
 		78EBD1F124AB2D7D38E70E8E /* AboutSelf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878ED6B87793FE4A12844669 /* AboutSelf.swift */; };
 		7FA36E1A9CC0DFA5A3ECB9AD /* NativeToolHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C673DDB50E956B2E5FD610 /* NativeToolHandler.swift */; };
 		8375A8F4BB60859635722350 /* WebTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F1A988F00C4E7050FED023 /* WebTools.swift */; };
@@ -232,7 +233,6 @@
 		WEB1000000000000000003 /* WebAutomationService+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000004 /* WebAutomationService+Navigation.swift */; };
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
-		741D62A344F93FECB53C8C65 /* ProviderParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245995D0756C349D623788CC /* ProviderParserTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -316,6 +316,7 @@
 		1E185ABB626D6FCD3D74523A /* DiffStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffStore.swift; sourceTree = "<group>"; };
 		21810D90659A7DAD10CFA17A /* ScreenshotPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotPreviewView.swift; sourceTree = "<group>"; };
 		224DF4E08C4D8857DC2B563B /* Automation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Automation.swift; sourceTree = "<group>"; };
+		245995D0756C349D623788CC /* ProviderParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderParserTests.swift; sourceTree = "<group>"; };
 		2AFB0612717E44BF8818651B /* FileBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBackupService.swift; sourceTree = "<group>"; };
 		30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalStateStore.swift; sourceTree = "<group>"; };
 		39A507049182BD42AD200EC6 /* ResponseCompletionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseCompletionTests.swift; sourceTree = "<group>"; };
@@ -521,7 +522,6 @@
 		WEB1000000000000000004 /* WebAutomationService+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Navigation.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
-		245995D0756C349D623788CC /* ProviderParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProviderParserTests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -925,8 +925,8 @@
 				AB112233445566778899070B /* ScriptServiceTests.swift */,
 				AB1122334455667788990C71 /* ToolErrorClassifierTests.swift */,
 				39A507049182BD42AD200EC6 /* ResponseCompletionTests.swift */,
-							245995D0756C349D623788CC /* ProviderParserTests.swift */,
-);
+				245995D0756C349D623788CC /* ProviderParserTests.swift */,
+			);
 			path = AgentTests;
 			sourceTree = "<group>";
 		};
@@ -1443,7 +1443,7 @@
 				8694EEF8CDF9D987CE3D1E2A /* PlanStateStore.swift in Sources */,
 				B73A9A6EBE2A1C13B66EB81E /* ToolErrorClassifier.swift in Sources */,
 				1DCD8313ABDDD50E52BDA2E0 /* CriticGate.swift in Sources */,
-);
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BB10000000000000000050 /* Sources */ = {
@@ -1926,7 +1926,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 1.0.0;
+				minimumVersion = 2.53.13;
 			};
 		};
 		EAE1E7072F7BF5590079432C /* XCRemoteSwiftPackageReference "AgentColorSyntax" */ = {
