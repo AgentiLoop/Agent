@@ -33,7 +33,7 @@ extension AgentViewModel {
     /// Tool icon color reflecting tool accessibility
     var toolsIconColor: Color {
         let prefs = ToolPreferencesService.shared
-        let all = AgentTools.tools(for: selectedProvider)
+        let all = AgentTools.tools()
         let enabledCount = all.filter { prefs.isEnabled(selectedProvider, $0.name) }.count
         if enabledCount == 0 { return .red }
         if !userEnabled { return .yellow }

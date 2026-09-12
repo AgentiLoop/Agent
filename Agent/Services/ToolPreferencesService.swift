@@ -84,7 +84,7 @@ final class ToolPreferencesService {
     private func seedAppleAIDefaults() {
         guard !UserDefaults.standard.bool(forKey: Self.appleAISeededKey) else { return }
         UserDefaults.standard.set(true, forKey: Self.appleAISeededKey)
-        let all = AgentTools.tools(for: .foundationModel).map { $0.name }
+        let all = AgentTools.tools().map { $0.name }
         var updated = disabledTools
         for name in all where !Self.appleAIDefaults.contains(name) {
             updated.insert(toolKey(.foundationModel, name))

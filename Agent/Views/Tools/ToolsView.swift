@@ -56,7 +56,7 @@ struct ToolsView: View {
             // Tag cloud — native tools only, sorted alphabetically
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    let tools = AgentTools.tools(for: selectedProvider)
+                    let tools = AgentTools.tools()
 
                     ForEach(Self.groupOrder, id: \.self) { groupName in
                         if let groupInfo = Self.groups[groupName] {
@@ -105,7 +105,7 @@ struct ToolsView: View {
 
             // Footer
             HStack {
-                let all = AgentTools.tools(for: selectedProvider)
+                let all = AgentTools.tools()
                 let enabledCount = all.filter { prefs.isEnabled(selectedProvider, $0.name) }.count
                 Text("\(enabledCount) of \(all.count) enabled")
                     .font(.caption)

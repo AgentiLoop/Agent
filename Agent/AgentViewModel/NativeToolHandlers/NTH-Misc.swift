@@ -18,7 +18,7 @@ extension AgentViewModel {
         // Tool discovery
         case "list_tools":
             let prefs = ToolPreferencesService.shared
-            let enabledTools = AgentTools.tools(for: selectedProvider)
+            let enabledTools = AgentTools.tools()
                 .filter { prefs.isEnabled(selectedProvider, $0.name) }
                 .sorted { $0.name < $1.name }
             let builtIn = enabledTools.map { tool -> String in
