@@ -95,6 +95,9 @@ extension AgentViewModel {
         case .openRouter:
             modelName = openRouterModel
             isVision = Self.isVisionModel(openRouterModel)
+        case .requesty:
+            modelName = requestyModel
+            isVision = Self.isVisionModel(requestyModel)
         case .qwen:
             modelName = qwenModel
             isVision = Self.isVisionModel(qwenModel)
