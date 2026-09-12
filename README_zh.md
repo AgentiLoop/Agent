@@ -24,7 +24,7 @@
 
 **一个应用。任意 AI。完全掌控你的 Mac。**
 
-Agent! 是一款 100% 原生的 Swift 6.2 / SwiftUI 应用，将 **18 家 LLM 提供商**——Claude、GPT、Gemini、Grok、Mistral、DeepSeek、Qwen、Z.ai、BigModel、Hugging Face、OpenRouter、Ollama（云端和本地）、vLLM、LM Studio、Codestral、Mistral Vibe 以及设备端的 **Apple Intelligence**——接入一个真正*会做事*的自主任务循环：读取你的代码库、修复 bug、构建 Xcode 项目、提交 diff、通过辅助功能 API 驱动任何 Mac 应用、以你的身份或 root 运行 shell 命令、通过 iMessage 把结果发给你，并响应你说出的 *「Agent!」*。
+Agent! 是一款 100% 原生的 Swift 6.2 / SwiftUI 应用，将 **18 家 LLM 提供商**——Claude、Codex、OpenAI、Gemini、Grok、Mistral、Mistral Vibe、DeepSeek、Hugging Face、Z.ai、BigModel、Qwen、MiniMax、OpenRouter、Ollama（云端和本地）、vLLM、LM Studio，以及设备端的 **Apple Intelligence**——接入一个真正*会做事*的自主任务循环：读取你的代码库、修复 bug、构建 Xcode 项目、提交 diff、通过辅助功能 API 驱动任何 Mac 应用、以你的身份或 root 运行 shell 命令、通过 iMessage 把结果发给你，并响应你说出的 *「Agent!」*。
 
 没有 NPM，没有 Electron，没有订阅，没有遥测。使用你自己的 API 密钥，完全本地运行，或用 Apple Intelligence 免费运行。它依赖的每个 Swift 包都出自同一位作者之手。详见下方的[项目背景](#项目背景)。
 
@@ -103,15 +103,17 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | 提供商 | 费用 | 适合 |
 |---|---|---|
 | **Claude** | 付费 | 长时间自主任务、扩展思考、提示词缓存 |
+| **Codex** | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
 | **OpenAI** | 付费 | 通用、工具调用、视觉、`reasoning_effort` |
 | **Google Gemini** | 付费（有免费额度） | 长上下文、视觉 |
 | **Grok** (xAI) | 付费 | 实时信息 |
-| **Mistral** / **Codestral** / **Mistral Vibe** | 付费 | 开放权重云端、代码、智能体产品 |
+| **Mistral** / **Mistral Vibe** | 付费 | 开放权重云端、代码、智能体产品 |
 | **DeepSeek** | 便宜 | 低成本编码、缓存命中报告 |
 | **Hugging Face** | 不定 | 开源模型，serverless 或专用端点 |
 | **OpenRouter** | 付费 | 200+ 模型，一把密钥；Claude 经 Anthropic 协议路由 |
 | **Z.ai** / **BigModel** | 便宜 | GLM-5.1 —— 推荐起点 |
 | **Qwen**（阿里巴巴） | 便宜 | 通过 Dashscope 使用 Qwen 2.5 / 3 |
+| **MiniMax** | 便宜 | 1M token 上下文 |
 | **Ollama**（云端） | 免费额度 | 托管的开源模型 |
 | **本地 Ollama** / **vLLM** / **LM Studio** | 免费 + 硬件 | 完全离线；自动检测各模型真实上下文窗口 |
 | **Apple Intelligence** | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，而非提供商选择器） |
