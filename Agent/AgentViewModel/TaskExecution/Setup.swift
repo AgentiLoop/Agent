@@ -58,6 +58,8 @@ extension AgentViewModel {
     }
 
     /// Whether the given provider/model pair accepts images (honours `forceVision`).
+    /// Order: Force Vision → provider-wide rules → catalog metadata recorded at
+    /// fetch time (`modelVisionSupport`) → model-name keyword heuristic.
     func resolveVision(provider: APIProvider, modelName: String) -> Bool {
         if forceVision { return true }
         switch provider {
@@ -72,6 +74,7 @@ extension AgentViewModel {
         case .localOllama:
             return selectedLocalOllamaSupportsVision || Self.isVisionModel(modelName)
         default:
+            if let known = modelVisionSupport[provider][modelName] { return known }
             return Self.isVisionModel(modelName)
         }
     }

@@ -292,6 +292,13 @@ final class AgentViewModel {
     /// registry's static size so compaction doesn't fire far too early on local models.
     var modelContextWindows = ProviderKeyed<[String: Int]>(load: { _ in [:] })
 
+    /// Per-model image-input support reported by the provider's /models catalog at fetch
+    /// time (OpenRouter/OrcaRouter `architecture.input_modalities`, Requesty
+    /// `supports_vision`), keyed by provider then model id. Zero extra calls — it rides
+    /// the catalog fetch. `resolveVision` prefers this over the name-keyword heuristic so
+    /// gateway models with opaque ids (e.g. z-ai/glm-5.3-flash) don't need Force Vision.
+    var modelVisionSupport = ProviderKeyed<[String: Bool]>(load: { _ in [:] })
+
     // vLLM settings
     var vLLMEndpoint: String = UserDefaults.standard.string(forKey: "vLLMEndpoint") ?? "http://localhost:8000/v1/chat/completions" {
         didSet { UserDefaults.standard.set(vLLMEndpoint, forKey: "vLLMEndpoint") }
