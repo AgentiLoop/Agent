@@ -25,6 +25,7 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
     case openRouter = "openRouter"
     case requesty = "requesty"
     case a2Agent = "a2Agent"
+    case orcaRouter = "orcaRouter"
     case foundationModel = "foundationModel"
 
     var displayName: String {
@@ -49,6 +50,7 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
         case .openRouter: "OpenRouter"
         case .requesty: "Requesty"
         case .a2Agent: "A2Agent"
+        case .orcaRouter: "OrcaRouter"
         case .foundationModel: "Apple Intelligence"
         }
     }

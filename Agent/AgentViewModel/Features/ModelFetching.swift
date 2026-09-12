@@ -347,6 +347,58 @@ extension AgentViewModel {
         return parsed.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
+    func fetchOrcaRouterModels() {
+        fetchingModels.insert(.orcaRouter)
+        Task {
+            defer { fetchingModels.remove(.orcaRouter) }
+            do {
+                let models = try await Self.fetchOrcaRouterCatalog(apiKey: apiKeys[.orcaRouter])
+                modelLists[.orcaRouter] = models
+                let ids = models.map(\.id)
+                if self.models[.orcaRouter].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.orcaRouter])) {
+                    self.models[.orcaRouter] = ids.first ?? ""
+                }
+            } catch {
+                appendLog("Failed to fetch OrcaRouter models: \(error.localizedDescription)")
+                modelLists[.orcaRouter] = []
+            }
+        }
+    }
+
+    /// Fetch OrcaRouter's /models catalog. Plain OpenAI shape (`data[].id`) with an
+    /// optional human-friendly `name`, plus `architecture.output_modalities` — used
+    /// to drop video-only entries (kling/minimax-h3/orca dub) the chat picker can't
+    /// drive. Non-200 responses are surfaced in the log (bad key, out of credits)
+    /// instead of silently yielding an empty picker.
+    private nonisolated static func fetchOrcaRouterCatalog(apiKey: String) async throws -> [OpenAIModelInfo] {
+        guard let url = URL(string: "https://api.orcarouter.ai/v1/models") else { throw AgentError.invalidURL }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        let key = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !key.isEmpty {
+            request.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
+        }
+        request.timeoutInterval = llmAPITimeout
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            let body = String(data: data, encoding: .utf8)?.prefix(200) ?? ""
+            throw AgentError.apiError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0, message: "OrcaRouter /models error \(body)")
+        }
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let entries = json["data"] as? [[String: Any]] else { return [] }
+
+        let parsed = entries.compactMap { entry -> OpenAIModelInfo? in
+            guard let id = entry["id"] as? String, !id.isEmpty else { return nil }
+            // Video-only models can't serve the chat/tool loop.
+            let modalities = ((entry["architecture"] as? [String: Any])?["output_modalities"] as? [String]) ?? []
+            if !modalities.isEmpty && !modalities.contains("text") { return nil }
+            let displayName = (entry["name"] as? String).map { $0.isEmpty ? id : $0 } ?? id
+            return OpenAIModelInfo(id: id, name: displayName)
+        }
+        return parsed.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
+
     func fetchHuggingFaceModels() {
         guard !apiKeys[.huggingFace].isEmpty else {
             modelLists[.huggingFace] = Self.defaultHuggingFaceModels
@@ -877,6 +929,7 @@ extension AgentViewModel {
         case .openRouter: fetchOpenRouterModels()
         case .requesty: fetchRequestyModels()
         case .a2Agent: fetchA2AgentModels()
+        case .orcaRouter: fetchOrcaRouterModels()
         case .vibe:
             // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
             fetchProviderModels(.vibe, defaults: [],
