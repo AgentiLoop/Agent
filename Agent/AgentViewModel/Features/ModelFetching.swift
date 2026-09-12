@@ -179,7 +179,9 @@ extension AgentViewModel {
                 return
             }
             do {
-                let all = try await Self.fetchOpenAICompatibleModels(apiKey: key, endpoint: endpoint)
+                let catalog = try await Self.fetchOpenAICompatibleModels(apiKey: key, endpoint: endpoint)
+                let all = catalog.models
+                modelVisionSupport[provider] = catalog.vision
                 var fetched = all
                 if let filter {
                     let filtered = filter(all)
@@ -748,8 +750,10 @@ extension AgentViewModel {
             ]
             for endpoint in endpoints {
                 do {
-                    let models = try await Self.fetchOpenAICompatibleModels(apiKey: key, endpoint: endpoint)
+                    let catalog = try await Self.fetchOpenAICompatibleModels(apiKey: key, endpoint: endpoint)
+                    let models = catalog.models
                     if !models.isEmpty {
+                        modelVisionSupport[.qwen] = catalog.vision
                         // Filter to chat/reasoning models (skip embedding, tts, asr, etc.)
                         let chatModels = models.filter { id in
                             let lower = id.id.lowercased()
@@ -782,21 +786,45 @@ extension AgentViewModel {
         }
     }
 
-    /// Shared OpenAI-compatible model list fetcher
-    private nonisolated static func fetchOpenAICompatibleModels(apiKey: String, endpoint: String) async throws -> [OpenAIModelInfo] {
+    /// Image-input support from a /models catalog entry, across the shapes providers
+    /// actually publish. nil when the entry carries no capability metadata so callers
+    /// fall through to the name heuristic instead of recording a false negative.
+    ///   - `architecture.input_modalities` / `input_modalities` — OpenRouter, OrcaRouter, xAI
+    ///   - `capabilities.vision` (Bool) — Mistral, Mistral Vibe
+    ///   - `capabilities` (["completion","vision",…]) — Ollama /api/show
+    ///   - `supports_vision` (Bool) — Requesty
+    ///   - `type == "vlm"` — LM Studio /api/v0/models
+    nonisolated static func catalogVisionFlag(_ entry: [String: Any]) -> Bool? {
+        if let inputs = (entry["architecture"] as? [String: Any])?["input_modalities"] as? [String]
+            ?? entry["input_modalities"] as? [String] {
+            return inputs.contains("image")
+        }
+        if let caps = entry["capabilities"] as? [String: Any], let v = caps["vision"] as? Bool { return v }
+        if let caps = entry["capabilities"] as? [String] { return caps.contains("vision") }
+        if let v = entry["supports_vision"] as? Bool { return v }
+        if let type = entry["type"] as? String { return type == "vlm" }
+        return nil
+    }
+
+    /// Shared OpenAI-compatible model list fetcher. Also records any per-model vision
+    /// metadata the catalog happens to carry (`catalogVisionFlag`).
+    private nonisolated static func fetchOpenAICompatibleModels(apiKey: String, endpoint: String) async throws -> (models: [OpenAIModelInfo], vision: [String: Bool]) {
         guard let url = URL(string: endpoint) else { throw AgentError.invalidURL }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.timeoutInterval = llmAPITimeout
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return [] }
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return ([], [:]) }
         guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let modelsData = json["data"] as? [[String: Any]] else { return [] }
-        return modelsData.compactMap { model -> OpenAIModelInfo? in
+              let modelsData = json["data"] as? [[String: Any]] else { return ([], [:]) }
+        var vision: [String: Bool] = [:]
+        let models = modelsData.compactMap { model -> OpenAIModelInfo? in
             guard let id = model["id"] as? String else { return nil }
+            if let v = catalogVisionFlag(model) { vision[id] = v }
             return OpenAIModelInfo(id: id, name: id)
         }.sorted { $0.name < $1.name }
+        return (models, vision)
     }
 
     // MARK: - vLLM Models
