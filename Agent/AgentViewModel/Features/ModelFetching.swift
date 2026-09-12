@@ -184,10 +184,6 @@ extension AgentViewModel {
         }
     }
 
-    func fetchDeepSeekModels() {
-        fetchProviderModels(.deepSeek, defaults: Self.defaultDeepSeekModels)
-    }
-
     /// Generic fetcher for providers exposing an OpenAI-compatible /models
     /// endpoint (URL from the provider's registry config). Handles the shared
     /// fetch → filter → defaults-fallback → auto-select flow.
@@ -347,10 +343,6 @@ extension AgentViewModel {
                 modelLists[.huggingFace] = Self.defaultHuggingFaceModels
             }
         }
-    }
-
-    func fetchMiniMaxModels() {
-        fetchProviderModels(.miniMax, defaults: Self.defaultMiniMaxModels)
     }
 
     // MARK: - Static API Fetch Helpers
@@ -724,31 +716,6 @@ extension AgentViewModel {
         }
     }
 
-    // MARK: - Google Gemini Models
-
-    func fetchGeminiModels() {
-        fetchProviderModels(.gemini, defaults: Self.defaultGeminiModels)
-    }
-
-    // MARK: - Grok Models
-
-    func fetchGrokModels() {
-        fetchProviderModels(.grok, defaults: Self.defaultGrokModels)
-    }
-
-    // MARK: - Mistral Models
-
-    func fetchMistralModels() {
-        fetchProviderModels(.mistral, defaults: Self.defaultMistralModels)
-    }
-
-
-    func fetchVibeModels() {
-        // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
-        fetchProviderModels(.vibe, defaults: Self.defaultVibeModels,
-            filter: { $0.filter { $0.id.lowercased().contains("devstral") && $0.id.contains("latest") } })
-    }
-
     /// Shared OpenAI-compatible model list fetcher
     private nonisolated static func fetchOpenAICompatibleModels(apiKey: String, endpoint: String) async throws -> [OpenAIModelInfo] {
         guard let url = URL(string: endpoint) else { throw AgentError.invalidURL }
@@ -902,7 +869,9 @@ extension AgentViewModel {
         fetchModels(for: provider)
     }
 
-    /// Fetch the model catalog for a provider (unconditionally).
+    /// Fetch the model catalog for a provider (unconditionally). Providers with a plain
+    /// OpenAI-compatible /models endpoint go through `fetchProviderModels`; the rest have
+    /// bespoke catalog shapes and keep their own fetchers.
     func fetchModels(for provider: APIProvider) {
         switch provider {
         case .claude: Task { await fetchClaudeModels() }
@@ -910,19 +879,19 @@ extension AgentViewModel {
         case .openAI: fetchOpenAIModels()
         case .ollama: fetchOllamaModels()
         case .localOllama: fetchLocalOllamaModels()
-        case .deepSeek: fetchDeepSeekModels()
         case .huggingFace: fetchHuggingFaceModels()
         case .vLLM: fetchVLLMModels()
         case .lmStudio: fetchLMStudioModels()
         case .zAI: fetchZAIModels()
         case .qwen: fetchQwenModels()
-        case .gemini: fetchGeminiModels()
-        case .grok: fetchGrokModels()
-        case .mistral: fetchMistralModels()
-        case .vibe: fetchVibeModels()
-        case .miniMax: fetchMiniMaxModels()
         case .openRouter: fetchOpenRouterModels()
         case .requesty: fetchRequestyModels()
+        case .vibe:
+            // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
+            fetchProviderModels(.vibe, defaults: [],
+                filter: { $0.filter { $0.id.lowercased().contains("devstral") && $0.id.contains("latest") } })
+        case .deepSeek, .gemini, .grok, .mistral, .miniMax:
+            fetchProviderModels(provider, defaults: [])
         case .bigModel, .foundationModel: break
         }
     }
