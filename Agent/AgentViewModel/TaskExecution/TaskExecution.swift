@@ -574,24 +574,9 @@ extension AgentViewModel {
                 if finalizeShouldBreak || stopAfterTurn { break taskLoop }
 
             } catch {
-                let activeService: ActiveLLMService
-                if services.claude != nil {
-                    activeService = .claude
-                } else if services.codex != nil {
-                    activeService = .codex
-                } else if services.openAICompatible != nil {
-                    activeService = .openAICompatible
-                } else if services.ollama != nil {
-                    activeService = .ollama
-                } else if services.foundationModel != nil {
-                    activeService = .foundationModel
-                } else {
-                    activeService = .none
-                }
                 let outcome = await handleTaskLoopError(
                     error,
-                    activeService: activeService,
-                    providerDisplayName: provider.displayName,
+                    provider: provider,
                     messages: &messages,
                     timeoutRetryCount: &timeoutRetryCount,
                     maxTimeoutRetries: maxTimeoutRetries,

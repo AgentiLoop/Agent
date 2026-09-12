@@ -25,27 +25,17 @@ extension AgentViewModel {
         case lowerMaxTokens(Int)
     }
 
-    /// / Which LLM service a given task-loop iteration is talking to. / Used only so the caller can tell
-    /// `handleTaskLoopError` which of / claude/openAICompatible/ollama/foundationModelService was active / without having to ship the whole service quartet across the call.
-    enum ActiveLLMService {
-        case claude
-        case codex
-        case openAICompatible
-        case ollama
-        case foundationModel
-        case none
-    }
-
     /// Handles an error from LLM streaming: context-overflow pruning, stale connection retries, timeouts (with
     /// Ollama health-check/restart), 429 rate-limits, recoverable AgentErrors, network loss, and fallback-chain
     /// switching. Mutates `messages` and `timeoutRetryCount` inout. Returns TaskLoopErrorOutcome.
     ///
+    /// `provider` is the provider the failing iteration was talking to; its protocol decides the
+    /// error-source label and rate-limiter key.
     /// `appendLogFn`/`flushFn` route log lines: nil = self.appendLog/flushLog (main task), non-nil = a tab's
     /// log writer (used by handleTabTaskError shim).
     func handleTaskLoopError(
         _ error: Error,
-        activeService: ActiveLLMService,
-        providerDisplayName: String,
+        provider: APIProvider,
         messages: inout [[String: Any]],
         timeoutRetryCount: inout Int,
         maxTimeoutRetries: Int,
@@ -57,8 +47,12 @@ extension AgentViewModel {
         let flushLog: () -> Void = flushFn ?? { [weak self] in self?.flushLog() }
         if Task.isCancelled { return .breakLoop }
         let errMsg = error.localizedDescription
-        // Limiter key the services record Retry-After under (matches TaskExecution).
-        let limiterKey = activeService == .claude ? APIProvider.claude.rawValue : selectedProvider.rawValue
+        // Limiter key the services record Retry-After under: ClaudeService always records as "claude",
+        // even when it is serving LM Studio / OpenRouter in Anthropic-protocol mode.
+        let usesClaudeService = provider == .claude
+            || (provider == .lmStudio && lmStudioProtocol == .anthropic)
+            || (provider == .openRouter && openRouterProtocol == .anthropic)
+        let limiterKey = usesClaudeService ? APIProvider.claude.rawValue : provider.rawValue
 
         // Context overflow — prune messages aggressively and retry.
         // Detection narrowed: require an "exceed/too long/too many" phrase alongside
@@ -141,20 +135,11 @@ extension AgentViewModel {
 
 
         // Determine error source for better logging
-        var errorSource = "Unknown"
-        switch activeService {
-        case .claude:
-            errorSource = "Claude API"
-        case .codex:
-            errorSource = "Codex API"
-        case .openAICompatible:
-            errorSource = "\(providerDisplayName) API"
-        case .ollama:
-            errorSource = "Ollama API"
-        case .foundationModel:
-            errorSource = "Apple Intelligence"
-        case .none:
-            errorSource = "Unknown"
+        let errorSource: String
+        switch provider.apiProtocol {
+        case .ollama: errorSource = "Ollama API"
+        case .foundationModel: errorSource = "Apple Intelligence"
+        default: errorSource = "\(provider.displayName) API"
         }
 
         // Handle timeout errors with retry logic
