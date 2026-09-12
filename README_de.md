@@ -65,7 +65,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 > ⚠️ Option-B-Builds sind ad-hoc signiert. Die Launch-Agent-/Daemon-Helper registrieren sich nicht (SMAppService braucht eine Team ID), aber LLM-Schleife, alle Tools, Accessibility, AppleScript, Shell und MCP funktionieren trotzdem.
 
-> 💡 **Günstiges Setup:** **GLM-5.1** über **Z.ai** (schnellste Anmeldung, Standardmodell) kostet nur Cents pro Million Tokens. Lokal? Nur **GLM-4.7-Turbo** (32B) passt auf Consumer-Hardware (64–128 GB Apple Silicon über Ollama).
+> 💡 **Günstiges Setup:** **GLM-5.3** über **Z.ai** (schnellste Anmeldung, Standardmodell) kostet nur Cents pro Million Tokens. Lokal? Nur **GLM-4.7-Turbo** (32B) passt auf Consumer-Hardware (64–128 GB Apple Silicon über Ollama).
 
 ### Fehlerbehebung (Aus dem Quellcode bauen)
 
@@ -111,7 +111,7 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 | **DeepSeek** | Günstig | Budget-Coding, Cache-Hit-Reporting |
 | **Hugging Face** | Variabel | Offene Modelle, serverless oder dedizierte Endpunkte |
 | **OpenRouter** | Kostenpflichtig | 200+ Modelle, ein Schlüssel; Claude über Anthropic-Protokoll |
-| **Z.ai** / **BigModel** | Günstig | GLM-5.1 — empfohlener Einstieg |
+| **Z.ai** / **BigModel** | Günstig | GLM-5.3 — empfohlener Einstieg |
 | **Qwen** (Alibaba) | Günstig | Qwen 2.5 / 3 über Dashscope |
 | **MiniMax** | Günstig | 1M-Token-Kontext |
 | **Ollama** (Cloud) | Free Tier | Gehostete offene Modelle |
@@ -309,7 +309,7 @@ Slash-Befehle laufen lokal: `/clear [log|all|llm|history|tasks|tokens]`, `/memor
 ## FAQ
 
 **Muss ich programmieren können?** Nein — einfaches Deutsch (oder deine Muttersprache).
-**Was kostet es?** Die App ist kostenlos (MIT). Du bezahlst deinen Anbieter; GLM-5.1 über Z.ai/BigModel oder DeepSeek sind für ernsthafte Arbeit am günstigsten. Lokale Modelle sind kostenlos, wenn du die Hardware besitzt.
+**Was kostet es?** Die App ist kostenlos (MIT). Du bezahlst deinen Anbieter; GLM-5.3 über Z.ai/BigModel oder DeepSeek sind für ernsthafte Arbeit am günstigsten. Lokale Modelle sind kostenlos, wenn du die Hardware besitzt.
 **Welchen Mac brauche ich?** Apple Silicon, macOS 26.4.1+. Jeder moderne Mac für Cloud-Anbieter; 64 GB+ für lokale 30B-Modelle.
 **Was unterscheidet das von Siri?** Siri antwortet. Agent! *handelt* — Apps, Dateien, Code, System.
 

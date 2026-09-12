@@ -65,7 +65,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 > ⚠️ Les builds de l'Option B sont signés ad hoc. Les helpers Launch Agent/Daemon ne s'enregistreront pas (SMAppService exige un Team ID), mais la boucle LLM, tous les outils, l'Accessibilité, AppleScript, le shell et MCP fonctionnent quand même.
 
-> 💡 **Configuration économique :** **GLM-5.1** via **Z.ai** (inscription la plus rapide, modèle par défaut) coûte quelques centimes par million de tokens. En local ? Seul **GLM-4.7-Turbo** (32B) tient sur du matériel grand public (Apple Silicon 64–128 Go via Ollama).
+> 💡 **Configuration économique :** **GLM-5.3** via **Z.ai** (inscription la plus rapide, modèle par défaut) coûte quelques centimes par million de tokens. En local ? Seul **GLM-4.7-Turbo** (32B) tient sur du matériel grand public (Apple Silicon 64–128 Go via Ollama).
 
 ### Dépannage (Compiler depuis les sources)
 
@@ -111,7 +111,7 @@ Tapez simplement ce que vous voulez. Agent! trouve comment et le réalise.
 | **DeepSeek** | Bon marché | Codage économique, rapport de hits de cache |
 | **Hugging Face** | Variable | Modèles ouverts, serverless ou endpoints dédiés |
 | **OpenRouter** | Payant | 200+ modèles, une clé ; Claude routé via le protocole Anthropic |
-| **Z.ai** / **BigModel** | Bon marché | GLM-5.1 — point de départ recommandé |
+| **Z.ai** / **BigModel** | Bon marché | GLM-5.3 — point de départ recommandé |
 | **Qwen** (Alibaba) | Bon marché | Qwen 2.5 / 3 via Dashscope |
 | **MiniMax** | Bon marché | Contexte de 1M tokens |
 | **Ollama** (cloud) | Offre gratuite | Modèles ouverts hébergés |
@@ -309,7 +309,7 @@ Les commandes slash s'exécutent en local : `/clear [log|all|llm|history|tasks|t
 ## FAQ
 
 **Dois-je savoir coder ?** Non — du français courant (ou votre langue maternelle).
-**Combien ça coûte ?** L'app est gratuite (MIT). Vous payez votre fournisseur ; GLM-5.1 via Z.ai/BigModel ou DeepSeek sont les moins chers pour un travail sérieux. Les modèles locaux sont gratuits si vous possédez le matériel.
+**Combien ça coûte ?** L'app est gratuite (MIT). Vous payez votre fournisseur ; GLM-5.3 via Z.ai/BigModel ou DeepSeek sont les moins chers pour un travail sérieux. Les modèles locaux sont gratuits si vous possédez le matériel.
 **Quel Mac me faut-il ?** Apple Silicon, macOS 26.4.1+. N'importe quel Mac récent pour les fournisseurs cloud ; 64 Go+ pour les modèles locaux 30B.
 **Quelle différence avec Siri ?** Siri répond. Agent! *agit* — apps, fichiers, code, système.
 
