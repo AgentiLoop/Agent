@@ -24,7 +24,7 @@
 
 **Una app. Cualquier IA. Control total de tu Mac.**
 
-Agent! es una app 100 % nativa en Swift 6.2 / SwiftUI que conecta **19 proveedores de LLM** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Qwen, MiniMax, OpenRouter, Requesty, Ollama (nube y local), vLLM y LM Studio — más **Apple Intelligence** en el dispositivo — a un bucle de tareas autónomo que realmente *hace cosas*: lee tu código, corrige el bug, compila el proyecto de Xcode, hace commit del diff, controla cualquier app de Mac mediante la API de Accesibilidad, ejecuta comandos de shell como tú o como root, te envía los resultados por iMessage y responde a un *«Agent!»* hablado.
+Agent! es una app 100 % nativa en Swift 6.2 / SwiftUI que conecta **20 proveedores de LLM** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Qwen, MiniMax, OpenRouter, Requesty, A2Agent, Ollama (nube y local), vLLM y LM Studio — más **Apple Intelligence** en el dispositivo — a un bucle de tareas autónomo que realmente *hace cosas*: lee tu código, corrige el bug, compila el proyecto de Xcode, hace commit del diff, controla cualquier app de Mac mediante la API de Accesibilidad, ejecuta comandos de shell como tú o como root, te envía los resultados por iMessage y responde a un *«Agent!»* hablado.
 
 Sin NPM, sin Electron, sin suscripción, sin telemetría. Trae tu propia clave de API, ejecútalo totalmente en local o gratis con Apple Intelligence. Cada paquete Swift del que depende fue escrito por el mismo autor. Consulta la [Historia](#historia) más abajo.
 
@@ -98,7 +98,7 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 - **🗂 Pestañas, historial, memoria, planes, skills** — cada pestaña tiene su propia carpeta de proyecto y registro; memoria de usuario persistente; listas multi-plan en cada prompt.
 - **🔄 Cadena de respaldo** — cambio automático al siguiente proveedor configurado ante 429/timeout/fallo de red.
 
-## 🤖 19 proveedores de IA
+## 🤖 20 proveedores de IA
 
 | Proveedor | Coste | Ideal para |
 |---|---|---|
@@ -112,6 +112,7 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 | **Hugging Face** | Varía | Modelos abiertos, serverless o endpoints dedicados |
 | **OpenRouter** | De pago | 200+ modelos, una clave; Claude enrutado por protocolo Anthropic |
 | **Requesty** | De pago | 300+ modelos con una sola clave compatible con OpenAI; precios y capacidades por modelo |
+| **A2Agent** | Barato | DeepSeek, GLM, Kimi, MiniMax y Qwen con una sola clave compatible con OpenAI a una fracción del precio oficial |
 | **Z.ai** / **BigModel** | Barato | GLM-5.3 — punto de partida recomendado |
 | **Qwen** (Alibaba) | Barato | Qwen 3.8 vía Dashscope |
 | **MiniMax** | Barato | Contexto de 1M tokens |

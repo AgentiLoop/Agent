@@ -24,6 +24,7 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
     case miniMax = "miniMax"
     case openRouter = "openRouter"
     case requesty = "requesty"
+    case a2Agent = "a2Agent"
     case foundationModel = "foundationModel"
 
     var displayName: String {
@@ -47,6 +48,7 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
         case .miniMax: "MiniMax"
         case .openRouter: "OpenRouter"
         case .requesty: "Requesty"
+        case .a2Agent: "A2Agent"
         case .foundationModel: "Apple Intelligence"
         }
     }

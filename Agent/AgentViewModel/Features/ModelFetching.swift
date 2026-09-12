@@ -832,7 +832,7 @@ extension AgentViewModel {
             // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
             fetchProviderModels(.vibe, defaults: [],
                 filter: { $0.filter { $0.id.lowercased().contains("devstral") && $0.id.contains("latest") } })
-        case .openAI, .deepSeek, .gemini, .grok, .mistral, .miniMax:
+        case .openAI, .deepSeek, .gemini, .grok, .mistral, .miniMax, .a2Agent:
             fetchProviderModels(provider, defaults: [])
         case .bigModel, .foundationModel: break
         }
