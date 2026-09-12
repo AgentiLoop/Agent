@@ -112,7 +112,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Hugging Face** | 不定 | 开源模型，serverless 或专用端点 |
 | **OpenRouter** | 付费 | 200+ 模型，一把密钥；Claude 经 Anthropic 协议路由 |
 | **Z.ai** / **BigModel** | 便宜 | GLM-5.3 —— 推荐起点 |
-| **Qwen**（阿里巴巴） | 便宜 | 通过 Dashscope 使用 Qwen 2.5 / 3 |
+| **Qwen**（阿里巴巴） | 便宜 | 通过 Dashscope 使用 Qwen 3.8 |
 | **MiniMax** | 便宜 | 1M token 上下文 |
 | **Ollama**（云端） | 免费额度 | 托管的开源模型 |
 | **本地 Ollama** / **vLLM** / **LM Studio** | 免费 + 硬件 | 完全离线；自动检测各模型真实上下文窗口 |
