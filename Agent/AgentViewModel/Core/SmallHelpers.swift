@@ -75,11 +75,11 @@ extension AgentViewModel {
     var hasAttachments: Bool { !attachedImages.isEmpty }
 
     var selectedOllamaSupportsVision: Bool {
-        ollamaModels.first(where: { $0.name == ollamaModel })?.supportsVision ?? false
+        ollamaModels.first(where: { $0.name == models[.ollama] })?.supportsVision ?? false
     }
 
     var selectedLocalOllamaSupportsVision: Bool {
-        localOllamaModels.first(where: { $0.name == localOllamaModel })?.supportsVision ?? false
+        localOllamaModels.first(where: { $0.name == models[.localOllama] })?.supportsVision ?? false
     }
 
     /// Check if speech recognition is authorized
@@ -94,7 +94,7 @@ extension AgentViewModel {
         let provider = selectedProvider
         guard provider == .ollama || provider == .localOllama else { return }
         let endpoint = provider == .ollama ? ollamaEndpoint : localOllamaEndpoint
-        let model = provider == .ollama ? ollamaModel : localOllamaModel
+        let model = provider == .ollama ? models[.ollama] : models[.localOllama]
         guard !model.isEmpty else { return }
 
         let chatURL = endpoint.isEmpty ? "http://localhost:11434/api/chat" : endpoint

@@ -135,24 +135,24 @@ struct ToolsView: View {
     private var modelBinding: Binding<String> {
         switch selectedProvider {
         case .claude: return $viewModel.selectedModel
-        case .codex: return $viewModel.codexModel
-        case .openAI: return $viewModel.openAIModel
-        case .deepSeek: return $viewModel.deepSeekModel
-        case .huggingFace: return $viewModel.huggingFaceModel
-        case .ollama: return $viewModel.ollamaModel
-        case .localOllama: return $viewModel.localOllamaModel
-        case .vLLM: return $viewModel.vLLMModel
-        case .lmStudio: return $viewModel.lmStudioModel
-        case .zAI: return $viewModel.zAIModel
-        case .bigModel: return $viewModel.bigModelModel
-        case .qwen: return $viewModel.qwenModel
-        case .gemini: return $viewModel.geminiModel
-        case .grok: return $viewModel.grokModel
-        case .mistral: return $viewModel.mistralModel
-        case .vibe: return $viewModel.vibeModel
-        case .miniMax: return $viewModel.miniMaxModel
-        case .openRouter: return $viewModel.openRouterModel
-        case .requesty: return $viewModel.requestyModel
+        case .codex: return $viewModel.models[.codex]
+        case .openAI: return $viewModel.models[.openAI]
+        case .deepSeek: return $viewModel.models[.deepSeek]
+        case .huggingFace: return $viewModel.models[.huggingFace]
+        case .ollama: return $viewModel.models[.ollama]
+        case .localOllama: return $viewModel.models[.localOllama]
+        case .vLLM: return $viewModel.models[.vLLM]
+        case .lmStudio: return $viewModel.models[.lmStudio]
+        case .zAI: return $viewModel.models[.zAI]
+        case .bigModel: return $viewModel.models[.bigModel]
+        case .qwen: return $viewModel.models[.qwen]
+        case .gemini: return $viewModel.models[.gemini]
+        case .grok: return $viewModel.models[.grok]
+        case .mistral: return $viewModel.models[.mistral]
+        case .vibe: return $viewModel.models[.vibe]
+        case .miniMax: return $viewModel.models[.miniMax]
+        case .openRouter: return $viewModel.models[.openRouter]
+        case .requesty: return $viewModel.models[.requesty]
         case .foundationModel: return .constant("Apple Intelligence")
         }
     }
@@ -171,26 +171,26 @@ struct ToolsView: View {
             let models = viewModel.availableClaudeModels.isEmpty ? AgentViewModel.defaultClaudeModels : viewModel.availableClaudeModels
             return models.map { ($0.id, $0.formattedDisplayName) }
         case .codex:
-            return viewModel.codexModels.map { ($0.id, $0.name) }
-        case .openAI: return oai(viewModel.openAIModels, AgentViewModel.defaultOpenAIModels)
-        case .deepSeek: return oai(viewModel.deepSeekModels, AgentViewModel.defaultDeepSeekModels)
-        case .huggingFace: return oai(viewModel.huggingFaceModels, AgentViewModel.defaultHuggingFaceModels)
-        case .zAI: return oai(viewModel.zAIModels, AgentViewModel.defaultZAIModels)
-        case .qwen: return oai(viewModel.qwenModels, AgentViewModel.defaultQwenModels)
-        case .gemini: return oai(viewModel.geminiModels, AgentViewModel.defaultGeminiModels)
-        case .grok: return oai(viewModel.grokModels, AgentViewModel.defaultGrokModels)
-        case .mistral: return oai(viewModel.mistralModels, AgentViewModel.defaultMistralModels)
-        case .vibe: return oai(viewModel.vibeModels, AgentViewModel.defaultVibeModels)
+            return viewModel.modelLists[.codex].map { ($0.id, $0.name) }
+        case .openAI: return oai(viewModel.modelLists[.openAI], AgentViewModel.defaultOpenAIModels)
+        case .deepSeek: return oai(viewModel.modelLists[.deepSeek], AgentViewModel.defaultDeepSeekModels)
+        case .huggingFace: return oai(viewModel.modelLists[.huggingFace], AgentViewModel.defaultHuggingFaceModels)
+        case .zAI: return oai(viewModel.modelLists[.zAI], AgentViewModel.defaultZAIModels)
+        case .qwen: return oai(viewModel.modelLists[.qwen], AgentViewModel.defaultQwenModels)
+        case .gemini: return oai(viewModel.modelLists[.gemini], AgentViewModel.defaultGeminiModels)
+        case .grok: return oai(viewModel.modelLists[.grok], AgentViewModel.defaultGrokModels)
+        case .mistral: return oai(viewModel.modelLists[.mistral], AgentViewModel.defaultMistralModels)
+        case .vibe: return oai(viewModel.modelLists[.vibe], AgentViewModel.defaultVibeModels)
         case .ollama:
             let models = viewModel.ollamaModels.isEmpty ? AgentViewModel.defaultOllamaModels : viewModel.ollamaModels
             return models.map { ($0.name, $0.name) }
         case .localOllama:
             return viewModel.localOllamaModels.map { ($0.name, $0.name) }
-        case .vLLM: return viewModel.vLLMModels.map { ($0.id, $0.name) }
-        case .lmStudio: return viewModel.lmStudioModels.map { ($0.id, $0.name) }
-        case .miniMax: return oai(viewModel.miniMaxModels, AgentViewModel.defaultMiniMaxModels)
-        case .openRouter: return viewModel.openRouterModels.map { ($0.id, $0.name) }
-        case .requesty: return viewModel.requestyModels.map { ($0.id, $0.name) }
+        case .vLLM: return viewModel.modelLists[.vLLM].map { ($0.id, $0.name) }
+        case .lmStudio: return viewModel.modelLists[.lmStudio].map { ($0.id, $0.name) }
+        case .miniMax: return oai(viewModel.modelLists[.miniMax], AgentViewModel.defaultMiniMaxModels)
+        case .openRouter: return viewModel.modelLists[.openRouter].map { ($0.id, $0.name) }
+        case .requesty: return viewModel.modelLists[.requesty].map { ($0.id, $0.name) }
         case .bigModel: return []
         case .foundationModel:
             return [("Apple Intelligence", "Apple Intelligence")]

@@ -200,20 +200,20 @@ struct FallbackChainView: View {
         }
         switch provider {
         case .claude: return viewModel.availableClaudeModels.map { ($0.id, $0.formattedDisplayName) }
-        case .openAI: return oai(viewModel.openAIModels)
+        case .openAI: return oai(viewModel.modelLists[.openAI])
         case .ollama: return viewModel.ollamaModels.map { ($0.name, $0.name) }
         case .localOllama: return viewModel.localOllamaModels.map { ($0.name, $0.name) }
-        case .deepSeek: return oai(viewModel.deepSeekModels)
-        case .huggingFace: return oai(viewModel.huggingFaceModels)
-        case .vLLM: return oai(viewModel.vLLMModels)
-        case .lmStudio: return oai(viewModel.lmStudioModels)
-        case .zAI: return oai(viewModel.zAIModels)
-        case .qwen: return oai(viewModel.qwenModels)
-        case .gemini: return oai(viewModel.geminiModels)
-        case .grok: return oai(viewModel.grokModels)
-        case .mistral: return oai(viewModel.mistralModels)
-        case .openRouter: return oai(viewModel.openRouterModels)
-        case .requesty: return oai(viewModel.requestyModels)
+        case .deepSeek: return oai(viewModel.modelLists[.deepSeek])
+        case .huggingFace: return oai(viewModel.modelLists[.huggingFace])
+        case .vLLM: return oai(viewModel.modelLists[.vLLM])
+        case .lmStudio: return oai(viewModel.modelLists[.lmStudio])
+        case .zAI: return oai(viewModel.modelLists[.zAI])
+        case .qwen: return oai(viewModel.modelLists[.qwen])
+        case .gemini: return oai(viewModel.modelLists[.gemini])
+        case .grok: return oai(viewModel.modelLists[.grok])
+        case .mistral: return oai(viewModel.modelLists[.mistral])
+        case .openRouter: return oai(viewModel.modelLists[.openRouter])
+        case .requesty: return oai(viewModel.modelLists[.requesty])
         default: return []
         }
     }
@@ -237,24 +237,24 @@ struct FallbackChainView: View {
         // Prefer the model the user is actively using for that provider
         switch provider {
         case .claude: if !viewModel.selectedModel.isEmpty { return viewModel.selectedModel }
-        case .codex: if !viewModel.codexModel.isEmpty { return viewModel.codexModel }
-        case .openAI: if !viewModel.openAIModel.isEmpty { return viewModel.openAIModel }
-        case .ollama: if !viewModel.ollamaModel.isEmpty { return viewModel.ollamaModel }
-        case .localOllama: if !viewModel.localOllamaModel.isEmpty { return viewModel.localOllamaModel }
-        case .deepSeek: if !viewModel.deepSeekModel.isEmpty { return viewModel.deepSeekModel }
-        case .huggingFace: if !viewModel.huggingFaceModel.isEmpty { return viewModel.huggingFaceModel }
-        case .vLLM: if !viewModel.vLLMModel.isEmpty { return viewModel.vLLMModel }
-        case .lmStudio: if !viewModel.lmStudioModel.isEmpty { return viewModel.lmStudioModel }
-        case .zAI: if !viewModel.zAIModel.isEmpty { return viewModel.zAIModel }
-        case .qwen: if !viewModel.qwenModel.isEmpty { return viewModel.qwenModel }
-        case .gemini: if !viewModel.geminiModel.isEmpty { return viewModel.geminiModel }
-        case .grok: if !viewModel.grokModel.isEmpty { return viewModel.grokModel }
-        case .mistral: if !viewModel.mistralModel.isEmpty { return viewModel.mistralModel }
-        case .vibe: if !viewModel.vibeModel.isEmpty { return viewModel.vibeModel }
-        case .bigModel: if !viewModel.bigModelModel.isEmpty { return viewModel.bigModelModel }
-        case .miniMax: if !viewModel.miniMaxModel.isEmpty { return viewModel.miniMaxModel }
-        case .openRouter: if !viewModel.openRouterModel.isEmpty { return viewModel.openRouterModel }
-        case .requesty: if !viewModel.requestyModel.isEmpty { return viewModel.requestyModel }
+        case .codex: if !viewModel.models[.codex].isEmpty { return viewModel.models[.codex] }
+        case .openAI: if !viewModel.models[.openAI].isEmpty { return viewModel.models[.openAI] }
+        case .ollama: if !viewModel.models[.ollama].isEmpty { return viewModel.models[.ollama] }
+        case .localOllama: if !viewModel.models[.localOllama].isEmpty { return viewModel.models[.localOllama] }
+        case .deepSeek: if !viewModel.models[.deepSeek].isEmpty { return viewModel.models[.deepSeek] }
+        case .huggingFace: if !viewModel.models[.huggingFace].isEmpty { return viewModel.models[.huggingFace] }
+        case .vLLM: if !viewModel.models[.vLLM].isEmpty { return viewModel.models[.vLLM] }
+        case .lmStudio: if !viewModel.models[.lmStudio].isEmpty { return viewModel.models[.lmStudio] }
+        case .zAI: if !viewModel.models[.zAI].isEmpty { return viewModel.models[.zAI] }
+        case .qwen: if !viewModel.models[.qwen].isEmpty { return viewModel.models[.qwen] }
+        case .gemini: if !viewModel.models[.gemini].isEmpty { return viewModel.models[.gemini] }
+        case .grok: if !viewModel.models[.grok].isEmpty { return viewModel.models[.grok] }
+        case .mistral: if !viewModel.models[.mistral].isEmpty { return viewModel.models[.mistral] }
+        case .vibe: if !viewModel.models[.vibe].isEmpty { return viewModel.models[.vibe] }
+        case .bigModel: if !viewModel.models[.bigModel].isEmpty { return viewModel.models[.bigModel] }
+        case .miniMax: if !viewModel.models[.miniMax].isEmpty { return viewModel.models[.miniMax] }
+        case .openRouter: if !viewModel.models[.openRouter].isEmpty { return viewModel.models[.openRouter] }
+        case .requesty: if !viewModel.models[.requesty].isEmpty { return viewModel.models[.requesty] }
         case .foundationModel: return "Apple Intelligence"
         }
         // Fall back to the first dynamically-fetched model for this provider

@@ -60,59 +60,59 @@ extension AgentViewModel {
             modelName = selectedModel
             isVision = true // Claude Sonnet/Opus/Haiku all support vision
         case .codex:
-            modelName = codexModel
+            modelName = models[.codex]
             isVision = true // GPT-5 codex supports vision via input_image blocks
         case .openAI:
-            modelName = openAIModel
+            modelName = models[.openAI]
             isVision = true // GPT-4o, GPT-4 Turbo support vision
         case .deepSeek:
-            modelName = deepSeekModel
-            isVision = Self.isVisionModel(deepSeekModel)
+            modelName = models[.deepSeek]
+            isVision = Self.isVisionModel(models[.deepSeek])
         case .huggingFace:
-            modelName = huggingFaceModel
-            isVision = Self.isVisionModel(huggingFaceModel)
+            modelName = models[.huggingFace]
+            isVision = Self.isVisionModel(models[.huggingFace])
         case .ollama:
-            modelName = ollamaModel
-            isVision = selectedOllamaSupportsVision || Self.isVisionModel(ollamaModel)
+            modelName = models[.ollama]
+            isVision = selectedOllamaSupportsVision || Self.isVisionModel(models[.ollama])
         case .localOllama:
-            modelName = localOllamaModel
-            isVision = selectedLocalOllamaSupportsVision || Self.isVisionModel(localOllamaModel)
+            modelName = models[.localOllama]
+            isVision = selectedLocalOllamaSupportsVision || Self.isVisionModel(models[.localOllama])
         case .vLLM:
-            modelName = vLLMModel
-            isVision = Self.isVisionModel(vLLMModel)
+            modelName = models[.vLLM]
+            isVision = Self.isVisionModel(models[.vLLM])
         case .lmStudio:
-            modelName = lmStudioModel
-            isVision = Self.isVisionModel(lmStudioModel)
+            modelName = models[.lmStudio]
+            isVision = Self.isVisionModel(models[.lmStudio])
         case .zAI:
-            isVision = zAIModel.hasSuffix(":v")
-            modelName = zAIModel.replacingOccurrences(of: ":v", with: "")
+            isVision = models[.zAI].hasSuffix(":v")
+            modelName = models[.zAI].replacingOccurrences(of: ":v", with: "")
         case .bigModel:
-            isVision = bigModelModel.hasSuffix(":v")
-            modelName = bigModelModel.replacingOccurrences(of: ":v", with: "")
+            isVision = models[.bigModel].hasSuffix(":v")
+            modelName = models[.bigModel].replacingOccurrences(of: ":v", with: "")
         case .miniMax:
-            modelName = miniMaxModel
+            modelName = models[.miniMax]
             isVision = false
         case .openRouter:
-            modelName = openRouterModel
-            isVision = Self.isVisionModel(openRouterModel)
+            modelName = models[.openRouter]
+            isVision = Self.isVisionModel(models[.openRouter])
         case .requesty:
-            modelName = requestyModel
-            isVision = Self.isVisionModel(requestyModel)
+            modelName = models[.requesty]
+            isVision = Self.isVisionModel(models[.requesty])
         case .qwen:
-            modelName = qwenModel
-            isVision = Self.isVisionModel(qwenModel)
+            modelName = models[.qwen]
+            isVision = Self.isVisionModel(models[.qwen])
         case .gemini:
-            modelName = geminiModel
+            modelName = models[.gemini]
             isVision = true // Gemini supports vision
         case .grok:
-            modelName = grokModel
-            isVision = Self.isVisionModel(grokModel)
+            modelName = models[.grok]
+            isVision = Self.isVisionModel(models[.grok])
         case .mistral:
-            modelName = mistralModel
+            modelName = models[.mistral]
             isVision = true
 
         case .vibe:
-            modelName = vibeModel
+            modelName = models[.vibe]
             isVision = false
         case .foundationModel:
             modelName = "Apple Intelligence"
@@ -154,14 +154,14 @@ extension AgentViewModel {
             )
         } else if provider == .lmStudio && lmStudioProtocol == .anthropic {
             claude = ClaudeService(
-                apiKey: lmStudioAPIKey, model: lmStudioModel,
+                apiKey: apiKeys[.lmStudio], model: models[.lmStudio],
                 historyContext: historyContext,
                 projectFolder: projectFolder,
                 baseURL: lmStudioEndpoint, maxTokens: mt
             )
         } else if provider == .openRouter && openRouterProtocol == .anthropic {
             claude = ClaudeService(
-                apiKey: openRouterAPIKey, model: modelName,
+                apiKey: apiKeys[.openRouter], model: modelName,
                 historyContext: historyContext,
                 projectFolder: projectFolder,
                 baseURL: LLMProviderSetup.openRouterAnthropicChatURL, maxTokens: mt
@@ -204,7 +204,7 @@ extension AgentViewModel {
         switch provider {
         case .ollama:
             ollama = OllamaService(
-                apiKey: ollamaAPIKey, model: modelName,
+                apiKey: apiKeys[.ollama], model: modelName,
                 endpoint: ollamaEndpoint, supportsVision: isVision,
                 historyContext: historyContext, projectFolder: projectFolder,
                 provider: .ollama

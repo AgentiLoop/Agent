@@ -8,26 +8,26 @@ struct SettingsView: View {
     /// Per-provider temperature binding so the slider always edits the active model's temp.
     private var llmTemperatureBinding: Binding<Double> {
         switch viewModel.selectedProvider {
-        case .claude: return $viewModel.claudeTemperature
-        case .codex: return $viewModel.openAITemperature
-        case .ollama: return $viewModel.ollamaTemperature
-        case .openAI: return $viewModel.openAITemperature
-        case .deepSeek: return $viewModel.deepSeekTemperature
-        case .huggingFace: return $viewModel.huggingFaceTemperature
-        case .localOllama: return $viewModel.localOllamaTemperature
-        case .vLLM: return $viewModel.vLLMTemperature
-        case .lmStudio: return $viewModel.lmStudioTemperature
-        case .zAI: return $viewModel.zAITemperature
-        case .bigModel: return $viewModel.zAITemperature
-        case .miniMax: return $viewModel.miniMaxTemperature
-        case .openRouter: return $viewModel.openAITemperature
-        case .requesty: return $viewModel.openAITemperature
-        case .qwen: return $viewModel.openAITemperature
-        case .gemini: return $viewModel.geminiTemperature
-        case .grok: return $viewModel.grokTemperature
-        case .mistral: return $viewModel.openAITemperature
-        case .vibe: return $viewModel.openAITemperature
-        case .foundationModel: return $viewModel.claudeTemperature // unused
+        case .claude: return $viewModel.temperatures[.claude]
+        case .codex: return $viewModel.temperatures[.openAI]
+        case .ollama: return $viewModel.temperatures[.ollama]
+        case .openAI: return $viewModel.temperatures[.openAI]
+        case .deepSeek: return $viewModel.temperatures[.deepSeek]
+        case .huggingFace: return $viewModel.temperatures[.huggingFace]
+        case .localOllama: return $viewModel.temperatures[.localOllama]
+        case .vLLM: return $viewModel.temperatures[.vLLM]
+        case .lmStudio: return $viewModel.temperatures[.lmStudio]
+        case .zAI: return $viewModel.temperatures[.zAI]
+        case .bigModel: return $viewModel.temperatures[.zAI]
+        case .miniMax: return $viewModel.temperatures[.miniMax]
+        case .openRouter: return $viewModel.temperatures[.openAI]
+        case .requesty: return $viewModel.temperatures[.openAI]
+        case .qwen: return $viewModel.temperatures[.openAI]
+        case .gemini: return $viewModel.temperatures[.gemini]
+        case .grok: return $viewModel.temperatures[.grok]
+        case .mistral: return $viewModel.temperatures[.openAI]
+        case .vibe: return $viewModel.temperatures[.openAI]
+        case .foundationModel: return $viewModel.temperatures[.claude] // unused
         }
     }
 
@@ -73,7 +73,7 @@ struct SettingsView: View {
                                     .clipShape(Capsule())
                             }
                         }
-                        LockedSecureField(text: $viewModel.apiKey, placeholder: "sk-ant-api… (key) or sk-ant-oat01… (OAuth)", lockKey: "lock.claudeAPIKey")
+                        LockedSecureField(text: $viewModel.apiKey, placeholder: "sk-ant-api… (key) or sk-ant-oat01… (OAuth)", lockKey: "lock.apiKeys[.claude]")
                         Text("Paste `sk-ant-api…` for pay-per-token billing, or run `claude setup-token` in Claude Code and paste the resulting `sk-ant-oat01…` to bill against your Claude subscription.")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
@@ -93,7 +93,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchModelsIfNeeded(for: .claude, force: true)
                             } label: {
-                                if viewModel.isFetchingClaudeModels {
+                                if viewModel.fetchingModels.contains(.claude) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -102,7 +102,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingClaudeModels)
+                            .disabled(viewModel.fetchingModels.contains(.claude))
                             .help("Fetch available models")
                         }
                     }
@@ -115,18 +115,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.openAIAPIKey, placeholder: "sk-...", lockKey: "lock.openAIAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.openAI], placeholder: "sk-...", lockKey: "lock.apiKeys[.openAI]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.openAIModels.isEmpty {
-                                TextField("Model name", text: $viewModel.openAIModel)
+                            if viewModel.modelLists[.openAI].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.openAI])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.openAIModel) {
-                                    ForEach(viewModel.openAIModels) { model in
+                                Picker("Model", selection: $viewModel.models[.openAI]) {
+                                    ForEach(viewModel.modelLists[.openAI]) { model in
                                         Text(model.name).tag(model.id)
                                     }
                                 }
@@ -136,7 +136,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchModelsIfNeeded(for: .openAI, force: true)
                             } label: {
-                                if viewModel.isFetchingOpenAIModels {
+                                if viewModel.fetchingModels.contains(.openAI) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -145,7 +145,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingOpenAIModels)
+                            .disabled(viewModel.fetchingModels.contains(.openAI))
                             .help("Fetch available models")
                         }
                     }
@@ -158,18 +158,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.deepSeekAPIKey, placeholder: "sk-...", lockKey: "lock.deepSeekAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.deepSeek], placeholder: "sk-...", lockKey: "lock.apiKeys[.deepSeek]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.deepSeekModels.isEmpty {
-                                TextField("Model name", text: $viewModel.deepSeekModel)
+                            if viewModel.modelLists[.deepSeek].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.deepSeek])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.deepSeekModel) {
-                                    ForEach(viewModel.deepSeekModels) { model in
+                                Picker("Model", selection: $viewModel.models[.deepSeek]) {
+                                    ForEach(viewModel.modelLists[.deepSeek]) { model in
                                         Text(model.name).tag(model.id)
                                     }
                                 }
@@ -179,7 +179,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchDeepSeekModels()
                             } label: {
-                                if viewModel.isFetchingDeepSeekModels {
+                                if viewModel.fetchingModels.contains(.deepSeek) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -188,7 +188,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingDeepSeekModels)
+                            .disabled(viewModel.fetchingModels.contains(.deepSeek))
                             .help("Fetch available models")
                         }
                     }
@@ -201,18 +201,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.huggingFaceAPIKey, placeholder: "hf_...", lockKey: "lock.huggingFaceAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.huggingFace], placeholder: "hf_...", lockKey: "lock.apiKeys[.huggingFace]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.huggingFaceModels.isEmpty {
-                                TextField("Model name", text: $viewModel.huggingFaceModel)
+                            if viewModel.modelLists[.huggingFace].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.huggingFace])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.huggingFaceModel) {
-                                    ForEach(viewModel.huggingFaceModels) { model in
+                                Picker("Model", selection: $viewModel.models[.huggingFace]) {
+                                    ForEach(viewModel.modelLists[.huggingFace]) { model in
                                         HStack(spacing: 4) {
                                             Text(model.name)
                                             if AgentViewModel.isVisionModel(model.id) {
@@ -229,7 +229,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchHuggingFaceModels()
                             } label: {
-                                if viewModel.isFetchingHuggingFaceModels {
+                                if viewModel.fetchingModels.contains(.huggingFace) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -238,7 +238,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingHuggingFaceModels)
+                            .disabled(viewModel.fetchingModels.contains(.huggingFace))
                             .help("Fetch available models")
                         }
                     }
@@ -251,18 +251,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.zAIAPIKey, placeholder: "Z.ai API key", lockKey: "lock.zAIAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.zAI], placeholder: "Z.ai API key", lockKey: "lock.apiKeys[.zAI]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.zAIModels.isEmpty {
-                                TextField("Model name", text: $viewModel.zAIModel)
+                            if viewModel.modelLists[.zAI].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.zAI])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.zAIModel) {
-                                    ForEach(viewModel.zAIModels) { model in
+                                Picker("Model", selection: $viewModel.models[.zAI]) {
+                                    ForEach(viewModel.modelLists[.zAI]) { model in
                                         HStack(spacing: 4) {
                                             Text(model.name)
                                             if model.id.hasSuffix(":v") {
@@ -279,7 +279,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchModelsIfNeeded(for: .zAI, force: true)
                             } label: {
-                                if viewModel.isFetchingZAIModels {
+                                if viewModel.fetchingModels.contains(.zAI) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -288,7 +288,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingZAIModels)
+                            .disabled(viewModel.fetchingModels.contains(.zAI))
                             .help("Fetch available models")
                         }
                     }
@@ -300,12 +300,12 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.bigModelAPIKey, placeholder: "BigModel API key", lockKey: "lock.bigModelAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.bigModel], placeholder: "BigModel API key", lockKey: "lock.apiKeys[.bigModel]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
-                        TextField("Model name", text: $viewModel.bigModelModel)
+                        TextField("Model name", text: $viewModel.models[.bigModel])
                             .textFieldStyle(.roundedBorder)
                     }
                 }
@@ -316,18 +316,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.miniMaxAPIKey, placeholder: "MiniMax API key", lockKey: "lock.miniMaxAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.miniMax], placeholder: "MiniMax API key", lockKey: "lock.apiKeys[.miniMax]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.miniMaxModels.isEmpty {
-                                TextField("Model name", text: $viewModel.miniMaxModel)
+                            if viewModel.modelLists[.miniMax].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.miniMax])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.miniMaxModel) {
-                                    ForEach(viewModel.miniMaxModels) { model in
+                                Picker("Model", selection: $viewModel.models[.miniMax]) {
+                                    ForEach(viewModel.modelLists[.miniMax]) { model in
                                         Text(model.name).tag(model.id)
                                     }
                                 }
@@ -337,7 +337,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchMiniMaxModels()
                             } label: {
-                                if viewModel.isFetchingMiniMaxModels {
+                                if viewModel.fetchingModels.contains(.miniMax) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -346,7 +346,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingMiniMaxModels)
+                            .disabled(viewModel.fetchingModels.contains(.miniMax))
                             .help("Fetch available models")
                         }
                     }
@@ -368,18 +368,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.openRouterAPIKey, placeholder: "sk-or-...", lockKey: "lock.openRouterAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.openRouter], placeholder: "sk-or-...", lockKey: "lock.apiKeys[.openRouter]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.openRouterModels.isEmpty {
-                                TextField("e.g. anthropic/claude-opus-4", text: $viewModel.openRouterModel)
+                            if viewModel.modelLists[.openRouter].isEmpty {
+                                TextField("e.g. anthropic/claude-opus-4", text: $viewModel.models[.openRouter])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.openRouterModel) {
-                                    ForEach(viewModel.openRouterModels) { model in
+                                Picker("Model", selection: $viewModel.models[.openRouter]) {
+                                    ForEach(viewModel.modelLists[.openRouter]) { model in
                                         Text(model.name).tag(model.id)
                                     }
                                 }
@@ -389,7 +389,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchOpenRouterModels()
                             } label: {
-                                if viewModel.isFetchingOpenRouterModels {
+                                if viewModel.fetchingModels.contains(.openRouter) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -398,7 +398,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingOpenRouterModels)
+                            .disabled(viewModel.fetchingModels.contains(.openRouter))
                             .help("Fetch available models")
                         }
                     }
@@ -410,18 +410,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.requestyAPIKey, placeholder: "Requesty API key", lockKey: "lock.requestyAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.requesty], placeholder: "Requesty API key", lockKey: "lock.apiKeys[.requesty]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.requestyModels.isEmpty {
-                                TextField("e.g. anthropic/claude-sonnet-4-5", text: $viewModel.requestyModel)
+                            if viewModel.modelLists[.requesty].isEmpty {
+                                TextField("e.g. anthropic/claude-sonnet-4-5", text: $viewModel.models[.requesty])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.requestyModel) {
-                                    ForEach(viewModel.requestyModels) { model in
+                                Picker("Model", selection: $viewModel.models[.requesty]) {
+                                    ForEach(viewModel.modelLists[.requesty]) { model in
                                         Text(model.name).tag(model.id)
                                     }
                                 }
@@ -431,7 +431,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchRequestyModels()
                             } label: {
-                                if viewModel.isFetchingRequestyModels {
+                                if viewModel.fetchingModels.contains(.requesty) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -440,7 +440,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingRequestyModels)
+                            .disabled(viewModel.fetchingModels.contains(.requesty))
                             .help("Fetch available models")
                         }
                     }
@@ -452,18 +452,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.qwenAPIKey, placeholder: "DashScope API key", lockKey: "lock.qwenAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.qwen], placeholder: "DashScope API key", lockKey: "lock.apiKeys[.qwen]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.qwenModels.isEmpty {
-                                TextField("Model name", text: $viewModel.qwenModel)
+                            if viewModel.modelLists[.qwen].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.qwen])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.qwenModel) {
-                                    ForEach(viewModel.qwenModels) { model in
+                                Picker("Model", selection: $viewModel.models[.qwen]) {
+                                    ForEach(viewModel.modelLists[.qwen]) { model in
                                         Text(model.name).tag(model.id)
                                     }
                                 }
@@ -473,14 +473,14 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchQwenModels()
                             } label: {
-                                if viewModel.isFetchingQwenModels {
+                                if viewModel.fetchingModels.contains(.qwen) {
                                     ProgressView().controlSize(.small)
                                 } else {
                                     Image(systemName: "arrow.clockwise")
                                 }
                             }
                             .buttonStyle(.borderless)
-                            .disabled(viewModel.isFetchingQwenModels)
+                            .disabled(viewModel.fetchingModels.contains(.qwen))
                         }
                     }
                 }
@@ -491,18 +491,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.geminiAPIKey, placeholder: "Gemini API key", lockKey: "lock.geminiAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.gemini], placeholder: "Gemini API key", lockKey: "lock.apiKeys[.gemini]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.geminiModels.isEmpty {
-                                TextField("Model name", text: $viewModel.geminiModel)
+                            if viewModel.modelLists[.gemini].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.gemini])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.geminiModel) {
-                                    ForEach(viewModel.geminiModels) { model in
+                                Picker("Model", selection: $viewModel.models[.gemini]) {
+                                    ForEach(viewModel.modelLists[.gemini]) { model in
                                         HStack(spacing: 4) {
                                             Text(model.name)
                                             if model.id.contains("gemini-") {
@@ -519,7 +519,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchGeminiModels()
                             } label: {
-                                if viewModel.isFetchingGeminiModels {
+                                if viewModel.fetchingModels.contains(.gemini) {
                                     ProgressView().controlSize(.small)
                                 } else {
                                     Image(systemName: "arrow.clockwise")
@@ -527,7 +527,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingGeminiModels)
+                            .disabled(viewModel.fetchingModels.contains(.gemini))
                             .help("Fetch available models")
                         }
                     }
@@ -539,18 +539,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.grokAPIKey, placeholder: "Grok API key", lockKey: "lock.grokAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.grok], placeholder: "Grok API key", lockKey: "lock.apiKeys[.grok]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.grokModels.isEmpty {
-                                TextField("Model name", text: $viewModel.grokModel)
+                            if viewModel.modelLists[.grok].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.grok])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.grokModel) {
-                                    ForEach(viewModel.grokModels) { model in
+                                Picker("Model", selection: $viewModel.models[.grok]) {
+                                    ForEach(viewModel.modelLists[.grok]) { model in
                                         Text(model.name).tag(model.id)
                                     }
                                 }
@@ -560,7 +560,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchGrokModels()
                             } label: {
-                                if viewModel.isFetchingGrokModels {
+                                if viewModel.fetchingModels.contains(.grok) {
                                     ProgressView().controlSize(.small)
                                 } else {
                                     Image(systemName: "arrow.clockwise")
@@ -568,7 +568,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingGrokModels)
+                            .disabled(viewModel.fetchingModels.contains(.grok))
                             .help("Fetch available models")
                         }
                     }
@@ -580,18 +580,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.mistralAPIKey, placeholder: "Mistral API key", lockKey: "lock.mistralAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.mistral], placeholder: "Mistral API key", lockKey: "lock.apiKeys[.mistral]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.mistralModels.isEmpty {
-                                TextField("Model name", text: $viewModel.mistralModel)
+                            if viewModel.modelLists[.mistral].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.mistral])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.mistralModel) {
-                                    ForEach(viewModel.mistralModels) { model in
+                                Picker("Model", selection: $viewModel.models[.mistral]) {
+                                    ForEach(viewModel.modelLists[.mistral]) { model in
                                         HStack(spacing: 4) {
                                             Text(model.name)
                                             if AgentViewModel.isVisionModel(model.id) {
@@ -607,7 +607,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchMistralModels()
                             } label: {
-                                if viewModel.isFetchingMistralModels {
+                                if viewModel.fetchingModels.contains(.mistral) {
                                     ProgressView().controlSize(.small)
                                 } else {
                                     Image(systemName: "arrow.clockwise")
@@ -615,7 +615,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingMistralModels)
+                            .disabled(viewModel.fetchingModels.contains(.mistral))
                             .help("Fetch available models")
                         }
                     }
@@ -627,14 +627,14 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.vibeAPIKey, placeholder: "Vibe API key", lockKey: "lock.vibeAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.vibe], placeholder: "Vibe API key", lockKey: "lock.apiKeys[.vibe]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            Picker("", selection: $viewModel.vibeModel) {
-                                ForEach(viewModel.vibeModels, id: \.id) { model in
+                            Picker("", selection: $viewModel.models[.vibe]) {
+                                ForEach(viewModel.modelLists[.vibe], id: \.id) { model in
                                     Text(model.name.isEmpty ? model.id : model.name).tag(model.id)
                                 }
                             }
@@ -643,7 +643,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchVibeModels()
                             } label: {
-                                if viewModel.isFetchingVibeModels {
+                                if viewModel.fetchingModels.contains(.vibe) {
                                     ProgressView().controlSize(.mini)
                                 } else {
                                     Image(systemName: "arrow.clockwise")
@@ -651,7 +651,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingVibeModels)
+                            .disabled(viewModel.fetchingModels.contains(.vibe))
                             .help("Fetch available models")
                         }
                     }
@@ -664,17 +664,17 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.ollamaAPIKey, placeholder: "Required for cloud", lockKey: "lock.ollamaAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.ollama], placeholder: "Required for cloud", lockKey: "lock.apiKeys[.ollama]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
                             if viewModel.ollamaModels.isEmpty {
-                                TextField("Model name", text: $viewModel.ollamaModel)
+                                TextField("Model name", text: $viewModel.models[.ollama])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.ollamaModel) {
+                                Picker("Model", selection: $viewModel.models[.ollama]) {
                                     ForEach(viewModel.ollamaModels) { model in
                                         HStack(spacing: 4) {
                                             Text(model.name)
@@ -693,7 +693,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchModelsIfNeeded(for: .ollama, force: true)
                             } label: {
-                                if viewModel.isFetchingModels {
+                                if viewModel.fetchingModels.contains(.ollama) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -702,7 +702,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingModels)
+                            .disabled(viewModel.fetchingModels.contains(.ollama))
                             .help("Fetch available models")
                         }
                     }
@@ -725,7 +725,7 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key (optional)").font(.caption).foregroundStyle(.secondary)
-                        SecureField("Leave blank if not required", text: $viewModel.lmStudioAPIKey)
+                        SecureField("Leave blank if not required", text: $viewModel.apiKeys[.lmStudio])
                             .textContentType(.oneTimeCode)
                             .textFieldStyle(.roundedBorder)
                     }
@@ -739,12 +739,12 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.lmStudioModels.isEmpty {
-                                TextField("Model name", text: $viewModel.lmStudioModel)
+                            if viewModel.modelLists[.lmStudio].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.lmStudio])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.lmStudioModel) {
-                                    ForEach(viewModel.lmStudioModels) { model in
+                                Picker("Model", selection: $viewModel.models[.lmStudio]) {
+                                    ForEach(viewModel.modelLists[.lmStudio]) { model in
                                         Text(model.name).tag(model.id)
                                     }
                                 }
@@ -754,7 +754,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchLMStudioModels()
                             } label: {
-                                if viewModel.isFetchingLMStudioModels {
+                                if viewModel.fetchingModels.contains(.lmStudio) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -763,7 +763,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingLMStudioModels)
+                            .disabled(viewModel.fetchingModels.contains(.lmStudio))
                             .help("Fetch available models")
                         }
                     }
@@ -782,18 +782,18 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key (optional)").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.vLLMAPIKey, placeholder: "Optional", lockKey: "lock.vLLMAPIKey")
+                        LockedSecureField(text: $viewModel.apiKeys[.vLLM], placeholder: "Optional", lockKey: "lock.apiKeys[.vLLM]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.vLLMModels.isEmpty {
-                                TextField("Model name", text: $viewModel.vLLMModel)
+                            if viewModel.modelLists[.vLLM].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.vLLM])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.vLLMModel) {
-                                    ForEach(viewModel.vLLMModels) { model in
+                                Picker("Model", selection: $viewModel.models[.vLLM]) {
+                                    ForEach(viewModel.modelLists[.vLLM]) { model in
                                         Text(model.name).tag(model.id)
                                     }
                                 }
@@ -803,7 +803,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchVLLMModels()
                             } label: {
-                                if viewModel.isFetchingVLLMModels {
+                                if viewModel.fetchingModels.contains(.vLLM) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -812,7 +812,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingVLLMModels)
+                            .disabled(viewModel.fetchingModels.contains(.vLLM))
                             .help("Fetch available models")
                         }
                     }
@@ -877,12 +877,12 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.codexModels.isEmpty {
-                                TextField("Model id (e.g. gpt-5)", text: $viewModel.codexModel)
+                            if viewModel.modelLists[.codex].isEmpty {
+                                TextField("Model id (e.g. gpt-5)", text: $viewModel.models[.codex])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.codexModel) {
-                                    ForEach(viewModel.codexModels) { model in
+                                Picker("Model", selection: $viewModel.models[.codex]) {
+                                    ForEach(viewModel.modelLists[.codex]) { model in
                                         Text(model.name).tag(model.id)
                                     }
                                 }
@@ -891,14 +891,14 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchModelsIfNeeded(for: .codex, force: true)
                             } label: {
-                                if viewModel.isFetchingCodexModels {
+                                if viewModel.fetchingModels.contains(.codex) {
                                     ProgressView().controlSize(.small)
                                 } else {
                                     Image(systemName: "arrow.clockwise")
                                 }
                             }
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingCodexModels)
+                            .disabled(viewModel.fetchingModels.contains(.codex))
                             .help("Fetch available models from Codex")
                         }
                     }
@@ -919,10 +919,10 @@ struct SettingsView: View {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
                             if viewModel.localOllamaModels.isEmpty {
-                                TextField("Model name", text: $viewModel.localOllamaModel)
+                                TextField("Model name", text: $viewModel.models[.localOllama])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.localOllamaModel) {
+                                Picker("Model", selection: $viewModel.models[.localOllama]) {
                                     ForEach(viewModel.localOllamaModels) { model in
                                         HStack(spacing: 4) {
                                             Text(model.name)
@@ -941,7 +941,7 @@ struct SettingsView: View {
                             Button {
                                 viewModel.fetchLocalOllamaModels()
                             } label: {
-                                if viewModel.isFetchingLocalModels {
+                                if viewModel.fetchingModels.contains(.localOllama) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -950,7 +950,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.isFetchingLocalModels)
+                            .disabled(viewModel.fetchingModels.contains(.localOllama))
                             .help("Fetch available local models")
                         }
                     }
