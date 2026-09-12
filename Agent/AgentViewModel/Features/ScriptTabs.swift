@@ -68,11 +68,13 @@ extension AgentViewModel {
     }
 
     /// Return the API key for the given provider. Codex (OAuth file) and keyless local
-    /// providers have no key.
+    /// providers have no key. Trimmed: a key pasted with a trailing newline/space makes
+    /// URLSession drop the whole `Authorization` header (CR/LF is illegal in a header
+    /// value), which surfaces as a 401 "API key is required" from the gateway.
     func apiKeyForProvider(_ provider: APIProvider) -> String {
         switch provider {
         case .codex, .localOllama, .foundationModel: return ""
-        default: return apiKeys[provider]
+        default: return apiKeys[provider].trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
 
