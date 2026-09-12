@@ -24,7 +24,7 @@
 
 **Eine App. Jede KI. Volle Kontrolle über deinen Mac.**
 
-Agent! ist eine zu 100 % native Swift-6.2-/SwiftUI-App, die **20 LLM-Anbieter** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Qwen, MiniMax, OpenRouter, Requesty, A2Agent, Ollama (Cloud und lokal), vLLM und LM Studio — plus die geräteinterne **Apple Intelligence** — mit einer autonomen Aufgabenschleife verbindet, die wirklich *etwas tut*: Sie liest deinen Code, behebt den Fehler, baut das Xcode-Projekt, committet den Diff, steuert jede Mac-App über die Accessibility-API, führt Shell-Befehle als du oder als root aus, schickt dir Ergebnisse per iMessage und reagiert auf ein gesprochenes *„Agent!"*.
+Agent! ist eine zu 100 % native Swift-6.2-/SwiftUI-App, die **21 LLM-Anbieter** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Qwen, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (Cloud und lokal), vLLM und LM Studio — plus die geräteinterne **Apple Intelligence** — mit einer autonomen Aufgabenschleife verbindet, die wirklich *etwas tut*: Sie liest deinen Code, behebt den Fehler, baut das Xcode-Projekt, committet den Diff, steuert jede Mac-App über die Accessibility-API, führt Shell-Befehle als du oder als root aus, schickt dir Ergebnisse per iMessage und reagiert auf ein gesprochenes *„Agent!"*.
 
 Kein NPM, kein Electron, kein Abo, keine Telemetrie. Bring deinen eigenen API-Schlüssel mit, lauf komplett lokal oder kostenlos mit Apple Intelligence. Jedes Swift-Paket, von dem die App abhängt, wurde vom selben Autor geschrieben. Siehe [Entstehungsgeschichte](#entstehungsgeschichte) unten.
 
@@ -98,7 +98,7 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 - **🗂 Tabs, Verlauf, Gedächtnis, Pläne, Skills** — jeder Tab hat eigenen Projektordner und eigenes Log; persistentes Nutzergedächtnis; Multi-Plan-Checklisten in jedem Prompt.
 - **🔄 Fallback-Kette** — automatischer Wechsel zum nächsten konfigurierten Anbieter bei 429/Timeout/Netzwerkfehler.
 
-## 🤖 20 KI-Anbieter
+## 🤖 21 KI-Anbieter
 
 | Anbieter | Kosten | Am besten für |
 |---|---|---|
@@ -113,6 +113,7 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 | **OpenRouter** | Kostenpflichtig | 200+ Modelle, ein Schlüssel; Claude über Anthropic-Protokoll |
 | **Requesty** | Kostenpflichtig | 300+ Modelle mit einem OpenAI-kompatiblen Schlüssel; Preise und Fähigkeiten pro Modell |
 | **A2Agent** | Günstig | DeepSeek, GLM, Kimi, MiniMax und Qwen mit einem OpenAI-kompatiblen Schlüssel zu einem Bruchteil der offiziellen Preise |
+| **OrcaRouter** | Kostenpflichtig | 190+ Modelle mit einem OpenAI-kompatiblen Schlüssel zum Anbieterpreis; Auto-/Fusion-/Fallback-Routing |
 | **Z.ai** / **BigModel** | Günstig | GLM-5.3 — empfohlener Einstieg |
 | **Qwen** (Alibaba) | Günstig | Qwen 3.8 über Dashscope |
 | **MiniMax** | Günstig | 1M-Token-Kontext |
