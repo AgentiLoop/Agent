@@ -93,6 +93,17 @@ enum LLMProviderSetup {
                 capabilities: [.streaming, .tools, .vision, .systemPrompt],
                 contextSize: 200_000)
 
+        // A2Agent — OpenAI-compatible gateway for DeepSeek, GLM, Kimi, MiniMax and Qwen.
+        case .a2Agent:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.a2agent.me/v1/chat/completions",
+                    modelsURL: "https://api.a2agent.me/v1/models"
+                ),
+                model: "deepseek-v4-flash",
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 128_000)
+
         case .miniMax:
             return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
                 endpoint: LLMEndpoint(
