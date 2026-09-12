@@ -109,49 +109,33 @@ extension AgentViewModel {
 
     /// Approximate context window for a provider/model. Single source of truth for
     /// both the token meter in ThinkingIndicatorView and the compaction threshold
-    /// in CompactionState.
+    /// in CompactionState. The static per-provider size lives in the registry
+    /// (`LLMProviderSetup.config(for:)`); providers that report a real per-model
+    /// window at fetch time override it here.
     func contextWindow(for provider: APIProvider) -> Int {
+        let fallback = provider.config.contextSize
         switch provider {
-        case .claude: return 1_000_000
         case .codex:
-            // Real context window from the live /models response; fall back
-            // to gpt-5.2's published 272K if we haven't fetched yet.
+            // Real context window from the live /models response.
             if let ctx = codexContextWindows[codexModel], ctx > 0 { return ctx }
-            return 272_000
-        case .openAI: return 272_000
-        case .deepSeek: return 128_000
-        case .gemini: return 2_000_000
-        case .grok: return 2_000_000
-        case .zAI: return 128_000
-        case .bigModel: return 128_000
-        case .miniMax: return 1_000_000
-        case .openRouter: return 200_000
-        case .requesty: return 200_000
-        case .qwen: return 131_072
-        case .mistral: return 256_000
-        case .vibe: return 128_000
-        case .huggingFace: return 32_000
         case .ollama, .localOllama:
             // Explicit user setting wins — it's also what gets sent as num_ctx.
             if localOllamaContextSize > 0 { return localOllamaContextSize }
-            // Real per-model context from /api/show (num_ctx or context_length);
-            // fall back to 32K only when the API hasn't answered.
+            // Real per-model context from /api/show (num_ctx or context_length).
             let model = provider == .ollama ? ollamaModel : localOllamaModel
             if let ctx = ollamaContextWindows[model], ctx > 0 { return ctx }
-            return 32_000
         case .vLLM:
-            // Real context from vLLM's /v1/models max_model_len; fall back to
-            // 32K only when the API hasn't answered.
+            // Real context from vLLM's /v1/models max_model_len.
             if let ctx = vLLMContextWindows[vLLMModel], ctx > 0 { return ctx }
-            return 32_000
         case .lmStudio:
-            // Real context length from LM Studio's /api/v0/models (loaded or max);
-            // fall back to 32K only when the REST API hasn't answered.
+            // Real context length from LM Studio's /api/v0/models (loaded or max).
             if let ctx = lmStudioContextWindows[lmStudioModel], ctx > 0 { return ctx }
-            return 32_000
-        case .foundationModel: return 4_096
+        default:
+            break
         }
+        return fallback
     }
+
 
     // MARK: - Message History Compression
 
