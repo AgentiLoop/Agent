@@ -28,6 +28,7 @@ final class KeychainService: Sendable {
         case qwen = "com.agent.qwen-api-key"
         case miniMax = "com.agent.minimax-api-key"
         case openRouter = "com.agent.openrouter-api-key"
+        case requesty = "com.agent.requesty-api-key"
         case exa = "com.agent.exa-api-key"
         case lmStudio = "com.agent.lmstudio-api-key"
     }

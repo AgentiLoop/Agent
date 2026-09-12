@@ -9,7 +9,7 @@ enum LLMProviderSetup {
     static func registerAllProviders() {
         LLMRegistry.shared.registerAll([
             claude, codex, openAI, gemini, grok, mistral, vibe, deepSeek, huggingFace, miniMax, zAI, bigModel, qwen, openRouter,
-            ollama, localOllama, vLLM, lmStudio, appleIntelligence
+            requesty, ollama, localOllama, vLLM, lmStudio, appleIntelligence
         ])
     }
 
@@ -79,6 +79,16 @@ enum LLMProviderSetup {
         endpoint: LLMEndpoint(
             chatURL: "https://openrouter.ai/api/v1/chat/completions",
             modelsURL: "https://openrouter.ai/api/v1/models"
+        ),
+        capabilities: [.streaming, .tools, .vision, .systemPrompt]
+    )
+
+    static let requesty = LLMProviderConfig(
+        id: "requesty", displayName: "Requesty",
+        kind: .cloudAPI, apiProtocol: .openAI,
+        endpoint: LLMEndpoint(
+            chatURL: "https://router.requesty.ai/v1/chat/completions",
+            modelsURL: "https://router.requesty.ai/v1/models"
         ),
         capabilities: [.streaming, .tools, .vision, .systemPrompt]
     )

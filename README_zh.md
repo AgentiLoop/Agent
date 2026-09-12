@@ -24,7 +24,7 @@
 
 **一个应用。任意 AI。完全掌控你的 Mac。**
 
-Agent! 是一款 100% 原生的 Swift 6.2 / SwiftUI 应用，将 **18 家 LLM 提供商**——Claude、Codex、OpenAI、Gemini、Grok、Mistral、Mistral Vibe、DeepSeek、Hugging Face、Z.ai、BigModel、Qwen、MiniMax、OpenRouter、Ollama（云端和本地）、vLLM、LM Studio，以及设备端的 **Apple Intelligence**——接入一个真正*会做事*的自主任务循环：读取你的代码库、修复 bug、构建 Xcode 项目、提交 diff、通过辅助功能 API 驱动任何 Mac 应用、以你的身份或 root 运行 shell 命令、通过 iMessage 把结果发给你，并响应你说出的 *「Agent!」*。
+Agent! 是一款 100% 原生的 Swift 6.2 / SwiftUI 应用，将 **19 家 LLM 提供商**——Claude、Codex、OpenAI、Gemini、Grok、Mistral、Mistral Vibe、DeepSeek、Hugging Face、Z.ai、BigModel、Qwen、MiniMax、OpenRouter、Requesty、Ollama（云端和本地）、vLLM、LM Studio，以及设备端的 **Apple Intelligence**——接入一个真正*会做事*的自主任务循环：读取你的代码库、修复 bug、构建 Xcode 项目、提交 diff、通过辅助功能 API 驱动任何 Mac 应用、以你的身份或 root 运行 shell 命令、通过 iMessage 把结果发给你，并响应你说出的 *「Agent!」*。
 
 没有 NPM，没有 Electron，没有订阅，没有遥测。使用你自己的 API 密钥，完全本地运行，或用 Apple Intelligence 免费运行。它依赖的每个 Swift 包都出自同一位作者之手。详见下方的[项目背景](#项目背景)。
 
@@ -98,7 +98,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **🗂 标签页、历史、记忆、计划、技能** —— 每个标签页有独立的项目文件夹和日志；持久化用户记忆；多计划清单出现在每个提示词中。
 - **🔄 回退链** —— 遇到 429/超时/网络故障时自动切换到下一个已配置的提供商。
 
-## 🤖 18 家 AI 提供商
+## 🤖 19 家 AI 提供商
 
 | 提供商 | 费用 | 适合 |
 |---|---|---|
@@ -111,6 +111,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **DeepSeek** | 便宜 | 低成本编码、缓存命中报告 |
 | **Hugging Face** | 不定 | 开源模型，serverless 或专用端点 |
 | **OpenRouter** | 付费 | 200+ 模型，一把密钥；Claude 经 Anthropic 协议路由 |
+| **Requesty** | 付费 | 一把 OpenAI 兼容密钥即可访问 300+ 模型；按模型提供价格与能力信息 |
 | **Z.ai** / **BigModel** | 便宜 | GLM-5.3 —— 推荐起点 |
 | **Qwen**（阿里巴巴） | 便宜 | 通过 Dashscope 使用 Qwen 3.8 |
 | **MiniMax** | 便宜 | 1M token 上下文 |
