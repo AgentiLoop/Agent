@@ -280,8 +280,9 @@ extension AgentViewModel {
         stripOldImages(&request, keepRecentCount: 0)
         request.append(["role": "user", "content": compactSummaryPrompt])
 
+        log?("🗜️ Requesting LLM summary of \(request.count - 1) messages (large models may take a while)...")
         var summary = await summarizer(request)
-        if summary == nil, messages.count > keepRecent + 8 {
+        if summary == nil, !Task.isCancelled, messages.count > keepRecent + 8 {
             // The summary request itself may be too long for the provider
             // (forced compaction after a 413). Retry once summarizing only the
             // newer half of the middle — the older half is spilled below and
@@ -299,7 +300,11 @@ extension AgentViewModel {
             summary = await summarizer(shorter)
         }
         guard let summary, !summary.isEmpty else {
-            log?("⚠️ LLM compaction summary failed — falling back to prune")
+            if Task.isCancelled {
+                log?("⚠️ LLM compaction summary cancelled")
+            } else {
+                log?("⚠️ LLM compaction summary failed — falling back to prune")
+            }
             return false
         }
 
@@ -406,6 +411,9 @@ extension AgentViewModel {
                     return true
                 }
             }
+            // Task was stopped mid-summary — don't burn Apple AI + prune on a
+            // transcript nobody will send.
+            if Task.isCancelled { return false }
         }
 
         // Microcompact: clear old tool results to recoverable stubs.
