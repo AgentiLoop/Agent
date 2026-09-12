@@ -104,7 +104,7 @@ extension AgentViewModel {
             if let windows = try? await Self.fetchOllamaContextWindows(
                 endpoint: endpoint, apiKey: apiKey, models: names
             ) {
-                ollamaContextWindows.merge(windows) { _, new in new }
+                modelContextWindows[.ollama].merge(windows) { _, new in new }
             }
         }
     }
@@ -131,7 +131,7 @@ extension AgentViewModel {
             if let windows = try? await Self.fetchOllamaContextWindows(
                 endpoint: endpoint, apiKey: "", models: names
             ) {
-                ollamaContextWindows.merge(windows) { _, new in new }
+                modelContextWindows[.localOllama].merge(windows) { _, new in new }
             }
         }
     }
@@ -173,7 +173,7 @@ extension AgentViewModel {
             do {
                 let models = try await CodexService.fetchModels()
                 modelLists[.codex] = models.map { OpenAIModelInfo(id: $0.id, name: $0.display) }
-                codexContextWindows = Dictionary(uniqueKeysWithValues: models.map { ($0.id, $0.contextWindow) })
+                modelContextWindows[.codex] = Dictionary(uniqueKeysWithValues: models.map { ($0.id, $0.contextWindow) })
                 let ids = models.map(\.id)
                 if self.models[.codex].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.codex])) {
                     self.models[.codex] = ids.first ?? "gpt-5"
@@ -744,7 +744,7 @@ extension AgentViewModel {
             do {
                 let (models, windows) = try await Self.fetchVLLMModelsFromAPI(endpoint: endpoint, apiKey: key)
                 modelLists[.vLLM] = models
-                vLLMContextWindows = windows
+                modelContextWindows[.vLLM] = windows
                 let ids = models.map(\.id)
                 if self.models[.vLLM].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.vLLM])) {
                     self.models[.vLLM] = ids.first ?? ""
@@ -813,7 +813,7 @@ extension AgentViewModel {
             // compaction threshold. Best-effort: older LM Studio versions without
             // /api/v0/models just keep the 32K fallback.
             if let windows = try? await Self.fetchLMStudioContextWindows() {
-                lmStudioContextWindows = windows
+                modelContextWindows[.lmStudio] = windows
             }
         }
     }

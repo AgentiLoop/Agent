@@ -286,10 +286,11 @@ final class AgentViewModel {
 
     let ollamaEndpoint = "https://ollama.com/api/chat"
 
-    /// Context window per Codex model id, populated by `fetchCodexModels`.
-    /// Consulted by the Thinking HUD so it shows the correct token ceiling for
-    /// whichever Codex model is currently selected.
-    var codexContextWindows: [String: Int] = [:]
+    /// Real per-model context windows reported at fetch time, keyed by provider then model id
+    /// (Codex /models, Ollama /api/show num_ctx/context_length, vLLM max_model_len, LM Studio
+    /// /api/v0/models loaded/max context). `contextWindow(for:)` prefers these over the
+    /// registry's static size so compaction doesn't fire far too early on local models.
+    var modelContextWindows = ProviderKeyed<[String: Int]>(load: { _ in [:] })
 
     // vLLM settings
     var vLLMEndpoint: String = UserDefaults.standard.string(forKey: "vLLMEndpoint") ?? "http://localhost:8000/v1/chat/completions" {
@@ -310,22 +311,6 @@ final class AgentViewModel {
     var lmStudioEndpoint: String = UserDefaults.standard.string(forKey: "lmStudioEndpoint") ?? "http://localhost:1234/v1/chat/completions" {
         didSet { UserDefaults.standard.set(lmStudioEndpoint, forKey: "lmStudioEndpoint") }
     }
-
-    /// Context window per LM Studio model id, populated by `fetchLMStudioModels`
-    /// from LM Studio's REST API (`/api/v0/models` → loaded_context_length /
-    /// max_context_length). Without this the compaction threshold assumed a
-    /// hardcoded 32K window for every local model and compacted far too early.
-    var lmStudioContextWindows: [String: Int] = [:]
-
-    /// Context window per Ollama model name (cloud + local), populated by
-    /// `fetchOllamaModels` / `fetchLocalOllamaModels` from `/api/show`
-    /// (Modelfile num_ctx preferred, else the architecture's context_length).
-    /// Used only when the user hasn't set an explicit context size.
-    var ollamaContextWindows: [String: Int] = [:]
-
-    /// Context window per vLLM model id, populated by `fetchVLLMModels` from
-    /// `/v1/models` → max_model_len.
-    var vLLMContextWindows: [String: Int] = [:]
 
     var openRouterProtocol: LLMAPIProtocol = {
         let raw = UserDefaults.standard.string(forKey: "openRouterProtocol") ?? "openAI"

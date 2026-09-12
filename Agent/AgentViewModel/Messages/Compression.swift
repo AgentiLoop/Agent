@@ -113,27 +113,13 @@ extension AgentViewModel {
     /// (`LLMProviderSetup.config(for:)`); providers that report a real per-model
     /// window at fetch time override it here.
     func contextWindow(for provider: APIProvider) -> Int {
-        let fallback = provider.config.contextSize
-        switch provider {
-        case .codex:
-            // Real context window from the live /models response.
-            if let ctx = codexContextWindows[models[.codex]], ctx > 0 { return ctx }
-        case .ollama, .localOllama:
-            // Explicit user setting wins — it's also what gets sent as num_ctx.
-            if localOllamaContextSize > 0 { return localOllamaContextSize }
-            // Real per-model context from /api/show (num_ctx or context_length).
-            let model = provider == .ollama ? models[.ollama] : models[.localOllama]
-            if let ctx = ollamaContextWindows[model], ctx > 0 { return ctx }
-        case .vLLM:
-            // Real context from vLLM's /v1/models max_model_len.
-            if let ctx = vLLMContextWindows[models[.vLLM]], ctx > 0 { return ctx }
-        case .lmStudio:
-            // Real context length from LM Studio's /api/v0/models (loaded or max).
-            if let ctx = lmStudioContextWindows[models[.lmStudio]], ctx > 0 { return ctx }
-        default:
-            break
+        // Explicit Ollama user setting wins — it's also what gets sent as num_ctx.
+        if (provider == .ollama || provider == .localOllama) && localOllamaContextSize > 0 {
+            return localOllamaContextSize
         }
-        return fallback
+        // Real per-model window reported at fetch time, else the registry's static size.
+        if let ctx = modelContextWindows[provider][models[provider]], ctx > 0 { return ctx }
+        return provider.config.contextSize
     }
 
 
