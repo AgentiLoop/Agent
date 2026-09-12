@@ -20,6 +20,7 @@ struct SettingsView: View {
         case .bigModel: return $viewModel.zAITemperature
         case .miniMax: return $viewModel.miniMaxTemperature
         case .openRouter: return $viewModel.openAITemperature
+        case .requesty: return $viewModel.openAITemperature
         case .qwen: return $viewModel.openAITemperature
         case .gemini: return $viewModel.geminiTemperature
         case .grok: return $viewModel.grokTemperature
@@ -397,6 +398,48 @@ struct SettingsView: View {
                             .buttonStyle(.bordered)
                             .controlSize(.small)
                             .disabled(viewModel.isFetchingOpenRouterModels)
+                            .help("Fetch available models")
+                        }
+                    }
+                }
+            } else if viewModel.selectedProvider == .requesty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Requesty")
+                        .font(.headline)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("API Key").font(.caption).foregroundStyle(.secondary)
+                        LockedSecureField(text: $viewModel.requestyAPIKey, placeholder: "Requesty API key", lockKey: "lock.requestyAPIKey")
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Model").font(.caption).foregroundStyle(.secondary)
+                        HStack {
+                            if viewModel.requestyModels.isEmpty {
+                                TextField("e.g. anthropic/claude-sonnet-4-5", text: $viewModel.requestyModel)
+                                    .textFieldStyle(.roundedBorder)
+                            } else {
+                                Picker("Model", selection: $viewModel.requestyModel) {
+                                    ForEach(viewModel.requestyModels) { model in
+                                        Text(model.name).tag(model.id)
+                                    }
+                                }
+                                .labelsHidden()
+                            }
+
+                            Button {
+                                viewModel.fetchRequestyModels()
+                            } label: {
+                                if viewModel.isFetchingRequestyModels {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                } else {
+                                    Image(systemName: "arrow.clockwise")
+                                }
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .disabled(viewModel.isFetchingRequestyModels)
                             .help("Fetch available models")
                         }
                     }

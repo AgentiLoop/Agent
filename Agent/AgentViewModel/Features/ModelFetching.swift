@@ -290,6 +290,54 @@ extension AgentViewModel {
         return filtered.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
+    func fetchRequestyModels() {
+        isFetchingRequestyModels = true
+        Task {
+            defer { isFetchingRequestyModels = false }
+            do {
+                let models = try await Self.fetchRequestyCatalog(apiKey: requestyAPIKey)
+                requestyModels = models
+                let ids = models.map(\.id)
+                if requestyModel.isEmpty || (!ids.isEmpty && !ids.contains(requestyModel)) {
+                    requestyModel = ids.first ?? ""
+                }
+            } catch {
+                appendLog("Failed to fetch Requesty models: \(error.localizedDescription)")
+                requestyModels = []
+            }
+        }
+    }
+
+    /// Fetch Requesty's /models catalog and keep only entries Agent! can actually drive:
+    /// nonzero context_window AND supports_tool_calling. Requesty ids are already
+    /// `provider/model` (e.g. openai/gpt-4o-mini), so the id doubles as the display name.
+    private nonisolated static func fetchRequestyCatalog(apiKey: String) async throws -> [OpenAIModelInfo] {
+        guard let url = URL(string: "https://router.requesty.ai/v1/models") else { throw AgentError.invalidURL }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        if !apiKey.isEmpty {
+            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        }
+        request.timeoutInterval = llmAPITimeout
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw AgentError.apiError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0, message: "Requesty /models error")
+        }
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let entries = json["data"] as? [[String: Any]] else { return [] }
+
+        let filtered = entries.compactMap { entry -> OpenAIModelInfo? in
+            guard let id = entry["id"] as? String, !id.isEmpty else { return nil }
+            let ctx = entry["context_window"] as? Int ?? 0
+            guard ctx > 0 else { return nil }
+            // Agent!'s loop is tool-driven, so skip models that cannot call tools.
+            guard entry["supports_tool_calling"] as? Bool == true else { return nil }
+            return OpenAIModelInfo(id: id, name: id)
+        }
+        return filtered.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
+
     func fetchHuggingFaceModels() {
         guard !huggingFaceAPIKey.isEmpty else {
             huggingFaceModels = Self.defaultHuggingFaceModels
@@ -917,6 +965,7 @@ extension AgentViewModel {
         case .vibe: if force || vibeModels.isEmpty { fetchVibeModels() }
         case .miniMax: if force || miniMaxModels.isEmpty { fetchMiniMaxModels() }
         case .openRouter: if force || openRouterModels.isEmpty { fetchOpenRouterModels() }
+        case .requesty: if force || requestyModels.isEmpty { fetchRequestyModels() }
         case .bigModel: break
         default: break
         }

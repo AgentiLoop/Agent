@@ -431,6 +431,19 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(openRouterProtocol.rawValue, forKey: "openRouterProtocol") }
     }
 
+    // MARK: - Requesty
+
+    var requestyAPIKey: String = KeychainService.shared.get(.requesty) ?? "" {
+        didSet { KeychainService.shared.set(.requesty, requestyAPIKey) }
+    }
+
+    var requestyModel: String = UserDefaults.standard.string(forKey: "requestyModel") ?? "" {
+        didSet { UserDefaults.standard.set(requestyModel, forKey: "requestyModel") }
+    }
+
+    var requestyModels: [OpenAIModelInfo] = []
+    var isFetchingRequestyModels = false
+
     // MARK: - Google Gemini
 
     var geminiAPIKey: String = KeychainService.shared.get(.gemini) ?? "" {

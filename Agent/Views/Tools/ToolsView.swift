@@ -152,6 +152,7 @@ struct ToolsView: View {
         case .vibe: return $viewModel.vibeModel
         case .miniMax: return $viewModel.miniMaxModel
         case .openRouter: return $viewModel.openRouterModel
+        case .requesty: return $viewModel.requestyModel
         case .foundationModel: return .constant("Apple Intelligence")
         }
     }
@@ -189,6 +190,7 @@ struct ToolsView: View {
         case .lmStudio: return viewModel.lmStudioModels.map { ($0.id, $0.name) }
         case .miniMax: return oai(viewModel.miniMaxModels, AgentViewModel.defaultMiniMaxModels)
         case .openRouter: return viewModel.openRouterModels.map { ($0.id, $0.name) }
+        case .requesty: return viewModel.requestyModels.map { ($0.id, $0.name) }
         case .bigModel: return []
         case .foundationModel:
             return [("Apple Intelligence", "Apple Intelligence")]
