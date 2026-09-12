@@ -905,17 +905,20 @@ extension AgentViewModel {
             }
             // Real context length per model from LM Studio's REST API — drives the
             // compaction threshold. Best-effort: older LM Studio versions without
-            // /api/v0/models just keep the 32K fallback.
-            if let windows = try? await Self.fetchLMStudioContextWindows() {
-                modelContextWindows[.lmStudio] = windows
+            // /api/v0/models just keep the 32K fallback. The same response carries
+            // `type: "vlm"` for vision models — recorded so the eye badge and
+            // resolveVision work without Force Vision.
+            if let info = try? await Self.fetchLMStudioContextWindows() {
+                modelContextWindows[.lmStudio] = info.windows
+                modelVisionSupport[.lmStudio] = info.vision
             }
         }
     }
 
-    /// Query LM Studio's REST API (`/api/v0/models`) for per-model context lengths.
-    /// Prefers `loaded_context_length` (what the model was actually loaded with)
-    /// over `max_context_length` (what it supports).
-    private nonisolated static func fetchLMStudioContextWindows() async throws -> [String: Int] {
+    /// Query LM Studio's REST API (`/api/v0/models`) for per-model context lengths
+    /// and vision support. Prefers `loaded_context_length` (what the model was
+    /// actually loaded with) over `max_context_length` (what it supports).
+    private nonisolated static func fetchLMStudioContextWindows() async throws -> (windows: [String: Int], vision: [String: Bool]) {
         guard let url = URL(string: "http://localhost:1234/api/v0/models") else { throw AgentError.invalidURL }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -923,16 +926,18 @@ extension AgentViewModel {
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200,
               let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let modelsData = json["data"] as? [[String: Any]] else { return [:] }
+              let modelsData = json["data"] as? [[String: Any]] else { return ([:], [:]) }
         var windows: [String: Int] = [:]
+        var vision: [String: Bool] = [:]
         for model in modelsData {
             guard let id = model["id"] as? String else { continue }
             let loaded = model["loaded_context_length"] as? Int ?? 0
             let maxCtx = model["max_context_length"] as? Int ?? 0
             let ctx = loaded > 0 ? loaded : maxCtx
             if ctx > 0 { windows[id] = ctx }
+            if let v = catalogVisionFlag(model) { vision[id] = v }
         }
-        return windows
+        return (windows, vision)
     }
 
     private nonisolated static func fetchLMStudioModelsFromAPI(modelsURL: String) async throws -> [OpenAIModelInfo] {
