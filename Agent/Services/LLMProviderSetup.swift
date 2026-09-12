@@ -104,6 +104,18 @@ enum LLMProviderSetup {
                 capabilities: [.streaming, .tools, .vision, .systemPrompt],
                 contextSize: 128_000)
 
+        // OrcaRouter — OpenAI-compatible gateway routing to OpenAI, Anthropic,
+        // Gemini, DeepSeek, Qwen, MiniMax, Z.ai and more behind one key.
+        case .orcaRouter:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.orcarouter.ai/v1/chat/completions",
+                    modelsURL: "https://api.orcarouter.ai/v1/models"
+                ),
+                model: "orcarouter/fusion",
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 200_000)
+
         case .miniMax:
             return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
                 endpoint: LLMEndpoint(
