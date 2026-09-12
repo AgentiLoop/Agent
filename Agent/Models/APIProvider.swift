@@ -51,9 +51,11 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    /// Providers offered in the picker UI (Apple Intelligence is surfaced separately).
+    /// Providers offered in the picker UI, alphabetical by display name
+    /// (Apple Intelligence is surfaced separately).
     static var selectableProviders: [APIProvider] {
         allCases.filter { $0 != .foundationModel }
+            .sorted { $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending }
     }
 
     /// Keychain account string for this provider's API key. The strings are the
