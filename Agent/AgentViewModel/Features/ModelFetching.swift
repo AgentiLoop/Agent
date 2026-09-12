@@ -203,9 +203,10 @@ extension AgentViewModel {
         Task {
             defer { fetchingModels.remove(.openRouter) }
             do {
-                let models = try await Self.fetchOpenRouterCatalog(apiKey: apiKeys[.openRouter])
-                modelLists[.openRouter] = models
-                let ids = models.map(\.id)
+                let catalog = try await Self.fetchOpenRouterCatalog(apiKey: apiKeys[.openRouter])
+                modelLists[.openRouter] = catalog.models
+                modelVisionSupport[.openRouter] = catalog.vision
+                let ids = catalog.models.map(\.id)
                 if self.models[.openRouter].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.openRouter])) {
                     self.models[.openRouter] = ids.first ?? ""
                 }
@@ -220,7 +221,8 @@ extension AgentViewModel {
     /// nonzero context_length AND supports the "tools" parameter. Strips out preview,
     /// embedding, image-only, and legacy chat-only entries that would just confuse the picker.
     /// Display name uses OpenRouter's human-friendly "name" field instead of the raw id.
-    private nonisolated static func fetchOpenRouterCatalog(apiKey: String) async throws -> [OpenAIModelInfo] {
+    /// `architecture.input_modalities` feeds the per-model vision map.
+    private nonisolated static func fetchOpenRouterCatalog(apiKey: String) async throws -> (models: [OpenAIModelInfo], vision: [String: Bool]) {
         guard let url = URL(string: "https://openrouter.ai/api/v1/models") else { throw AgentError.invalidURL }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -234,8 +236,9 @@ extension AgentViewModel {
             throw AgentError.apiError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0, message: "OpenRouter /models error")
         }
         guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let entries = json["data"] as? [[String: Any]] else { return [] }
+              let entries = json["data"] as? [[String: Any]] else { return ([], [:]) }
 
+        var vision: [String: Bool] = [:]
         let filtered = entries.compactMap { entry -> OpenAIModelInfo? in
             guard let id = entry["id"] as? String, !id.isEmpty else { return nil }
             // Require a real context window — strips preview/placeholder rows.
@@ -245,10 +248,13 @@ extension AgentViewModel {
             // chat-only / embedding / image-only models would just dead-end.
             let params = entry["supported_parameters"] as? [String] ?? []
             guard params.contains("tools") else { return nil }
+            if let inputs = (entry["architecture"] as? [String: Any])?["input_modalities"] as? [String] {
+                vision[id] = inputs.contains("image")
+            }
             let displayName = (entry["name"] as? String).map { $0.isEmpty ? id : $0 } ?? id
             return OpenAIModelInfo(id: id, name: displayName)
         }
-        return filtered.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        return (filtered.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }, vision)
     }
 
     func fetchRequestyModels() {
@@ -256,9 +262,10 @@ extension AgentViewModel {
         Task {
             defer { fetchingModels.remove(.requesty) }
             do {
-                let models = try await Self.fetchRequestyCatalog(apiKey: apiKeys[.requesty])
-                modelLists[.requesty] = models
-                let ids = models.map(\.id)
+                let catalog = try await Self.fetchRequestyCatalog(apiKey: apiKeys[.requesty])
+                modelLists[.requesty] = catalog.models
+                modelVisionSupport[.requesty] = catalog.vision
+                let ids = catalog.models.map(\.id)
                 if self.models[.requesty].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.requesty])) {
                     self.models[.requesty] = ids.first ?? ""
                 }
@@ -272,7 +279,8 @@ extension AgentViewModel {
     /// Fetch Requesty's /models catalog and keep only entries Agent! can actually drive:
     /// nonzero context_window AND supports_tool_calling. Requesty ids are already
     /// `provider/model` (e.g. openai/gpt-4o-mini), so the id doubles as the display name.
-    private nonisolated static func fetchRequestyCatalog(apiKey: String) async throws -> [OpenAIModelInfo] {
+    /// `supports_vision` feeds the per-model vision map.
+    private nonisolated static func fetchRequestyCatalog(apiKey: String) async throws -> (models: [OpenAIModelInfo], vision: [String: Bool]) {
         guard let url = URL(string: "https://router.requesty.ai/v1/models") else { throw AgentError.invalidURL }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -286,17 +294,19 @@ extension AgentViewModel {
             throw AgentError.apiError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0, message: "Requesty /models error")
         }
         guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let entries = json["data"] as? [[String: Any]] else { return [] }
+              let entries = json["data"] as? [[String: Any]] else { return ([], [:]) }
 
+        var vision: [String: Bool] = [:]
         let filtered = entries.compactMap { entry -> OpenAIModelInfo? in
             guard let id = entry["id"] as? String, !id.isEmpty else { return nil }
             let ctx = entry["context_window"] as? Int ?? 0
             guard ctx > 0 else { return nil }
             // Agent!'s loop is tool-driven, so skip models that cannot call tools.
             guard entry["supports_tool_calling"] as? Bool == true else { return nil }
+            if let v = entry["supports_vision"] as? Bool { vision[id] = v }
             return OpenAIModelInfo(id: id, name: id)
         }
-        return filtered.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        return (filtered.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }, vision)
     }
 
     func fetchA2AgentModels() {
@@ -352,9 +362,10 @@ extension AgentViewModel {
         Task {
             defer { fetchingModels.remove(.orcaRouter) }
             do {
-                let models = try await Self.fetchOrcaRouterCatalog(apiKey: apiKeys[.orcaRouter])
-                modelLists[.orcaRouter] = models
-                let ids = models.map(\.id)
+                let catalog = try await Self.fetchOrcaRouterCatalog(apiKey: apiKeys[.orcaRouter])
+                modelLists[.orcaRouter] = catalog.models
+                modelVisionSupport[.orcaRouter] = catalog.vision
+                let ids = catalog.models.map(\.id)
                 if self.models[.orcaRouter].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.orcaRouter])) {
                     self.models[.orcaRouter] = ids.first ?? ""
                 }
@@ -368,9 +379,11 @@ extension AgentViewModel {
     /// Fetch OrcaRouter's /models catalog. Plain OpenAI shape (`data[].id`) with an
     /// optional human-friendly `name`, plus `architecture.output_modalities` — used
     /// to drop video-only entries (kling/minimax-h3/orca dub) the chat picker can't
-    /// drive. Non-200 responses are surfaced in the log (bad key, out of credits)
-    /// instead of silently yielding an empty picker.
-    private nonisolated static func fetchOrcaRouterCatalog(apiKey: String) async throws -> [OpenAIModelInfo] {
+    /// drive. `architecture.input_modalities` feeds the per-model vision map (only
+    /// entries that carry the field are recorded, so the name heuristic still applies
+    /// to the rest). Non-200 responses are surfaced in the log (bad key, out of
+    /// credits) instead of silently yielding an empty picker.
+    private nonisolated static func fetchOrcaRouterCatalog(apiKey: String) async throws -> (models: [OpenAIModelInfo], vision: [String: Bool]) {
         guard let url = URL(string: "https://api.orcarouter.ai/v1/models") else { throw AgentError.invalidURL }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -386,17 +399,27 @@ extension AgentViewModel {
             throw AgentError.apiError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0, message: "OrcaRouter /models error \(body)")
         }
         guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let entries = json["data"] as? [[String: Any]] else { return [] }
+              let entries = json["data"] as? [[String: Any]] else { return ([], [:]) }
 
+        var vision: [String: Bool] = [:]
         let parsed = entries.compactMap { entry -> OpenAIModelInfo? in
             guard let id = entry["id"] as? String, !id.isEmpty else { return nil }
+            let arch = entry["architecture"] as? [String: Any]
             // Video-only models can't serve the chat/tool loop.
-            let modalities = ((entry["architecture"] as? [String: Any])?["output_modalities"] as? [String]) ?? []
+            let modalities = arch?["output_modalities"] as? [String] ?? []
             if !modalities.isEmpty && !modalities.contains("text") { return nil }
+            if let inputs = arch?["input_modalities"] as? [String] {
+                vision[id] = inputs.contains("image")
+            }
             let displayName = (entry["name"] as? String).map { $0.isEmpty ? id : $0 } ?? id
             return OpenAIModelInfo(id: id, name: displayName)
         }
-        return parsed.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        // Free-tier variants (e.g. z-ai/glm-5.3-flash-free) ship without `architecture`;
+        // they are the same model as the base id, so inherit its vision flag.
+        for model in parsed where vision[model.id] == nil && model.id.hasSuffix("-free") {
+            if let base = vision[String(model.id.dropLast(5))] { vision[model.id] = base }
+        }
+        return (parsed.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }, vision)
     }
 
     func fetchHuggingFaceModels() {
