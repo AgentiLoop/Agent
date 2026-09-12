@@ -67,7 +67,8 @@ struct FallbackChainView: View {
                                         .foregroundStyle(.secondary)
                                         .lineLimit(1)
                                         .truncationMode(.middle)
-                                    if AgentViewModel.isVisionModel(entry.model) {
+                                    if let p = APIProvider(rawValue: entry.provider),
+                                       viewModel.showsVisionBadge(provider: p, modelId: entry.model) {
                                         Image(systemName: "eye")
                                             .foregroundStyle(.blue)
                                             .font(.caption2)
@@ -137,7 +138,7 @@ struct FallbackChainView: View {
                             ForEach(models, id: \.id) { model in
                                 HStack(spacing: 4) {
                                     Text(shortModel(model.display))
-                                    if AgentViewModel.isVisionModel(model.id) {
+                                    if viewModel.showsVisionBadge(provider: selectedProvider, modelId: model.id) {
                                         Image(systemName: "eye")
                                             .foregroundStyle(.blue)
                                             .font(.caption2)
