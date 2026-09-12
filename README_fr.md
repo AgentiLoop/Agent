@@ -102,7 +102,7 @@ Tapez simplement ce que vous voulez. Agent! trouve comment et le réalise.
 
 | Fournisseur | Coût | Idéal pour |
 |---|---|---|
-| **Claude** | Payant | Longues tâches autonomes, réflexion étendue, cache de prompts |
+| **Claude** | Au token (clé API) ou abonnement (OAuth) | Longues tâches autonomes, réflexion étendue, cache de prompts |
 | **Codex** | Abonnement ChatGPT | Modèles OpenAI via OAuth ChatGPT — pas de clé API, pas de facturation au token |
 | **OpenAI** | Payant | Usage général, appels d'outils, vision, `reasoning_effort` |
 | **Google Gemini** | Payant (offre gratuite) | Contexte long, vision |

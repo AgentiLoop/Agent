@@ -102,7 +102,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 | 提供商 | 费用 | 适合 |
 |---|---|---|
-| **Claude** | 付费 | 长时间自主任务、扩展思考、提示词缓存 |
+| **Claude** | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
 | **Codex** | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
 | **OpenAI** | 付费 | 通用、工具调用、视觉、`reasoning_effort` |
 | **Google Gemini** | 付费（有免费额度） | 长上下文、视觉 |

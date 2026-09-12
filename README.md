@@ -102,7 +102,7 @@ Just type what you want. Agent! figures out how and makes it happen.
 
 | Provider | Cost | Best for |
 |---|---|---|
-| **Claude** | Paid | Long autonomous tasks, extended thinking, prompt caching |
+| **Claude** | Per-token (API key) or subscription (OAuth) | Long autonomous tasks, extended thinking, prompt caching |
 | **Codex** | ChatGPT subscription | OpenAI models via ChatGPT OAuth — no API key, no per-token charges |
 | **OpenAI** | Paid | General purpose, tool calling, vision, `reasoning_effort` |
 | **Google Gemini** | Paid (free tier) | Long context, vision |
