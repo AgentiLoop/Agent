@@ -134,83 +134,16 @@ extension AgentViewModel {
 
         // Build a minimal service for this sub-agent
         let historyContext = "" // Sub-agents start with clean context
-        let claude: ClaudeService?
-        if provider == .claude {
-            claude = ClaudeService(
-                apiKey: apiKey,
-                model: modelName,
-                historyContext: historyContext,
-                projectFolder: agent.projectFolder,
-                maxTokens: mt
-            )
-        } else if provider == .lmStudio && lmStudioProtocol == .anthropic {
-            claude = ClaudeService(
-                apiKey: apiKeys[.lmStudio],
-                model: modelName,
-                historyContext: historyContext,
-                projectFolder: agent.projectFolder,
-                baseURL: lmStudioEndpoint,
-                maxTokens: mt
-            )
-        } else if provider == .openRouter && openRouterProtocol == .anthropic {
-            claude = ClaudeService(
-                apiKey: apiKeys[.openRouter],
-                model: modelName,
-                historyContext: historyContext,
-                projectFolder: agent.projectFolder,
-                baseURL: LLMProviderSetup.openRouterAnthropicChatURL,
-                maxTokens: mt
-            )
-        } else {
-            claude = nil
-        }
-        let openAICompatible: OpenAICompatibleService?
-        switch provider {
-        case .claude, .codex, .ollama, .localOllama, .foundationModel:
-            openAICompatible = nil
-        case .lmStudio where lmStudioProtocol == .anthropic:
-            openAICompatible = nil
-        case .openRouter where openRouterProtocol == .anthropic:
-            openAICompatible = nil
-        case .vLLM:
-            openAICompatible = OpenAICompatibleService(
-                apiKey: apiKeyForProvider(provider), model: modelName,
-                baseURL: vLLMEndpoint, historyContext: historyContext,
-                projectFolder: agent.projectFolder, provider: provider,
-                maxTokens: mt
-            )
-        default:
-            let url = chatURLForProvider(provider)
-            openAICompatible = url.isEmpty ? nil : OpenAICompatibleService(
-                apiKey: apiKeyForProvider(provider), model: modelName,
-                baseURL: url, historyContext: historyContext,
-                projectFolder: agent.projectFolder, provider: provider,
-                maxTokens: mt
-            )
-        }
-        let ollama: OllamaService?
-        switch provider {
-        case .ollama:
-            ollama = OllamaService(
-                apiKey: apiKeys[.ollama], model: modelName,
-                endpoint: ollamaEndpoint, historyContext: historyContext,
-                projectFolder: agent.projectFolder, provider: .ollama
-            )
-        case .localOllama:
-            ollama = OllamaService(
-                apiKey: "", model: modelName,
-                endpoint: localOllamaEndpoint, historyContext: historyContext,
-                projectFolder: agent.projectFolder, provider: .localOllama,
-                contextSize: localOllamaContextSize
-            )
-        default:
-            ollama = nil
-        }
-
-        // Set temperature
-        claude?.temperature = temperatureForProvider(.claude)
-        ollama?.temperature = temperatureForProvider(provider)
-        openAICompatible?.temperature = temperatureForProvider(provider)
+        let services = buildLLMServiceBundle(
+            provider: provider,
+            modelName: modelName,
+            historyContext: historyContext,
+            projectFolder: agent.projectFolder,
+            maxTokens: mt
+        )
+        let claude = services.claude
+        let openAICompatible = services.openAICompatible
+        let ollama = services.ollama
 
         // Sub-agent tool groups — configurable by parent, defaults to Core+Work+Code. Deliberately NOT including
         // Tool.Group.subAgents in the default, so a spawned child cannot recursively spawn grandchildren without explicit parent opt-in. The maxSubAgents=3 cap is enforced per-parent, so recursive spawning would silently blow past it. Parents that need multi-level orchestration can pass agent.toolGroups explicitly.

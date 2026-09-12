@@ -172,9 +172,9 @@ extension AgentViewModel {
         tab.flush()
 
         var mt = maxTokens
-        var services = buildTabLLMServices(
+        var services = buildLLMServiceBundle(
             provider: provider,
-            modelId: modelId,
+            modelName: modelId,
             historyContext: tabHistoryContext,
             projectFolder: projectFolder,
             maxTokens: mt
@@ -249,15 +249,10 @@ extension AgentViewModel {
                     tab?.appendLog(msg)
                     tab?.flush()
                 }
-                let bundle = LLMServiceBundle(
-                    claude: services.claude, codex: nil,
-                    openAICompatible: services.openAICompatible,
-                    ollama: services.ollama, foundationModel: services.foundationModel
-                )
                 let compacted = await Self.tieredCompact(
                     &messages,
                     state: &compactionState,
-                    summarizer: makeCompactSummarizer(services: bundle, log: compactLog),
+                    summarizer: makeCompactSummarizer(services: services, log: compactLog),
                     log: compactLog
                 )
                 if compacted, let restored = postCompactReattachment(tabID: tab.id) {
@@ -492,9 +487,9 @@ extension AgentViewModel {
                     mt = newMT
                     compactionState.maxTokens = mt
                     compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
-                    services = buildTabLLMServices(
+                    services = buildLLMServiceBundle(
                         provider: provider,
-                        modelId: modelId,
+                        modelName: modelId,
                         historyContext: tabHistoryContext,
                         projectFolder: projectFolder,
                         maxTokens: mt
@@ -506,9 +501,9 @@ extension AgentViewModel {
                     // Rescale the compaction threshold to the fallback provider's
                     // real context window (see the main loop's fallback path).
                     compactionState = CompactionState(contextWindow: contextWindow(for: fbProvider), maxTokens: mt)
-                    services = buildTabLLMServices(
+                    services = buildLLMServiceBundle(
                         provider: provider,
-                        modelId: modelId,
+                        modelName: modelId,
                         historyContext: tabHistoryContext,
                         projectFolder: projectFolder,
                         maxTokens: mt
