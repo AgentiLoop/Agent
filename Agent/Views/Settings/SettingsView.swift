@@ -11,6 +11,99 @@ struct SettingsView: View {
         $viewModel.temperatures[viewModel.selectedProvider]
     }
 
+    /// OpenAI-compatible providers that share the generic API-key + model section.
+    /// Claude, Codex, Ollama, LM Studio and vLLM keep bespoke sections (OAuth, endpoints, protocols).
+    private static let standardProviders: Set<APIProvider> = [
+        .openAI, .deepSeek, .huggingFace, .zAI, .bigModel, .miniMax, .openRouter,
+        .requesty, .qwen, .gemini, .grok, .mistral, .vibe,
+    ]
+
+    private func keyPlaceholder(_ provider: APIProvider) -> String {
+        switch provider {
+        case .openAI, .deepSeek: "sk-..."
+        case .huggingFace: "hf_..."
+        case .openRouter: "sk-or-..."
+        case .qwen: "DashScope API key"
+        default: "\(provider.displayName) API key"
+        }
+    }
+
+    private func showsVisionBadge(_ provider: APIProvider, modelId: String) -> Bool {
+        switch provider {
+        case .huggingFace, .mistral: AgentViewModel.isVisionModel(modelId)
+        case .zAI: modelId.hasSuffix(":v")
+        case .gemini: modelId.contains("gemini-")
+        default: false
+        }
+    }
+
+    @ViewBuilder
+    private func standardProviderSection(_ provider: APIProvider) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(provider.displayName)
+                .font(.headline)
+
+            if provider == .openRouter {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("API Protocol").font(.caption).foregroundStyle(.secondary)
+                    Picker("Protocol", selection: $viewModel.openRouterProtocol) {
+                        ForEach(APIProvider.openRouter.config.supportedProtocols, id: \.self) { proto in
+                            Text(proto.displayName).tag(proto)
+                        }
+                    }
+                    .labelsHidden()
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("API Key").font(.caption).foregroundStyle(.secondary)
+                LockedSecureField(text: $viewModel.apiKeys[provider], placeholder: keyPlaceholder(provider), lockKey: "lock.apiKeys[.\(provider.rawValue)]")
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Model").font(.caption).foregroundStyle(.secondary)
+                HStack {
+                    if viewModel.modelLists[provider].isEmpty {
+                        TextField("e.g. \(provider.config.model)", text: $viewModel.models[provider])
+                            .textFieldStyle(.roundedBorder)
+                    } else {
+                        Picker("Model", selection: $viewModel.models[provider]) {
+                            ForEach(viewModel.modelLists[provider]) { model in
+                                HStack(spacing: 4) {
+                                    Text(model.name.isEmpty ? model.id : model.name)
+                                    if showsVisionBadge(provider, modelId: model.id) {
+                                        Image(systemName: "eye")
+                                            .foregroundStyle(.blue)
+                                            .font(.caption2)
+                                    }
+                                }.tag(model.id)
+                            }
+                        }
+                        .labelsHidden()
+                    }
+
+                    // BigModel has no /models endpoint — nothing to fetch.
+                    if provider != .bigModel {
+                        Button {
+                            viewModel.fetchModelsIfNeeded(for: provider, force: true)
+                        } label: {
+                            if viewModel.fetchingModels.contains(provider) {
+                                ProgressView()
+                                    .controlSize(.small)
+                            } else {
+                                Image(systemName: "arrow.clockwise")
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .disabled(viewModel.fetchingModels.contains(provider))
+                        .help("Fetch available models")
+                    }
+                }
+            }
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Provider toggle
@@ -87,555 +180,8 @@ struct SettingsView: View {
                         }
                     }
                 }
-            } else if viewModel.selectedProvider == .openAI {
-                // OpenAI settings
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("OpenAI API")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.openAI], placeholder: "sk-...", lockKey: "lock.apiKeys[.openAI]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            if viewModel.modelLists[.openAI].isEmpty {
-                                TextField("Model name", text: $viewModel.models[.openAI])
-                                    .textFieldStyle(.roundedBorder)
-                            } else {
-                                Picker("Model", selection: $viewModel.models[.openAI]) {
-                                    ForEach(viewModel.modelLists[.openAI]) { model in
-                                        Text(model.name).tag(model.id)
-                                    }
-                                }
-                                .labelsHidden()
-                            }
-
-                            Button {
-                                viewModel.fetchModelsIfNeeded(for: .openAI, force: true)
-                            } label: {
-                                if viewModel.fetchingModels.contains(.openAI) {
-                                    ProgressView()
-                                        .controlSize(.small)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(.openAI))
-                            .help("Fetch available models")
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .deepSeek {
-                // DeepSeek settings
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("DeepSeek API")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.deepSeek], placeholder: "sk-...", lockKey: "lock.apiKeys[.deepSeek]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            if viewModel.modelLists[.deepSeek].isEmpty {
-                                TextField("Model name", text: $viewModel.models[.deepSeek])
-                                    .textFieldStyle(.roundedBorder)
-                            } else {
-                                Picker("Model", selection: $viewModel.models[.deepSeek]) {
-                                    ForEach(viewModel.modelLists[.deepSeek]) { model in
-                                        Text(model.name).tag(model.id)
-                                    }
-                                }
-                                .labelsHidden()
-                            }
-
-                            Button {
-                                viewModel.fetchDeepSeekModels()
-                            } label: {
-                                if viewModel.fetchingModels.contains(.deepSeek) {
-                                    ProgressView()
-                                        .controlSize(.small)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(.deepSeek))
-                            .help("Fetch available models")
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .huggingFace {
-                // Hugging Face settings
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Hugging Face Inference")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.huggingFace], placeholder: "hf_...", lockKey: "lock.apiKeys[.huggingFace]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            if viewModel.modelLists[.huggingFace].isEmpty {
-                                TextField("Model name", text: $viewModel.models[.huggingFace])
-                                    .textFieldStyle(.roundedBorder)
-                            } else {
-                                Picker("Model", selection: $viewModel.models[.huggingFace]) {
-                                    ForEach(viewModel.modelLists[.huggingFace]) { model in
-                                        HStack(spacing: 4) {
-                                            Text(model.name)
-                                            if AgentViewModel.isVisionModel(model.id) {
-                                                Image(systemName: "eye")
-                                                    .foregroundStyle(.blue)
-                                                    .font(.caption2)
-                                            }
-                                        }.tag(model.id)
-                                    }
-                                }
-                                .labelsHidden()
-                            }
-
-                            Button {
-                                viewModel.fetchHuggingFaceModels()
-                            } label: {
-                                if viewModel.fetchingModels.contains(.huggingFace) {
-                                    ProgressView()
-                                        .controlSize(.small)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(.huggingFace))
-                            .help("Fetch available models")
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .zAI {
-                // Z.ai (ZhipuAI GLM) settings
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Z.ai API")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.zAI], placeholder: "Z.ai API key", lockKey: "lock.apiKeys[.zAI]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            if viewModel.modelLists[.zAI].isEmpty {
-                                TextField("Model name", text: $viewModel.models[.zAI])
-                                    .textFieldStyle(.roundedBorder)
-                            } else {
-                                Picker("Model", selection: $viewModel.models[.zAI]) {
-                                    ForEach(viewModel.modelLists[.zAI]) { model in
-                                        HStack(spacing: 4) {
-                                            Text(model.name)
-                                            if model.id.hasSuffix(":v") {
-                                                Image(systemName: "eye")
-                                                    .foregroundStyle(.blue)
-                                                    .font(.caption2)
-                                            }
-                                        }.tag(model.id)
-                                    }
-                                }
-                                .labelsHidden()
-                            }
-
-                            Button {
-                                viewModel.fetchModelsIfNeeded(for: .zAI, force: true)
-                            } label: {
-                                if viewModel.fetchingModels.contains(.zAI) {
-                                    ProgressView()
-                                        .controlSize(.small)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(.zAI))
-                            .help("Fetch available models")
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .bigModel {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("BigModel (China)")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.bigModel], placeholder: "BigModel API key", lockKey: "lock.apiKeys[.bigModel]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        TextField("Model name", text: $viewModel.models[.bigModel])
-                            .textFieldStyle(.roundedBorder)
-                    }
-                }
-            } else if viewModel.selectedProvider == .miniMax {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("MiniMax API")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.miniMax], placeholder: "MiniMax API key", lockKey: "lock.apiKeys[.miniMax]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            if viewModel.modelLists[.miniMax].isEmpty {
-                                TextField("Model name", text: $viewModel.models[.miniMax])
-                                    .textFieldStyle(.roundedBorder)
-                            } else {
-                                Picker("Model", selection: $viewModel.models[.miniMax]) {
-                                    ForEach(viewModel.modelLists[.miniMax]) { model in
-                                        Text(model.name).tag(model.id)
-                                    }
-                                }
-                                .labelsHidden()
-                            }
-
-                            Button {
-                                viewModel.fetchMiniMaxModels()
-                            } label: {
-                                if viewModel.fetchingModels.contains(.miniMax) {
-                                    ProgressView()
-                                        .controlSize(.small)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(.miniMax))
-                            .help("Fetch available models")
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .openRouter {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("OpenRouter")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Protocol").font(.caption).foregroundStyle(.secondary)
-                        Picker("Protocol", selection: $viewModel.openRouterProtocol) {
-                            ForEach(APIProvider.openRouter.config.supportedProtocols, id: \.self) { proto in
-                                Text(proto.displayName).tag(proto)
-                            }
-                        }
-                        .labelsHidden()
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.openRouter], placeholder: "sk-or-...", lockKey: "lock.apiKeys[.openRouter]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            if viewModel.modelLists[.openRouter].isEmpty {
-                                TextField("e.g. anthropic/claude-opus-4", text: $viewModel.models[.openRouter])
-                                    .textFieldStyle(.roundedBorder)
-                            } else {
-                                Picker("Model", selection: $viewModel.models[.openRouter]) {
-                                    ForEach(viewModel.modelLists[.openRouter]) { model in
-                                        Text(model.name).tag(model.id)
-                                    }
-                                }
-                                .labelsHidden()
-                            }
-
-                            Button {
-                                viewModel.fetchOpenRouterModels()
-                            } label: {
-                                if viewModel.fetchingModels.contains(.openRouter) {
-                                    ProgressView()
-                                        .controlSize(.small)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(.openRouter))
-                            .help("Fetch available models")
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .requesty {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Requesty")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.requesty], placeholder: "Requesty API key", lockKey: "lock.apiKeys[.requesty]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            if viewModel.modelLists[.requesty].isEmpty {
-                                TextField("e.g. anthropic/claude-sonnet-4-5", text: $viewModel.models[.requesty])
-                                    .textFieldStyle(.roundedBorder)
-                            } else {
-                                Picker("Model", selection: $viewModel.models[.requesty]) {
-                                    ForEach(viewModel.modelLists[.requesty]) { model in
-                                        Text(model.name).tag(model.id)
-                                    }
-                                }
-                                .labelsHidden()
-                            }
-
-                            Button {
-                                viewModel.fetchRequestyModels()
-                            } label: {
-                                if viewModel.fetchingModels.contains(.requesty) {
-                                    ProgressView()
-                                        .controlSize(.small)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(.requesty))
-                            .help("Fetch available models")
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .qwen {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Qwen (DashScope)")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.qwen], placeholder: "DashScope API key", lockKey: "lock.apiKeys[.qwen]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            if viewModel.modelLists[.qwen].isEmpty {
-                                TextField("Model name", text: $viewModel.models[.qwen])
-                                    .textFieldStyle(.roundedBorder)
-                            } else {
-                                Picker("Model", selection: $viewModel.models[.qwen]) {
-                                    ForEach(viewModel.modelLists[.qwen]) { model in
-                                        Text(model.name).tag(model.id)
-                                    }
-                                }
-                                .labelsHidden()
-                            }
-
-                            Button {
-                                viewModel.fetchQwenModels()
-                            } label: {
-                                if viewModel.fetchingModels.contains(.qwen) {
-                                    ProgressView().controlSize(.small)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.borderless)
-                            .disabled(viewModel.fetchingModels.contains(.qwen))
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .gemini {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Google Gemini API")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.gemini], placeholder: "Gemini API key", lockKey: "lock.apiKeys[.gemini]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            if viewModel.modelLists[.gemini].isEmpty {
-                                TextField("Model name", text: $viewModel.models[.gemini])
-                                    .textFieldStyle(.roundedBorder)
-                            } else {
-                                Picker("Model", selection: $viewModel.models[.gemini]) {
-                                    ForEach(viewModel.modelLists[.gemini]) { model in
-                                        HStack(spacing: 4) {
-                                            Text(model.name)
-                                            if model.id.contains("gemini-") {
-                                                Image(systemName: "eye")
-                                                    .foregroundStyle(.blue)
-                                                    .font(.caption2)
-                                            }
-                                        }.tag(model.id)
-                                    }
-                                }
-                                .labelsHidden()
-                            }
-
-                            Button {
-                                viewModel.fetchGeminiModels()
-                            } label: {
-                                if viewModel.fetchingModels.contains(.gemini) {
-                                    ProgressView().controlSize(.small)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(.gemini))
-                            .help("Fetch available models")
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .grok {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Grok API (xAI)")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.grok], placeholder: "Grok API key", lockKey: "lock.apiKeys[.grok]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            if viewModel.modelLists[.grok].isEmpty {
-                                TextField("Model name", text: $viewModel.models[.grok])
-                                    .textFieldStyle(.roundedBorder)
-                            } else {
-                                Picker("Model", selection: $viewModel.models[.grok]) {
-                                    ForEach(viewModel.modelLists[.grok]) { model in
-                                        Text(model.name).tag(model.id)
-                                    }
-                                }
-                                .labelsHidden()
-                            }
-
-                            Button {
-                                viewModel.fetchGrokModels()
-                            } label: {
-                                if viewModel.fetchingModels.contains(.grok) {
-                                    ProgressView().controlSize(.small)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(.grok))
-                            .help("Fetch available models")
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .mistral {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Mistral AI")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.mistral], placeholder: "Mistral API key", lockKey: "lock.apiKeys[.mistral]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            if viewModel.modelLists[.mistral].isEmpty {
-                                TextField("Model name", text: $viewModel.models[.mistral])
-                                    .textFieldStyle(.roundedBorder)
-                            } else {
-                                Picker("Model", selection: $viewModel.models[.mistral]) {
-                                    ForEach(viewModel.modelLists[.mistral]) { model in
-                                        HStack(spacing: 4) {
-                                            Text(model.name)
-                                            if AgentViewModel.isVisionModel(model.id) {
-                                                Image(systemName: "eye")
-                                                    .foregroundStyle(.blue)
-                                                    .font(.caption2)
-                                            }
-                                        }.tag(model.id)
-                                    }
-                                }
-                                .labelsHidden()
-                            }
-                            Button {
-                                viewModel.fetchMistralModels()
-                            } label: {
-                                if viewModel.fetchingModels.contains(.mistral) {
-                                    ProgressView().controlSize(.small)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(.mistral))
-                            .help("Fetch available models")
-                        }
-                    }
-                }
-            } else if viewModel.selectedProvider == .vibe {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Mistral Vibe")
-                        .font(.headline)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[.vibe], placeholder: "Vibe API key", lockKey: "lock.apiKeys[.vibe]")
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
-                        HStack {
-                            Picker("", selection: $viewModel.models[.vibe]) {
-                                ForEach(viewModel.modelLists[.vibe], id: \.id) { model in
-                                    Text(model.name.isEmpty ? model.id : model.name).tag(model.id)
-                                }
-                            }
-                            .labelsHidden()
-
-                            Button {
-                                viewModel.fetchVibeModels()
-                            } label: {
-                                if viewModel.fetchingModels.contains(.vibe) {
-                                    ProgressView().controlSize(.mini)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(.vibe))
-                            .help("Fetch available models")
-                        }
-                    }
-                }
+            } else if Self.standardProviders.contains(viewModel.selectedProvider) {
+                standardProviderSection(viewModel.selectedProvider)
             } else if viewModel.selectedProvider == .ollama {
                 // Cloud Ollama settings
                 VStack(alignment: .leading, spacing: 10) {
@@ -732,7 +278,7 @@ struct SettingsView: View {
                             }
 
                             Button {
-                                viewModel.fetchLMStudioModels()
+                                viewModel.fetchModelsIfNeeded(for: .lmStudio, force: true)
                             } label: {
                                 if viewModel.fetchingModels.contains(.lmStudio) {
                                     ProgressView()
@@ -781,7 +327,7 @@ struct SettingsView: View {
                             }
 
                             Button {
-                                viewModel.fetchVLLMModels()
+                                viewModel.fetchModelsIfNeeded(for: .vLLM, force: true)
                             } label: {
                                 if viewModel.fetchingModels.contains(.vLLM) {
                                     ProgressView()
