@@ -2,251 +2,277 @@ import Foundation
 import AgentLLM
 
 /// All Agent! LLM provider configurations — defined in the app, not the package.
-/// To add a new LLM: add a static config here and register it in registerAllProviders().
+/// `APIProvider` is the single list of providers; `config(for:)` is exhaustive, so
+/// adding a case there forces its endpoint/protocol/capabilities/defaults to be described here.
 @MainActor
 enum LLMProviderSetup {
 
     static func registerAllProviders() {
-        LLMRegistry.shared.registerAll([
-            claude, codex, openAI, gemini, grok, mistral, vibe, deepSeek, huggingFace, miniMax, zAI, bigModel, qwen, openRouter,
-            requesty, ollama, localOllama, vLLM, lmStudio, appleIntelligence
-        ])
+        LLMRegistry.shared.registerAll(APIProvider.allCases.map(config(for:)))
     }
 
-    // MARK: - Cloud API Providers
+    /// Endpoint, protocol, capabilities and defaults (model, temperature, context window) per provider.
+    static func config(for provider: APIProvider) -> LLMProviderConfig {
+        switch provider {
 
-    static let claude = LLMProviderConfig(
-        id: "claude", displayName: "Claude",
-        kind: .cloudAPI, apiProtocol: .anthropic,
-        endpoint: LLMEndpoint(
-            chatURL: "https://api.anthropic.com/v1/messages",
-            modelsURL: "https://api.anthropic.com/v1/models",
-            authHeader: "x-api-key",
-            authPrefix: "",
-            extraHeaders: ["anthropic-version": "2023-06-01"]
-        ),
-        capabilities: [.streaming, .tools, .vision, .systemPrompt, .caching, .thinking, .webSearch]
-    )
+        // MARK: - Cloud API Providers
 
-    static let openAI = LLMProviderConfig(
-        id: "openAI", displayName: "OpenAI",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://api.openai.com/v1/chat/completions",
-            modelsURL: "https://api.openai.com/v1/models"
-        ),
-        capabilities: [.streaming, .tools, .vision, .systemPrompt]
-    )
+        case .claude:
+            return make(provider, kind: .cloudAPI, apiProtocol: .anthropic,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.anthropic.com/v1/messages",
+                    modelsURL: "https://api.anthropic.com/v1/models",
+                    authHeader: "x-api-key",
+                    authPrefix: "",
+                    extraHeaders: ["anthropic-version": "2023-06-01"]
+                ),
+                model: "claude-sonnet-4-20250514",
+                capabilities: [.streaming, .tools, .vision, .systemPrompt, .caching, .thinking, .webSearch],
+                contextSize: 1_000_000)
 
-    /// Codex — ChatGPT-authenticated Responses API used by the Codex CLI.
-    /// Requires OAuth (JWT bearer token) to chatgpt.com/backend-api/codex.
-    /// API protocol is `.custom` because the /v1/responses shape differs from
-    /// the standard /v1/chat/completions OpenAI shape — CodexService handles it.
-    static let codex = LLMProviderConfig(
-        id: "codex", displayName: "Codex",
-        kind: .cloudAPI, apiProtocol: .custom,
-        endpoint: LLMEndpoint(
-            chatURL: "https://chatgpt.com/backend-api/codex/responses",
-            modelsURL: "https://chatgpt.com/backend-api/codex/models"
-        ),
-        capabilities: [.streaming, .tools, .vision, .systemPrompt, .thinking]
-    )
+        case .openAI:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.openai.com/v1/chat/completions",
+                    modelsURL: "https://api.openai.com/v1/models"
+                ),
+                model: "gpt-4.1-nano",
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 272_000)
 
+        /// Codex — ChatGPT-authenticated Responses API used by the Codex CLI.
+        /// Requires OAuth (JWT bearer token) to chatgpt.com/backend-api/codex.
+        /// API protocol is `.custom` because the /v1/responses shape differs from
+        /// the standard /v1/chat/completions OpenAI shape — CodexService handles it.
+        case .codex:
+            return make(provider, kind: .cloudAPI, apiProtocol: .custom,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://chatgpt.com/backend-api/codex/responses",
+                    modelsURL: "https://chatgpt.com/backend-api/codex/models"
+                ),
+                model: "gpt-5",
+                capabilities: [.streaming, .tools, .vision, .systemPrompt, .thinking],
+                contextSize: 272_000)
 
-    static let deepSeek = LLMProviderConfig(
-        id: "deepSeek", displayName: "DeepSeek",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://api.deepseek.com/chat/completions",
-            modelsURL: "https://api.deepseek.com/v1/models"
-        ),
-        capabilities: [.streaming, .tools, .systemPrompt]
-    )
+        case .deepSeek:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.deepseek.com/chat/completions",
+                    modelsURL: "https://api.deepseek.com/v1/models"
+                ),
+                model: "deepseek-chat",
+                capabilities: [.streaming, .tools, .systemPrompt],
+                contextSize: 128_000)
 
-    static let huggingFace = LLMProviderConfig(
-        id: "huggingFace", displayName: "Hugging Face",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://router.huggingface.co/v1/chat/completions",
-            modelsURL: "https://router.huggingface.co/v1/models"
-        ),
-        capabilities: [.streaming, .tools, .systemPrompt]
-    )
+        case .huggingFace:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://router.huggingface.co/v1/chat/completions",
+                    modelsURL: "https://router.huggingface.co/v1/models"
+                ),
+                model: "deepseek-ai/DeepSeek-V3-0324",
+                capabilities: [.streaming, .tools, .systemPrompt],
+                contextSize: 32_000)
 
-    static let openRouter = LLMProviderConfig(
-        id: "openRouter", displayName: "OpenRouter",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://openrouter.ai/api/v1/chat/completions",
-            modelsURL: "https://openrouter.ai/api/v1/models"
-        ),
-        capabilities: [.streaming, .tools, .vision, .systemPrompt]
-    )
+        case .openRouter:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://openrouter.ai/api/v1/chat/completions",
+                    modelsURL: "https://openrouter.ai/api/v1/models"
+                ),
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 200_000,
+                supportedProtocols: [.openAI, .anthropic])
 
-    static let requesty = LLMProviderConfig(
-        id: "requesty", displayName: "Requesty",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://router.requesty.ai/v1/chat/completions",
-            modelsURL: "https://router.requesty.ai/v1/models"
-        ),
-        capabilities: [.streaming, .tools, .vision, .systemPrompt]
-    )
+        case .requesty:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://router.requesty.ai/v1/chat/completions",
+                    modelsURL: "https://router.requesty.ai/v1/models"
+                ),
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 200_000)
 
-    static let miniMax = LLMProviderConfig(
-        id: "miniMax", displayName: "MiniMax",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://api.minimax.io/v1/chat/completions",
-            modelsURL: "https://api.minimax.io/v1/models"
-        ),
-        capabilities: [.streaming, .tools, .systemPrompt],
-        temperature: 1.0
-    )
+        case .miniMax:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.minimax.io/v1/chat/completions",
+                    modelsURL: "https://api.minimax.io/v1/models"
+                ),
+                model: "MiniMax-M3",
+                capabilities: [.streaming, .tools, .systemPrompt],
+                temperature: 1.0,
+                contextSize: 1_000_000)
 
-    static let zAI = LLMProviderConfig(
-        id: "zAI", displayName: "Z.ai",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://api.z.ai/api/coding/paas/v4/chat/completions",
-            modelsURL: "https://api.z.ai/api/coding/paas/v4/models",
-            visionChatURL: "https://api.z.ai/api/paas/v4/chat/completions",
-            visionModelsURL: "https://api.z.ai/api/paas/v4/models"
-        ),
-        capabilities: [.streaming, .tools, .systemPrompt, .vision],
-        temperature: 0.7
-    )
+        case .zAI:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.z.ai/api/coding/paas/v4/chat/completions",
+                    modelsURL: "https://api.z.ai/api/coding/paas/v4/models",
+                    visionChatURL: "https://api.z.ai/api/paas/v4/chat/completions",
+                    visionModelsURL: "https://api.z.ai/api/paas/v4/models"
+                ),
+                model: "glm-4.7",
+                capabilities: [.streaming, .tools, .systemPrompt, .vision],
+                contextSize: 128_000)
 
-    // BigModel.cn — China mainland mirror of Z.ai, same dual-API structure
-    static let bigModel = LLMProviderConfig(
-        id: "bigModel", displayName: "BigModel",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://open.bigmodel.cn/api/coding/paas/v4/chat/completions",
-            modelsURL: "https://open.bigmodel.cn/api/coding/paas/v4/models",
-            visionChatURL: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
-            visionModelsURL: "https://open.bigmodel.cn/api/paas/v4/models"
-        ),
-        capabilities: [.streaming, .tools, .systemPrompt, .vision],
-        temperature: 0.7
-    )
+        // BigModel.cn — China mainland mirror of Z.ai, same dual-API structure
+        case .bigModel:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://open.bigmodel.cn/api/coding/paas/v4/chat/completions",
+                    modelsURL: "https://open.bigmodel.cn/api/coding/paas/v4/models",
+                    visionChatURL: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+                    visionModelsURL: "https://open.bigmodel.cn/api/paas/v4/models"
+                ),
+                model: "glm-4.7",
+                capabilities: [.streaming, .tools, .systemPrompt, .vision],
+                contextSize: 128_000)
 
-    // Qwen (Alibaba DashScope) — URL based on user locale
-    static let qwen: LLMProviderConfig = {
-        let region = Locale.current.region?.identifier ?? ""
-        let baseURL: String
-        switch region {
-        case "CN": baseURL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-        case "HK": baseURL = "https://cn-hongkong.aliyuncs.com/compatible-mode/v1"
-        default: baseURL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+        // Qwen (Alibaba DashScope) — URL based on user locale
+        case .qwen:
+            let region = Locale.current.region?.identifier ?? ""
+            let baseURL: String
+            switch region {
+            case "CN": baseURL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+            case "HK": baseURL = "https://cn-hongkong.aliyuncs.com/compatible-mode/v1"
+            default: baseURL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+            }
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "\(baseURL)/chat/completions",
+                    modelsURL: "\(baseURL)/models"
+                ),
+                model: "qwen-plus",
+                capabilities: [.streaming, .tools, .systemPrompt, .vision],
+                contextSize: 131_072)
+
+        case .gemini:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+                    modelsURL: "https://generativelanguage.googleapis.com/v1beta/openai/models"
+                ),
+                model: "gemini-2.5-flash",
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 2_000_000)
+
+        case .grok:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.x.ai/v1/chat/completions",
+                    modelsURL: "https://api.x.ai/v1/models"
+                ),
+                model: "grok-3-mini-fast",
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 2_000_000)
+
+        case .mistral:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.mistral.ai/v1/chat/completions",
+                    modelsURL: "https://api.mistral.ai/v1/models"
+                ),
+                model: "mistral-large-latest",
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 256_000)
+
+        case .vibe:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.mistral.ai/v1/chat/completions",
+                    modelsURL: "https://api.mistral.ai/v1/models"
+                ),
+                model: "devstral-latest",
+                capabilities: [.streaming, .tools, .systemPrompt],
+                contextSize: 128_000)
+
+        // MARK: - Ollama
+
+        case .ollama:
+            return make(provider, kind: .remoteServer, apiProtocol: .ollama,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://ollama.com/api/chat",
+                    modelsURL: "https://ollama.com/api/tags",
+                    defaultPort: LLMEndpoint.ollamaPort
+                ),
+                capabilities: [.streaming, .tools, .systemPrompt, .vision],
+                contextSize: 32_000)
+
+        case .localOllama:
+            return make(provider, kind: .localServer, apiProtocol: .ollama,
+                endpoint: LLMEndpoint(
+                    chatURL: "http://localhost:\(LLMEndpoint.ollamaPort)/api/chat",
+                    modelsURL: "http://localhost:\(LLMEndpoint.ollamaPort)/api/tags",
+                    authHeader: "", authPrefix: "",
+                    defaultPort: LLMEndpoint.ollamaPort
+                ),
+                capabilities: [.streaming, .tools, .systemPrompt, .vision],
+                contextSize: 32_000,
+                apiKeyOptional: true)
+
+        // MARK: - Self-Hosted
+
+        case .vLLM:
+            return make(provider, kind: .remoteServer, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "http://localhost:\(LLMEndpoint.vLLMPort)/v1/chat/completions",
+                    modelsURL: "http://localhost:\(LLMEndpoint.vLLMPort)/v1/models",
+                    authHeader: "", authPrefix: "",
+                    defaultPort: LLMEndpoint.vLLMPort
+                ),
+                capabilities: [.streaming, .tools, .systemPrompt],
+                contextSize: 32_000,
+                apiKeyOptional: true)
+
+        // MARK: - LM Studio (3 protocol variants)
+
+        case .lmStudio:
+            return make(provider, kind: .localServer, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "http://localhost:\(LLMEndpoint.lmStudioPort)/v1/chat/completions",
+                    modelsURL: "http://localhost:\(LLMEndpoint.lmStudioPort)/v1/models",
+                    authHeader: "", authPrefix: "",
+                    defaultPort: LLMEndpoint.lmStudioPort
+                ),
+                capabilities: [.streaming, .tools, .systemPrompt],
+                contextSize: 32_000,
+                apiKeyOptional: true,
+                supportedProtocols: [.openAI, .anthropic, .custom])
+
+        // MARK: - On-Device
+
+        case .foundationModel:
+            return make(provider, kind: .embedded, apiProtocol: .foundationModel,
+                endpoint: LLMEndpoint(chatURL: ""),
+                model: "Apple Intelligence",
+                capabilities: [.streaming, .tools, .systemPrompt],
+                contextSize: 4_096,
+                apiKeyOptional: true)
         }
-        return LLMProviderConfig(
-            id: "qwen", displayName: "Qwen",
-            kind: .cloudAPI, apiProtocol: .openAI,
-            endpoint: LLMEndpoint(
-                chatURL: "\(baseURL)/chat/completions",
-                modelsURL: "\(baseURL)/models"
-            ),
-            capabilities: [.streaming, .tools, .systemPrompt, .vision]
+    }
+
+    private static func make(
+        _ provider: APIProvider,
+        kind: LLMProviderKind,
+        apiProtocol: LLMAPIProtocol,
+        endpoint: LLMEndpoint,
+        model: String = "",
+        capabilities: LLMCapability,
+        temperature: Double = 0.2,
+        contextSize: Int,
+        apiKeyOptional: Bool = false,
+        supportedProtocols: [LLMAPIProtocol] = []
+    ) -> LLMProviderConfig {
+        LLMProviderConfig(
+            id: provider.rawValue, displayName: provider.displayName,
+            kind: kind, apiProtocol: apiProtocol,
+            endpoint: endpoint, model: model,
+            capabilities: capabilities, temperature: temperature,
+            contextSize: contextSize, apiKeyOptional: apiKeyOptional,
+            supportedProtocols: supportedProtocols
         )
-    }()
-
-    static let gemini = LLMProviderConfig(
-        id: "gemini", displayName: "Google Gemini",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-            modelsURL: "https://generativelanguage.googleapis.com/v1beta/openai/models"
-        ),
-        capabilities: [.streaming, .tools, .vision, .systemPrompt]
-    )
-
-    static let grok = LLMProviderConfig(
-        id: "grok", displayName: "Grok",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://api.x.ai/v1/chat/completions",
-            modelsURL: "https://api.x.ai/v1/models"
-        ),
-        capabilities: [.streaming, .tools, .vision, .systemPrompt]
-    )
-
-    static let mistral = LLMProviderConfig(
-        id: "mistral", displayName: "Mistral",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://api.mistral.ai/v1/chat/completions",
-            modelsURL: "https://api.mistral.ai/v1/models"
-        ),
-        capabilities: [.streaming, .tools, .vision, .systemPrompt]
-    )
-
-    static let vibe = LLMProviderConfig(
-        id: "vibe", displayName: "Mistral Vibe",
-        kind: .cloudAPI, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "https://api.mistral.ai/v1/chat/completions",
-            modelsURL: "https://api.mistral.ai/v1/models"
-        ),
-        capabilities: [.streaming, .tools, .systemPrompt]
-    )
-
-    // MARK: - Ollama
-
-    static let ollama = LLMProviderConfig(
-        id: "ollama", displayName: "Ollama",
-        kind: .remoteServer, apiProtocol: .ollama,
-        endpoint: LLMEndpoint(
-            chatURL: "https://ollama.com/api/chat",
-            modelsURL: "https://ollama.com/api/tags",
-            defaultPort: LLMEndpoint.ollamaPort
-        ),
-        capabilities: [.streaming, .tools, .systemPrompt, .vision]
-    )
-
-    static let localOllama = LLMProviderConfig(
-        id: "localOllama", displayName: "Local Ollama",
-        kind: .localServer, apiProtocol: .ollama,
-        endpoint: LLMEndpoint(
-            chatURL: "http://localhost:\(LLMEndpoint.ollamaPort)/api/chat",
-            modelsURL: "http://localhost:\(LLMEndpoint.ollamaPort)/api/tags",
-            authHeader: "", authPrefix: "",
-            defaultPort: LLMEndpoint.ollamaPort
-        ),
-        capabilities: [.streaming, .tools, .systemPrompt, .vision],
-        apiKeyOptional: true
-    )
-
-    // MARK: - Self-Hosted
-
-    static let vLLM = LLMProviderConfig(
-        id: "vLLM", displayName: "vLLM",
-        kind: .remoteServer, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "http://localhost:\(LLMEndpoint.vLLMPort)/v1/chat/completions",
-            modelsURL: "http://localhost:\(LLMEndpoint.vLLMPort)/v1/models",
-            authHeader: "", authPrefix: "",
-            defaultPort: LLMEndpoint.vLLMPort
-        ),
-        capabilities: [.streaming, .tools, .systemPrompt],
-        apiKeyOptional: true
-    )
-
-    // MARK: - LM Studio (3 protocol variants)
-
-    static let lmStudio = LLMProviderConfig(
-        id: "lmStudio", displayName: "LM Studio",
-        kind: .localServer, apiProtocol: .openAI,
-        endpoint: LLMEndpoint(
-            chatURL: "http://localhost:\(LLMEndpoint.lmStudioPort)/v1/chat/completions",
-            modelsURL: "http://localhost:\(LLMEndpoint.lmStudioPort)/v1/models",
-            authHeader: "", authPrefix: "",
-            defaultPort: LLMEndpoint.lmStudioPort
-        ),
-        capabilities: [.streaming, .tools, .systemPrompt],
-        apiKeyOptional: true,
-        supportedProtocols: [.openAI, .anthropic, .custom]
-    )
+    }
 
     /// LM Studio endpoint for Anthropic Compatible mode
     static let lmStudioAnthropicEndpoint = LLMEndpoint(
@@ -264,13 +290,6 @@ enum LLMProviderSetup {
         defaultPort: LLMEndpoint.lmStudioPort
     )
 
-    // MARK: - On-Device
-
-    static let appleIntelligence = LLMProviderConfig(
-        id: "foundationModel", displayName: "Apple Intelligence",
-        kind: .embedded, apiProtocol: .foundationModel,
-        endpoint: LLMEndpoint(chatURL: ""),
-        capabilities: [.streaming, .tools, .systemPrompt],
-        apiKeyOptional: true
-    )
+    /// OpenRouter's Anthropic-Messages-compatible chat URL (used when the user picks the Anthropic protocol).
+    static let openRouterAnthropicChatURL = "https://openrouter.ai/api/v1/messages"
 }
