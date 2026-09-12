@@ -63,24 +63,24 @@ extension AgentViewModel {
     func globalModelForProvider(_ provider: APIProvider) -> String {
         switch provider {
         case .claude: return selectedModel
-        case .codex: return codexModel
-        case .openAI: return openAIModel
-        case .deepSeek: return deepSeekModel
-        case .huggingFace: return huggingFaceModel
-        case .ollama: return ollamaModel
-        case .localOllama: return localOllamaModel
-        case .vLLM: return vLLMModel
-        case .lmStudio: return lmStudioModel
-        case .zAI: return zAIModel.replacingOccurrences(of: ":v", with: "")
-        case .bigModel: return bigModelModel.replacingOccurrences(of: ":v", with: "")
-        case .miniMax: return miniMaxModel
-        case .openRouter: return openRouterModel
-        case .requesty: return requestyModel
-        case .qwen: return qwenModel
-        case .gemini: return geminiModel
-        case .grok: return grokModel
-        case .mistral: return mistralModel
-        case .vibe: return vibeModel
+        case .codex: return models[.codex]
+        case .openAI: return models[.openAI]
+        case .deepSeek: return models[.deepSeek]
+        case .huggingFace: return models[.huggingFace]
+        case .ollama: return models[.ollama]
+        case .localOllama: return models[.localOllama]
+        case .vLLM: return models[.vLLM]
+        case .lmStudio: return models[.lmStudio]
+        case .zAI: return models[.zAI].replacingOccurrences(of: ":v", with: "")
+        case .bigModel: return models[.bigModel].replacingOccurrences(of: ":v", with: "")
+        case .miniMax: return models[.miniMax]
+        case .openRouter: return models[.openRouter]
+        case .requesty: return models[.requesty]
+        case .qwen: return models[.qwen]
+        case .gemini: return models[.gemini]
+        case .grok: return models[.grok]
+        case .mistral: return models[.mistral]
+        case .vibe: return models[.vibe]
         case .foundationModel: return "Apple Intelligence"
         }
     }
@@ -90,23 +90,23 @@ extension AgentViewModel {
         switch provider {
         case .claude: return apiKey
         case .codex: return "" // auth comes from ~/.codex/auth.json, no UI key
-        case .openAI: return openAIAPIKey
-        case .deepSeek: return deepSeekAPIKey
-        case .huggingFace: return huggingFaceAPIKey
-        case .ollama: return ollamaAPIKey
+        case .openAI: return apiKeys[.openAI]
+        case .deepSeek: return apiKeys[.deepSeek]
+        case .huggingFace: return apiKeys[.huggingFace]
+        case .ollama: return apiKeys[.ollama]
         case .localOllama: return ""
-        case .vLLM: return vLLMAPIKey
-        case .lmStudio: return lmStudioAPIKey
-        case .zAI: return zAIAPIKey
-        case .bigModel: return bigModelAPIKey
-        case .miniMax: return miniMaxAPIKey
-        case .openRouter: return openRouterAPIKey
-        case .requesty: return requestyAPIKey
-        case .qwen: return qwenAPIKey
-        case .gemini: return geminiAPIKey
-        case .grok: return grokAPIKey
-        case .mistral: return mistralAPIKey
-        case .vibe: return vibeAPIKey
+        case .vLLM: return apiKeys[.vLLM]
+        case .lmStudio: return apiKeys[.lmStudio]
+        case .zAI: return apiKeys[.zAI]
+        case .bigModel: return apiKeys[.bigModel]
+        case .miniMax: return apiKeys[.miniMax]
+        case .openRouter: return apiKeys[.openRouter]
+        case .requesty: return apiKeys[.requesty]
+        case .qwen: return apiKeys[.qwen]
+        case .gemini: return apiKeys[.gemini]
+        case .grok: return apiKeys[.grok]
+        case .mistral: return apiKeys[.mistral]
+        case .vibe: return apiKeys[.vibe]
         case .foundationModel: return ""
         }
     }
@@ -115,7 +115,7 @@ extension AgentViewModel {
     /// Pick the right chat URL — code or vision — based on the model's :v suffix.
     func chatURLForProvider(_ provider: APIProvider) -> String {
         guard let endpoint = LLMRegistry.shared.provider(provider.rawValue)?.endpoint else { return "" }
-        let raw = provider == .zAI ? zAIModel : (provider == .bigModel ? bigModelModel : "")
+        let raw = provider == .zAI ? models[.zAI] : (provider == .bigModel ? models[.bigModel] : "")
         let isVision = raw.hasSuffix(":v")
         return endpoint.resolvedChatURL(isVision: isVision)
     }
@@ -128,41 +128,41 @@ extension AgentViewModel {
         case .codex:
             return modelId
         case .openAI:
-            return openAIModels.first(where: { $0.id == modelId })?.name
+            return modelLists[.openAI].first(where: { $0.id == modelId })?.name
                 ?? Self.defaultOpenAIModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .deepSeek:
-            return deepSeekModels.first(where: { $0.id == modelId })?.name
+            return modelLists[.deepSeek].first(where: { $0.id == modelId })?.name
                 ?? Self.defaultDeepSeekModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .huggingFace:
-            return huggingFaceModels.first(where: { $0.id == modelId })?.name
+            return modelLists[.huggingFace].first(where: { $0.id == modelId })?.name
                 ?? Self.defaultHuggingFaceModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .ollama:
             return ollamaModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .localOllama:
             return localOllamaModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .vLLM:
-            return vLLMModels.first(where: { $0.id == modelId })?.name ?? modelId
+            return modelLists[.vLLM].first(where: { $0.id == modelId })?.name ?? modelId
         case .lmStudio:
-            return lmStudioModels.first(where: { $0.id == modelId })?.name ?? modelId
+            return modelLists[.lmStudio].first(where: { $0.id == modelId })?.name ?? modelId
         case .zAI:
-            return zAIModels.first(where: { $0.id == modelId })?.name
+            return modelLists[.zAI].first(where: { $0.id == modelId })?.name
                 ?? Self.defaultZAIModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .bigModel:
             return modelId
         case .miniMax:
-            return miniMaxModels.first(where: { $0.id == modelId })?.name
+            return modelLists[.miniMax].first(where: { $0.id == modelId })?.name
                 ?? Self.defaultMiniMaxModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .openRouter:
-            return openRouterModels.first(where: { $0.id == modelId })?.name ?? modelId
+            return modelLists[.openRouter].first(where: { $0.id == modelId })?.name ?? modelId
         case .requesty:
-            return requestyModels.first(where: { $0.id == modelId })?.name ?? modelId
+            return modelLists[.requesty].first(where: { $0.id == modelId })?.name ?? modelId
         case .qwen:
             return modelId
         case .gemini:
-            return geminiModels.first(where: { $0.id == modelId })?.name
+            return modelLists[.gemini].first(where: { $0.id == modelId })?.name
                 ?? Self.defaultGeminiModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .grok:
-            return grokModels.first(where: { $0.id == modelId })?.name
+            return modelLists[.grok].first(where: { $0.id == modelId })?.name
                 ?? Self.defaultGrokModels.first(where: { $0.id == modelId })?.name ?? modelId
         case .mistral:
             return modelId

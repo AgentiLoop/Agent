@@ -232,18 +232,46 @@ final class AgentViewModel {
         }
     }
 
-    // Claude settings - stored securely in Keychain
-    var apiKey: String = KeychainService.shared.get(.claude) ?? "" {
-        didSet { KeychainService.shared.set(.claude, apiKey) }
+    // MARK: - Per-provider settings (keyed by APIProvider — one store each, no per-provider properties)
+
+    /// API keys, stored in the Keychain under `APIProvider.keychainAccount`.
+    var apiKeys = ProviderKeyed<String>(
+        load: { KeychainService.shared.get($0) ?? "" },
+        persist: { KeychainService.shared.set($0, $1) }
+    )
+
+    /// Selected model id per provider, persisted under `APIProvider.modelDefaultsKey`;
+    /// default comes from the provider's registry config.
+    var models = ProviderKeyed<String>(
+        load: { UserDefaults.standard.string(forKey: $0.modelDefaultsKey) ?? $0.config.model },
+        persist: { UserDefaults.standard.set($1, forKey: $0.modelDefaultsKey) }
+    ) {
+        didSet {
+            for p in [APIProvider.ollama, .localOllama] where !models[p].isEmpty && oldValue[p] != models[p] {
+                let supportsVision = (p == .ollama ? ollamaModels : localOllamaModels)
+                    .first(where: { $0.name == models[p] })?.supportsVision ?? false
+                appendLog("🔄\(models[p])\(supportsVision ? " (vision)" : "")")
+                flushLog()
+            }
+        }
     }
 
-    var selectedModel: String = UserDefaults.standard.string(forKey: "agentModel") ?? "claude-sonnet-4-20250514" {
-        didSet { UserDefaults.standard.set(selectedModel, forKey: "agentModel") }
+    /// Fetched model catalog per OpenAI-compatible provider. Claude and Ollama keep their own
+    /// typed lists (`availableClaudeModels`, `ollamaModels`, `localOllamaModels`).
+    var modelLists = ProviderKeyed<[OpenAIModelInfo]>(load: { _ in [] })
+
+    /// Providers whose model list is currently being fetched.
+    var fetchingModels: Set<APIProvider> = []
+
+    // Claude aliases — kept because `apiKey` / `selectedModel` are referenced throughout the app.
+    var apiKey: String {
+        get { apiKeys[.claude] }
+        set { apiKeys[.claude] = newValue }
     }
 
-    // Ollama settings - API key stored securely in Keychain
-    var ollamaAPIKey: String = KeychainService.shared.get(.ollama) ?? "" {
-        didSet { KeychainService.shared.set(.ollama, ollamaAPIKey) }
+    var selectedModel: String {
+        get { models[.claude] }
+        set { models[.claude] = newValue }
     }
 
     // Tavily web search API key (available for all providers)
@@ -258,69 +286,15 @@ final class AgentViewModel {
 
     let ollamaEndpoint = "https://ollama.com/api/chat"
 
-    // OpenAI settings
-    var openAIAPIKey: String = KeychainService.shared.get(.openAI) ?? "" {
-        didSet { KeychainService.shared.set(.openAI, openAIAPIKey) }
-    }
-
-    var openAIModel: String = UserDefaults.standard.string(forKey: "openAIModel") ?? "gpt-4.1-nano" {
-        didSet { UserDefaults.standard.set(openAIModel, forKey: "openAIModel") }
-    }
-
-    var openAIModels: [OpenAIModelInfo] = []
-    var isFetchingOpenAIModels = false
-
-    // Codex (ChatGPT OAuth via ~/.codex/auth.json). No API key field — auth is
-    // read from the Codex CLI's auth file at request time.
-    var codexModel: String = UserDefaults.standard.string(forKey: "codexModel") ?? "gpt-5" {
-        didSet { UserDefaults.standard.set(codexModel, forKey: "codexModel") }
-    }
-    var codexModels: [OpenAIModelInfo] = []
-    var isFetchingCodexModels = false
     /// Context window per Codex model id, populated by `fetchCodexModels`.
     /// Consulted by the Thinking HUD so it shows the correct token ceiling for
     /// whichever Codex model is currently selected.
     var codexContextWindows: [String: Int] = [:]
 
-    // DeepSeek settings
-    var deepSeekAPIKey: String = KeychainService.shared.get(.deepSeek) ?? "" {
-        didSet { KeychainService.shared.set(.deepSeek, deepSeekAPIKey) }
-    }
-
-    var deepSeekModel: String = UserDefaults.standard.string(forKey: "deepSeekModel") ?? "deepseek-chat" {
-        didSet { UserDefaults.standard.set(deepSeekModel, forKey: "deepSeekModel") }
-    }
-
-    var deepSeekModels: [OpenAIModelInfo] = []
-    var isFetchingDeepSeekModels = false
-
-    // Hugging Face settings
-    var huggingFaceAPIKey: String = KeychainService.shared.get(.huggingFace) ?? "" {
-        didSet { KeychainService.shared.set(.huggingFace, huggingFaceAPIKey) }
-    }
-
-    var huggingFaceModel: String = UserDefaults.standard.string(forKey: "huggingFaceModel") ?? "deepseek-ai/DeepSeek-V3-0324" {
-        didSet { UserDefaults.standard.set(huggingFaceModel, forKey: "huggingFaceModel") }
-    }
-
-    var huggingFaceModels: [OpenAIModelInfo] = []
-    var isFetchingHuggingFaceModels = false
-
     // vLLM settings
-    var vLLMAPIKey: String = KeychainService.shared.get(.vLLM) ?? "" {
-        didSet { KeychainService.shared.set(.vLLM, vLLMAPIKey) }
-    }
-
     var vLLMEndpoint: String = UserDefaults.standard.string(forKey: "vLLMEndpoint") ?? "http://localhost:8000/v1/chat/completions" {
         didSet { UserDefaults.standard.set(vLLMEndpoint, forKey: "vLLMEndpoint") }
     }
-
-    var vLLMModel: String = UserDefaults.standard.string(forKey: "vLLMModel") ?? "" {
-        didSet { UserDefaults.standard.set(vLLMModel, forKey: "vLLMModel") }
-    }
-
-    var vLLMModels: [OpenAIModelInfo] = []
-    var isFetchingVLLMModels = false
 
     // LM Studio settings
     var lmStudioProtocol: LMStudioProtocol = {
@@ -337,21 +311,11 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(lmStudioEndpoint, forKey: "lmStudioEndpoint") }
     }
 
-    var lmStudioModel: String = UserDefaults.standard.string(forKey: "lmStudioModel") ?? "" {
-        didSet { UserDefaults.standard.set(lmStudioModel, forKey: "lmStudioModel") }
-    }
-
-    var lmStudioAPIKey: String = KeychainService.shared.get(.lmStudio) ?? "" {
-        didSet { KeychainService.shared.set(.lmStudio, lmStudioAPIKey) }
-    }
-
-    var lmStudioModels: [OpenAIModelInfo] = []
     /// Context window per LM Studio model id, populated by `fetchLMStudioModels`
     /// from LM Studio's REST API (`/api/v0/models` → loaded_context_length /
     /// max_context_length). Without this the compaction threshold assumed a
     /// hardcoded 32K window for every local model and compacted far too early.
     var lmStudioContextWindows: [String: Int] = [:]
-    var isFetchingLMStudioModels = false
 
     /// Context window per Ollama model name (cloud + local), populated by
     /// `fetchOllamaModels` / `fetchLocalOllamaModels` from `/api/show`
@@ -363,67 +327,6 @@ final class AgentViewModel {
     /// `/v1/models` → max_model_len.
     var vLLMContextWindows: [String: Int] = [:]
 
-    // Z.ai (ZhipuAI GLM) settings
-    var zAIAPIKey: String = KeychainService.shared.get(.zAI) ?? "" {
-        didSet { KeychainService.shared.set(.zAI, zAIAPIKey) }
-    }
-
-    var zAIModel: String = UserDefaults.standard.string(forKey: "zAIModel") ?? "glm-4.7" {
-        didSet { UserDefaults.standard.set(zAIModel, forKey: "zAIModel") }
-    }
-
-    var zAIModels: [OpenAIModelInfo] = []
-    var isFetchingZAIModels = false
-
-    // MARK: - BigModel (China)
-
-    var bigModelAPIKey: String = KeychainService.shared.get(.bigModel) ?? "" {
-        didSet { KeychainService.shared.set(.bigModel, bigModelAPIKey) }
-    }
-
-    var bigModelModel: String = UserDefaults.standard.string(forKey: "bigModelModel") ?? "glm-4.7" {
-        didSet { UserDefaults.standard.set(bigModelModel, forKey: "bigModelModel") }
-    }
-
-    // MARK: - Qwen (Alibaba DashScope)
-
-    var qwenAPIKey: String = KeychainService.shared.get(.qwen) ?? "" {
-        didSet { KeychainService.shared.set(.qwen, qwenAPIKey) }
-    }
-
-    var qwenModel: String = UserDefaults.standard.string(forKey: "qwenModel") ?? "qwen-plus" {
-        didSet { UserDefaults.standard.set(qwenModel, forKey: "qwenModel") }
-    }
-
-    var qwenModels: [OpenAIModelInfo] = []
-    var isFetchingQwenModels = false
-
-    // MARK: - MiniMax
-
-    var miniMaxAPIKey: String = KeychainService.shared.get(.miniMax) ?? "" {
-        didSet { KeychainService.shared.set(.miniMax, miniMaxAPIKey) }
-    }
-
-    var miniMaxModel: String = UserDefaults.standard.string(forKey: "miniMaxModel") ?? "MiniMax-M3" {
-        didSet { UserDefaults.standard.set(miniMaxModel, forKey: "miniMaxModel") }
-    }
-
-    var miniMaxModels: [OpenAIModelInfo] = []
-    var isFetchingMiniMaxModels = false
-
-    // MARK: - OpenRouter
-
-    var openRouterAPIKey: String = KeychainService.shared.get(.openRouter) ?? "" {
-        didSet { KeychainService.shared.set(.openRouter, openRouterAPIKey) }
-    }
-
-    var openRouterModel: String = UserDefaults.standard.string(forKey: "openRouterModel") ?? "" {
-        didSet { UserDefaults.standard.set(openRouterModel, forKey: "openRouterModel") }
-    }
-
-    var openRouterModels: [OpenAIModelInfo] = []
-    var isFetchingOpenRouterModels = false
-
     var openRouterProtocol: LLMAPIProtocol = {
         let raw = UserDefaults.standard.string(forKey: "openRouterProtocol") ?? "openAI"
         return LLMAPIProtocol(rawValue: raw) ?? .openAI
@@ -431,71 +334,6 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(openRouterProtocol.rawValue, forKey: "openRouterProtocol") }
     }
 
-    // MARK: - Requesty
-
-    var requestyAPIKey: String = KeychainService.shared.get(.requesty) ?? "" {
-        didSet { KeychainService.shared.set(.requesty, requestyAPIKey) }
-    }
-
-    var requestyModel: String = UserDefaults.standard.string(forKey: "requestyModel") ?? "" {
-        didSet { UserDefaults.standard.set(requestyModel, forKey: "requestyModel") }
-    }
-
-    var requestyModels: [OpenAIModelInfo] = []
-    var isFetchingRequestyModels = false
-
-    // MARK: - Google Gemini
-
-    var geminiAPIKey: String = KeychainService.shared.get(.gemini) ?? "" {
-        didSet { KeychainService.shared.set(.gemini, geminiAPIKey) }
-    }
-
-    var geminiModel: String = UserDefaults.standard.string(forKey: "geminiModel") ?? "gemini-2.5-flash" {
-        didSet { UserDefaults.standard.set(geminiModel, forKey: "geminiModel") }
-    }
-
-    var geminiModels: [OpenAIModelInfo] = []
-    var isFetchingGeminiModels = false
-
-    // MARK: - Grok (xAI)
-
-    var grokAPIKey: String = KeychainService.shared.get(.grok) ?? "" {
-        didSet { KeychainService.shared.set(.grok, grokAPIKey) }
-    }
-
-    var grokModel: String = UserDefaults.standard.string(forKey: "grokModel") ?? "grok-3-mini-fast" {
-        didSet { UserDefaults.standard.set(grokModel, forKey: "grokModel") }
-    }
-
-    var grokModels: [OpenAIModelInfo] = []
-    var isFetchingGrokModels = false
-
-    // MARK: - Mistral
-
-    var mistralAPIKey: String = KeychainService.shared.get(.mistral) ?? "" {
-        didSet { KeychainService.shared.set(.mistral, mistralAPIKey) }
-    }
-
-    var mistralModel: String = UserDefaults.standard.string(forKey: "mistralModel") ?? "mistral-large-latest" {
-        didSet { UserDefaults.standard.set(mistralModel, forKey: "mistralModel") }
-    }
-
-    var mistralModels: [OpenAIModelInfo] = []
-    var isFetchingMistralModels = false
-
-
-    // MARK: - Mistral Vibe (api.mistral.ai with Vibe key, Devstral models)
-
-    var vibeAPIKey: String = KeychainService.shared.get(.vibe) ?? "" {
-        didSet { KeychainService.shared.set(.vibe, vibeAPIKey) }
-    }
-
-    var vibeModel: String = UserDefaults.standard.string(forKey: "vibeModel") ?? "devstral-latest" {
-        didSet { UserDefaults.standard.set(vibeModel, forKey: "vibeModel") }
-    }
-
-    var vibeModels: [OpenAIModelInfo] = []
-    var isFetchingVibeModels = false
 
     var maxHistoryBeforeSummary: Int = UserDefaults.standard.object(forKey: "agentMaxHistory") as? Int ?? 10 {
         didSet { UserDefaults.standard.set(maxHistoryBeforeSummary, forKey: "agentMaxHistory") }
@@ -517,46 +355,18 @@ final class AgentViewModel {
     }
 
     // MARK: - Temperature per provider
-    var claudeTemperature: Double = UserDefaults.standard.object(forKey: "claudeTemperature") as? Double ?? 0.2 {
-        didSet { UserDefaults.standard.set(claudeTemperature, forKey: "claudeTemperature") }
-    }
-    var ollamaTemperature: Double = UserDefaults.standard.object(forKey: "ollamaTemperature") as? Double ?? 0.2 {
-        didSet { UserDefaults.standard.set(ollamaTemperature, forKey: "ollamaTemperature") }
-    }
-    var openAITemperature: Double = UserDefaults.standard.object(forKey: "openAITemperature") as? Double ?? 0.2 {
-        didSet { UserDefaults.standard.set(openAITemperature, forKey: "openAITemperature") }
-    }
-    var deepSeekTemperature: Double = UserDefaults.standard.object(forKey: "deepSeekTemperature") as? Double ?? 0.2 {
-        didSet { UserDefaults.standard.set(deepSeekTemperature, forKey: "deepSeekTemperature") }
-    }
-    var huggingFaceTemperature: Double = UserDefaults.standard.object(forKey: "huggingFaceTemperature") as? Double ?? 0.2 {
-        didSet { UserDefaults.standard.set(huggingFaceTemperature, forKey: "huggingFaceTemperature") }
-    }
-    var localOllamaTemperature: Double = UserDefaults.standard.object(forKey: "localOllamaTemperature") as? Double ?? 0.2 {
-        didSet { UserDefaults.standard.set(localOllamaTemperature, forKey: "localOllamaTemperature") }
-    }
+
+    /// Persisted under "<provider>Temperature"; default comes from the provider's registry config.
+    var temperatures = ProviderKeyed<Double>(
+        load: { UserDefaults.standard.object(forKey: $0.temperatureDefaultsKey) as? Double ?? $0.config.temperature },
+        persist: { UserDefaults.standard.set($1, forKey: $0.temperatureDefaultsKey) }
+    )
+
     /// Context window size for local Ollama. 0 = let model decide.
     var localOllamaContextSize: Int = UserDefaults.standard.object(forKey: "localOllamaContextSize") as? Int ?? 0 {
         didSet { UserDefaults.standard.set(localOllamaContextSize, forKey: "localOllamaContextSize") }
     }
-    var vLLMTemperature: Double = UserDefaults.standard.object(forKey: "vLLMTemperature") as? Double ?? 0.2 {
-        didSet { UserDefaults.standard.set(vLLMTemperature, forKey: "vLLMTemperature") }
-    }
-    var lmStudioTemperature: Double = UserDefaults.standard.object(forKey: "lmStudioTemperature") as? Double ?? 0.2 {
-        didSet { UserDefaults.standard.set(lmStudioTemperature, forKey: "lmStudioTemperature") }
-    }
-    var zAITemperature: Double = UserDefaults.standard.object(forKey: "zAITemperature") as? Double ?? 0.2 {
-        didSet { UserDefaults.standard.set(zAITemperature, forKey: "zAITemperature") }
-    }
-    var geminiTemperature: Double = UserDefaults.standard.object(forKey: "geminiTemperature") as? Double ?? 0.2 {
-        didSet { UserDefaults.standard.set(geminiTemperature, forKey: "geminiTemperature") }
-    }
-    var grokTemperature: Double = UserDefaults.standard.object(forKey: "grokTemperature") as? Double ?? 0.2 {
-        didSet { UserDefaults.standard.set(grokTemperature, forKey: "grokTemperature") }
-    }
-    var miniMaxTemperature: Double = UserDefaults.standard.object(forKey: "miniMaxTemperature") as? Double ?? 1.0 {
-        didSet { UserDefaults.standard.set(miniMaxTemperature, forKey: "miniMaxTemperature") }
-    }
+
 
     /// Max output tokens per provider. 0 = let provider decide (omit from request).
     /// Claude API requires max_tokens so 0 defaults to 16384 at the service level.
@@ -577,41 +387,15 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(tokenBudgetCeiling, forKey: "tokenBudgetCeiling") }
     }
 
-    var ollamaModel: String = UserDefaults.standard.string(forKey: "ollamaModel") ?? "" {
-        didSet {
-            UserDefaults.standard.set(ollamaModel, forKey: "ollamaModel")
-            if !ollamaModel.isEmpty && oldValue != ollamaModel {
-                let vision = selectedOllamaSupportsVision ? " (vision)" : ""
-                appendLog("🔄\(ollamaModel)\(vision)")
-                flushLog()
-            }
-        }
-    }
-
     var availableClaudeModels: [ClaudeModelInfo] = []
-    var isFetchingClaudeModels = false
-
     var ollamaModels: [OllamaModelInfo] = []
-    var isFetchingModels = false
+    var localOllamaModels: [OllamaModelInfo] = []
 
     // Local Ollama settings
     var localOllamaEndpoint: String = UserDefaults.standard.string(forKey: "localOllamaEndpoint") ?? "http://localhost:11434/api/chat" {
         didSet { UserDefaults.standard.set(localOllamaEndpoint, forKey: "localOllamaEndpoint") }
     }
 
-    var localOllamaModel: String = UserDefaults.standard.string(forKey: "localOllamaModel") ?? "" {
-        didSet {
-            UserDefaults.standard.set(localOllamaModel, forKey: "localOllamaModel")
-            if !localOllamaModel.isEmpty && oldValue != localOllamaModel {
-                let vision = selectedLocalOllamaSupportsVision ? " (vision)" : ""
-                appendLog("🔄\(localOllamaModel)\(vision)")
-                flushLog()
-            }
-        }
-    }
-
-    var localOllamaModels: [OllamaModelInfo] = []
-    var isFetchingLocalModels = false
 
     var projectFolder: String = UserDefaults.standard.string(forKey: "agentProjectFolder") ?? "" {
         didSet { UserDefaults.standard.set(projectFolder, forKey: "agentProjectFolder") }

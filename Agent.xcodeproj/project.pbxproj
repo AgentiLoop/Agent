@@ -234,6 +234,7 @@
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
 		40A6BBABC40BC543080ED54E /* APIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C209E7C2D6B010BDB470B3E2 /* APIProvider.swift */; };
+		0A1EEB47CE2C2A8E1FEC9539 /* ProviderKeyed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9147F16D98DBB40EA90C79 /* ProviderKeyed.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -524,6 +525,7 @@
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
 		C209E7C2D6B010BDB470B3E2 /* APIProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "APIProvider.swift"; sourceTree = "<group>"; };
+		7B9147F16D98DBB40EA90C79 /* ProviderKeyed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProviderKeyed.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1042,6 +1044,7 @@
 				AA10000000000000000020 /* Models.swift */,
 				AA10000000000000000201 /* LogLimits.swift */,
 							C209E7C2D6B010BDB470B3E2 /* APIProvider.swift */,
+				7B9147F16D98DBB40EA90C79 /* ProviderKeyed.swift */,
 );
 			path = Models;
 			sourceTree = "<group>";
@@ -1447,6 +1450,7 @@
 				B73A9A6EBE2A1C13B66EB81E /* ToolErrorClassifier.swift in Sources */,
 				1DCD8313ABDDD50E52BDA2E0 /* CriticGate.swift in Sources */,
 							40A6BBABC40BC543080ED54E /* APIProvider.swift in Sources */,
+				0A1EEB47CE2C2A8E1FEC9539 /* ProviderKeyed.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

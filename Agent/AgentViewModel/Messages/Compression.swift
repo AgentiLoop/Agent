@@ -117,19 +117,19 @@ extension AgentViewModel {
         switch provider {
         case .codex:
             // Real context window from the live /models response.
-            if let ctx = codexContextWindows[codexModel], ctx > 0 { return ctx }
+            if let ctx = codexContextWindows[models[.codex]], ctx > 0 { return ctx }
         case .ollama, .localOllama:
             // Explicit user setting wins — it's also what gets sent as num_ctx.
             if localOllamaContextSize > 0 { return localOllamaContextSize }
             // Real per-model context from /api/show (num_ctx or context_length).
-            let model = provider == .ollama ? ollamaModel : localOllamaModel
+            let model = provider == .ollama ? models[.ollama] : models[.localOllama]
             if let ctx = ollamaContextWindows[model], ctx > 0 { return ctx }
         case .vLLM:
             // Real context from vLLM's /v1/models max_model_len.
-            if let ctx = vLLMContextWindows[vLLMModel], ctx > 0 { return ctx }
+            if let ctx = vLLMContextWindows[models[.vLLM]], ctx > 0 { return ctx }
         case .lmStudio:
             // Real context length from LM Studio's /api/v0/models (loaded or max).
-            if let ctx = lmStudioContextWindows[lmStudioModel], ctx > 0 { return ctx }
+            if let ctx = lmStudioContextWindows[models[.lmStudio]], ctx > 0 { return ctx }
         default:
             break
         }

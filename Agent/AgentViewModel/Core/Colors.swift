@@ -108,26 +108,26 @@ extension AgentViewModel {
     /// Get temperature for the current provider.
     func temperatureForProvider(_ provider: APIProvider) -> Double {
         switch provider {
-        case .claude: return claudeTemperature
-        case .codex: return openAITemperature
-        case .ollama: return ollamaTemperature
-        case .openAI: return openAITemperature
-        case .deepSeek: return deepSeekTemperature
-        case .huggingFace: return huggingFaceTemperature
-        case .localOllama: return localOllamaTemperature
-        case .vLLM: return vLLMTemperature
-        case .lmStudio: return lmStudioTemperature
-        case .zAI: return zAITemperature
-        case .bigModel: return zAITemperature
-        case .miniMax: return miniMaxTemperature
-        case .openRouter: return openAITemperature
-        case .requesty: return openAITemperature
-        case .qwen: return openAITemperature
-        case .gemini: return geminiTemperature
-        case .grok: return grokTemperature
-        case .mistral: return openAITemperature
-        case .vibe: return openAITemperature
-        case .foundationModel: return claudeTemperature
+        case .claude: return temperatures[.claude]
+        case .codex: return temperatures[.openAI]
+        case .ollama: return temperatures[.ollama]
+        case .openAI: return temperatures[.openAI]
+        case .deepSeek: return temperatures[.deepSeek]
+        case .huggingFace: return temperatures[.huggingFace]
+        case .localOllama: return temperatures[.localOllama]
+        case .vLLM: return temperatures[.vLLM]
+        case .lmStudio: return temperatures[.lmStudio]
+        case .zAI: return temperatures[.zAI]
+        case .bigModel: return temperatures[.zAI]
+        case .miniMax: return temperatures[.miniMax]
+        case .openRouter: return temperatures[.openAI]
+        case .requesty: return temperatures[.openAI]
+        case .qwen: return temperatures[.openAI]
+        case .gemini: return temperatures[.gemini]
+        case .grok: return temperatures[.grok]
+        case .mistral: return temperatures[.openAI]
+        case .vibe: return temperatures[.openAI]
+        case .foundationModel: return temperatures[.claude]
         }
     }
 }

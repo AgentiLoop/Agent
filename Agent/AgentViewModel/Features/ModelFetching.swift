@@ -8,8 +8,8 @@ import AgentTools
 extension AgentViewModel {
 
     func fetchClaudeModels() async {
-        await MainActor.run { self.isFetchingClaudeModels = true }
-        defer { Task { @MainActor in self.isFetchingClaudeModels = false } }
+        await MainActor.run { self.fetchingModels.insert(.claude) }
+        defer { Task { @MainActor in self.fetchingModels.remove(.claude) } }
 
         guard !apiKey.isEmpty else {
             await MainActor.run {
@@ -82,17 +82,17 @@ extension AgentViewModel {
 
     func fetchOllamaModels() {
         let endpoint = ollamaEndpoint
-        let apiKey = ollamaAPIKey
-        isFetchingModels = true
+        let apiKey = apiKeys[.ollama]
+        fetchingModels.insert(.ollama)
         Task {
-            defer { isFetchingModels = false }
+            defer { fetchingModels.remove(.ollama) }
             do {
                 let models = try await Self.fetchModels(endpoint: endpoint, apiKey: apiKey)
                 ollamaModels = models.isEmpty ? Self.defaultOllamaModels : models
                 // Auto-select first model if current selection is empty or not in list
                 let names = ollamaModels.map(\.name)
-                if ollamaModel.isEmpty || (!names.isEmpty && !names.contains(ollamaModel)) {
-                    ollamaModel = names.first ?? ""
+                if self.models[.ollama].isEmpty || (!names.isEmpty && !names.contains(self.models[.ollama])) {
+                    self.models[.ollama] = names.first ?? ""
                 }
             } catch {
                 appendLog("Failed to fetch models: \(error.localizedDescription)")
@@ -111,15 +111,15 @@ extension AgentViewModel {
 
     func fetchLocalOllamaModels() {
         let endpoint = localOllamaEndpoint
-        isFetchingLocalModels = true
+        fetchingModels.insert(.localOllama)
         Task {
-            defer { isFetchingLocalModels = false }
+            defer { fetchingModels.remove(.localOllama) }
             do {
                 let models = try await Self.fetchModels(endpoint: endpoint, apiKey: "")
                 localOllamaModels = models.isEmpty ? Self.defaultOllamaModels : models
                 let names = localOllamaModels.map(\.name)
-                if localOllamaModel.isEmpty || (!names.isEmpty && !names.contains(localOllamaModel)) {
-                    localOllamaModel = names.first ?? ""
+                if self.models[.localOllama].isEmpty || (!names.isEmpty && !names.contains(self.models[.localOllama])) {
+                    self.models[.localOllama] = names.first ?? ""
                 }
             } catch {
                 appendLog("Failed to fetch local models: \(error.localizedDescription)")
@@ -139,23 +139,23 @@ extension AgentViewModel {
     // MARK: - OpenAI Model Fetching
 
     func fetchOpenAIModels() {
-        guard !openAIAPIKey.isEmpty else {
-            openAIModels = Self.defaultOpenAIModels
+        guard !apiKeys[.openAI].isEmpty else {
+            modelLists[.openAI] = Self.defaultOpenAIModels
             return
         }
-        isFetchingOpenAIModels = true
+        fetchingModels.insert(.openAI)
         Task {
-            defer { isFetchingOpenAIModels = false }
+            defer { fetchingModels.remove(.openAI) }
             do {
-                let models = try await Self.fetchOpenAIModelsFromAPI(apiKey: openAIAPIKey)
-                openAIModels = models.isEmpty ? Self.defaultOpenAIModels : models
-                let ids = openAIModels.map(\.id)
-                if openAIModel.isEmpty || (!ids.isEmpty && !ids.contains(openAIModel)) {
-                    openAIModel = ids.first ?? ""
+                let models = try await Self.fetchOpenAIModelsFromAPI(apiKey: apiKeys[.openAI])
+                modelLists[.openAI] = models.isEmpty ? Self.defaultOpenAIModels : models
+                let ids = modelLists[.openAI].map(\.id)
+                if self.models[.openAI].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.openAI])) {
+                    self.models[.openAI] = ids.first ?? ""
                 }
             } catch {
                 appendLog("Failed to fetch OpenAI models: \(error.localizedDescription)")
-                openAIModels = Self.defaultOpenAIModels
+                modelLists[.openAI] = Self.defaultOpenAIModels
             }
         }
     }
@@ -164,19 +164,19 @@ extension AgentViewModel {
     /// list if not signed in (user should run `codex login` or click Sign In).
     func fetchCodexModels() {
         guard CodexAuthFile.load() != nil else {
-            codexModels = []
+            modelLists[.codex] = []
             return
         }
-        isFetchingCodexModels = true
+        fetchingModels.insert(.codex)
         Task {
-            defer { isFetchingCodexModels = false }
+            defer { fetchingModels.remove(.codex) }
             do {
                 let models = try await CodexService.fetchModels()
-                codexModels = models.map { OpenAIModelInfo(id: $0.id, name: $0.display) }
+                modelLists[.codex] = models.map { OpenAIModelInfo(id: $0.id, name: $0.display) }
                 codexContextWindows = Dictionary(uniqueKeysWithValues: models.map { ($0.id, $0.contextWindow) })
                 let ids = models.map(\.id)
-                if codexModel.isEmpty || (!ids.isEmpty && !ids.contains(codexModel)) {
-                    codexModel = ids.first ?? "gpt-5"
+                if self.models[.codex].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.codex])) {
+                    self.models[.codex] = ids.first ?? "gpt-5"
                 }
             } catch {
                 appendLog("Failed to fetch Codex models: \(error.localizedDescription)")
@@ -185,72 +185,61 @@ extension AgentViewModel {
     }
 
     func fetchDeepSeekModels() {
-        fetchProviderModels(
-            key: deepSeekAPIKey,
-            endpoint: "https://api.deepseek.com/v1/models",
-            defaults: Self.defaultDeepSeekModels,
-            fallbackModel: "",
-            isFetching: \.isFetchingDeepSeekModels,
-            models: \.deepSeekModels,
-            selected: \.deepSeekModel,
-            providerName: "DeepSeek"
-        )
+        fetchProviderModels(.deepSeek, defaults: Self.defaultDeepSeekModels)
     }
 
     /// Generic fetcher for providers exposing an OpenAI-compatible /models
-    /// endpoint. Handles the shared fetch → filter → defaults-fallback →
-    /// auto-select flow that was previously duplicated per provider.
+    /// endpoint (URL from the provider's registry config). Handles the shared
+    /// fetch → filter → defaults-fallback → auto-select flow.
     private func fetchProviderModels(
-        key: String,
-        endpoint: String,
+        _ provider: APIProvider,
         defaults: [OpenAIModelInfo],
-        fallbackModel: String,
-        isFetching: ReferenceWritableKeyPath<AgentViewModel, Bool>,
-        models modelsPath: ReferenceWritableKeyPath<AgentViewModel, [OpenAIModelInfo]>,
-        selected selectedPath: ReferenceWritableKeyPath<AgentViewModel, String>,
-        providerName: String,
         filter: (([OpenAIModelInfo]) -> [OpenAIModelInfo])? = nil
     ) {
-        self[keyPath: isFetching] = true
+        let key = apiKeys[provider]
+        let endpoint = provider.config.endpoint.modelsURL
+        let fallbackModel = provider.config.model
+        fetchingModels.insert(provider)
         Task {
-            defer { self[keyPath: isFetching] = false }
+            defer { fetchingModels.remove(provider) }
             guard !key.isEmpty else {
-                self[keyPath: modelsPath] = defaults
+                modelLists[provider] = defaults
                 return
             }
             do {
                 let all = try await Self.fetchOpenAICompatibleModels(apiKey: key, endpoint: endpoint)
-                var models = all
+                var fetched = all
                 if let filter {
                     let filtered = filter(all)
-                    models = filtered.isEmpty ? all : filtered
+                    fetched = filtered.isEmpty ? all : filtered
                 }
-                self[keyPath: modelsPath] = models.isEmpty ? defaults : models
-                let current = self[keyPath: selectedPath]
-                if current.isEmpty || !self[keyPath: modelsPath].contains(where: { $0.id == current }) {
-                    self[keyPath: selectedPath] = self[keyPath: modelsPath].first?.id ?? fallbackModel
+                modelLists[provider] = fetched.isEmpty ? defaults : fetched
+                let current = models[provider]
+                if current.isEmpty || !modelLists[provider].contains(where: { $0.id == current }) {
+                    models[provider] = modelLists[provider].first?.id ?? fallbackModel
                 }
             } catch {
-                appendLog("Failed to fetch \(providerName) models: \(error.localizedDescription)")
-                self[keyPath: modelsPath] = defaults
+                appendLog("Failed to fetch \(provider.displayName) models: \(error.localizedDescription)")
+                modelLists[provider] = defaults
             }
         }
     }
 
+
     func fetchOpenRouterModels() {
-        isFetchingOpenRouterModels = true
+        fetchingModels.insert(.openRouter)
         Task {
-            defer { isFetchingOpenRouterModels = false }
+            defer { fetchingModels.remove(.openRouter) }
             do {
-                let models = try await Self.fetchOpenRouterCatalog(apiKey: openRouterAPIKey)
-                openRouterModels = models
+                let models = try await Self.fetchOpenRouterCatalog(apiKey: apiKeys[.openRouter])
+                modelLists[.openRouter] = models
                 let ids = models.map(\.id)
-                if openRouterModel.isEmpty || (!ids.isEmpty && !ids.contains(openRouterModel)) {
-                    openRouterModel = ids.first ?? ""
+                if self.models[.openRouter].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.openRouter])) {
+                    self.models[.openRouter] = ids.first ?? ""
                 }
             } catch {
                 appendLog("Failed to fetch OpenRouter models: \(error.localizedDescription)")
-                openRouterModels = []
+                modelLists[.openRouter] = []
             }
         }
     }
@@ -291,19 +280,19 @@ extension AgentViewModel {
     }
 
     func fetchRequestyModels() {
-        isFetchingRequestyModels = true
+        fetchingModels.insert(.requesty)
         Task {
-            defer { isFetchingRequestyModels = false }
+            defer { fetchingModels.remove(.requesty) }
             do {
-                let models = try await Self.fetchRequestyCatalog(apiKey: requestyAPIKey)
-                requestyModels = models
+                let models = try await Self.fetchRequestyCatalog(apiKey: apiKeys[.requesty])
+                modelLists[.requesty] = models
                 let ids = models.map(\.id)
-                if requestyModel.isEmpty || (!ids.isEmpty && !ids.contains(requestyModel)) {
-                    requestyModel = ids.first ?? ""
+                if self.models[.requesty].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.requesty])) {
+                    self.models[.requesty] = ids.first ?? ""
                 }
             } catch {
                 appendLog("Failed to fetch Requesty models: \(error.localizedDescription)")
-                requestyModels = []
+                modelLists[.requesty] = []
             }
         }
     }
@@ -339,38 +328,29 @@ extension AgentViewModel {
     }
 
     func fetchHuggingFaceModels() {
-        guard !huggingFaceAPIKey.isEmpty else {
-            huggingFaceModels = Self.defaultHuggingFaceModels
+        guard !apiKeys[.huggingFace].isEmpty else {
+            modelLists[.huggingFace] = Self.defaultHuggingFaceModels
             return
         }
-        isFetchingHuggingFaceModels = true
+        fetchingModels.insert(.huggingFace)
         Task {
-            defer { isFetchingHuggingFaceModels = false }
+            defer { fetchingModels.remove(.huggingFace) }
             do {
-                let models = try await Self.fetchHuggingFaceModelsFromAPI(apiKey: huggingFaceAPIKey)
-                huggingFaceModels = models.isEmpty ? Self.defaultHuggingFaceModels : models
-                let ids = huggingFaceModels.map(\.id)
-                if huggingFaceModel.isEmpty || (!ids.isEmpty && !ids.contains(huggingFaceModel)) {
-                    huggingFaceModel = ids.first ?? ""
+                let models = try await Self.fetchHuggingFaceModelsFromAPI(apiKey: apiKeys[.huggingFace])
+                modelLists[.huggingFace] = models.isEmpty ? Self.defaultHuggingFaceModels : models
+                let ids = modelLists[.huggingFace].map(\.id)
+                if self.models[.huggingFace].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.huggingFace])) {
+                    self.models[.huggingFace] = ids.first ?? ""
                 }
             } catch {
                 appendLog("Failed to fetch HuggingFace models: \(error.localizedDescription)")
-                huggingFaceModels = Self.defaultHuggingFaceModels
+                modelLists[.huggingFace] = Self.defaultHuggingFaceModels
             }
         }
     }
 
     func fetchMiniMaxModels() {
-        fetchProviderModels(
-            key: miniMaxAPIKey,
-            endpoint: "https://api.minimax.io/v1/models",
-            defaults: Self.defaultMiniMaxModels,
-            fallbackModel: "MiniMax-M3",
-            isFetching: \.isFetchingMiniMaxModels,
-            models: \.miniMaxModels,
-            selected: \.miniMaxModel,
-            providerName: "MiniMax"
-        )
+        fetchProviderModels(.miniMax, defaults: Self.defaultMiniMaxModels)
     }
 
     // MARK: - Static API Fetch Helpers
@@ -583,16 +563,16 @@ extension AgentViewModel {
     // MARK: - Z.ai Models
 
     func fetchZAIModels() {
-        isFetchingZAIModels = true
-        let key = zAIAPIKey
+        fetchingModels.insert(.zAI)
+        let key = apiKeys[.zAI]
         Task {
-            defer { isFetchingZAIModels = false }
+            defer { fetchingModels.remove(.zAI) }
             guard !key.isEmpty else { return }
             let models = await Self.fetchZAIModelsFromAPI(apiKey: key)
             if !models.isEmpty {
-                zAIModels = models
-                if zAIModel.isEmpty || !zAIModels.contains(where: { $0.id == zAIModel }) {
-                    zAIModel = zAIModels.first?.id ?? ""
+                modelLists[.zAI] = models
+                if self.models[.zAI].isEmpty || !modelLists[.zAI].contains(where: { $0.id == self.models[.zAI] }) {
+                    self.models[.zAI] = modelLists[.zAI].first?.id ?? ""
                 }
             }
         }
@@ -695,12 +675,12 @@ extension AgentViewModel {
     // MARK: - Qwen (DashScope) Models
 
     func fetchQwenModels() {
-        isFetchingQwenModels = true
-        let key = qwenAPIKey
+        fetchingModels.insert(.qwen)
+        let key = apiKeys[.qwen]
         Task {
-            defer { isFetchingQwenModels = false }
+            defer { fetchingModels.remove(.qwen) }
             guard !key.isEmpty else {
-                qwenModels = Self.defaultQwenModels
+                modelLists[.qwen] = Self.defaultQwenModels
                 return
             }
             // Try international endpoint first, then China mainland
@@ -730,9 +710,9 @@ extension AgentViewModel {
                             ]
                             return !skip.contains(where: { lower.contains($0) })
                         }
-                        qwenModels = chatModels.isEmpty ? models : chatModels
-                        if qwenModel.isEmpty || !qwenModels.contains(where: { $0.id == qwenModel }) {
-                            qwenModel = qwenModels.first?.id ?? "qwen-plus"
+                        modelLists[.qwen] = chatModels.isEmpty ? models : chatModels
+                        if self.models[.qwen].isEmpty || !modelLists[.qwen].contains(where: { $0.id == self.models[.qwen] }) {
+                            self.models[.qwen] = modelLists[.qwen].first?.id ?? "qwen-plus"
                         }
                         return
                     }
@@ -740,69 +720,33 @@ extension AgentViewModel {
                     AuditLog.log(.api, "Failed to fetch Qwen models from \(endpoint): \(error.localizedDescription)")
                 }
             }
-            qwenModels = Self.defaultQwenModels
+            modelLists[.qwen] = Self.defaultQwenModels
         }
     }
 
     // MARK: - Google Gemini Models
 
     func fetchGeminiModels() {
-        fetchProviderModels(
-            key: geminiAPIKey,
-            endpoint: "https://generativelanguage.googleapis.com/v1beta/openai/models",
-            defaults: Self.defaultGeminiModels,
-            fallbackModel: "gemini-2.5-flash",
-            isFetching: \.isFetchingGeminiModels,
-            models: \.geminiModels,
-            selected: \.geminiModel,
-            providerName: "Gemini"
-        )
+        fetchProviderModels(.gemini, defaults: Self.defaultGeminiModels)
     }
 
     // MARK: - Grok Models
 
     func fetchGrokModels() {
-        fetchProviderModels(
-            key: grokAPIKey,
-            endpoint: "https://api.x.ai/v1/models",
-            defaults: Self.defaultGrokModels,
-            fallbackModel: "grok-3-mini-fast",
-            isFetching: \.isFetchingGrokModels,
-            models: \.grokModels,
-            selected: \.grokModel,
-            providerName: "Grok"
-        )
+        fetchProviderModels(.grok, defaults: Self.defaultGrokModels)
     }
 
     // MARK: - Mistral Models
 
     func fetchMistralModels() {
-        fetchProviderModels(
-            key: mistralAPIKey,
-            endpoint: "https://api.mistral.ai/v1/models",
-            defaults: Self.defaultMistralModels,
-            fallbackModel: "mistral-large-latest",
-            isFetching: \.isFetchingMistralModels,
-            models: \.mistralModels,
-            selected: \.mistralModel,
-            providerName: "Mistral"
-        )
+        fetchProviderModels(.mistral, defaults: Self.defaultMistralModels)
     }
 
 
     func fetchVibeModels() {
         // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
-        fetchProviderModels(
-            key: vibeAPIKey,
-            endpoint: "https://api.mistral.ai/v1/models",
-            defaults: Self.defaultVibeModels,
-            fallbackModel: "devstral-latest",
-            isFetching: \.isFetchingVibeModels,
-            models: \.vibeModels,
-            selected: \.vibeModel,
-            providerName: "Vibe",
-            filter: { $0.filter { $0.id.lowercased().contains("devstral") && $0.id.contains("latest") } }
-        )
+        fetchProviderModels(.vibe, defaults: Self.defaultVibeModels,
+            filter: { $0.filter { $0.id.lowercased().contains("devstral") && $0.id.contains("latest") } })
     }
 
     /// Shared OpenAI-compatible model list fetcher
@@ -825,18 +769,18 @@ extension AgentViewModel {
     // MARK: - vLLM Models
 
     func fetchVLLMModels() {
-        isFetchingVLLMModels = true
+        fetchingModels.insert(.vLLM)
         let endpoint = vLLMEndpoint
-        let key = vLLMAPIKey
+        let key = apiKeys[.vLLM]
         Task {
-            defer { isFetchingVLLMModels = false }
+            defer { fetchingModels.remove(.vLLM) }
             do {
                 let (models, windows) = try await Self.fetchVLLMModelsFromAPI(endpoint: endpoint, apiKey: key)
-                vLLMModels = models
+                modelLists[.vLLM] = models
                 vLLMContextWindows = windows
                 let ids = models.map(\.id)
-                if vLLMModel.isEmpty || (!ids.isEmpty && !ids.contains(vLLMModel)) {
-                    vLLMModel = ids.first ?? ""
+                if self.models[.vLLM].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.vLLM])) {
+                    self.models[.vLLM] = ids.first ?? ""
                 }
             } catch {
                 appendLog("Failed to fetch vLLM models: \(error.localizedDescription)")
@@ -879,7 +823,7 @@ extension AgentViewModel {
     // MARK: - LM Studio Models
 
     func fetchLMStudioModels() {
-        isFetchingLMStudioModels = true
+        fetchingModels.insert(.lmStudio)
         let proto = lmStudioProtocol
         let modelsEndpoint: String
         switch proto {
@@ -887,13 +831,13 @@ extension AgentViewModel {
         default: modelsEndpoint = "http://localhost:1234/v1/models"
         }
         Task {
-            defer { isFetchingLMStudioModels = false }
+            defer { fetchingModels.remove(.lmStudio) }
             do {
                 let models = try await Self.fetchLMStudioModelsFromAPI(modelsURL: modelsEndpoint)
-                lmStudioModels = models
+                modelLists[.lmStudio] = models
                 let ids = models.map(\.id)
-                if lmStudioModel.isEmpty || (!ids.isEmpty && !ids.contains(lmStudioModel)) {
-                    lmStudioModel = ids.first ?? ""
+                if self.models[.lmStudio].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.lmStudio])) {
+                    self.models[.lmStudio] = ids.first ?? ""
                 }
             } catch {
                 appendLog("Failed to fetch LM Studio models: \(error.localizedDescription)")
@@ -947,27 +891,39 @@ extension AgentViewModel {
 
     /// Trigger model fetch for a provider if its list is empty. `force: true` skips the empty check.
     func fetchModelsIfNeeded(for provider: APIProvider, force: Bool = false) {
+        let isEmpty: Bool
         switch provider {
-        case .claude: if force || availableClaudeModels.isEmpty { Task { await fetchClaudeModels() } }
-        case .codex: if force || codexModels.isEmpty { fetchCodexModels() }
-        case .openAI: if force || openAIModels.isEmpty { fetchOpenAIModels() }
-        case .ollama: if force || ollamaModels.isEmpty { fetchOllamaModels() }
-        case .localOllama: if force || localOllamaModels.isEmpty { fetchLocalOllamaModels() }
-        case .deepSeek: if force || deepSeekModels.isEmpty { fetchDeepSeekModels() }
-        case .huggingFace: if force || huggingFaceModels.isEmpty { fetchHuggingFaceModels() }
-        case .vLLM: if force || vLLMModels.isEmpty { fetchVLLMModels() }
-        case .lmStudio: if force || lmStudioModels.isEmpty { fetchLMStudioModels() }
-        case .zAI: if force || zAIModels.isEmpty { fetchZAIModels() }
-        case .qwen: if force || qwenModels.isEmpty { fetchQwenModels() }
-        case .gemini: if force || geminiModels.isEmpty { fetchGeminiModels() }
-        case .grok: if force || grokModels.isEmpty { fetchGrokModels() }
-        case .mistral: if force || mistralModels.isEmpty { fetchMistralModels() }
-        case .vibe: if force || vibeModels.isEmpty { fetchVibeModels() }
-        case .miniMax: if force || miniMaxModels.isEmpty { fetchMiniMaxModels() }
-        case .openRouter: if force || openRouterModels.isEmpty { fetchOpenRouterModels() }
-        case .requesty: if force || requestyModels.isEmpty { fetchRequestyModels() }
-        case .bigModel: break
-        default: break
+        case .claude: isEmpty = availableClaudeModels.isEmpty
+        case .ollama: isEmpty = ollamaModels.isEmpty
+        case .localOllama: isEmpty = localOllamaModels.isEmpty
+        default: isEmpty = modelLists[provider].isEmpty
+        }
+        guard force || isEmpty else { return }
+        fetchModels(for: provider)
+    }
+
+    /// Fetch the model catalog for a provider (unconditionally).
+    func fetchModels(for provider: APIProvider) {
+        switch provider {
+        case .claude: Task { await fetchClaudeModels() }
+        case .codex: fetchCodexModels()
+        case .openAI: fetchOpenAIModels()
+        case .ollama: fetchOllamaModels()
+        case .localOllama: fetchLocalOllamaModels()
+        case .deepSeek: fetchDeepSeekModels()
+        case .huggingFace: fetchHuggingFaceModels()
+        case .vLLM: fetchVLLMModels()
+        case .lmStudio: fetchLMStudioModels()
+        case .zAI: fetchZAIModels()
+        case .qwen: fetchQwenModels()
+        case .gemini: fetchGeminiModels()
+        case .grok: fetchGrokModels()
+        case .mistral: fetchMistralModels()
+        case .vibe: fetchVibeModels()
+        case .miniMax: fetchMiniMaxModels()
+        case .openRouter: fetchOpenRouterModels()
+        case .requesty: fetchRequestyModels()
+        case .bigModel, .foundationModel: break
         }
     }
 }

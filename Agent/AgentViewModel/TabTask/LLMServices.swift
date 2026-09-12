@@ -142,7 +142,7 @@ extension AgentViewModel {
             )
         } else if provider == .lmStudio && lmStudioProtocol == .anthropic {
             services.claude = ClaudeService(
-                apiKey: lmStudioAPIKey,
+                apiKey: apiKeys[.lmStudio],
                 model: modelId,
                 historyContext: historyContext,
                 projectFolder: projectFolder,
@@ -151,7 +151,7 @@ extension AgentViewModel {
             )
         } else if provider == .openRouter && openRouterProtocol == .anthropic {
             services.claude = ClaudeService(
-                apiKey: openRouterAPIKey,
+                apiKey: apiKeys[.openRouter],
                 model: modelId,
                 historyContext: historyContext,
                 projectFolder: projectFolder,
@@ -196,7 +196,7 @@ extension AgentViewModel {
         switch provider {
         case .ollama:
             services.ollama = OllamaService(
-                apiKey: ollamaAPIKey, model: modelId,
+                apiKey: apiKeys[.ollama], model: modelId,
                 endpoint: ollamaEndpoint,
                 supportsVision: selectedOllamaSupportsVision || Self.isVisionModel(modelId),
                 historyContext: historyContext, projectFolder: projectFolder,

@@ -95,25 +95,25 @@ struct NewMainTabSheet: View {
 
         case .openAI:
             modelPickerWithFetch(
-                models: viewModel.openAIModels,
+                models: viewModel.modelLists[.openAI],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingOpenAIModels,
+                isFetching: viewModel.fetchingModels.contains(.openAI),
                 fetch: { viewModel.fetchModelsIfNeeded(for: .openAI, force: true) }
             )
 
         case .deepSeek:
             modelPickerWithFetch(
-                models: viewModel.deepSeekModels,
+                models: viewModel.modelLists[.deepSeek],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingDeepSeekModels,
+                isFetching: viewModel.fetchingModels.contains(.deepSeek),
                 fetch: { viewModel.fetchModelsIfNeeded(for: .deepSeek, force: true) }
             )
 
         case .huggingFace:
             modelPickerWithFetch(
-                models: viewModel.huggingFaceModels,
+                models: viewModel.modelLists[.huggingFace],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingHuggingFaceModels,
+                isFetching: viewModel.fetchingModels.contains(.huggingFace),
                 fetch: { viewModel.fetchModelsIfNeeded(for: .huggingFace, force: true) }
             )
 
@@ -125,25 +125,25 @@ struct NewMainTabSheet: View {
 
         case .vLLM:
             modelPickerWithFetch(
-                models: viewModel.vLLMModels,
+                models: viewModel.modelLists[.vLLM],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingVLLMModels,
+                isFetching: viewModel.fetchingModels.contains(.vLLM),
                 fetch: { viewModel.fetchModelsIfNeeded(for: .vLLM, force: true) }
             )
 
         case .lmStudio:
             modelPickerWithFetch(
-                models: viewModel.lmStudioModels,
+                models: viewModel.modelLists[.lmStudio],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingLMStudioModels,
+                isFetching: viewModel.fetchingModels.contains(.lmStudio),
                 fetch: { viewModel.fetchModelsIfNeeded(for: .lmStudio, force: true) }
             )
 
         case .zAI:
             modelPickerWithFetch(
-                models: viewModel.zAIModels,
+                models: viewModel.modelLists[.zAI],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingZAIModels,
+                isFetching: viewModel.fetchingModels.contains(.zAI),
                 fetch: { viewModel.fetchModelsIfNeeded(for: .zAI, force: true) }
             )
 
@@ -153,25 +153,25 @@ struct NewMainTabSheet: View {
 
         case .miniMax:
             modelPickerWithFetch(
-                models: viewModel.miniMaxModels,
+                models: viewModel.modelLists[.miniMax],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingMiniMaxModels,
+                isFetching: viewModel.fetchingModels.contains(.miniMax),
                 fetch: { viewModel.fetchModelsIfNeeded(for: .miniMax, force: true) }
             )
 
         case .openRouter:
             modelPickerWithFetch(
-                models: viewModel.openRouterModels,
+                models: viewModel.modelLists[.openRouter],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingOpenRouterModels,
+                isFetching: viewModel.fetchingModels.contains(.openRouter),
                 fetch: { viewModel.fetchModelsIfNeeded(for: .openRouter, force: true) }
             )
 
         case .requesty:
             modelPickerWithFetch(
-                models: viewModel.requestyModels,
+                models: viewModel.modelLists[.requesty],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingRequestyModels,
+                isFetching: viewModel.fetchingModels.contains(.requesty),
                 fetch: { viewModel.fetchModelsIfNeeded(for: .requesty, force: true) }
             )
 
@@ -181,25 +181,25 @@ struct NewMainTabSheet: View {
 
         case .gemini:
             modelPickerWithFetch(
-                models: viewModel.geminiModels,
+                models: viewModel.modelLists[.gemini],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingGeminiModels,
+                isFetching: viewModel.fetchingModels.contains(.gemini),
                 fetch: { viewModel.fetchGeminiModels() }
             )
 
         case .grok:
             modelPickerWithFetch(
-                models: viewModel.grokModels,
+                models: viewModel.modelLists[.grok],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingGrokModels,
+                isFetching: viewModel.fetchingModels.contains(.grok),
                 fetch: { viewModel.fetchGrokModels() }
             )
 
         case .mistral:
             modelPickerWithFetch(
-                models: viewModel.mistralModels,
+                models: viewModel.modelLists[.mistral],
                 fallbackBinding: $selectedModelId,
-                isFetching: viewModel.isFetchingMistralModels,
+                isFetching: viewModel.fetchingModels.contains(.mistral),
                 fetch: { viewModel.fetchMistralModels() }
             )
 
@@ -305,22 +305,22 @@ struct NewMainTabSheet: View {
     private func defaultModelId(for provider: APIProvider) -> String {
         switch provider {
         case .claude: return viewModel.selectedModel
-        case .codex: return viewModel.codexModel
-        case .openAI: return viewModel.openAIModel
-        case .deepSeek: return viewModel.deepSeekModel
-        case .huggingFace: return viewModel.huggingFaceModel
-        case .ollama: return viewModel.ollamaModel
-        case .localOllama: return viewModel.localOllamaModel
-        case .vLLM: return viewModel.vLLMModel
-        case .lmStudio: return viewModel.lmStudioModel
-        case .zAI: return viewModel.zAIModel
+        case .codex: return viewModel.models[.codex]
+        case .openAI: return viewModel.models[.openAI]
+        case .deepSeek: return viewModel.models[.deepSeek]
+        case .huggingFace: return viewModel.models[.huggingFace]
+        case .ollama: return viewModel.models[.ollama]
+        case .localOllama: return viewModel.models[.localOllama]
+        case .vLLM: return viewModel.models[.vLLM]
+        case .lmStudio: return viewModel.models[.lmStudio]
+        case .zAI: return viewModel.models[.zAI]
         case .bigModel: return "glm-4.7"
-        case .miniMax: return viewModel.miniMaxModel.isEmpty ? "MiniMax-M3" : viewModel.miniMaxModel
-        case .openRouter: return viewModel.openRouterModel
-        case .requesty: return viewModel.requestyModel
+        case .miniMax: return viewModel.models[.miniMax].isEmpty ? "MiniMax-M3" : viewModel.models[.miniMax]
+        case .openRouter: return viewModel.models[.openRouter]
+        case .requesty: return viewModel.models[.requesty]
         case .qwen: return "qwen-plus"
-        case .gemini: return viewModel.geminiModel
-        case .grok: return viewModel.grokModel
+        case .gemini: return viewModel.models[.gemini]
+        case .grok: return viewModel.models[.grok]
         case .mistral: return "mistral-large-latest"
         case .vibe: return "devstral-small-2507"
         case .foundationModel: return "Apple Intelligence"
