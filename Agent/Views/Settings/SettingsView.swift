@@ -34,7 +34,7 @@ struct SettingsView: View {
         case .huggingFace, .mistral: AgentViewModel.isVisionModel(modelId)
         case .zAI: modelId.hasSuffix(":v")
         case .gemini: modelId.contains("gemini-")
-        default: false
+        default: viewModel.modelVisionSupport[provider][modelId] ?? false
         }
     }
 
