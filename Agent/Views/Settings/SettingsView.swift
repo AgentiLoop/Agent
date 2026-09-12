@@ -30,12 +30,7 @@ struct SettingsView: View {
     }
 
     private func showsVisionBadge(_ provider: APIProvider, modelId: String) -> Bool {
-        switch provider {
-        case .huggingFace, .mistral: AgentViewModel.isVisionModel(modelId)
-        case .zAI: modelId.hasSuffix(":v")
-        case .gemini: modelId.contains("gemini-")
-        default: viewModel.modelVisionSupport[provider][modelId] ?? false
-        }
+        viewModel.showsVisionBadge(provider: provider, modelId: modelId)
     }
 
     @ViewBuilder

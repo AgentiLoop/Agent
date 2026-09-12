@@ -82,6 +82,28 @@ extension AgentViewModel {
         localOllamaModels.first(where: { $0.name == models[.localOllama] })?.supportsVision ?? false
     }
 
+    /// Single rule for the picker "eye" badge across every provider — same knowledge
+    /// `resolveVision` uses, minus Force Vision: provider-wide rules, Ollama's per-model
+    /// /api/show capabilities, Z.ai/BigModel `:v`, the catalog map recorded at fetch
+    /// time (`modelVisionSupport`), then the model-name heuristic.
+    func showsVisionBadge(provider: APIProvider, modelId: String) -> Bool {
+        switch provider {
+        case .claude, .codex, .openAI, .gemini:
+            return true
+        case .miniMax, .vibe, .foundationModel:
+            return false
+        case .zAI, .bigModel:
+            return modelId.hasSuffix(":v")
+        case .ollama:
+            return ollamaModels.first(where: { $0.id == modelId })?.supportsVision ?? Self.isVisionModel(modelId)
+        case .localOllama:
+            return localOllamaModels.first(where: { $0.id == modelId })?.supportsVision ?? Self.isVisionModel(modelId)
+        default:
+            if let known = modelVisionSupport[provider][modelId] { return known }
+            return Self.isVisionModel(modelId)
+        }
+    }
+
     /// Check if speech recognition is authorized
     var isSpeechRecognitionAuthorized: Bool {
         SFSpeechRecognizer.authorizationStatus() == .authorized
