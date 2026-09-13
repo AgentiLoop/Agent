@@ -105,7 +105,7 @@ Just type what you want. Agent! figures out how and makes it happen.
 | Provider | Cost | Best for |
 |---|---|---|
 | **A2Agent** | Cheap | DeepSeek, GLM, Kimi, MiniMax and Qwen via one OpenAI-compatible key at a fraction of official pricing |
-| **Apple Intelligence** | Free, on-device | Triage, summaries, token compression (brain icon, not the provider picker) |
+| **Apple Intelligence** | Free, on-device | Triage, summaries, token compression (brain icon, not available on the provider picker) |
 | **Claude** | Per-token (API key) or subscription (OAuth) | Long autonomous tasks, extended thinking, prompt caching |
 | **Codex** | ChatGPT subscription | OpenAI models via ChatGPT OAuth — no API key, no per-token charges |
 | **DeepSeek** | Cheap | Budget coding, cache-hit reporting |

@@ -105,7 +105,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | 提供商 | 费用 | 适合 |
 |---|---|---|
 | **A2Agent** | 便宜 | 一把 OpenAI 兼容密钥即可使用 DeepSeek、GLM、Kimi、MiniMax 和 Qwen，价格远低于官方 |
-| **Apple Intelligence** | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，而非提供商选择器） |
+| **Apple Intelligence** | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，提供商选择器中不可用） |
 | **Claude** | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
 | **Codex** | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
 | **DeepSeek** | 便宜 | 低成本编码、缓存命中报告 |
