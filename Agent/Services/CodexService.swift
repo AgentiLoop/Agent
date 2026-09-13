@@ -544,14 +544,20 @@ final class CodexService {
                     outputTokens = (usage["output_tokens"] as? Int) ?? 0
                 }
 
-            case "response.failed", "response.incomplete":
-                if let resp = obj["response"] as? [String: Any],
-                   let err = resp["error"] as? [String: Any],
-                   let msg = err["message"] as? String
-                {
-                    AuditLog.log(.api, "Codex stream \(type): \(msg)")
-                }
-                stopReason = "error"
+            case "response.failed":
+                // HTTP 200 + failed event (e.g. "You have no credits remaining").
+                // Returning empty content here let the task loop treat it as a
+                // tool-less turn ("No tool call" nudge → "Completed:") and the
+                // real error never reached the user. Throw so it surfaces.
+                let msg = ((obj["response"] as? [String: Any])?["error"] as? [String: Any])?["message"] as? String
+                    ?? "response.failed"
+                AuditLog.log(.api, "Codex stream response.failed: \(msg)")
+                throw AgentError.apiError(statusCode: 200, message: msg)
+
+            case "response.incomplete":
+                let reason = ((obj["response"] as? [String: Any])?["incomplete_details"] as? [String: Any])?["reason"] as? String ?? ""
+                AuditLog.log(.api, "Codex stream response.incomplete: \(reason)")
+                stopReason = reason == "max_output_tokens" ? "max_tokens" : "error"
 
             default:
                 continue
