@@ -8,7 +8,7 @@ import AgentTools
 extension AgentViewModel {
 
     func fetchClaudeModels() async {
-        await MainActor.run { self.fetchingModels.insert(.claude) }
+        await MainActor.run { _ = self.fetchingModels.insert(.claude) }
         defer { Task { @MainActor in self.fetchingModels.remove(.claude) } }
 
         guard !apiKey.isEmpty else {
