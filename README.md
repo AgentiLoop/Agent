@@ -104,24 +104,24 @@ Just type what you want. Agent! figures out how and makes it happen.
 
 | Provider | Cost | Best for |
 |---|---|---|
+| **A2Agent** | Cheap | DeepSeek, GLM, Kimi, MiniMax and Qwen via one OpenAI-compatible key at a fraction of official pricing |
+| **Apple Intelligence** | Free, on-device | Triage, summaries, token compression (brain icon, not the provider picker) |
 | **Claude** | Per-token (API key) or subscription (OAuth) | Long autonomous tasks, extended thinking, prompt caching |
 | **Codex** | ChatGPT subscription | OpenAI models via ChatGPT OAuth — no API key, no per-token charges |
-| **OpenAI** | Paid | General purpose, tool calling, vision, `reasoning_effort` |
+| **DeepSeek** | Cheap | Budget coding, cache-hit reporting |
 | **Google Gemini** | Paid (free tier) | Long context, vision |
 | **Grok** (xAI) | Paid | Real-time info |
-| **Mistral** / **Mistral Vibe** | Paid | Open-weight cloud, code, agent product |
-| **DeepSeek** | Cheap | Budget coding, cache-hit reporting |
 | **Hugging Face** | Varies | Open models, serverless or dedicated endpoints |
-| **Z.ai** / **BigModel** | Cheap | GLM-5.3 — recommended starting point |
-| **Qwen** (Alibaba) | Cheap | Qwen 3.8 via Dashscope |
-| **MiniMax** | Cheap | 1M-token context |
-| **OpenRouter** | Paid | 200+ models, one key; Claude routed via Anthropic protocol |
-| **Requesty** | Paid | 300+ models via one OpenAI-compatible key; per-model pricing and capability metadata |
-| **A2Agent** | Cheap | DeepSeek, GLM, Kimi, MiniMax and Qwen via one OpenAI-compatible key at a fraction of official pricing |
-| **OrcaRouter** | Paid | 190+ models via one OpenAI-compatible key at provider cost; auto/fusion/fallback routing |
-| **Ollama** (cloud) | Free tier | Hosted open models |
 | **Local Ollama** / **vLLM** / **LM Studio** | Free + hardware | Fully offline; real per-model context window detected |
-| **Apple Intelligence** | Free, on-device | Triage, summaries, token compression (brain icon, not the provider picker) |
+| **MiniMax** | Cheap | 1M-token context |
+| **Mistral** / **Mistral Vibe** | Paid | Open-weight cloud, code, agent product |
+| **Ollama** (cloud) | Free tier | Hosted open models |
+| **OpenAI** | Paid | General purpose, tool calling, vision, `reasoning_effort` |
+| **OpenRouter** | Paid | 200+ models, one key; Claude routed via Anthropic protocol |
+| **OrcaRouter** | Paid | 190+ models via one OpenAI-compatible key at provider cost; auto/fusion/fallback routing |
+| **Qwen** (Alibaba) | Cheap | Qwen 3.8 via Dashscope |
+| **Requesty** | Paid | 300+ models via one OpenAI-compatible key; per-model pricing and capability metadata |
+| **Z.ai** / **BigModel** | Cheap | GLM-5.3 — recommended starting point |
 
 > 💡 Self-hosted providers are free only in the API-fee sense — a usable 30B+ model needs an M2/M3/M4 Ultra Mac Studio (64–128GB). Without that hardware, the cheap cloud paths above are dramatically cheaper.
 
