@@ -1,5 +1,7 @@
 # 🦾 AgentiLoop Agent!
 
+### ¡Llegamos a 600 estrellas! Gracias a todos por apoyar a Agent! Aún nos queda un largo camino por recorrer, pero hemos tenido un comienzo increíble. Agent! nació el 1 de abril de 2026 con nuestra propia tecnología, desarrollada desde 2000 y entre 2023 y 2026.
+
 ### **IA agéntica para tu escritorio Mac**
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
