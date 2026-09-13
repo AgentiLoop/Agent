@@ -104,24 +104,24 @@ Tapez simplement ce que vous voulez. Agent! trouve comment et le réalise.
 
 | Fournisseur | Coût | Idéal pour |
 |---|---|---|
-| **Claude** | Au token (clé API) ou abonnement (OAuth) | Longues tâches autonomes, réflexion étendue, cache de prompts |
-| **Codex** | Abonnement ChatGPT | Modèles OpenAI via OAuth ChatGPT — pas de clé API, pas de facturation au token |
-| **OpenAI** | Payant | Usage général, appels d'outils, vision, `reasoning_effort` |
+| **A2Agent** | Bon marché | DeepSeek, GLM, Kimi, MiniMax et Qwen avec une seule clé compatible OpenAI à une fraction du prix officiel |
+| **Apple Intelligence** | Gratuit, sur l'appareil | Triage, résumés, compression de tokens (icône cerveau, pas le sélecteur de fournisseur) |
+| **Claude** | Au token (clé API) ou abonnement (OAuth) | Longues tâches autonomes, réflexion étendue, cache de prompts |
+| **Codex** | Abonnement ChatGPT | Modèles OpenAI via OAuth ChatGPT — pas de clé API, pas de facturation au token |
+| **DeepSeek** | Bon marché | Codage économique, rapport de hits de cache |
 | **Google Gemini** | Payant (offre gratuite) | Contexte long, vision |
 | **Grok** (xAI) | Payant | Infos en temps réel |
-| **Mistral** / **Mistral Vibe** | Payant | Cloud open-weight, code, produit agent |
-| **DeepSeek** | Bon marché | Codage économique, rapport de hits de cache |
 | **Hugging Face** | Variable | Modèles ouverts, serverless ou endpoints dédiés |
-| **OpenRouter** | Payant | 200+ modèles, une clé ; Claude routé via le protocole Anthropic |
-| **Requesty** | Payant | 300+ modèles avec une seule clé compatible OpenAI ; tarifs et capacités par modèle |
-| **A2Agent** | Bon marché | DeepSeek, GLM, Kimi, MiniMax et Qwen avec une seule clé compatible OpenAI à une fraction du prix officiel |
-| **OrcaRouter** | Payant | 190+ modèles avec une seule clé compatible OpenAI au prix du fournisseur ; routage auto/fusion/fallback |
-| **Z.ai** / **BigModel** | Bon marché | GLM-5.3 — point de départ recommandé |
-| **Qwen** (Alibaba) | Bon marché | Qwen 3.8 via Dashscope |
-| **MiniMax** | Bon marché | Contexte de 1M tokens |
+| **MiniMax** | Bon marché | Contexte de 1M tokens |
+| **Mistral** / **Mistral Vibe** | Payant | Cloud open-weight, code, produit agent |
 | **Ollama** (cloud) | Offre gratuite | Modèles ouverts hébergés |
 | **Ollama local** / **vLLM** / **LM Studio** | Gratuit + matériel | Entièrement hors ligne ; vraie fenêtre de contexte par modèle détectée |
-| **Apple Intelligence** | Gratuit, sur l'appareil | Triage, résumés, compression de tokens (icône cerveau, pas le sélecteur de fournisseur) |
+| **OpenAI** | Payant | Usage général, appels d'outils, vision, `reasoning_effort` |
+| **OpenRouter** | Payant | 200+ modèles, une clé ; Claude routé via le protocole Anthropic |
+| **OrcaRouter** | Payant | 190+ modèles avec une seule clé compatible OpenAI au prix du fournisseur ; routage auto/fusion/fallback |
+| **Qwen** (Alibaba) | Bon marché | Qwen 3.8 via Dashscope |
+| **Requesty** | Payant | 300+ modèles avec une seule clé compatible OpenAI ; tarifs et capacités par modèle |
+| **Z.ai** / **BigModel** | Bon marché | GLM-5.3 — point de départ recommandé |
 
 > 💡 Les fournisseurs auto-hébergés ne sont gratuits qu'au sens des frais d'API — un modèle 30B+ utilisable exige un Mac Studio M2/M3/M4 Ultra (64–128 Go). Sans ce matériel, les voies cloud bon marché ci-dessus reviennent bien moins cher.
 
