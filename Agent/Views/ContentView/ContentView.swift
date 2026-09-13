@@ -30,6 +30,7 @@ struct ContentView: View {
     @State private var showUserQuestion = false
     @State private var userQuestionText = ""
     @State private var userAnswerText = ""
+    @State private var keyMonitor: Any?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -221,7 +222,13 @@ struct ContentView: View {
                     // 2.5-second auto-dismiss when allGood is true.
                 }
             }
-            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            // Install the key monitor once per ContentView and tear it down in
+            // onDisappear. A leaked monitor from a previous ContentView (window
+            // closed + reopened) captures a stale viewModel: it swallows Cmd+V,
+            // shows the "Attach image" dialog, and attaches the image to an
+            // instance the visible UI is no longer bound to.
+            guard keyMonitor == nil else { return }
+            keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
                 // Cmd+W to close current tab or quit
                 if event.modifierFlags.contains(.command),
                    event.charactersIgnoringModifiers == "w"
@@ -523,6 +530,12 @@ struct ContentView: View {
                 }
 
                 return event
+            }
+        }
+        .onDisappear {
+            if let monitor = keyMonitor {
+                NSEvent.removeMonitor(monitor)
+                keyMonitor = nil
             }
         }
     }
