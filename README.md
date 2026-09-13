@@ -1,5 +1,7 @@
 # 🦾 AgentiLoop Agent!
 
+## We made it to 600 Stars! Thank you to all for using Agent!
+
 ### **Agentic AI for your Mac Desktop**
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
