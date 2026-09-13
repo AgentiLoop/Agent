@@ -1,5 +1,7 @@
 # 🦾 AgentiLoop Agent!
 
+### 我们达到了 600 颗星！感谢大家对 Agent! 的支持。前路漫长，但我们的开局非常精彩。Agent! 诞生于 2026 年 4 月 1 日，采用我们自 2000 年以及 2023–2026 年间自主研发的技术。
+
 ### **为你的 Mac 桌面打造的智能体 AI**
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
