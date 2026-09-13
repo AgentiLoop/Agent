@@ -105,7 +105,7 @@ Tapez simplement ce que vous voulez. Agent! trouve comment et le réalise.
 | Fournisseur | Coût | Idéal pour |
 |---|---|---|
 | **A2Agent** | Bon marché | DeepSeek, GLM, Kimi, MiniMax et Qwen avec une seule clé compatible OpenAI à une fraction du prix officiel |
-| **Apple Intelligence** | Gratuit, sur l'appareil | Triage, résumés, compression de tokens (icône cerveau, pas le sélecteur de fournisseur) |
+| **Apple Intelligence** | Gratuit, sur l'appareil | Triage, résumés, compression de tokens (icône cerveau, non disponible dans le sélecteur de fournisseur) |
 | **Claude** | Au token (clé API) ou abonnement (OAuth) | Longues tâches autonomes, réflexion étendue, cache de prompts |
 | **Codex** | Abonnement ChatGPT | Modèles OpenAI via OAuth ChatGPT — pas de clé API, pas de facturation au token |
 | **DeepSeek** | Bon marché | Codage économique, rapport de hits de cache |
