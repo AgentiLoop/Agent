@@ -104,24 +104,24 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 
 | Anbieter | Kosten | Am besten für |
 |---|---|---|
+| **A2Agent** | Günstig | DeepSeek, GLM, Kimi, MiniMax und Qwen mit einem OpenAI-kompatiblen Schlüssel zu einem Bruchteil der offiziellen Preise |
+| **Apple Intelligence** | Kostenlos, auf dem Gerät | Triage, Zusammenfassungen, Token-Kompression (Gehirn-Symbol, nicht die Anbieterauswahl) |
 | **Claude** | Pro Token (API-Key) oder Abo (OAuth) | Lange autonome Aufgaben, Extended Thinking, Prompt-Caching |
-| **Codex** | ChatGPT-Abo | OpenAI-Modelle über ChatGPT-OAuth — kein API-Key, keine Token-Kosten |
-| **OpenAI** | Kostenpflichtig | Allzweck, Tool-Calling, Vision, `reasoning_effort` |
+| **Codex** | ChatGPT-Abo | OpenAI-Modelle über ChatGPT-OAuth — kein API-Key, keine Token-Kosten |
+| **DeepSeek** | Günstig | Budget-Coding, Cache-Hit-Reporting |
 | **Google Gemini** | Kostenpflichtig (Free Tier) | Langer Kontext, Vision |
 | **Grok** (xAI) | Kostenpflichtig | Echtzeit-Informationen |
-| **Mistral** / **Mistral Vibe** | Kostenpflichtig | Open-Weight-Cloud, Code, Agent-Produkt |
-| **DeepSeek** | Günstig | Budget-Coding, Cache-Hit-Reporting |
 | **Hugging Face** | Variabel | Offene Modelle, serverless oder dedizierte Endpunkte |
-| **OpenRouter** | Kostenpflichtig | 200+ Modelle, ein Schlüssel; Claude über Anthropic-Protokoll |
-| **Requesty** | Kostenpflichtig | 300+ Modelle mit einem OpenAI-kompatiblen Schlüssel; Preise und Fähigkeiten pro Modell |
-| **A2Agent** | Günstig | DeepSeek, GLM, Kimi, MiniMax und Qwen mit einem OpenAI-kompatiblen Schlüssel zu einem Bruchteil der offiziellen Preise |
-| **OrcaRouter** | Kostenpflichtig | 190+ Modelle mit einem OpenAI-kompatiblen Schlüssel zum Anbieterpreis; Auto-/Fusion-/Fallback-Routing |
-| **Z.ai** / **BigModel** | Günstig | GLM-5.3 — empfohlener Einstieg |
-| **Qwen** (Alibaba) | Günstig | Qwen 3.8 über Dashscope |
-| **MiniMax** | Günstig | 1M-Token-Kontext |
-| **Ollama** (Cloud) | Free Tier | Gehostete offene Modelle |
 | **Lokales Ollama** / **vLLM** / **LM Studio** | Kostenlos + Hardware | Komplett offline; echtes Kontextfenster pro Modell wird erkannt |
-| **Apple Intelligence** | Kostenlos, auf dem Gerät | Triage, Zusammenfassungen, Token-Kompression (Gehirn-Symbol, nicht die Anbieterauswahl) |
+| **MiniMax** | Günstig | 1M-Token-Kontext |
+| **Mistral** / **Mistral Vibe** | Kostenpflichtig | Open-Weight-Cloud, Code, Agent-Produkt |
+| **Ollama** (Cloud) | Free Tier | Gehostete offene Modelle |
+| **OpenAI** | Kostenpflichtig | Allzweck, Tool-Calling, Vision, `reasoning_effort` |
+| **OpenRouter** | Kostenpflichtig | 200+ Modelle, ein Schlüssel; Claude über Anthropic-Protokoll |
+| **OrcaRouter** | Kostenpflichtig | 190+ Modelle mit einem OpenAI-kompatiblen Schlüssel zum Anbieterpreis; Auto-/Fusion-/Fallback-Routing |
+| **Qwen** (Alibaba) | Günstig | Qwen 3.8 über Dashscope |
+| **Requesty** | Kostenpflichtig | 300+ Modelle mit einem OpenAI-kompatiblen Schlüssel; Preise und Fähigkeiten pro Modell |
+| **Z.ai** / **BigModel** | Günstig | GLM-5.3 — empfohlener Einstieg |
 
 > 💡 Selbst gehostete Anbieter sind nur im Sinne der API-Gebühren kostenlos — ein brauchbares 30B+-Modell braucht einen M2/M3/M4 Ultra Mac Studio (64–128 GB). Ohne diese Hardware sind die günstigen Cloud-Wege oben deutlich billiger.
 

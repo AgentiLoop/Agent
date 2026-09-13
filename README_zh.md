@@ -104,24 +104,24 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 | 提供商 | 费用 | 适合 |
 |---|---|---|
+| **A2Agent** | 便宜 | 一把 OpenAI 兼容密钥即可使用 DeepSeek、GLM、Kimi、MiniMax 和 Qwen，价格远低于官方 |
+| **Apple Intelligence** | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，而非提供商选择器） |
 | **Claude** | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
 | **Codex** | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
-| **OpenAI** | 付费 | 通用、工具调用、视觉、`reasoning_effort` |
+| **DeepSeek** | 便宜 | 低成本编码、缓存命中报告 |
 | **Google Gemini** | 付费（有免费额度） | 长上下文、视觉 |
 | **Grok** (xAI) | 付费 | 实时信息 |
-| **Mistral** / **Mistral Vibe** | 付费 | 开放权重云端、代码、智能体产品 |
-| **DeepSeek** | 便宜 | 低成本编码、缓存命中报告 |
 | **Hugging Face** | 不定 | 开源模型，serverless 或专用端点 |
-| **OpenRouter** | 付费 | 200+ 模型，一把密钥；Claude 经 Anthropic 协议路由 |
-| **Requesty** | 付费 | 一把 OpenAI 兼容密钥即可访问 300+ 模型；按模型提供价格与能力信息 |
-| **A2Agent** | 便宜 | 一把 OpenAI 兼容密钥即可使用 DeepSeek、GLM、Kimi、MiniMax 和 Qwen，价格远低于官方 |
-| **OrcaRouter** | 付费 | 一把 OpenAI 兼容密钥即可访问 190+ 模型，按提供商原价计费；支持 auto/fusion/fallback 路由 |
-| **Z.ai** / **BigModel** | 便宜 | GLM-5.3 —— 推荐起点 |
-| **Qwen**（阿里巴巴） | 便宜 | 通过 Dashscope 使用 Qwen 3.8 |
 | **MiniMax** | 便宜 | 1M token 上下文 |
+| **Mistral** / **Mistral Vibe** | 付费 | 开放权重云端、代码、智能体产品 |
 | **Ollama**（云端） | 免费额度 | 托管的开源模型 |
 | **本地 Ollama** / **vLLM** / **LM Studio** | 免费 + 硬件 | 完全离线；自动检测各模型真实上下文窗口 |
-| **Apple Intelligence** | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，而非提供商选择器） |
+| **OpenAI** | 付费 | 通用、工具调用、视觉、`reasoning_effort` |
+| **OpenRouter** | 付费 | 200+ 模型，一把密钥；Claude 经 Anthropic 协议路由 |
+| **OrcaRouter** | 付费 | 一把 OpenAI 兼容密钥即可访问 190+ 模型，按提供商原价计费；支持 auto/fusion/fallback 路由 |
+| **Qwen**（阿里巴巴） | 便宜 | 通过 Dashscope 使用 Qwen 3.8 |
+| **Requesty** | 付费 | 一把 OpenAI 兼容密钥即可访问 300+ 模型；按模型提供价格与能力信息 |
+| **Z.ai** / **BigModel** | 便宜 | GLM-5.3 —— 推荐起点 |
 
 > 💡 自托管提供商只是在 API 费用意义上免费——要以可用速度运行 30B+ 模型，需要 M2/M3/M4 Ultra Mac Studio（64–128GB）。没有这类硬件的话，上面的低价云端方案要便宜得多。
 
