@@ -43,33 +43,7 @@ extension AgentViewModel {
                     }
                     // Auto-checkpoint logic (same as foreground path)
                     if result.contains("BUILD SUCCEEDED"), !self.projectFolder.isEmpty {
-                        let dir = self.projectFolder
-                        let check = await Self.offMain {
-                            let p = Process()
-                            p.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-                            p.arguments = ["status", "--porcelain"]
-                            p.currentDirectoryURL = URL(fileURLWithPath: dir)
-                            let pipe = Pipe()
-                            p.standardOutput = pipe; p.standardError = pipe
-                            try? p.run()
-                            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                            p.waitUntilExit()
-                            return String(data: data, encoding: .utf8) ?? ""
-                        }
-                        if !check.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            _ = await Self.offMain {
-                                let p = Process()
-                                p.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-                                p.arguments = ["add", "-A"]
-                                p.currentDirectoryURL = URL(fileURLWithPath: dir)
-                                try? p.run(); p.waitUntilExit()
-                                let c = Process()
-                                c.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-                                c.arguments = ["commit", "-m", "WIP: auto-checkpoint after successful build"]
-                                c.currentDirectoryURL = URL(fileURLWithPath: dir)
-                                try? c.run(); c.waitUntilExit()
-                            }
-                        }
+                        await self.autoCheckpointAfterBuild(dir: self.projectFolder)
                     }
                 }
                 appendLog("🚀 Started xcode_build in background tab 'xcode_build:\(label)'")
@@ -79,33 +53,7 @@ extension AgentViewModel {
             let buildResult = await Self.offMain { XcodeService.shared.buildProject(projectPath: projectPath) }
             // Git auto-checkpoint after successful build — saves progress for overnight runs
             if buildResult.contains("BUILD SUCCEEDED") && !projectFolder.isEmpty {
-                let dir = projectFolder
-                let checkResult = await Self.offMain {
-                    let p = Process()
-                    p.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-                    p.arguments = ["status", "--porcelain"]
-                    p.currentDirectoryURL = URL(fileURLWithPath: dir)
-                    let pipe = Pipe()
-                    p.standardOutput = pipe; p.standardError = pipe
-                    try? p.run()
-                    let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                    p.waitUntilExit()
-                    return String(data: data, encoding: .utf8) ?? ""
-                }
-                if !checkResult.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    _ = await Self.offMain {
-                        let p = Process()
-                        p.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-                        p.arguments = ["add", "-A"]
-                        p.currentDirectoryURL = URL(fileURLWithPath: dir)
-                        try? p.run(); p.waitUntilExit()
-                        let c = Process()
-                        c.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-                        c.arguments = ["commit", "-m", "WIP: auto-checkpoint after successful build"]
-                        c.currentDirectoryURL = URL(fileURLWithPath: dir)
-                        try? c.run(); c.waitUntilExit()
-                    }
-                }
+                await autoCheckpointAfterBuild(dir: projectFolder)
             }
             // Auto-verify: launch app and capture initial UI state (opt-in)
             if buildResult.contains("BUILD SUCCEEDED") && autoVerifyEnabled {
@@ -332,6 +280,55 @@ extension AgentViewModel {
                 return
             }
             try? await Task.sleep(for: .milliseconds(150))
+            try? await Task.sleep(for: .milliseconds(150))
+        }
+    }
+
+    /// Git auto-checkpoint after a successful build — saves progress for overnight runs.
+    /// Title summarizes the current task and the changed files so the git log is readable.
+    func autoCheckpointAfterBuild(dir: String) async {
+        let status = await Self.offMain {
+            let p = Process()
+            p.executableURL = URL(fileURLWithPath: "/usr/bin/git")
+            p.arguments = ["status", "--porcelain"]
+            p.currentDirectoryURL = URL(fileURLWithPath: dir)
+            let pipe = Pipe()
+            p.standardOutput = pipe; p.standardError = pipe
+            try? p.run()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            p.waitUntilExit()
+            return String(data: data, encoding: .utf8) ?? ""
+        }
+        let lines = status.split(separator: "\n").map { String($0) }.filter { $0.count > 3 }
+        guard !lines.isEmpty else { return }
+        let files = lines.map { line -> String in
+            let path = String(line.dropFirst(3))
+            // Renames show as "old -> new"; keep the new name
+            let final = path.components(separatedBy: " -> ").last ?? path
+            return (final as NSString).lastPathComponent
+        }
+        let fileSummary = files.prefix(3).joined(separator: ", ") + (files.count > 3 ? " +\(files.count - 3) more" : "")
+        let taskLine = currentTaskPrompt
+            .split(whereSeparator: \.isNewline).first.map(String.init)?
+            .trimmingCharacters(in: .whitespaces) ?? ""
+        let taskSummary = taskLine.isEmpty ? "" : (taskLine.count > 60 ? String(taskLine.prefix(57)) + "..." : taskLine)
+        let title = taskSummary.isEmpty
+            ? "checkpoint: build ok — \(fileSummary)"
+            : "checkpoint: \(taskSummary) — \(fileSummary)"
+        let body = "Auto-checkpoint after successful build (\(files.count) file\(files.count == 1 ? "" : "s")).\n\n"
+            + (taskLine.isEmpty ? "" : "Task: \(taskLine)\n\n")
+            + "Changed:\n" + lines.joined(separator: "\n")
+        _ = await Self.offMain {
+            let p = Process()
+            p.executableURL = URL(fileURLWithPath: "/usr/bin/git")
+            p.arguments = ["add", "-A"]
+            p.currentDirectoryURL = URL(fileURLWithPath: dir)
+            try? p.run(); p.waitUntilExit()
+            let c = Process()
+            c.executableURL = URL(fileURLWithPath: "/usr/bin/git")
+            c.arguments = ["commit", "-m", title, "-m", body]
+            c.currentDirectoryURL = URL(fileURLWithPath: dir)
+            try? c.run(); c.waitUntilExit()
         }
     }
 }
