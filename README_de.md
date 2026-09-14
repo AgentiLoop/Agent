@@ -26,7 +26,7 @@
 
 **Eine App. Jede KI. Volle Kontrolle über deinen Mac.**
 
-Agent! ist eine zu 100 % native Swift-6.2-/SwiftUI-App, die **21 LLM-Anbieter** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Qwen, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (Cloud und lokal), vLLM und LM Studio — plus die geräteinterne **Apple Intelligence** — mit einer autonomen Aufgabenschleife verbindet, die wirklich *etwas tut*: Sie liest deinen Code, behebt den Fehler, baut das Xcode-Projekt, committet den Diff, steuert jede Mac-App über die Accessibility-API, führt Shell-Befehle als du oder als root aus, schickt dir Ergebnisse per iMessage und reagiert auf ein gesprochenes *„Agent!"*.
+Agent! ist eine zu 100 % native Swift-6.2-/SwiftUI-App, die **22 LLM-Anbieter** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba, Qwen Coder, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (Cloud und lokal), vLLM und LM Studio — plus die geräteinterne **Apple Intelligence** — mit einer autonomen Aufgabenschleife verbindet, die wirklich *etwas tut*: Sie liest deinen Code, behebt den Fehler, baut das Xcode-Projekt, committet den Diff, steuert jede Mac-App über die Accessibility-API, führt Shell-Befehle als du oder als root aus, schickt dir Ergebnisse per iMessage und reagiert auf ein gesprochenes *„Agent!"*.
 
 Kein NPM, kein Electron, kein Abo, keine Telemetrie. Bring deinen eigenen API-Schlüssel mit, lauf komplett lokal oder kostenlos mit Apple Intelligence. Jedes Swift-Paket, von dem die App abhängt, wurde vom selben Autor geschrieben. Siehe [Entstehungsgeschichte](#entstehungsgeschichte) unten.
 
@@ -119,7 +119,8 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 | **OpenAI** | Kostenpflichtig | Allzweck, Tool-Calling, Vision, `reasoning_effort` |
 | **OpenRouter** | Kostenpflichtig | 200+ Modelle, ein Schlüssel; Claude über Anthropic-Protokoll |
 | **OrcaRouter** | Kostenpflichtig | 190+ Modelle mit einem OpenAI-kompatiblen Schlüssel zum Anbieterpreis; Auto-/Fusion-/Fallback-Routing |
-| **Qwen** (Alibaba) | Günstig | Qwen 3.8 über Dashscope |
+| **Alibaba** (qwen.ai / Model Studio) | Günstig | Qwen 3.8 über DashScope |
+| **Qwen Coder** | Abo | Alibaba Coding Plan (`sk-sp-`-Schlüssel): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
 | **Requesty** | Kostenpflichtig | 300+ Modelle mit einem OpenAI-kompatiblen Schlüssel; Preise und Fähigkeiten pro Modell |
 | **Z.ai** / **BigModel** | Günstig | GLM-5.3 — empfohlener Einstieg |
 
