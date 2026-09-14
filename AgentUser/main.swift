@@ -43,7 +43,14 @@ final class UserDelegate: NSObject, NSXPCListenerDelegate {
 DaemonCore.auditCategory = .launchAgent
 AuditLog.log(.launchAgent, "AgentUser agent started (uid \(getuid()))")
 let delegate = UserDelegate()
-let listener = NSXPCListener(machServiceName: "Agent.app.toddbruss.user")
+// Mach service name == our own bundle ID (PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_ID).user),
+// read from the __info_plist section Xcode embeds in this tool. Must match MachServices in the
+// generated LaunchAgents plist — both derive from BundleID.xcconfig.
+guard let machServiceName = Bundle.main.bundleIdentifier else {
+    AuditLog.log(.launchAgent, "AgentUser: missing embedded CFBundleIdentifier — cannot start XPC listener")
+    exit(1)
+}
+let listener = NSXPCListener(machServiceName: machServiceName)
 listener.delegate = delegate
 listener.resume()
 RunLoop.current.run()

@@ -11,7 +11,7 @@
 	<key>CFBundleHelpBookFolder</key>
 	<string>Agent.help</string>
 	<key>CFBundleHelpBookName</key>
-	<string>Agent.app.toddbruss.help</string>
+	<string>$(APP_BUNDLE_ID).help</string>
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIconName</key>
