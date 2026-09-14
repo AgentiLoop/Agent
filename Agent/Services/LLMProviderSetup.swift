@@ -152,7 +152,9 @@ enum LLMProviderSetup {
                 capabilities: [.streaming, .tools, .systemPrompt, .vision],
                 contextSize: 128_000)
 
-        // Qwen (Alibaba DashScope) — URL based on user locale
+        // Alibaba (QwenCloud / Model Studio, formerly "Qwen") — DashScope OpenAI-compatible mode.
+        // qwen.ai (QwenCloud) keys (sk-ws-…) and Model Studio keys (sk-…) both use these URLs;
+        // region picked from user locale.
         case .qwen:
             let region = Locale.current.region?.identifier ?? ""
             let baseURL: String
@@ -167,6 +169,23 @@ enum LLMProviderSetup {
                     modelsURL: "\(baseURL)/models"
                 ),
                 model: "qwen-plus",
+                capabilities: [.streaming, .tools, .systemPrompt, .vision],
+                contextSize: 131_072)
+
+        // Qwen Coder — Alibaba Model Studio Coding Plan (dedicated sk-sp-… key).
+        // Fixed monthly quota endpoint used by Qwen Code / Claude Code / Cline;
+        // not interchangeable with the pay-as-you-go key above.
+        case .qwenCoder:
+            let region = Locale.current.region?.identifier ?? ""
+            let baseURL = region == "CN"
+                ? "https://coding.dashscope.aliyuncs.com/v1"
+                : "https://coding-intl.dashscope.aliyuncs.com/v1"
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "\(baseURL)/chat/completions",
+                    modelsURL: "\(baseURL)/models"
+                ),
+                model: "qwen3-coder-plus",
                 capabilities: [.streaming, .tools, .systemPrompt, .vision],
                 contextSize: 131_072)
 

@@ -244,7 +244,7 @@ extension AgentViewModel {
 
             MULTI-PROVIDER AI:
             Claude, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, \
-            DeepSeek, Hugging Face, Z.ai, BigModel, Qwen, Ollama, LM Studio, \
+            DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba, Qwen Coder, Ollama, LM Studio, \
             and Apple Intelligence — all with tool calling, streaming, and vision.
 
             RIGHT NOW:
