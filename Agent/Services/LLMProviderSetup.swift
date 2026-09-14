@@ -152,10 +152,9 @@ enum LLMProviderSetup {
                 capabilities: [.streaming, .tools, .systemPrompt, .vision],
                 contextSize: 128_000)
 
-        // Alibaba (QwenCloud / Model Studio, formerly "Qwen") — DashScope OpenAI-compatible mode.
-        // qwen.ai (QwenCloud) keys (sk-ws-…) and Model Studio keys (sk-…) both use these URLs;
-        // region picked from user locale.
-        case .qwen:
+        // Alibaba DashScope — Model Studio / QwenCloud pay-as-you-go, OpenAI-compatible mode.
+        // Regular keys (sk-… Model Studio, sk-ws-… QwenCloud); region picked from user locale.
+        case .dashscope:
             let region = Locale.current.region?.identifier ?? ""
             let baseURL: String
             switch region {
@@ -172,9 +171,26 @@ enum LLMProviderSetup {
                 capabilities: [.streaming, .tools, .systemPrompt, .vision],
                 contextSize: 131_072)
 
-        // Qwen Coder — Alibaba Model Studio Coding Plan (dedicated sk-sp-… key).
+        // Qwen — QwenCloud Token Plan (qwen.ai subscription, dedicated sk-sp-… key).
+        // Region-specific *.maas.aliyuncs.com endpoint; keys and base URLs are not
+        // interchangeable with DashScope pay-as-you-go or the Coding Plan.
+        case .qwen:
+            let region = Locale.current.region?.identifier ?? ""
+            let baseURL = region == "CN"
+                ? "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+                : "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1"
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "\(baseURL)/chat/completions",
+                    modelsURL: "\(baseURL)/models"
+                ),
+                model: "qwen3.7-plus",
+                capabilities: [.streaming, .tools, .systemPrompt, .vision],
+                contextSize: 131_072)
+
+        // Qwen Code — Alibaba Model Studio Coding Plan (dedicated sk-sp-… key).
         // Fixed monthly quota endpoint used by Qwen Code / Claude Code / Cline;
-        // not interchangeable with the pay-as-you-go key above.
+        // not interchangeable with the pay-as-you-go or Token Plan keys above.
         case .qwenCoder:
             let region = Locale.current.region?.identifier ?? ""
             let baseURL = region == "CN"

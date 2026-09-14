@@ -732,15 +732,15 @@ extension AgentViewModel {
         }.sorted { $0.name < $1.name }
     }
 
-    // MARK: - Qwen (DashScope) Models
+    // MARK: - Alibaba DashScope Models
 
-    func fetchQwenModels() {
-        fetchingModels.insert(.qwen)
-        let key = apiKeys[.qwen]
+    func fetchDashscopeModels() {
+        fetchingModels.insert(.dashscope)
+        let key = apiKeys[.dashscope]
         Task {
-            defer { fetchingModels.remove(.qwen) }
+            defer { fetchingModels.remove(.dashscope) }
             guard !key.isEmpty else {
-                modelLists[.qwen] = Self.defaultQwenModels
+                modelLists[.dashscope] = Self.defaultDashscopeModels
                 return
             }
             // Try international endpoint first, then China mainland
@@ -753,7 +753,7 @@ extension AgentViewModel {
                     let catalog = try await Self.fetchOpenAICompatibleModels(apiKey: key, endpoint: endpoint)
                     let models = catalog.models
                     if !models.isEmpty {
-                        modelVisionSupport[.qwen] = catalog.vision
+                        modelVisionSupport[.dashscope] = catalog.vision
                         // Filter to chat/reasoning models (skip embedding, tts, asr, etc.)
                         let chatModels = models.filter { id in
                             let lower = id.id.lowercased()
@@ -772,17 +772,17 @@ extension AgentViewModel {
                             ]
                             return !skip.contains(where: { lower.contains($0) })
                         }
-                        modelLists[.qwen] = chatModels.isEmpty ? models : chatModels
-                        if self.models[.qwen].isEmpty || !modelLists[.qwen].contains(where: { $0.id == self.models[.qwen] }) {
-                            self.models[.qwen] = modelLists[.qwen].first?.id ?? "qwen-plus"
+                        modelLists[.dashscope] = chatModels.isEmpty ? models : chatModels
+                        if self.models[.dashscope].isEmpty || !modelLists[.dashscope].contains(where: { $0.id == self.models[.dashscope] }) {
+                            self.models[.dashscope] = modelLists[.dashscope].first?.id ?? "qwen-plus"
                         }
                         return
                     }
                 } catch {
-                    AuditLog.log(.api, "Failed to fetch Qwen models from \(endpoint): \(error.localizedDescription)")
+                    AuditLog.log(.api, "Failed to fetch DashScope models from \(endpoint): \(error.localizedDescription)")
                 }
             }
-            modelLists[.qwen] = Self.defaultQwenModels
+            modelLists[.dashscope] = Self.defaultDashscopeModels
         }
     }
 
@@ -981,7 +981,10 @@ extension AgentViewModel {
         case .vLLM: fetchVLLMModels()
         case .lmStudio: fetchLMStudioModels()
         case .zAI: fetchZAIModels()
-        case .qwen: fetchQwenModels()
+        case .dashscope: fetchDashscopeModels()
+        case .qwen:
+            // Token Plan endpoint may not expose /models — fall back to the documented plan list.
+            fetchProviderModels(.qwen, defaults: Self.defaultQwenModels)
         case .qwenCoder:
             // Coding Plan endpoint may not expose /models — fall back to the documented plan list.
             fetchProviderModels(.qwenCoder, defaults: Self.defaultQwenCoderModels)

@@ -165,7 +165,7 @@ final class OpenAICompatibleService {
         // DashScope rejects the reserved function name "search" (400 InvalidParameter:
         // "Tool names are not allowed to be [search]"). Send it as "web_search", which
         // ToolDispatch already handles directly — no reverse mapping needed.
-        guard provider == .qwen || provider == .qwenCoder else { return defs }
+        guard provider == .dashscope || provider == .qwen || provider == .qwenCoder else { return defs }
         return defs.map { tool in
             guard var fn = tool["function"] as? [String: Any], fn["name"] as? String == "search" else { return tool }
             fn["name"] = "web_search"
