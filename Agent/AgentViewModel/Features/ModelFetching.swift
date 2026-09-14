@@ -982,6 +982,9 @@ extension AgentViewModel {
         case .lmStudio: fetchLMStudioModels()
         case .zAI: fetchZAIModels()
         case .qwen: fetchQwenModels()
+        case .qwenCoder:
+            // Coding Plan endpoint may not expose /models — fall back to the documented plan list.
+            fetchProviderModels(.qwenCoder, defaults: Self.defaultQwenCoderModels)
         case .openRouter: fetchOpenRouterModels()
         case .requesty: fetchRequestyModels()
         case .a2Agent: fetchA2AgentModels()
