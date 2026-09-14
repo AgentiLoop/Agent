@@ -1,0 +1,16 @@
+// Single source of truth for every bundle identifier in the project.
+//
+// Change APP_BUNDLE_ID here and everything derives from it:
+//   - PRODUCT_BUNDLE_IDENTIFIER for Agent!, AgentHelper (.helper), AgentUser (.user), AgentTests (.tests)
+//   - Agent.entitlements keychain-access-groups
+//   - Info.plist CFBundleHelpBookName (.help) and the embedded Agent.help bundle ID
+//   - Contents/Library/LaunchDaemons/<id>.helper.plist and LaunchAgents/<id>.user.plist
+//     (generated at build time from Agent/LaunchDaemons/helper.plist.template and
+//      Agent/LaunchAgents/user.plist.template by the "Generate launchd plists" phase)
+//   - Swift: AppConstants reads Bundle.main.bundleIdentifier; the helper/user tools read
+//     their embedded __info_plist section.
+//
+// Note: changing the ID also requires new provisioning profiles (release.yml) and a
+// fresh SMAppService registration on machines that had the old daemon/agent installed.
+
+APP_BUNDLE_ID = Agent.app.toddbruss

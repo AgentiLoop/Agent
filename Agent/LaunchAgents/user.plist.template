@@ -3,12 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>Agent.app.toddbruss.user</string>
+	<string>$(APP_BUNDLE_ID).user</string>
 	<key>BundleProgram</key>
 	<string>Contents/MacOS/AgentUser</string>
 	<key>MachServices</key>
 	<dict>
-		<key>Agent.app.toddbruss.user</key>
+		<key>$(APP_BUNDLE_ID).user</key>
 		<true/>
 	</dict>
 </dict>

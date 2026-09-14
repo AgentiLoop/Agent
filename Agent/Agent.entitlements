@@ -40,7 +40,7 @@
 	<true/>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)Agent.app.toddbruss</string>
+		<string>$(AppIdentifierPrefix)$(APP_BUNDLE_ID)</string>
 	</array>
 </dict>
 </plist>

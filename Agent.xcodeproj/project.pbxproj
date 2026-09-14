@@ -159,7 +159,6 @@
 		BB10000000000000000017 /* AppleIntelligencePopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB10000000000000000007 /* AppleIntelligencePopover.swift */; };
 		BB10000000000000000030 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1000000000000000001A /* main.swift */; };
 		BB10000000000000000031 /* HelperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1000000000000000001B /* HelperProtocol.swift */; };
-		BB10000000000000000032 /* Agent.app.toddbruss.helper.plist in Copy Daemon Plist */ = {isa = PBXBuildFile; fileRef = AA10000000000000000023 /* Agent.app.toddbruss.helper.plist */; };
 		BB10000000000000000033 /* AgentHelper in Copy Helper */ = {isa = PBXBuildFile; fileRef = BB1000000000000000001C /* AgentHelper */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C1DD1E30D7BE7F635978E929 /* ToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176D0F01E4553C80C7E38FB2 /* ToolResultCache.swift */; };
 		CA11000000000000000001 /* CodexAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA11000000000000000002 /* CodexAuth.swift */; };
@@ -168,7 +167,6 @@
 		CC10000000000000000001 /* TabToolHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC10000000000000000002 /* TabToolHandlers.swift */; };
 		CC10000000000000000030 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1000000000000000001A /* main.swift */; };
 		CC10000000000000000031 /* UserProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1000000000000000001B /* UserProtocol.swift */; };
-		CC10000000000000000032 /* Agent.app.toddbruss.user.plist in Copy Agent Plist */ = {isa = PBXBuildFile; fileRef = AA10000000000000000027 /* Agent.app.toddbruss.user.plist */; };
 		CC10000000000000000033 /* AgentUser in Copy User Agent */ = {isa = PBXBuildFile; fileRef = CC1000000000000000001C /* AgentUser */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CS110000000000000000001 /* CodingService+ShellCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = CS110000000000000000002 /* CodingService+ShellCommands.swift */; };
 		CS110000000000000000003 /* CodingService+SplitFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = CS110000000000000000004 /* CodingService+SplitFile.swift */; };
@@ -273,17 +271,6 @@
 			name = "Copy Helper";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		BB10000000000000000052 /* Copy Daemon Plist */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = Contents/Library/LaunchDaemons;
-			dstSubfolderSpec = 1;
-			files = (
-				BB10000000000000000032 /* Agent.app.toddbruss.helper.plist in Copy Daemon Plist */,
-			);
-			name = "Copy Daemon Plist";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		CC10000000000000000051 /* Copy User Agent */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -293,17 +280,6 @@
 				CC10000000000000000033 /* AgentUser in Copy User Agent */,
 			);
 			name = "Copy User Agent";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		CC10000000000000000052 /* Copy Agent Plist */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = Contents/Library/LaunchAgents;
-			dstSubfolderSpec = 1;
-			files = (
-				CC10000000000000000032 /* Agent.app.toddbruss.user.plist in Copy Agent Plist */,
-			);
-			name = "Copy Agent Plist";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -342,11 +318,12 @@
 		AA10000000000000000020 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		AA10000000000000000021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA10000000000000000022 /* Agent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Agent.entitlements; sourceTree = "<group>"; };
-		AA10000000000000000023 /* Agent.app.toddbruss.helper.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Agent.app.toddbruss.helper.plist; sourceTree = "<group>"; };
+		AA10000000000000000023 /* helper.plist.template */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = helper.plist.template; sourceTree = "<group>"; };
 		AA10000000000000000024 /* Agent!.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Agent!.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA10000000000000000025 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
 		AA10000000000000000026 /* UserProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProtocol.swift; sourceTree = "<group>"; };
-		AA10000000000000000027 /* Agent.app.toddbruss.user.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Agent.app.toddbruss.user.plist; sourceTree = "<group>"; };
+		AA10000000000000000027 /* user.plist.template */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = user.plist.template; sourceTree = "<group>"; };
+		AB10000000000000000001 /* BundleID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BundleID.xcconfig; sourceTree = "<group>"; };
 		AA10000000000000000028 /* OllamaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaService.swift; sourceTree = "<group>"; };
 		AA10000000000000000029 /* ScriptService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptService.swift; sourceTree = "<group>"; };
 		AA1000000000000000002B /* XcodeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeService.swift; sourceTree = "<group>"; };
@@ -577,6 +554,7 @@
 		AA10000000000000000040 = {
 			isa = PBXGroup;
 			children = (
+				AB10000000000000000001 /* BundleID.xcconfig */,
 				AA10000000000000000041 /* Agent */,
 				BB10000000000000000040 /* AgentHelper */,
 				CC10000000000000000040 /* AgentUser */,
@@ -876,7 +854,7 @@
 		BB10000000000000000041 /* LaunchDaemons */ = {
 			isa = PBXGroup;
 			children = (
-				AA10000000000000000023 /* Agent.app.toddbruss.helper.plist */,
+				AA10000000000000000023 /* helper.plist.template */,
 			);
 			path = LaunchDaemons;
 			sourceTree = "<group>";
@@ -893,7 +871,7 @@
 		CC10000000000000000041 /* LaunchAgents */ = {
 			isa = PBXGroup;
 			children = (
-				AA10000000000000000027 /* Agent.app.toddbruss.user.plist */,
+				AA10000000000000000027 /* user.plist.template */,
 			);
 			path = LaunchAgents;
 			sourceTree = "<group>";
@@ -1105,9 +1083,8 @@
 				AA10000000000000000051 /* Resources */,
 				AA10000000000000000052 /* Frameworks */,
 				BB10000000000000000051 /* Copy Helper */,
-				BB10000000000000000052 /* Copy Daemon Plist */,
 				CC10000000000000000051 /* Copy User Agent */,
-				CC10000000000000000052 /* Copy Agent Plist */,
+				AA10000000000000003002 /* Generate launchd plists */,
 			);
 			buildRules = (
 			);
@@ -1265,6 +1242,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -eu\nDIR=\"${SRCROOT}/Agent/SDEFs\"\nif [ ! -d \"$DIR\" ]; then exit 0; fi\nBAD=$(find \"$DIR\" -mindepth 1 -maxdepth 1 ! -name '*.json')\nif [ -n \"$BAD\" ]; then\n  echo \"error: non-JSON entries in $DIR will be silently copied into the app bundle via the SDEFs folder reference. Remove these:\" >&2\n  echo \"$BAD\" >&2\n  exit 1\nfi\n";
+		};
+		AA10000000000000003002 /* Generate launchd plists */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Agent/LaunchDaemons/helper.plist.template",
+				"$(SRCROOT)/Agent/LaunchAgents/user.plist.template",
+				"$(SRCROOT)/BundleID.xcconfig",
+			);
+			name = "Generate launchd plists";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\n: \"${APP_BUNDLE_ID:?APP_BUNDLE_ID not set - see BundleID.xcconfig}\"\nAPP=\"$TARGET_BUILD_DIR/$WRAPPER_NAME\"\nDAEMONS=\"$APP/Contents/Library/LaunchDaemons\"\nAGENTS=\"$APP/Contents/Library/LaunchAgents\"\nmkdir -p \"$DAEMONS\" \"$AGENTS\"\n# Drop plists left over from a previous bundle ID\nfind \"$DAEMONS\" \"$AGENTS\" -name '*.plist' -delete\nsed \"s/[$](APP_BUNDLE_ID)/$APP_BUNDLE_ID/g\" \"$SRCROOT/Agent/LaunchDaemons/helper.plist.template\" > \"$DAEMONS/$APP_BUNDLE_ID.helper.plist\"\nsed \"s/[$](APP_BUNDLE_ID)/$APP_BUNDLE_ID/g\" \"$SRCROOT/Agent/LaunchAgents/user.plist.template\" > \"$AGENTS/$APP_BUNDLE_ID.user.plist\"\nplutil -lint \"$DAEMONS/$APP_BUNDLE_ID.helper.plist\" \"$AGENTS/$APP_BUNDLE_ID.user.plist\"\n# Keep the embedded help book's bundle ID in sync with CFBundleHelpBookName\nHELP=\"$APP/Contents/Resources/Agent.help/Contents/Info.plist\"\nif [ -f \"$HELP\" ]; then /usr/libexec/PlistBuddy -c \"Set :CFBundleIdentifier $APP_BUNDLE_ID.help\" \"$HELP\"; fi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1525,6 +1524,7 @@
 /* Begin XCBuildConfiguration section */
 		AA10000000000000000080 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB10000000000000000001 /* BundleID.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -1591,6 +1591,7 @@
 		};
 		AA10000000000000000081 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB10000000000000000001 /* BundleID.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -1688,7 +1689,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
 				MARKETING_VERSION = 1.1.39;
-				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = YES;
@@ -1743,7 +1744,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
 				MARKETING_VERSION = 1.1.39;
-				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = YES;
@@ -1767,7 +1768,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss.helper;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).helper";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 6.2;
@@ -1784,7 +1785,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss.helper;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).helper";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 6.2;
@@ -1802,7 +1803,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss.user;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).user";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 6.2;
@@ -1820,7 +1821,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss.user;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).user";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 6.2;
@@ -1836,7 +1837,7 @@
 				DEVELOPMENT_TEAM = 469UCUB275;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Agent!.app/Contents/MacOS/Agent!";
@@ -1852,7 +1853,7 @@
 				DEVELOPMENT_TEAM = 469UCUB275;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				PRODUCT_BUNDLE_IDENTIFIER = Agent.app.toddbruss.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Agent!.app/Contents/MacOS/Agent!";

@@ -44,7 +44,14 @@ final class HelperDelegate: NSObject, NSXPCListenerDelegate {
 DaemonCore.auditCategory = .launchDaemon
 AuditLog.log(.launchDaemon, "AgentHelper daemon started (uid \(getuid()))")
 let delegate = HelperDelegate()
-let listener = NSXPCListener(machServiceName: "Agent.app.toddbruss.helper")
+// Mach service name == our own bundle ID (PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_ID).helper),
+// read from the __info_plist section Xcode embeds in this tool. Must match MachServices in the
+// generated LaunchDaemons plist — both derive from BundleID.xcconfig.
+guard let machServiceName = Bundle.main.bundleIdentifier else {
+    AuditLog.log(.launchDaemon, "AgentHelper: missing embedded CFBundleIdentifier — cannot start XPC listener")
+    exit(1)
+}
+let listener = NSXPCListener(machServiceName: machServiceName)
 listener.delegate = delegate
 listener.resume()
 RunLoop.current.run()
