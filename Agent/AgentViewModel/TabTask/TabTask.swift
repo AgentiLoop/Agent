@@ -287,6 +287,16 @@ extension AgentViewModel {
                     }
 
                     tab.flushStreamBuffer()
+                } else if let codex = services.codex {
+                    let r = try await codex.sendStreaming(messages: sendMessages, activeGroups: activeGroups) { [weak tab] delta in
+                        Task { @MainActor in
+                            tab?.isLLMThinking = false
+                            tab?.appendStreamDelta(delta)
+                        }
+                    }
+                    response = (r.content, r.stopReason, r.inputTokens, r.outputTokens)
+
+                    tab.flushStreamBuffer()
                 } else if let openAICompatible = services.openAICompatible {
                     let r = try await openAICompatible
                         .sendStreaming(messages: sendMessages, activeGroups: activeGroups) { [weak tab] delta in
