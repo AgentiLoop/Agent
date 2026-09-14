@@ -16,8 +16,9 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
     case huggingFace = "huggingFace"
     case zAI = "zAI"
     case bigModel = "bigModel"
-    case qwen = "qwen"          // Alibaba (QwenCloud / Model Studio) — rawValue kept for stored keys
-    case qwenCoder = "qwenCoder"
+    case dashscope = "dashscope" // Alibaba Model Studio / QwenCloud pay-as-you-go (sk-… / sk-ws-…)
+    case qwen = "qwen"           // QwenCloud Token Plan (sk-sp-…, token-plan.*.maas.aliyuncs.com)
+    case qwenCoder = "qwenCoder" // Model Studio Coding Plan (sk-sp-…, coding[-intl].dashscope.aliyuncs.com)
     case ollama = "ollama"
     case localOllama = "localOllama"
     case vLLM = "vLLM"
@@ -46,8 +47,9 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
         case .lmStudio: "LM Studio"
         case .zAI: "Z.ai"
         case .bigModel: "BigModel"
-        case .qwen: "Alibaba"
-        case .qwenCoder: "Qwen Coder"
+        case .dashscope: "Alibaba DashScope"
+        case .qwen: "Qwen"
+        case .qwenCoder: "Qwen Code"
         case .miniMax: "MiniMax"
         case .openRouter: "OpenRouter"
         case .requesty: "Requesty"
@@ -70,6 +72,10 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
         switch self {
         case .claude, .ollama, .openAI, .deepSeek, .huggingFace, .vLLM:
             "agent.\(rawValue)APIKey"
+        case .dashscope:
+            "com.agent.qwen-api-key"        // legacy slot from when this case was `.qwen`
+        case .qwen:
+            "com.agent.qwen-token-plan-api-key"
         default:
             "com.agent.\(rawValue.lowercased())-api-key"
         }
