@@ -166,7 +166,10 @@ extension AgentViewModel {
                 result = await Self.executeTCC(command: command)
             } else if isPrivileged {
                 // Root commands → LaunchDaemon via XPC
+                rootServiceActive = true
+                rootWasActive = true
                 result = await helperService.execute(command: command, workingDirectory: tabFolder)
+                rootServiceActive = false
             } else if userService.userReady {
                 // User LaunchAgent via XPC
                 result = await executeForTab(command: command, projectFolder: tabFolder)
