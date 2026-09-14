@@ -75,7 +75,10 @@ extension AgentViewModel {
             }
             appendLog("🔴 # \(Self.collapseHeredocs(command))")
             flushLog()
+            rootServiceActive = true
+            rootWasActive = true
             let result = await helperService.execute(command: command, workingDirectory: pf)
+            rootServiceActive = false
             if result.status > 0 { appendLog("exit code: \(result.status)") }
             flushLog()
             return result.output.isEmpty ? "(no output, exit \(result.status))" : result.output
