@@ -30,7 +30,8 @@ A macOS SwiftUI app that uses SMAppService + a privileged Launch Daemon to give 
 - `Agent/HelperProtocol.swift` - Shared XPC protocol definitions
 - `Agent/Models.swift` - AgentError enum + TaskHistory persistence
 - `AgentHelper/main.swift` - Privileged daemon with NSXPCListener
-- `Agent/LaunchDaemons/Agent.app.toddbruss.helper.plist` - Daemon configuration
+- `BundleID.xcconfig` - single source of truth for `APP_BUNDLE_ID`; every target/entitlement/plist derives from it
+- `Agent/LaunchDaemons/helper.plist.template` - Daemon configuration template (`$(APP_BUNDLE_ID)` substituted by the "Generate launchd plists" build phase)
 
 ### XPC Communication
 - Mach service: `Agent.app.toddbruss.helper`
