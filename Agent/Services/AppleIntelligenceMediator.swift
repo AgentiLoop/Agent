@@ -222,7 +222,7 @@ final class AppleIntelligenceMediator: ObservableObject {
     }
 
     /// Deterministic generation options for intent parsing — low temperature for consistent results.
-    private static let deterministicOptions = GenerationOptions(sampling: .greedy, temperature: 0.0)
+    private static let deterministicOptions = GenerationOptions(samplingMode: .greedy, temperature: 0.0)
 
     /// Slightly creative generation options for annotations and summaries.
     private static let annotationOptions = GenerationOptions(temperature: 0.3)

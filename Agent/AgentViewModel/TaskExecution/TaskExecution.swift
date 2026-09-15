@@ -583,8 +583,8 @@ extension AgentViewModel {
                     overflowCompactor: { [services] msgs in
                         // 413 / context overflow → same compactor as the
                         // threshold path, threshold check bypassed (Tier 7.7).
-                        let overflowLog: (String) -> Void = { [weak self] m in
-                            self?.appendLog(m); self?.flushLog()
+                        let overflowLog: (String) -> Void = { m in
+                            self.appendLog(m); self.flushLog()
                         }
                         return await Self.tieredCompact(
                             &msgs,
