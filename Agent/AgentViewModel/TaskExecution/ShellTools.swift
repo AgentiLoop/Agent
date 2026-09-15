@@ -157,7 +157,7 @@ extension AgentViewModel {
             AuditLog.log(.shell, "BLOCKED [\(verdict.rule ?? "?")]: \(command.prefix(200))")
             return (-1, verdict.reason ?? "Refused: command blocked by Agent! shell safety guardrail.")
         }
-        return await withCheckedContinuation { continuation in
+        return await Self.runCancellable { box, continuation in
             DispatchQueue.global().async {
                 let process = Process()
                 process.executableURL = URL(fileURLWithPath: AppConstants.shellPath)
@@ -189,6 +189,7 @@ extension AgentViewModel {
                     continuation.resume(returning: (-1, "Failed to launch: \(error.localizedDescription)"))
                     return
                 }
+                box.set(process)
 
                 // Read pipes then wait — osascript output is small, no deadlock risk
                 let stdoutData = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
@@ -204,6 +205,43 @@ extension AgentViewModel {
 
                 continuation.resume(returning: (process.terminationStatus, output))
             }
+        }
+    }
+
+    /// Holds the in-process `Process` so a Swift Task cancellation can kill it (and its
+    /// whole descendant tree). If cancel arrives before `run()` completes, the kill is
+    /// applied as soon as the process is registered.
+    final class ProcessBox: @unchecked Sendable {
+        private let lock = NSLock()
+        private var process: Process?
+        private var cancelled = false
+        func set(_ p: Process) {
+            lock.lock()
+            process = p
+            let killNow = cancelled
+            lock.unlock()
+            if killNow { ProcessTree.kill(rootPID: p.processIdentifier) }
+        }
+        func cancel() {
+            lock.lock()
+            cancelled = true
+            let p = process
+            lock.unlock()
+            if let p, p.isRunning { ProcessTree.kill(rootPID: p.processIdentifier) }
+        }
+    }
+
+    /// Bridge a blocking Process launch to Swift concurrency WITH cancellation: when the
+    /// surrounding Task is cancelled (stop() / stopTabTask()), the process tree is killed,
+    /// which unblocks the pipe reads / waitUntilExit inside `body` so it resumes normally.
+    nonisolated static func runCancellable(
+        _ body: @escaping @Sendable (ProcessBox, CheckedContinuation<(Int32, String), Never>) -> Void
+    ) async -> (status: Int32, output: String) {
+        let box = ProcessBox()
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in body(box, continuation) }
+        } onCancel: {
+            box.cancel()
         }
     }
 
@@ -225,7 +263,7 @@ extension AgentViewModel {
             onOutput(msg)
             return (-1, msg)
         }
-        return await withCheckedContinuation { continuation in
+        return await Self.runCancellable { box, continuation in
             DispatchQueue.global().async {
                 let process = Process()
                 process.executableURL = URL(fileURLWithPath: AppConstants.shellPath)
@@ -259,6 +297,7 @@ extension AgentViewModel {
                     continuation.resume(returning: (-1, msg))
                     return
                 }
+                box.set(process)
 
                 // Stream output chunks as they arrive
                 var collected = ""
