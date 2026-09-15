@@ -18,7 +18,7 @@ extension AgentViewModel {
 
     func startDictation() {
         isListening = true
-        SFSpeechRecognizer.requestAuthorization { @Sendable status in
+        SFSpeechRecognizer.requestAuthorization { @Sendable [weak self] status in
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 switch status {
@@ -132,7 +132,7 @@ extension AgentViewModel {
             preDictationText = taskInput
         }
 
-        speechRecognitionTask = recognizer.recognitionTask(with: request) { @Sendable result, error in
+        speechRecognitionTask = recognizer.recognitionTask(with: request) { @Sendable [weak self] result, error in
             let transcription = result?.bestTranscription.formattedString
             let isFinal = result?.isFinal ?? false
             let hasError = error != nil

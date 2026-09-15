@@ -236,7 +236,7 @@ extension ActivityLogView.Coordinator {
 
         Task.detached(priority: .userInitiated) { [weak self] in
             guard let self else { return }
-            let box = RenderedBox(value: self.buildAttributedString(from: text) { fraction in
+            let box = RenderedBox(value: self.buildAttributedString(from: text) { [weak self] fraction in
                 Task { @MainActor [weak self] in
                     self?.updateLoadingProgress(fraction, generation: generation)
                 }
