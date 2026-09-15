@@ -11,12 +11,16 @@ final class UpdateChecker {
 
     private static let releasesAPI = "https://api.github.com/repos/AgentiLoop/Agent/releases"
 
+    /// UserDefaults key for the opt-in "Include Pre-releases" toggle (default: off).
+    static let includePrereleasesKey = "updateChecker.includePrereleases"
+
     private struct Release: Decodable {
         struct Asset: Decodable {
             let name: String
             let browser_download_url: String
         }
         let tag_name: String
+        let prerelease: Bool
         let assets: [Asset]
     }
 
@@ -66,7 +70,8 @@ final class UpdateChecker {
                           userInfo: [NSLocalizedDescriptionKey: "GitHub returned HTTP \(http.statusCode)"])
         }
         let releases = try JSONDecoder().decode([Release].self, from: data)
-        for release in releases {
+        let includePrereleases = UserDefaults.standard.bool(forKey: Self.includePrereleasesKey)
+        for release in releases where includePrereleases || !release.prerelease {
             for asset in release.assets where asset.name.hasSuffix(".dmg") {
                 guard let url = URL(string: asset.browser_download_url) else { continue }
                 return LatestDMG(url: url,
