@@ -133,7 +133,6 @@ final class UserOutputHandler: NSObject, UserProgressProtocol, @unchecked Sendab
 @MainActor @Observable
 final class UserService {
     nonisolated static let userID = AppConstants.userID
-    nonisolated let instanceID = UUID().uuidString
 
     var onOutput: (@MainActor @Sendable (String) -> Void)?
 
@@ -287,7 +286,31 @@ final class UserService {
 
     func cancel() {
         onOutput = nil // Clear handler to prevent memory leaks
-        Self.cancelProcess(instanceID: instanceID)
+        Self.cancelAllInFlight()
+    }
+
+    // MARK: - In-flight tracking
+    // One instanceID PER CALL (not per service) so concurrent tabs never clobber each
+    // other's commands in DaemonCore, and each Swift Task can cancel exactly its own.
+
+    nonisolated private static let inFlightLock = NSLock()
+    nonisolated(unsafe) private static var inFlight: Set<String> = []
+
+    nonisolated private static func track(_ id: String) {
+        inFlightLock.lock(); inFlight.insert(id); inFlightLock.unlock()
+    }
+
+    nonisolated private static func untrack(_ id: String) {
+        inFlightLock.lock(); inFlight.remove(id); inFlightLock.unlock()
+    }
+
+    /// Cancel every user-agent command this app currently has in flight.
+    nonisolated static func cancelAllInFlight() {
+        inFlightLock.lock()
+        let ids = inFlight
+        inFlight.removeAll()
+        inFlightLock.unlock()
+        for id in ids { cancelProcess(instanceID: id) }
     }
 
     nonisolated static func cancelProcess(instanceID: String) {
@@ -314,57 +337,69 @@ final class UserService {
         outputHandler: UserOutputHandler
     ) async -> (status: Int32, output: String)
     {
-        await withCheckedContinuation { continuation in
-            var didResume = false
-            let resumeLock = NSLock()
+        let callID = UUID().uuidString
+        Self.track(callID)
+        defer { Self.untrack(callID) }
+        // Swift Task cancellation (stop() / stopTabTask()) does NOT cross a checked
+        // continuation on its own — bridge it to an explicit XPC cancel so the agent
+        // kills the process tree the moment the task is cancelled.
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                var didResume = false
+                let resumeLock = NSLock()
 
-            func safeResume(_ value: (Int32, String)) {
-                resumeLock.lock()
-                defer { resumeLock.unlock() }
-                guard !didResume else { return }
-                didResume = true
-                continuation.resume(returning: value)
-            }
+                func safeResume(_ value: (Int32, String)) {
+                    resumeLock.lock()
+                    defer { resumeLock.unlock() }
+                    guard !didResume else { return }
+                    didResume = true
+                    continuation.resume(returning: value)
+                }
 
-            let connection = makeConnection(outputHandler: outputHandler)
-            guard let proxy = connection.remoteObjectProxyWithErrorHandler({ error in
-                safeResume((-1, "XPC error: \(error.localizedDescription)"))
-            }) as? UserToolProtocol else {
-                connection.invalidate()
-                safeResume((-1, "XPC proxy cast failed"))
-                return
-            }
-
-            // Start timeout — tool must begin executing within toolStartTimeout seconds.
-            var started = false
-            let startedLock = NSLock()
-            let startTimer = DispatchWorkItem {
-                startedLock.lock()
-                let didStart = started
-                startedLock.unlock()
-                if !didStart {
+                let connection = makeConnection(outputHandler: outputHandler)
+                guard let proxy = connection.remoteObjectProxyWithErrorHandler({ error in
+                    safeResume((-1, "XPC error: \(error.localizedDescription)"))
+                }) as? UserToolProtocol else {
                     connection.invalidate()
-                    safeResume((-1, "Tool failed to start within \(Int(toolStartTimeout))s"))
+                    safeResume((-1, "XPC proxy cast failed"))
+                    return
+                }
+
+                // Start timeout — tool must begin executing within toolStartTimeout seconds.
+                var started = false
+                let startedLock = NSLock()
+                let startTimer = DispatchWorkItem {
+                    startedLock.lock()
+                    let didStart = started
+                    startedLock.unlock()
+                    if !didStart {
+                        Self.cancelProcess(instanceID: callID)
+                        connection.invalidate()
+                        safeResume((-1, "Tool failed to start within \(Int(toolStartTimeout))s"))
+                    }
+                }
+                DispatchQueue.global().asyncAfter(deadline: .now() + toolStartTimeout, execute: startTimer)
+
+                // Finish timeout — tool must complete within toolFinishTimeout seconds.
+                let finishTimer = DispatchWorkItem {
+                    Self.cancelProcess(instanceID: callID)
+                    connection.invalidate()
+                    safeResume((-1, "Tool timed out after \(Int(toolFinishTimeout))s"))
+                }
+                DispatchQueue.global().asyncAfter(deadline: .now() + toolFinishTimeout, execute: finishTimer)
+
+                proxy.execute(script: script, instanceID: callID, workingDirectory: workingDirectory) { status, output in
+                    startedLock.lock()
+                    started = true
+                    startedLock.unlock()
+                    startTimer.cancel()
+                    finishTimer.cancel()
+                    connection.invalidate()
+                    safeResume((status, output))
                 }
             }
-            DispatchQueue.global().asyncAfter(deadline: .now() + toolStartTimeout, execute: startTimer)
-
-            // Finish timeout — tool must complete within toolFinishTimeout seconds.
-            let finishTimer = DispatchWorkItem {
-                connection.invalidate()
-                safeResume((-1, "Tool timed out after \(Int(toolFinishTimeout))s"))
-            }
-            DispatchQueue.global().asyncAfter(deadline: .now() + toolFinishTimeout, execute: finishTimer)
-
-            proxy.execute(script: script, instanceID: self.instanceID, workingDirectory: workingDirectory) { status, output in
-                startedLock.lock()
-                started = true
-                startedLock.unlock()
-                startTimer.cancel()
-                finishTimer.cancel()
-                connection.invalidate()
-                safeResume((status, output))
-            }
+        } onCancel: {
+            Self.cancelProcess(instanceID: callID)
         }
     }
 

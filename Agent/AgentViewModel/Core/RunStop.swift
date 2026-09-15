@@ -224,7 +224,9 @@ extension AgentViewModel {
         runningTask = nil
         helperService.cancel()
         helperService.onOutput = nil
-        // Don't cancel userService — tabs may be using it for concurrent operations
+        // userService is NOT cancelled wholesale — tabs may have their own commands in flight.
+        // The main task's own user_shell commands are cancelled via runningTask?.cancel()
+        // (withTaskCancellationHandler in UserService.executeViaXPC sends the XPC cancel).
         userService.onOutput = nil
         // Stop progress updates
         stopProgressUpdates()
