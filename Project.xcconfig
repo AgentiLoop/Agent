@@ -1,4 +1,5 @@
-// Single source of truth for every bundle identifier in the project.
+// Project identity: single source of truth for the bundle identifier and the
+// Apple Developer Team used to sign every target.
 //
 // Change APP_BUNDLE_ID here and everything derives from it:
 //   - PRODUCT_BUNDLE_IDENTIFIER for Agent!, AgentHelper (.helper), AgentUser (.user), AgentTests (.tests)

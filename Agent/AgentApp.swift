@@ -3,7 +3,7 @@ import SwiftData
 import FoundationModels
 
 /// App identifiers — single source of truth for bundle ID, XPC services, plists, etc.
-/// The ID itself comes from BundleID.xcconfig (APP_BUNDLE_ID) via CFBundleIdentifier — never hardcode it.
+/// The ID itself comes from Project.xcconfig (APP_BUNDLE_ID) via CFBundleIdentifier — never hardcode it.
 enum AppConstants {
     static let bundleID: String = {
         guard let id = Bundle.main.bundleIdentifier else { fatalError("Missing CFBundleIdentifier") }

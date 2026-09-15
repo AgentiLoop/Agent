@@ -45,7 +45,7 @@ AuditLog.log(.launchAgent, "AgentUser agent started (uid \(getuid()))")
 let delegate = UserDelegate()
 // Mach service name == our own bundle ID (PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_ID).user),
 // read from the __info_plist section Xcode embeds in this tool. Must match MachServices in the
-// generated LaunchAgents plist — both derive from BundleID.xcconfig.
+// generated LaunchAgents plist — both derive from Project.xcconfig.
 guard let machServiceName = Bundle.main.bundleIdentifier else {
     AuditLog.log(.launchAgent, "AgentUser: missing embedded CFBundleIdentifier — cannot start XPC listener")
     exit(1)
