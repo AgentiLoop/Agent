@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentAccess.git",
       "state" : {
-        "revision" : "4de401e35bb7930c151b247435b1d513b0338dca",
-        "version" : "2.10.13"
+        "revision" : "5f33a06e0efcc50d12c3aced5f6b325ce8f0c42b",
+        "version" : "2.10.15"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentAudit.git",
       "state" : {
-        "revision" : "5973fe5ed37190bf38732df80f57c6373c66c8c1",
-        "version" : "1.3.3"
+        "revision" : "c53625ee7f772db843527f6e889f7f2dca2c32a9",
+        "version" : "1.3.4"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentColorSyntax.git",
       "state" : {
-        "revision" : "fc8b514863837844db3603d1ab4552a7eb6f57ab",
-        "version" : "1.2.4"
+        "revision" : "decbbd6d1ba0b27587ae6f3909d80c1f71041297",
+        "version" : "1.2.5"
       }
     },
     {
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentD1F.git",
       "state" : {
-        "revision" : "291a61dbfa9926428ab0ef5ba1b987b7ec461972",
-        "version" : "1.0.8"
+        "revision" : "379f4ea150a55fd78c6c404094591f13703d2faf",
+        "version" : "1.0.9"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentEventBridges.git",
       "state" : {
-        "revision" : "4d41cce22991afe1be3f5ca9db5fac168acd6f78",
-        "version" : "1.1.3"
+        "revision" : "61b0752d5439721ef0461aa7c277827db53fec02",
+        "version" : "1.1.4"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentLLM.git",
       "state" : {
-        "revision" : "d04c465bf9165f01403b60fd8e5e1d0ab6c7c3bc",
-        "version" : "1.0.4"
+        "revision" : "9657ea2729b7ea835fb074d3c3582f34fe03a52e",
+        "version" : "1.0.5"
       }
     },
     {
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentMCP.git",
       "state" : {
-        "revision" : "ff9d2ab7ee5cb0c17fa95718e5e377409e5b2126",
-        "version" : "1.6.4"
+        "revision" : "1eefbb4bd16d8476d2d7490433fe62c2eb49b32b",
+        "version" : "1.6.5"
       }
     },
     {
@@ -69,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentSwift.git",
       "state" : {
-        "revision" : "0e083dbde3a70bea424adb8aedd2d86fd3e0e9bd",
-        "version" : "1.1.5"
+        "revision" : "ca6238b2b18fb15a22ebb581b3c414a89a9e627d",
+        "version" : "1.1.6"
       }
     },
     {
@@ -78,8 +78,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentTerminalNeo.git",
       "state" : {
-        "revision" : "f2e227d1b1425658f0a92a39842a0f8ee5ed67da",
-        "version" : "1.37.5"
+        "revision" : "2e9d16c62e7f6f0ad47959f758906f78a47f6615",
+        "version" : "1.37.6"
       }
     },
     {
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/steipete/AXorcist.git",
       "state" : {
-        "revision" : "37d7ae82ff1443b4b36344ca6f3bf0ad33f13b12",
-        "version" : "0.1.9"
+        "revision" : "eaf808877546228ee4b0a4e260083a9b938e567f",
+        "version" : "0.1.10"
       }
     },
     {
