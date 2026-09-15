@@ -145,7 +145,8 @@ extension AgentViewModel {
             let base64 = encoded?.base64 ?? pngData.base64EncodedString()
             let payloadData = encoded?.pngData ?? pngData
 
-            if let tab = selectedTabId.flatMap({ tab(for: $0) }) {
+            let tab = selectedTabId.flatMap({ tab(for: $0) })
+            if let tab {
                 tab.attachedImages.append(image)
                 tab.attachedImagesBase64.append(base64)
             } else {
@@ -156,7 +157,8 @@ extension AgentViewModel {
                 let w = encoded?.width ?? Int(image.size.width)
                 let h = encoded?.height ?? Int(image.size.height)
                 let pct = Int((scale * 100).rounded())
-                appendLog("📎 Attached: \(path) (\(w)x\(h), sending at \(pct)%)")
+                let msg = "📎 Attached: \(path) (\(w)x\(h), sending at \(pct)%)"
+                if let tab { tab.appendLog(msg) } else { appendLog(msg) }
             }
             try? FileManager.default.removeItem(atPath: tempPath)
         }
@@ -230,7 +232,8 @@ extension AgentViewModel {
         Task {
             guard let encoded = await Self.encodeImageToBase64(imageData, userScale: scale) else { return }
             if let image = NSImage(data: imageData) {
-                if let tabId = currentTabId, let tab = self.tab(for: tabId) {
+                let tab = currentTabId.flatMap { self.tab(for: $0) }
+                if let tab {
                     tab.attachedImages.append(image)
                     tab.attachedImagesBase64.append(encoded.base64)
                 } else {
@@ -239,7 +242,8 @@ extension AgentViewModel {
                 }
                 if let path = saveHiResAttachment(data: encoded.pngData, image: image) {
                     let pct = Int((scale * 100).rounded())
-                    appendLog("📎 Attached: \(path) (\(encoded.width)x\(encoded.height), sending at \(pct)%)")
+                    let msg = "📎 Attached: \(path) (\(encoded.width)x\(encoded.height), sending at \(pct)%)"
+                    if let tab { tab.appendLog(msg) } else { appendLog(msg) }
                 }
             }
         }
