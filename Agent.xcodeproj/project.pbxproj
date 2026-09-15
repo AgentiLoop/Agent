@@ -1681,7 +1681,7 @@
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Agent/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Agent Ada";
+				INFOPLIST_KEY_CFBundleDisplayName = "Agent!";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1736,7 +1736,7 @@
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Agent/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Agent Ada";
+				INFOPLIST_KEY_CFBundleDisplayName = "Agent!";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
