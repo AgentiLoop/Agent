@@ -109,6 +109,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct AgentApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @AppStorage(UpdateChecker.includePrereleasesKey) private var includePrereleases = false
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -144,6 +145,7 @@ struct AgentApp: App {
                 } label: {
                     Label("Check for Updates…", systemImage: "arrow.triangle.2.circlepath")
                 }
+                Toggle("Include Pre-releases", isOn: $includePrereleases)
                 Divider()
                 Button {
                     if let url = URL(string: "https://AgentiLoop.ai") {
