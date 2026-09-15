@@ -398,7 +398,7 @@
 		AA10000000000000001200 /* AgentsMenuDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentsMenuDelegate.swift; sourceTree = "<group>"; };
 		AA10000000000000002001 /* CodexService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexService.swift; sourceTree = "<group>"; };
 		AA10000000000000004001 /* LLMRateLimiter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMRateLimiter.swift; sourceTree = "<group>"; };
-		AB10000000000000000001 /* BundleID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BundleID.xcconfig; sourceTree = "<group>"; };
+		AB10000000000000000001 /* Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
 		AB1100000000000000000002 /* ScriptTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptTabs.swift; sourceTree = "<group>"; };
 		AB1100000000000000000004 /* Compression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compression.swift; sourceTree = "<group>"; };
 		AB1100000000000000000006 /* Messages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Messages.swift; sourceTree = "<group>"; };
@@ -554,7 +554,7 @@
 		AA10000000000000000040 = {
 			isa = PBXGroup;
 			children = (
-				AB10000000000000000001 /* BundleID.xcconfig */,
+				AB10000000000000000001 /* Project.xcconfig */,
 				AA10000000000000000041 /* Agent */,
 				BB10000000000000000040 /* AgentHelper */,
 				CC10000000000000000040 /* AgentUser */,
@@ -1254,7 +1254,7 @@
 			inputPaths = (
 				"$(SRCROOT)/Agent/LaunchDaemons/helper.plist.template",
 				"$(SRCROOT)/Agent/LaunchAgents/user.plist.template",
-				"$(SRCROOT)/BundleID.xcconfig",
+				"$(SRCROOT)/Project.xcconfig",
 			);
 			name = "Generate launchd plists";
 			outputFileListPaths = (
@@ -1263,7 +1263,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -eu\n: \"${APP_BUNDLE_ID:?APP_BUNDLE_ID not set - see BundleID.xcconfig}\"\nAPP=\"$TARGET_BUILD_DIR/$WRAPPER_NAME\"\nDAEMONS=\"$APP/Contents/Library/LaunchDaemons\"\nAGENTS=\"$APP/Contents/Library/LaunchAgents\"\nmkdir -p \"$DAEMONS\" \"$AGENTS\"\n# Drop plists left over from a previous bundle ID\nfind \"$DAEMONS\" \"$AGENTS\" -name '*.plist' -delete\nsed \"s/[$](APP_BUNDLE_ID)/$APP_BUNDLE_ID/g\" \"$SRCROOT/Agent/LaunchDaemons/helper.plist.template\" > \"$DAEMONS/$APP_BUNDLE_ID.helper.plist\"\nsed \"s/[$](APP_BUNDLE_ID)/$APP_BUNDLE_ID/g\" \"$SRCROOT/Agent/LaunchAgents/user.plist.template\" > \"$AGENTS/$APP_BUNDLE_ID.user.plist\"\nplutil -lint \"$DAEMONS/$APP_BUNDLE_ID.helper.plist\" \"$AGENTS/$APP_BUNDLE_ID.user.plist\"\n# Keep the embedded help book's bundle ID in sync with CFBundleHelpBookName\nHELP=\"$APP/Contents/Resources/Agent.help/Contents/Info.plist\"\nif [ -f \"$HELP\" ]; then /usr/libexec/PlistBuddy -c \"Set :CFBundleIdentifier $APP_BUNDLE_ID.help\" \"$HELP\"; fi\n";
+			shellScript = "set -eu\n: \"${APP_BUNDLE_ID:?APP_BUNDLE_ID not set - see Project.xcconfig}\"\nAPP=\"$TARGET_BUILD_DIR/$WRAPPER_NAME\"\nDAEMONS=\"$APP/Contents/Library/LaunchDaemons\"\nAGENTS=\"$APP/Contents/Library/LaunchAgents\"\nmkdir -p \"$DAEMONS\" \"$AGENTS\"\n# Drop plists left over from a previous bundle ID\nfind \"$DAEMONS\" \"$AGENTS\" -name '*.plist' -delete\nsed \"s/[$](APP_BUNDLE_ID)/$APP_BUNDLE_ID/g\" \"$SRCROOT/Agent/LaunchDaemons/helper.plist.template\" > \"$DAEMONS/$APP_BUNDLE_ID.helper.plist\"\nsed \"s/[$](APP_BUNDLE_ID)/$APP_BUNDLE_ID/g\" \"$SRCROOT/Agent/LaunchAgents/user.plist.template\" > \"$AGENTS/$APP_BUNDLE_ID.user.plist\"\nplutil -lint \"$DAEMONS/$APP_BUNDLE_ID.helper.plist\" \"$AGENTS/$APP_BUNDLE_ID.user.plist\"\n# Keep the embedded help book's bundle ID in sync with CFBundleHelpBookName\nHELP=\"$APP/Contents/Resources/Agent.help/Contents/Info.plist\"\nif [ -f \"$HELP\" ]; then /usr/libexec/PlistBuddy -c \"Set :CFBundleIdentifier $APP_BUNDLE_ID.help\" \"$HELP\"; fi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1524,7 +1524,7 @@
 /* Begin XCBuildConfiguration section */
 		AA10000000000000000080 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AB10000000000000000001 /* BundleID.xcconfig */;
+			baseConfigurationReference = AB10000000000000000001 /* Project.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -1590,7 +1590,7 @@
 		};
 		AA10000000000000000081 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AB10000000000000000001 /* BundleID.xcconfig */;
+			baseConfigurationReference = AB10000000000000000001 /* Project.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
