@@ -145,7 +145,7 @@ extension AgentViewModel {
             let base64 = encoded?.base64 ?? pngData.base64EncodedString()
             let payloadData = encoded?.pngData ?? pngData
 
-            let tab = selectedTabId.flatMap({ tab(for: $0) })
+            let tab = selectedTabId.flatMap({ self.tab(for: $0) })
             if let tab {
                 tab.attachedImages.append(image)
                 tab.attachedImagesBase64.append(base64)
