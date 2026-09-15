@@ -222,7 +222,12 @@ final class AppleIntelligenceMediator: ObservableObject {
     }
 
     /// Deterministic generation options for intent parsing — low temperature for consistent results.
+    /// `sampling:` was renamed `samplingMode:` in the Xcode 27 SDK; CI still builds with Xcode 26.
+    #if compiler(>=6.4)
     private static let deterministicOptions = GenerationOptions(samplingMode: .greedy, temperature: 0.0)
+    #else
+    private static let deterministicOptions = GenerationOptions(sampling: .greedy, temperature: 0.0)
+    #endif
 
     /// Slightly creative generation options for annotations and summaries.
     private static let annotationOptions = GenerationOptions(temperature: 0.3)
