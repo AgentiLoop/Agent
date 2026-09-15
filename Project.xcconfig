@@ -21,4 +21,5 @@ APP_BUNDLE_ID = Agent.app.toddbruss
 // The project file intentionally does not set DEVELOPMENT_TEAM anywhere, so this is
 // the only place to edit. (CI: .github/workflows/release.yml and ExportOptions.plist
 // carry their own copy for archive/export.)
+
 DEVELOPMENT_TEAM = 469UCUB275
