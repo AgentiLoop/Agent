@@ -144,6 +144,7 @@ struct AgentApp: App {
                     UpdateChecker.shared.checkForUpdates()
                 } label: {
                     Label("Check for Updates…", systemImage: "arrow.triangle.2.circlepath")
+                        .labelStyle(.titleAndIcon)
                 }
                 Toggle("Include Pre-releases", isOn: $includePrereleases)
                 Divider()
@@ -153,6 +154,7 @@ struct AgentApp: App {
                     }
                 } label: {
                     Label("Website", systemImage: "globe")
+                        .labelStyle(.titleAndIcon)
                 }
                 Button {
                     if let url = URL(string: "https://github.com/AgentiLoop/Agent") {
@@ -160,6 +162,7 @@ struct AgentApp: App {
                     }
                 } label: {
                     Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                        .labelStyle(.titleAndIcon)
                 }
             }
             CommandGroup(after: .windowArrangement) {
