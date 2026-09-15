@@ -3,6 +3,8 @@ import AgentAudit
 
 final class UserCommandHandler: NSObject, UserToolProtocol, @unchecked Sendable {
     weak var connection: NSXPCConnection?
+    private let inFlightLock = NSLock()
+    private var inFlight: Set<String> = []
 
     func execute(script: String, instanceID: String, withReply reply: @escaping (Int32, String) -> Void) {
         execute(script: script, instanceID: instanceID, workingDirectory: "", withReply: reply)
@@ -10,18 +12,34 @@ final class UserCommandHandler: NSObject, UserToolProtocol, @unchecked Sendable 
 
     func execute(script: String, instanceID: String, workingDirectory: String, withReply reply: @escaping (Int32, String) -> Void) {
         let proxy = connection?.remoteObjectProxy as? UserProgressProtocol
+        inFlightLock.lock(); inFlight.insert(instanceID); inFlightLock.unlock()
         DaemonCore.execute(
             script: script,
             instanceID: instanceID,
             workingDirectory: workingDirectory,
             progressHandler: { proxy?.progressUpdate($0) },
-            reply: reply
+            reply: { [weak self] status, output in
+                if let self { self.inFlightLock.lock(); self.inFlight.remove(instanceID); self.inFlightLock.unlock() }
+                reply(status, output)
+            }
         )
     }
 
     func cancelOperation(instanceID: String, withReply reply: @escaping () -> Void) {
         DaemonCore.cancel(instanceID: instanceID)
         reply()
+    }
+
+    /// Connection dropped (app quit, crash, or client-side timeout invalidated it):
+    /// kill every command this connection started so nothing keeps running detached.
+    func connectionInvalidated() {
+        inFlightLock.lock()
+        let ids = inFlight
+        inFlight.removeAll()
+        inFlightLock.unlock()
+        guard !ids.isEmpty else { return }
+        AuditLog.log(.launchAgent, "connection invalidated — cancelling \(ids.count) in-flight command(s)")
+        DaemonCore.cancelAll(instanceIDs: ids)
     }
 }
 
@@ -35,6 +53,8 @@ final class UserDelegate: NSObject, NSXPCListenerDelegate {
         connection.exportedInterface = NSXPCInterface(with: UserToolProtocol.self)
         connection.remoteObjectInterface = NSXPCInterface(with: UserProgressProtocol.self)
         connection.exportedObject = handler
+        connection.invalidationHandler = { handler.connectionInvalidated() }
+        connection.interruptionHandler = { handler.connectionInvalidated() }
         connection.resume()
         return true
     }
