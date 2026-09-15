@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleIdentifier</key>
-	<string>Agent.app.toddbruss.help</string>
+	<string>$(APP_BUNDLE_ID).help</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
