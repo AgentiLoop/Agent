@@ -160,29 +160,37 @@ extension ScriptService {
             return ("Failed to launch script: \(error.localizedDescription)", 1)
         }
 
-        // Wait for completion, checking cancellation
-        return await withCheckedContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async {
-                while process.isRunning {
-                    if isCancelled?() == true {
-                        process.terminate()
-                        break
+        // Wait for completion, checking cancellation. Two cancel sources:
+        //  - the tab's cancel flag (Stop button on a script tab), polled below
+        //  - Swift Task cancellation (stop() / stopTabTask()), via onCancel
+        // Either one kills the runner AND every process it spawned.
+        let pid = process.processIdentifier
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                DispatchQueue.global(qos: .userInitiated).async {
+                    while process.isRunning {
+                        if isCancelled?() == true {
+                            ProcessTree.kill(rootPID: pid)
+                            break
+                        }
+                        Thread.sleep(forTimeInterval: 0.05)
                     }
-                    Thread.sleep(forTimeInterval: 0.05)
+                    process.waitUntilExit()
+                    // Drain any remaining output
+                    stdoutPipe.fileHandleForReading.readabilityHandler = nil
+                    let remaining = stdoutPipe.fileHandleForReading.availableData
+                    if !remaining.isEmpty,
+                       let chunk = String(data: remaining, encoding: .utf8)
+                    {
+                        collected.append(chunk)
+                        onOutput?(chunk)
+                    }
+                    let status = process.terminationStatus
+                    continuation.resume(returning: (collected.output, status))
                 }
-                process.waitUntilExit()
-                // Drain any remaining output
-                stdoutPipe.fileHandleForReading.readabilityHandler = nil
-                let remaining = stdoutPipe.fileHandleForReading.availableData
-                if !remaining.isEmpty,
-                   let chunk = String(data: remaining, encoding: .utf8)
-                {
-                    collected.append(chunk)
-                    onOutput?(chunk)
-                }
-                let status = process.terminationStatus
-                continuation.resume(returning: (collected.output, status))
             }
+        } onCancel: {
+            ProcessTree.kill(rootPID: pid)
         }
     }
 
