@@ -108,9 +108,13 @@ extension AgentViewModel {
             tab.appendLog("🍎 AppleScript:\n\(source)")
             tab.isRunning = true
             tab.flush()
-            let result = await Self.offMain {
-                NSAppleScriptService.shared.execute(source: source)
-            }
+            // Routed through `osascript` (child of Agent.app → inherits TCC) instead of in-process NSAppleScript so
+            // Stop can kill it via executeTCCStreaming's tree kill. NSAppleScriptService remains for other callers.
+            let escaped = source.replacingOccurrences(of: "'", with: "'\\''")
+            let osa = await Self.executeTCCStreaming(command: "osascript -e '\(escaped)'") { _ in }
+            let result: (success: Bool, output: String) = osa.status == 0
+                ? (true, osa.output.isEmpty ? "(no output)" : osa.output)
+                : (false, osa.output.isEmpty ? "AppleScript error: exit \(osa.status)" : "AppleScript error: \(osa.output)")
             tab.isRunning = false
             let toolContent: String
             if !result.success {

@@ -82,22 +82,19 @@ extension AgentViewModel {
             if result.status > 0 { appendLog("exit code: \(result.status)") }
             flushLog()
             return result.output.isEmpty ? "(no output, exit \(result.status))" : result.output
-        // AppleScript (NSAppleScript in-process with TCC)
+        // AppleScript — routed through `osascript` as a child process of Agent.app (inherits TCC via responsible-process
+        // attribution) instead of in-process NSAppleScript, so Stop can kill it via executeTCCStreaming's tree kill.
         case "run_applescript":
             let source = (input["source"] as? String ?? "")
-            let result = await Self.offMain { () -> (String, Bool) in
-                var err: NSDictionary?
-                guard let script = NSAppleScript(source: source) else { return ("Error", false) }
-                let out = script.executeAndReturnError(&err)
-                if let e = err { return ("AppleScript error: \(e)", false) }
-                return (out.stringValue ?? "(no output)", true)
-            }
-            if result.1 {
+            let escaped = source.replacingOccurrences(of: "'", with: "'\\''")
+            let result = await Self.executeTCCStreaming(command: "osascript -e '\(escaped)'") { _ in }
+            if result.status == 0 {
                 let autoName = Self.autoScriptName(from: source)
                 let _ = await Self.offMain { [ss = scriptService] in ss.saveAppleScript(name: autoName, source: source) }
-                return result.0
+                return result.output.isEmpty ? "(no output)" : result.output
             }
-            return Self.enrichAppleScriptFailure(source: source, output: result.0)
+            let asOutput = result.output.isEmpty ? "AppleScript error: exit \(result.status)" : "AppleScript error: \(result.output)"
+            return Self.enrichAppleScriptFailure(source: source, output: asOutput)
         // osascript (runs osascript CLI in-process with TCC)
         case "run_osascript":
             let script = input["script"] as? String ?? input["command"] as? String ?? ""
