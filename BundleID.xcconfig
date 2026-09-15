@@ -14,3 +14,10 @@
 // fresh SMAppService registration on machines that had the old daemon/agent installed.
 
 APP_BUNDLE_ID = Agent.app.toddbruss
+
+// Apple Developer Team ID used to sign every target (app, helper, user agent, tests).
+// Change this to your own Team ID when building from your own developer account.
+// The project file intentionally does not set DEVELOPMENT_TEAM anywhere, so this is
+// the only place to edit. (CI: .github/workflows/release.yml and ExportOptions.plist
+// carry their own copy for archive/export.)
+DEVELOPMENT_TEAM = 469UCUB275
