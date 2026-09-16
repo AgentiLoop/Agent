@@ -300,6 +300,22 @@ enum LLMProviderSetup {
 
         // MARK: - On-Device
 
+        // Apple Foundation Models CLI (macOS 27 `/usr/bin/fm`). `fm serve` exposes a
+        // loopback-only Chat Completions API on 127.0.0.1:1976 with a single model
+        // ("system"). No API key; the fm license must be accepted once (`sudo fm license`).
+        case .fmServe:
+            return make(provider, kind: .localServer, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "http://127.0.0.1:1976/v1/chat/completions",
+                    modelsURL: "http://127.0.0.1:1976/v1/models",
+                    authHeader: "", authPrefix: "",
+                    defaultPort: 1976
+                ),
+                model: "system",
+                capabilities: [.streaming, .tools, .systemPrompt],
+                contextSize: 4_096,
+                apiKeyOptional: true)
+
         case .foundationModel:
             return make(provider, kind: .embedded, apiProtocol: .foundationModel,
                 endpoint: LLMEndpoint(chatURL: ""),
