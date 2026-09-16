@@ -1933,7 +1933,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 2.53.14;
+				minimumVersion = 2.53.15;
 			};
 		};
 		EAE1E7072F7BF5590079432C /* XCRemoteSwiftPackageReference "AgentColorSyntax" */ = {
@@ -1996,7 +1996,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 2.10.17;
+				minimumVersion = 2.10.18;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
