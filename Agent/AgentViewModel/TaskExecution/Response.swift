@@ -217,7 +217,10 @@ extension AgentViewModel {
             guard !str.isEmpty else { continue }
             // Collapse the app-pointer fields to a single `app:` label
             let label = (key == "appBundleId" || key == "name") ? "app" : key
-            parts.append("\(label): \(str.count > 80 ? String(str.prefix(77)) + "…" : str)")
+            // Paths/URLs are shown in full — the tail is the informative part.
+            let isPath = key == "file_path" || key == "path" || key == "url"
+            let shown = (!isPath && str.count > 80) ? String(str.prefix(77)) + "…" : str
+            parts.append("\(label): \(shown)")
         }
         let args = parts.joined(separator: ", ")
         switch (action, args.isEmpty) {
