@@ -15,7 +15,7 @@ struct SettingsView: View {
     /// Claude, Codex, Ollama, LM Studio and vLLM keep bespoke sections (OAuth, endpoints, protocols).
     private static let standardProviders: Set<APIProvider> = [
         .openAI, .deepSeek, .huggingFace, .zAI, .bigModel, .miniMax, .openRouter,
-        .requesty, .a2Agent, .orcaRouter, .dashscope, .qwen, .qwenCoder, .gemini, .grok, .mistral, .vibe, .fmServe,
+        .requesty, .a2Agent, .orcaRouter, .dashscope, .qwen, .qwenCoder, .gemini, .grok, .mistral, .vibe,
     ]
 
     private func keyPlaceholder(_ provider: APIProvider) -> String {
@@ -27,7 +27,6 @@ struct SettingsView: View {
         case .dashscope: "sk-... (Model Studio) or sk-ws-... (QwenCloud pay-as-you-go)"
         case .qwen: "sk-sp-... (Token Plan key)"
         case .qwenCoder: "sk-sp-... (Coding Plan key)"
-        case .fmServe: "Not required (run `fm serve` first)"
         default: "\(provider.displayName) API key"
         }
     }
@@ -101,6 +100,97 @@ struct SettingsView: View {
                 }
             }
         }
+    }
+
+    /// Apple fm serve (macOS 27 Foundation Models CLI) — experimental. No API key;
+    /// the server is started/restarted from here.
+    @ViewBuilder
+    private var fmServeSection: some View {
+        let fm = FMServeService.shared
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                Text("Apple fm serve")
+                    .font(.headline)
+                Text("Experimental")
+                    .font(.caption2).bold()
+                    .padding(.horizontal, 6).padding(.vertical, 1)
+                    .background(Color.orange.opacity(0.2))
+                    .clipShape(Capsule())
+            }
+
+            Text("Uses the macOS 27 `fm` CLI, which serves the on-device Apple Foundation Model over a local Chat Completions API (127.0.0.1:1976). Requires `sudo fm license` to have been accepted once. Experimental — Apple may change or remove this tool.")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Server").font(.caption).foregroundStyle(.secondary)
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(fm.isRunning ? Color.green : Color.red)
+                        .frame(width: 8, height: 8)
+                    Text(fm.isRunning ? "Running" : (fm.isAvailable ? "Not running" : "fm not found (macOS 27 required)"))
+                        .font(.caption)
+
+                    if fm.isRunning {
+                        Button("Restart") { Task { await fm.restart(); viewModel.fetchModelsIfNeeded(for: .fmServe, force: true) } }
+                        Button("Stop") { Task { await fm.stop() } }
+                    } else {
+                        Button("Start") { Task { await fm.start(); viewModel.fetchModelsIfNeeded(for: .fmServe, force: true) } }
+                            .disabled(!fm.isAvailable)
+                    }
+                    Button {
+                        Task { await fm.checkHealth() }
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    .help("Check server status")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .disabled(fm.isBusy)
+
+                if let error = fm.lastError {
+                    Text(error)
+                        .font(.caption2)
+                        .foregroundStyle(.red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Model").font(.caption).foregroundStyle(.secondary)
+                HStack {
+                    if viewModel.modelLists[.fmServe].isEmpty {
+                        TextField("system", text: $viewModel.models[.fmServe])
+                            .textFieldStyle(.roundedBorder)
+                    } else {
+                        Picker("Model", selection: $viewModel.models[.fmServe]) {
+                            ForEach(viewModel.modelLists[.fmServe]) { model in
+                                Text(model.name).tag(model.id)
+                            }
+                        }
+                        .labelsHidden()
+                    }
+
+                    Button {
+                        viewModel.fetchModelsIfNeeded(for: .fmServe, force: true)
+                    } label: {
+                        if viewModel.fetchingModels.contains(.fmServe) {
+                            ProgressView()
+                                .controlSize(.small)
+                        } else {
+                            Image(systemName: "arrow.clockwise")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .disabled(viewModel.fetchingModels.contains(.fmServe))
+                    .help("Fetch available models")
+                }
+            }
+        }
+        .task { await fm.checkHealth() }
     }
 
     var body: some View {
@@ -181,6 +271,8 @@ struct SettingsView: View {
                 }
             } else if Self.standardProviders.contains(viewModel.selectedProvider) {
                 standardProviderSection(viewModel.selectedProvider)
+            } else if viewModel.selectedProvider == .fmServe {
+                fmServeSection
             } else if viewModel.selectedProvider == .ollama {
                 // Cloud Ollama settings
                 VStack(alignment: .leading, spacing: 10) {
