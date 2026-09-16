@@ -46,7 +46,7 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
         case .localOllama: "Local Ollama"
         case .vLLM: "vLLM"
         case .lmStudio: "LM Studio"
-        case .fmServe: "Apple fm serve"
+        case .fmServe: "Apple fm serve (Experimental)"
         case .zAI: "Z.ai"
         case .bigModel: "BigModel"
         case .dashscope: "Alibaba DashScope"
