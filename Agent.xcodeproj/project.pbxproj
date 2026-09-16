@@ -1987,7 +1987,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 1.3.4;
+				minimumVersion = 1.3.5;
 			};
 		};
 		EAE1E7242F7C02000079432C /* XCRemoteSwiftPackageReference "AgentAccess" */ = {
