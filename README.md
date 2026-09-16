@@ -342,7 +342,7 @@ MIT — free and open source.
 >
 > "AgentiLoop Agent! for Mac" is an independent software project and is **not** affiliated with, endorsed by, sponsored by, or otherwise associated with Apple Inc. "Apple," "Mac," "Mac mini," "MacBook," "macOS," and related marks are trademarks of Apple Inc., registered in the U.S. and other countries. All other trademarks, service marks, and trade names referenced herein are the property of their respective owners and are used for identification purposes only.
 >
-> "AgentiLoop Agent!" and the AgentiLoop Agent! logo are trademarks of AgentiLoop Agent. Use of these marks requires prior written permission. The MIT license below grants rights to the source code only — it does **not** grant any trademark rights.
+> "AgentiLoop Agent!" and the AgentiLoop Agent! logo are trademarks of AgentiLoop.ai, a Logos InkPen LLC company. Use of these marks requires prior written permission. The MIT license below grants rights to the source code only — it does **not** grant any trademark rights.
 >
 > ### Source Code License (MIT)
 >
@@ -350,9 +350,9 @@ MIT — free and open source.
 >
 > ### Compiled Binaries & Releases
 >
-> Compiled binaries, installers, code-signed builds, and release artifacts distributed through this project's GitHub Releases, [AgentiLoop.ai](https://AgentiLoop.ai), or any other official channel are the copyrighted work of AgentiLoop Agent and are **not** covered by the MIT license that governs the source code. All rights to the official binaries — including the "AgentiLoop Agent!" name, logo, code-signing identity, and Developer ID — are reserved.
+> Compiled binaries, installers, code-signed builds, and release artifacts distributed through this project's GitHub Releases, [AgentiLoop.ai](https://AgentiLoop.ai), or any other official channel are the copyrighted work of AgentiLoop.ai, a Logos InkPen LLC company and are **not** covered by the MIT license that governs the source code. All rights to the official binaries — including the "AgentiLoop Agent!" name, logo, code-signing identity, and Developer ID — are reserved.
 >
-> Copyright © 2000, 2023–2026 AgentiLoop Agent, All Rights Reserved.
+> Copyright © 2026 AgentiLoop.ai, a Logos InkPen LLC company. All rights reserved.
 >
 > You are welcome to build your own binaries from source under the MIT license, provided you do not use the "AgentiLoop Agent!" name, logo, or branding to identify your product.
 >
