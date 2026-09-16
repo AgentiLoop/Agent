@@ -98,6 +98,8 @@ extension AgentViewModel {
         "ask_user",
         "wait_for_element",
         "wait_adaptive",
+        "wait_until_actionable",
+        "observe_poll",
         "find_element",
         "get_focused_element",
         "read_focused",

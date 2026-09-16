@@ -185,6 +185,11 @@ extension AgentViewModel {
         "screenshot",
         "wait_for_element",
         "wait",
+        "wait_until_actionable",
+        "observe_start",
+        "observe_poll",
+        "observe_stop",
+        "observe_list",
         "highlight_element"
     ]
 
@@ -331,6 +336,33 @@ extension AgentViewModel {
                 role: role, title: title, value: value,
                 appBundleId: app,
                 timeout: input["timeout"] as? Double ?? 10)
+        case "wait_until_actionable":
+            return await ax.waitUntilActionable(
+                role: role, title: title, value: value,
+                appBundleId: app,
+                timeout: input["timeout"] as? Double ?? 5,
+                pollInterval: input["pollInterval"] as? Double ?? 0.1)
+        case "select_text_range":
+            return ax.selectTextRange(
+                role: role, title: title, value: value,
+                appBundleId: app,
+                location: input["location"] as? Int ?? 0,
+                length: input["length"] as? Int ?? 0)
+        case "observe_start":
+            let notifications = (input["notifications"] as? [String])
+                ?? (input["notifications"] as? String).map { $0.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) } }
+                ?? ["AXValueChanged"]
+            return ax.startObserving(
+                appBundleId: app, notifications: notifications,
+                role: role, title: title, value: value)
+        case "observe_poll":
+            return ax.pollObservations(
+                observerId: input["observerId"] as? String ?? "",
+                clear: input["clear"] as? Bool ?? true)
+        case "observe_stop":
+            return ax.stopObserving(observerId: input["observerId"] as? String ?? "")
+        case "observe_list":
+            return ax.listObservations()
         case "manage_app":
             let manageAction = input["sub_action"] as? String
                 ?? { let a = input["action"] as? String ?? "list"; return a == "manage_app" ? "list" : a }()
