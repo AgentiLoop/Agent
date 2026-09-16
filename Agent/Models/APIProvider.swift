@@ -23,6 +23,7 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
     case localOllama = "localOllama"
     case vLLM = "vLLM"
     case lmStudio = "lmStudio"
+    case fmServe = "fmServe"       // macOS 27 `fm serve` — Apple Foundation Models over a local Chat Completions API
     case miniMax = "miniMax"
     case openRouter = "openRouter"
     case requesty = "requesty"
@@ -45,6 +46,7 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
         case .localOllama: "Local Ollama"
         case .vLLM: "vLLM"
         case .lmStudio: "LM Studio"
+        case .fmServe: "Apple fm serve"
         case .zAI: "Z.ai"
         case .bigModel: "BigModel"
         case .dashscope: "Alibaba DashScope"

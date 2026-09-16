@@ -15,7 +15,7 @@ struct SettingsView: View {
     /// Claude, Codex, Ollama, LM Studio and vLLM keep bespoke sections (OAuth, endpoints, protocols).
     private static let standardProviders: Set<APIProvider> = [
         .openAI, .deepSeek, .huggingFace, .zAI, .bigModel, .miniMax, .openRouter,
-        .requesty, .a2Agent, .orcaRouter, .dashscope, .qwen, .qwenCoder, .gemini, .grok, .mistral, .vibe,
+        .requesty, .a2Agent, .orcaRouter, .dashscope, .qwen, .qwenCoder, .gemini, .grok, .mistral, .vibe, .fmServe,
     ]
 
     private func keyPlaceholder(_ provider: APIProvider) -> String {
@@ -27,6 +27,7 @@ struct SettingsView: View {
         case .dashscope: "sk-... (Model Studio) or sk-ws-... (QwenCloud pay-as-you-go)"
         case .qwen: "sk-sp-... (Token Plan key)"
         case .qwenCoder: "sk-sp-... (Coding Plan key)"
+        case .fmServe: "Not required (run `fm serve` first)"
         default: "\(provider.displayName) API key"
         }
     }
