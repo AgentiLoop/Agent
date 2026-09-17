@@ -51,7 +51,7 @@ No NPM, no Electron, no subscription, no telemetry. Bring your own API key, run 
 
 1. **Download** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) and drag to Applications — or with Homebrew:
    ```sh
-   brew install --cask agentiloop/tap/agent
+   brew install --cask agentiloop-agent
    ```
 2. **Open Agent!** — it sets up everything automatically
 3. **Pick your AI** — Settings → choose a provider → enter API key
