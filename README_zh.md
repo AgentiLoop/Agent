@@ -30,7 +30,7 @@
 
 **一个应用。任意 AI。完全掌控你的 Mac。**
 
-Agent! 是一款 100% 原生的 Swift 6.2 / SwiftUI 应用，将 **22 家 LLM 提供商**——Claude、Codex、OpenAI、Gemini、Grok、Mistral、Mistral Vibe、DeepSeek、Hugging Face、Z.ai、BigModel、阿里巴巴、Qwen Coder、MiniMax、OpenRouter、Requesty、A2Agent、OrcaRouter、Ollama（云端和本地）、vLLM、LM Studio，以及设备端的 **Apple Intelligence**——接入一个真正*会做事*的自主任务循环：读取你的代码库、修复 bug、构建 Xcode 项目、提交 diff、通过辅助功能 API 驱动任何 Mac 应用、以你的身份或 root 运行 shell 命令、通过 iMessage 把结果发给你，并响应你说出的 *「Agent!」*。
+Agent! 是一款 100% 原生的 Swift 6.2 / SwiftUI 应用，将 **21 家 LLM 提供商**——Claude、Codex、OpenAI、Gemini、Grok、Mistral、Mistral Vibe、DeepSeek、Hugging Face、Z.ai、BigModel、阿里巴巴、Qwen Coder、MiniMax、OpenRouter、Requesty、A2Agent、OrcaRouter、Ollama（云端和本地）、vLLM、LM Studio，以及设备端的 **Apple Intelligence**——接入一个真正*会做事*的自主任务循环：读取你的代码库、修复 bug、构建 Xcode 项目、提交 diff、通过辅助功能 API 驱动任何 Mac 应用、以你的身份或 root 运行 shell 命令、通过 iMessage 把结果发给你，并响应你说出的 *「Agent!」*。
 
 没有 NPM，没有 Electron，没有订阅，没有遥测。使用你自己的 API 密钥，完全本地运行，或用 Apple Intelligence 免费运行。它依赖的每个 Swift 包都出自同一位作者之手。详见下方的[项目背景](#项目背景)。
 
