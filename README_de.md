@@ -11,6 +11,10 @@
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://www.paypal.com/ncp/payment/9C6RY2UAE5M3S"><img src="https://img.shields.io/badge/Donation-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Tip Jar" /></a>
 
+<img src="agent-demo.gif" width="900" alt="Agent! automatisiert Photo Booth über die macOS-Bedienungshilfen-API — nimmt ein Foto von Anfang bis Ende mit einer einzigen Anfrage in natürlicher Sprache auf" />
+
+*Agent! steuert Photo Booth über die Bedienungshilfen — keine Klicks, keine Skripte, nur „mach ein Foto“.*
+
 ## README-Übersetzungen
 
 - [English](README.md)
