@@ -30,7 +30,7 @@
 
 **Eine App. Jede KI. Volle Kontrolle über deinen Mac.**
 
-Agent! ist eine zu 100 % native Swift-6.2-/SwiftUI-App, die **23 LLM-Anbieter** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (Cloud und lokal), vLLM und LM Studio — plus die geräteinterne **Apple Intelligence** — mit einer autonomen Aufgabenschleife verbindet, die wirklich *etwas tut*: Sie liest deinen Code, behebt den Fehler, baut das Xcode-Projekt, committet den Diff, steuert jede Mac-App über die Accessibility-API, führt Shell-Befehle als du oder als root aus, schickt dir Ergebnisse per iMessage und reagiert auf ein gesprochenes *„Agent!"*.
+Agent! ist eine zu 100 % native Swift-6.2-/SwiftUI-App, die **21 LLM-Anbieter** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (Cloud und lokal), vLLM und LM Studio — plus die geräteinterne **Apple Intelligence** — mit einer autonomen Aufgabenschleife verbindet, die wirklich *etwas tut*: Sie liest deinen Code, behebt den Fehler, baut das Xcode-Projekt, committet den Diff, steuert jede Mac-App über die Accessibility-API, führt Shell-Befehle als du oder als root aus, schickt dir Ergebnisse per iMessage und reagiert auf ein gesprochenes *„Agent!"*.
 
 Kein NPM, kein Electron, kein Abo, keine Telemetrie. Bring deinen eigenen API-Schlüssel mit, lauf komplett lokal oder kostenlos mit Apple Intelligence. Jedes Swift-Paket, von dem die App abhängt, wurde vom selben Autor geschrieben. Siehe [Entstehungsgeschichte](#entstehungsgeschichte) unten.
 
