@@ -62,9 +62,10 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
     }
 
     /// Providers offered in the picker UI, alphabetical by display name
-    /// (Apple Intelligence is surfaced separately).
+    /// (Apple Intelligence is surfaced separately; fm serve is hidden for now —
+    /// its context window is too small for Agent!'s system prompt).
     static var selectableProviders: [APIProvider] {
-        allCases.filter { $0 != .foundationModel }
+        allCases.filter { $0 != .foundationModel && $0 != .fmServe }
             .sorted { $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending }
     }
 
