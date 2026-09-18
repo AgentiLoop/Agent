@@ -106,7 +106,7 @@ struct LLMCommonSettingsView: View {
                 Toggle("", isOn: $viewModel.jevAdvisoryEnabled)
                     .toggleStyle(.switch)
                     .controlSize(.mini)
-                    .tint(.green)
+                    .tint(.blue)
                     .help("Ask Jev for a second opinion before running a shell command. Requires an API key.")
             }
             .disabled(viewModel.jevAPIKey.isEmpty)
@@ -120,7 +120,7 @@ struct LLMCommonSettingsView: View {
                 }
                 Slider(value: $viewModel.jevBlockPercent, in: 0...100, step: 10)
                     .controlSize(.small)
-                    .tint(.green)
+                    .tint(.blue)
                 Text("Jev blocks a command it rates this likely — or more — to irreversibly destroy data. 0% rejects everything Jev is asked about; 100% only certainties.")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
