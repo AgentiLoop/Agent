@@ -54,9 +54,9 @@ enum JevConfiguration {
 
     static let blockThresholdDefaultsKey = "jevBlockThreshold"
 
-    /// Default cut-off: Jev only overrides a command it rates 90%+ destructive.
+    /// Default cut-off: Jev only overrides a command it rates 70%+ destructive.
     /// `ShellSafetyService` is the enforcement layer; Jev catches the rest.
-    static let defaultBlockThreshold = 0.9
+    static let defaultBlockThreshold = 0.7
 
     /// Probability above which Jev's "this destroys data" answer blocks the
     /// command, 0.0–1.0. Settings stores it in 10% steps. An unset key reads as
