@@ -66,6 +66,9 @@ struct LLMCommonSettingsView: View {
                             .textFieldStyle(.roundedBorder)
                     } else {
                         Picker("Model", selection: $viewModel.jevModel) {
+                            if !viewModel.jevModels.contains(where: { $0.name == viewModel.jevModel }) {
+                                Text(viewModel.jevModel).tag(viewModel.jevModel)
+                            }
                             ForEach(viewModel.jevModels, id: \.name) { model in
                                 Text(model.name).tag(model.name)
                             }
