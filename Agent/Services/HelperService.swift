@@ -218,6 +218,12 @@ final class HelperService {
         } else {
             dir = (workingDirectory as NSString).expandingTildeInPath
         }
+        if let reason = await JevAdvisor.shellBlockReason(command: command, workingDirectory: dir) {
+            AuditLog.log(.launchDaemon, "BLOCKED [jev]: \(command.prefix(200))")
+            return (-1, reason)
+        }
+        guard !Task.isCancelled else { return (-1, "Command cancelled before execution.") }
+
         // Prepend `export AGENT_PROJECT_FOLDER='<dir>'; cd '<dir>' && ` so the root daemon's command runs in the right
         // directory AND has the project folder env var available, matching the agent script and user-launch-agent contracts.
         let fullCommand: String
