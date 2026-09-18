@@ -284,6 +284,43 @@ final class AgentViewModel {
         didSet { KeychainService.shared.set(.exa, exaAPIKey) }
     }
 
+    // MARK: - Jev (TypeSafe System One) decision layer
+    // Not an APIProvider — Jev returns typed Choice/Score/Noul answers, not text,
+    // so it advises the existing loop instead of driving it. See JevService.
+
+    var jevAPIKey: String = KeychainService.shared.get(.jev) ?? "" {
+        didSet { KeychainService.shared.set(.jev, jevAPIKey) }
+    }
+
+    var jevModel: String = UserDefaults.standard.string(forKey: JevService.modelDefaultsKey) ?? JevService.defaultModel {
+        didSet { UserDefaults.standard.set(jevModel, forKey: JevService.modelDefaultsKey) }
+    }
+
+    /// Models fetched from `GET /v1/models`; empty until the user hits refresh.
+    var jevModels: [JevService.ModelInfo] = []
+    var fetchingJevModels = false
+    var jevModelsError: String?
+
+    /// Whether Jev is consulted for tool-gating decisions (off until a key is set).
+    var jevAdvisoryEnabled: Bool = UserDefaults.standard.bool(forKey: "jevAdvisoryEnabled") {
+        didSet { UserDefaults.standard.set(jevAdvisoryEnabled, forKey: "jevAdvisoryEnabled") }
+    }
+
+    func fetchJevModels() {
+        guard !fetchingJevModels else { return }
+        fetchingJevModels = true
+        jevModelsError = nil
+        Task { @MainActor in
+            defer { fetchingJevModels = false }
+            do {
+                jevModels = try await JevService.shared.listModels()
+            } catch {
+                jevModelsError = error.localizedDescription
+            }
+        }
+    }
+
+
     let ollamaEndpoint = "https://ollama.com/api/chat"
 
     /// Real per-model context windows reported at fetch time, keyed by provider then model id

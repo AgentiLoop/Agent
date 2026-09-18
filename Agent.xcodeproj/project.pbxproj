@@ -68,6 +68,9 @@
 		AA1000000000000000003F /* DependencyChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000002D /* DependencyChecker.swift */; };
 		AA10000000000000000044 /* DependencyOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000002E /* DependencyOverlayView.swift */; };
 		AA10000000000000000047 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000000046 /* KeychainService.swift */; };
+		JEV0000000000000000001 /* JevService.swift in Sources */ = {isa = PBXBuildFile; fileRef = JEV0000000000000000000 /* JevService.swift */; };
+		JEV0000000000000000003 /* JevAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = JEV0000000000000000002 /* JevAdvisor.swift */; };
+
 		AA10000000000000000049 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000000048 /* Logging.swift */; };
 		AA1000000000000000004B /* TaskExecution.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000004A /* TaskExecution.swift */; };
 		AA1000000000000000004F /* CodingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000004E /* CodingService.swift */; };
@@ -335,6 +338,9 @@
 		AA1000000000000000002D /* DependencyChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyChecker.swift; sourceTree = "<group>"; };
 		AA1000000000000000002E /* DependencyOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyOverlayView.swift; sourceTree = "<group>"; };
 		AA10000000000000000046 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		JEV0000000000000000000 /* JevService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JevService.swift; sourceTree = "<group>"; };
+		JEV0000000000000000002 /* JevAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JevAdvisor.swift; sourceTree = "<group>"; };
+
 		AA10000000000000000048 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		AA1000000000000000004A /* TaskExecution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskExecution.swift; sourceTree = "<group>"; };
 		AA1000000000000000004E /* CodingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodingService.swift; sourceTree = "<group>"; };
@@ -943,6 +949,9 @@
 				SS110000000000000000006 /* ScriptService+SavedScripts.swift */,
 				AA1000000000000000002B /* XcodeService.swift */,
 				AA10000000000000000046 /* KeychainService.swift */,
+				JEV0000000000000000000 /* JevService.swift */,
+				JEV0000000000000000002 /* JevAdvisor.swift */,
+
 				WEB1000000000000000002 /* WebAutomationService.swift */,
 				WEB1000000000000000004 /* WebAutomationService+Navigation.swift */,
 				WEB1000000000000000006 /* WebAutomationService+Utilities.swift */,
@@ -1363,6 +1372,9 @@
 				AA1000000000000000007E /* AccessibilitySettingsView.swift in Sources */,
 				AA10000000000000000077 /* MessagesView.swift in Sources */,
 				AA10000000000000000047 /* KeychainService.swift in Sources */,
+				JEV0000000000000000001 /* JevService.swift in Sources */,
+				JEV0000000000000000003 /* JevAdvisor.swift in Sources */,
+
 				AA10000000000000000049 /* Logging.swift in Sources */,
 				AA1000000000000000004B /* TaskExecution.swift in Sources */,
 				7FA36E1A9CC0DFA5A3ECB9AD /* NativeToolHandler.swift in Sources */,

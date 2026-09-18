@@ -157,6 +157,13 @@ extension AgentViewModel {
             AuditLog.log(.shell, "BLOCKED [\(verdict.rule ?? "?")]: \(command.prefix(200))")
             return (-1, verdict.reason ?? "Refused: command blocked by Agent! shell safety guardrail.")
         }
+        // Optional Jev second opinion — no-op unless a TypeSafe key is set and
+        // "Consult Jev before tools" is on. Fail-open: nil means allow.
+        if let jevReason = await JevService.shared.shellBlockReason(command: command, workingDirectory: workingDirectory) {
+            AuditLog.log(.shell, "BLOCKED [jev]: \(command.prefix(200))")
+            return (-1, jevReason)
+        }
+
         return await Self.runCancellable { box, continuation in
             DispatchQueue.global().async {
                 let process = Process()
@@ -263,6 +270,14 @@ extension AgentViewModel {
             onOutput(msg)
             return (-1, msg)
         }
+        // Optional Jev second opinion — no-op unless a TypeSafe key is set and
+        // "Consult Jev before tools" is on. Fail-open: nil means allow.
+        if let jevReason = await JevService.shared.shellBlockReason(command: command, workingDirectory: workingDirectory) {
+            AuditLog.log(.shell, "BLOCKED [jev]: \(command.prefix(200))")
+            onOutput(jevReason)
+            return (-1, jevReason)
+        }
+
         return await Self.runCancellable { box, continuation in
             DispatchQueue.global().async {
                 let process = Process()
