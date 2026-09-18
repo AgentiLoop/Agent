@@ -223,6 +223,75 @@ func makeClient(_ transport: any TypeSafeTransport, retry: RetryPolicy = .none) 
         _ = try TypeSafeClient(apiKey: "")
     }
 }
+@Test func providerInheritsClientModel() async throws {
+    let box = Box()
+    let client = try TypeSafeClient(
+        apiKey: "test-key", model: "jev-1.13.0", retryPolicy: .none,
+        transport: StubTransport(box: box, body: sampleResponse))
+    let provider = JevProvider(client: client)
+    _ = try await provider.decide(state: "x", questions: ["is_urgent": .noul(instructions: "Urgent?")])
+    let json = try #require(try JSONSerialization.jsonObject(with: box.bodies[0]) as? [String: Any])
+    #expect(json["model"] as? String == "jev-1.13.0")
+}
+
+struct CancelledTransport: TypeSafeTransport {
+    let box: Box
+
+    func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+        box.attempts += 1
+        throw URLError(.cancelled)
+    }
+}
+
+@Test func cancellationIsNotRetried() async throws {
+    let box = Box()
+    let client = try makeClient(
+        CancelledTransport(box: box),
+        retry: RetryPolicy(maxAttempts: 3, initialBackoff: 0, jitter: 0))
+    do {
+        _ = try await client.systemOne(state: "x", questions: ["q": .noul(instructions: "Urgent?")])
+        Issue.record("Expected cancellation")
+    } catch let error as URLError {
+        #expect(error.code == .cancelled)
+    } catch {
+        Issue.record("Cancellation was converted to another error: \(error)")
+    }
+    #expect(box.attempts == 1)
+}
+
+@Test func commandRiskUsesDocumentedNoulRequest() async throws {
+    let box = Box()
+    let body = """
+    {"model":"jev-1.13.0","answers":{"destructive":{"type":"noul","noul":0.95}},
+     "usage":{"input_tokens":30,"output_tokens":1}}
+    """
+    let client = try makeClient(StubTransport(box: box, body: body))
+    let risk = try await JevProvider(client: client).commandRisk(
+        command: "printf 'audit fixture'", workingDirectory: "/tmp")
+    #expect(risk.isBlocked)
+    #expect(risk.percent == 95)
+    let json = try #require(try JSONSerialization.jsonObject(with: box.bodies[0]) as? [String: Any])
+    let state = try #require(json["state"] as? [String: String])
+    #expect(state["shell_command"] == "printf 'audit fixture'")
+    #expect(state["working_directory"] == "/tmp")
+    let questions = try #require(json["questions"] as? [String: [String: Any]])
+    let question = try #require(questions["destructive"])
+    #expect(question["type"] as? String == "noul")
+    let criteria = try #require(question["criteria"] as? [String: String])
+    #expect(criteria["true"] != nil)
+    #expect(criteria["false"] != nil)
+}
+
+@Test func commandRiskHonorsStrictBoundary() async throws {
+    for (probability, blocked) in [(0.1, false), (0.9, false), (0.91, true)] {
+        let provider = FakeProvider(
+            box: Box(), answers: ["destructive": .noul(NoulAnswer(noul: probability))])
+        let risk = try await provider.commandRisk(command: "fixture only")
+        #expect(risk.isBlocked == blocked)
+    }
+}
+
+
 
 // MARK: - Middleware
 
