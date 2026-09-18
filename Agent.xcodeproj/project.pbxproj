@@ -1934,7 +1934,7 @@
 /* Begin XCLocalSwiftPackageReference section */
 		TSK0000000000000000004 /* XCLocalSwiftPackageReference "TypeSafeKit" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../TypeSafeKit;
+			relativePath = TypeSafeKit;
 		};
 /* End XCLocalSwiftPackageReference section */
 
