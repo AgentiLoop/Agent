@@ -132,6 +132,7 @@ public struct TypeSafeClient: Sendable {
 
         var attempt = 1
         while true {
+            try Task.checkCancellation()
             let failure: TypeSafeError
             do {
                 let (data, response) = try await transport.send(request)
@@ -150,6 +151,7 @@ public struct TypeSafeClient: Sendable {
                 if case .decoding = error { throw error }
                 failure = error
             } catch let error as URLError {
+                if error.code == .cancelled { throw error }
                 failure = error.code == .timedOut
                     ? .timeout
                     : .connection(error.localizedDescription)
