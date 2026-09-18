@@ -224,11 +224,11 @@ struct SettingsView: View {
                 Text("Model").font(.caption).foregroundStyle(.secondary)
                 HStack {
                     if viewModel.jevModels.isEmpty {
-                        TextField("e.g. \(JevService.defaultModel)", text: $viewModel.jevModel)
+                        TextField("e.g. \(JevConfiguration.defaultModel)", text: $viewModel.jevModel)
                             .textFieldStyle(.roundedBorder)
                     } else {
                         Picker("Model", selection: $viewModel.jevModel) {
-                            ForEach(viewModel.jevModels) { model in
+                            ForEach(viewModel.jevModels, id: \.name) { model in
                                 Text(model.name).tag(model.name)
                             }
                         }

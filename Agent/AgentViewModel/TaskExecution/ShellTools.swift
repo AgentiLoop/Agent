@@ -159,7 +159,7 @@ extension AgentViewModel {
         }
         // Optional Jev second opinion — no-op unless a TypeSafe key is set and
         // "Consult Jev before tools" is on. Fail-open: nil means allow.
-        if let jevReason = await JevService.shared.shellBlockReason(command: command, workingDirectory: workingDirectory) {
+        if let jevReason = await JevAdvisor.shellBlockReason(command: command, workingDirectory: workingDirectory) {
             AuditLog.log(.shell, "BLOCKED [jev]: \(command.prefix(200))")
             return (-1, jevReason)
         }
@@ -272,7 +272,7 @@ extension AgentViewModel {
         }
         // Optional Jev second opinion — no-op unless a TypeSafe key is set and
         // "Consult Jev before tools" is on. Fail-open: nil means allow.
-        if let jevReason = await JevService.shared.shellBlockReason(command: command, workingDirectory: workingDirectory) {
+        if let jevReason = await JevAdvisor.shellBlockReason(command: command, workingDirectory: workingDirectory) {
             AuditLog.log(.shell, "BLOCKED [jev]: \(command.prefix(200))")
             onOutput(jevReason)
             return (-1, jevReason)

@@ -4,6 +4,7 @@ import AgentColorSyntax
 import AgentTerminalNeo
 import AgentLLM
 import AgentAccess
+import TypeSafeKit
 import AppKit
 import SwiftUI
 import SQLite3
@@ -286,24 +287,25 @@ final class AgentViewModel {
 
     // MARK: - Jev (TypeSafe System One) decision layer
     // Not an APIProvider — Jev returns typed Choice/Score/Noul answers, not text,
-    // so it advises the existing loop instead of driving it. See JevService.
+    // so it advises the existing loop instead of driving it. The endpoint and key
+    // live in JevConfiguration; the protocol lives in the TypeSafeKit package.
 
     var jevAPIKey: String = KeychainService.shared.get(.jev) ?? "" {
         didSet { KeychainService.shared.set(.jev, jevAPIKey) }
     }
 
-    var jevModel: String = UserDefaults.standard.string(forKey: JevService.modelDefaultsKey) ?? JevService.defaultModel {
-        didSet { UserDefaults.standard.set(jevModel, forKey: JevService.modelDefaultsKey) }
+    var jevModel: String = UserDefaults.standard.string(forKey: JevConfiguration.modelDefaultsKey) ?? JevConfiguration.defaultModel {
+        didSet { UserDefaults.standard.set(jevModel, forKey: JevConfiguration.modelDefaultsKey) }
     }
 
     /// Models fetched from `GET /v1/models`; empty until the user hits refresh.
-    var jevModels: [JevService.ModelInfo] = []
+    var jevModels: [ModelCard] = []
     var fetchingJevModels = false
     var jevModelsError: String?
 
     /// Whether Jev is consulted for tool-gating decisions (off until a key is set).
-    var jevAdvisoryEnabled: Bool = UserDefaults.standard.bool(forKey: "jevAdvisoryEnabled") {
-        didSet { UserDefaults.standard.set(jevAdvisoryEnabled, forKey: "jevAdvisoryEnabled") }
+    var jevAdvisoryEnabled: Bool = UserDefaults.standard.bool(forKey: JevConfiguration.advisoryDefaultsKey) {
+        didSet { UserDefaults.standard.set(jevAdvisoryEnabled, forKey: JevConfiguration.advisoryDefaultsKey) }
     }
 
     func fetchJevModels() {
@@ -313,7 +315,7 @@ final class AgentViewModel {
         Task { @MainActor in
             defer { fetchingJevModels = false }
             do {
-                jevModels = try await JevService.shared.listModels()
+                jevModels = try await JevAdvisor.availableModels()
             } catch {
                 jevModelsError = error.localizedDescription
             }

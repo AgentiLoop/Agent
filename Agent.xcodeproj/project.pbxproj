@@ -68,7 +68,9 @@
 		AA1000000000000000003F /* DependencyChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000002D /* DependencyChecker.swift */; };
 		AA10000000000000000044 /* DependencyOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000002E /* DependencyOverlayView.swift */; };
 		AA10000000000000000047 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000000046 /* KeychainService.swift */; };
-		JEV0000000000000000001 /* JevService.swift in Sources */ = {isa = PBXBuildFile; fileRef = JEV0000000000000000000 /* JevService.swift */; };
+		JEV0000000000000000001 /* JevConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = JEV0000000000000000000 /* JevConfiguration.swift */; };
+		TSK0000000000000000001 /* TypeSafeKit in Frameworks */ = {isa = PBXBuildFile; productRef = TSK0000000000000000000 /* TypeSafeKit */; };
+		TSK0000000000000000003 /* TypeSafeMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = TSK0000000000000000002 /* TypeSafeMiddleware */; };
 		JEV0000000000000000003 /* JevAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = JEV0000000000000000002 /* JevAdvisor.swift */; };
 
 		AA10000000000000000049 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000000048 /* Logging.swift */; };
@@ -338,7 +340,7 @@
 		AA1000000000000000002D /* DependencyChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyChecker.swift; sourceTree = "<group>"; };
 		AA1000000000000000002E /* DependencyOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyOverlayView.swift; sourceTree = "<group>"; };
 		AA10000000000000000046 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
-		JEV0000000000000000000 /* JevService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JevService.swift; sourceTree = "<group>"; };
+		JEV0000000000000000000 /* JevConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JevConfiguration.swift; sourceTree = "<group>"; };
 		JEV0000000000000000002 /* JevAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JevAdvisor.swift; sourceTree = "<group>"; };
 
 		AA10000000000000000048 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
@@ -534,6 +536,8 @@
 				EAE1E7152F7BF6880079432C /* AgentSwift in Frameworks */,
 				EAE1E7222F7C00000079432C /* AgentLLM in Frameworks */,
 				EAA08AAC2F7D549300D5998A /* AgentLLM in Frameworks */,
+				TSK0000000000000000001 /* TypeSafeKit in Frameworks */,
+				TSK0000000000000000003 /* TypeSafeMiddleware in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -949,7 +953,7 @@
 				SS110000000000000000006 /* ScriptService+SavedScripts.swift */,
 				AA1000000000000000002B /* XcodeService.swift */,
 				AA10000000000000000046 /* KeychainService.swift */,
-				JEV0000000000000000000 /* JevService.swift */,
+				JEV0000000000000000000 /* JevConfiguration.swift */,
 				JEV0000000000000000002 /* JevAdvisor.swift */,
 
 				WEB1000000000000000002 /* WebAutomationService.swift */,
@@ -1122,6 +1126,8 @@
 				EAE1E7212F7C00000079432C /* AgentLLM */,
 				EAA08AAB2F7D549300D5998A /* AgentLLM */,
 				EAE1E7252F7C02000079432C /* AgentAccess */,
+				TSK0000000000000000000 /* TypeSafeKit */,
+				TSK0000000000000000002 /* TypeSafeMiddleware */,
 			);
 			productName = Agent;
 			productReference = AA10000000000000000024 /* Agent!.app */;
@@ -1212,6 +1218,7 @@
 				EAE1E7192F7BF7000079432C /* XCRemoteSwiftPackageReference "AgentAudit" */,
 				EAA08AAA2F7D549300D5998A /* XCRemoteSwiftPackageReference "AgentLLM" */,
 				EAE1E7242F7C02000079432C /* XCRemoteSwiftPackageReference "AgentAccess" */,
+				TSK0000000000000000004 /* XCLocalSwiftPackageReference "TypeSafeKit" */,
 			);
 			productRefGroup = AA10000000000000000042 /* Products */;
 			projectDirPath = "";
@@ -1372,7 +1379,7 @@
 				AA1000000000000000007E /* AccessibilitySettingsView.swift in Sources */,
 				AA10000000000000000077 /* MessagesView.swift in Sources */,
 				AA10000000000000000047 /* KeychainService.swift in Sources */,
-				JEV0000000000000000001 /* JevService.swift in Sources */,
+				JEV0000000000000000001 /* JevConfiguration.swift in Sources */,
 				JEV0000000000000000003 /* JevAdvisor.swift in Sources */,
 
 				AA10000000000000000049 /* Logging.swift in Sources */,
@@ -1924,6 +1931,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		TSK0000000000000000004 /* XCLocalSwiftPackageReference "TypeSafeKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../TypeSafeKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		EAA08AAA2F7D549300D5998A /* XCRemoteSwiftPackageReference "AgentLLM" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -2081,6 +2095,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = EAE1E7192F7BF7000079432C /* XCRemoteSwiftPackageReference "AgentAudit" */;
 			productName = AgentAudit;
+		};
+		TSK0000000000000000000 /* TypeSafeKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = TSK0000000000000000004 /* XCLocalSwiftPackageReference "TypeSafeKit" */;
+			productName = TypeSafeKit;
+		};
+		TSK0000000000000000002 /* TypeSafeMiddleware */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = TSK0000000000000000004 /* XCLocalSwiftPackageReference "TypeSafeKit" */;
+			productName = TypeSafeMiddleware;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
