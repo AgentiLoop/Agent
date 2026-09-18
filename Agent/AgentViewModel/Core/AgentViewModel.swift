@@ -472,6 +472,7 @@ final class AgentViewModel {
     /// Commands run during current task — used by history, mediator, and tool handlers.
     var commandsRun: [String] = []
     @ObservationIgnored private var terminationObserver: Any?
+    @ObservationIgnored private var jevObserver: Any?
 
     // MARK: - Messages Monitor
     var messagesMonitorEnabled: Bool = UserDefaults.standard.object(forKey: "agentMessagesMonitor") as? Bool ?? false {
@@ -721,6 +722,22 @@ final class AgentViewModel {
                 self?.persistScriptTabs()
             }
         }
+
+        // Jev speaks from the nonisolated tool loop — relay its notifications
+        // into the activity log so the user can see the advisor working.
+        jevObserver = NotificationCenter.default.addObserver(
+            forName: .jevActivity, object: nil, queue: .main
+        ) { [weak self] note in
+            guard let message = note.userInfo?["message"] as? String else { return }
+            MainActor.assumeIsolated {
+                if let tabId = self?.selectedTabId, let tab = self?.tab(for: tabId) {
+                    tab.appendLog(message)
+                } else {
+                    self?.appendLog(message)
+                }
+            }
+        }
+
 
         // No auto-fetch on launch — avoids wasting API calls for inactive LLMs.
         // Xcode Command Line Tools check is handled by DependencyOverlay in ContentView.
