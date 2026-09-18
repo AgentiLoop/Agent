@@ -24,7 +24,15 @@ enum JevAdvisor {
     /// Second-opinion gate for a shell command that already passed
     /// `ShellSafetyService.check`. Returns a refusal reason, or `nil` to allow.
     static func shellBlockReason(command: String, workingDirectory: String) async -> String? {
-        guard isAdvising, let provider = JevConfiguration.provider() else { return nil }
+        guard isAdvising else { return nil }
+
+        // The usage callback fires before the verdict exists, so park it here
+        // and log both together — a bare "Jev answered" says nothing about
+        // what Jev decided.
+        let meter = JevUsageMeter()
+        guard let provider = JevConfiguration.provider(onUsage: { model, usage in
+            meter.record(model: model, usage: usage)
+        }) else { return nil }
 
         let risk: CommandRisk
         do {
@@ -38,6 +46,10 @@ enum JevAdvisor {
             JevConfiguration.report("⚠️ Jev check failed, command allowed: \(error.localizedDescription)")
             return nil
         }
+
+        let verdict = risk.isBlocked ? "REFUSED" : "allowed"
+        JevConfiguration.report(
+            "🔒 Jev: \(risk.percent)% destructive — \(verdict): \(summarize(command))\(meter.suffix)")
         guard risk.isBlocked else { return nil }
 
         return """
@@ -48,6 +60,15 @@ enum JevAdvisor {
         """
     }
 
+    /// One-line form of a command for the activity log.
+    private static func summarize(_ command: String) -> String {
+        let flat = command.split(whereSeparator: \.isNewline)
+            .joined(separator: " ⏎ ")
+            .trimmingCharacters(in: .whitespaces)
+        return flat.count > 70 ? String(flat.prefix(70)) + "…" : flat
+    }
+
+
     /// `GET /v1/models` — the names this account may send. Throws so Settings
     /// can show why a fetch failed.
     static func availableModels() async throws -> [ModelCard] {
@@ -55,5 +76,25 @@ enum JevAdvisor {
             throw TypeSafeError.missingAPIKey
         }
         return try await provider.availableModels()
+    }
+}
+
+/// Holds the token usage of the single request a `JevAdvisor` helper makes, so
+/// the verdict line can carry its cost. Locked because the package calls
+/// `onUsage` from whatever thread finished the request.
+private final class JevUsageMeter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var text = ""
+
+    func record(model: String, usage: Usage) {
+        lock.lock()
+        defer { lock.unlock() }
+        text = " (\(model), \(usage.inputTokens) in / \(usage.outputTokens) out)"
+    }
+
+    var suffix: String {
+        lock.lock()
+        defer { lock.unlock() }
+        return text
     }
 }
