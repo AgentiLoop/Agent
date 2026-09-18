@@ -66,11 +66,16 @@ enum JevConfiguration {
 
     /// The package's decision layer, wired to this app's endpoint and key.
     /// `nil` when no key is set — callers treat that as "no opinion".
-    /// `onUsage` fires after every successful answer, which is the only proof
-    /// the user gets that Jev actually ran.
-    static func provider() -> JevProvider? {
-        try? JevProvider(apiKey: apiKey, baseURL: baseURL, model: model) { answeringModel, usage in
+    /// A caller that knows what it asked supplies its own `onUsage` so it can
+    /// log the verdict and the token cost as one line; the default callback
+    /// only proves that Jev ran.
+    static func provider(
+        onUsage: (@Sendable (String, Usage) -> Void)? = nil
+    ) -> JevProvider? {
+        let sink = onUsage ?? { answeringModel, usage in
             report("🔒 Jev answered via \(answeringModel) — \(usage.inputTokens) in / \(usage.outputTokens) out tokens")
         }
+        return try? JevProvider(apiKey: apiKey, baseURL: baseURL, model: model, onUsage: sink)
     }
+
 }
