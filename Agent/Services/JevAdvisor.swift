@@ -17,9 +17,10 @@ enum JevAdvisor {
     }
 
     /// Probability above which Jev's "this destroys data" answer overrides the
-    /// command. Deliberately high — `ShellSafetyService` is the enforcement
-    /// layer; Jev only catches what the pattern rules miss.
-    static let destructiveBlockThreshold = 0.9
+    /// command. User-tunable in Settings (0–100% in 10% steps); the default is
+    /// deliberately high — `ShellSafetyService` is the enforcement layer, Jev
+    /// only catches what the pattern rules miss.
+    static var destructiveBlockThreshold: Double { JevConfiguration.blockThreshold }
 
     /// Second-opinion gate for a shell command that already passed
     /// `ShellSafetyService.check`. Returns a refusal reason, or `nil` to allow.

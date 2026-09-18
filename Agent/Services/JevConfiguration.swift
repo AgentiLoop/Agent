@@ -50,6 +50,25 @@ enum JevConfiguration {
         UserDefaults.standard.bool(forKey: advisoryDefaultsKey)
     }
 
+    // MARK: - Block threshold
+
+    static let blockThresholdDefaultsKey = "jevBlockThreshold"
+
+    /// Default cut-off: Jev only overrides a command it rates 90%+ destructive.
+    /// `ShellSafetyService` is the enforcement layer; Jev catches the rest.
+    static let defaultBlockThreshold = 0.9
+
+    /// Probability above which Jev's "this destroys data" answer blocks the
+    /// command, 0.0–1.0. Settings stores it in 10% steps. An unset key reads as
+    /// 0, so absence falls back to the default instead of blocking everything.
+    static var blockThreshold: Double {
+        guard UserDefaults.standard.object(forKey: blockThresholdDefaultsKey) != nil else {
+            return defaultBlockThreshold
+        }
+        let stored = UserDefaults.standard.double(forKey: blockThresholdDefaultsKey)
+        return min(max(stored, 0), 1)
+    }
+
     // MARK: - Activity reporting
 
     /// Jev is consulted from the nonisolated tool loop, where there is no
