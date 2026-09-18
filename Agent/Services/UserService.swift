@@ -219,6 +219,12 @@ final class UserService {
         } else {
             dir = (workingDirectory as NSString).expandingTildeInPath
         }
+        if let reason = await JevAdvisor.shellBlockReason(command: command, workingDirectory: dir) {
+            AuditLog.log(.launchAgent, "BLOCKED [jev]: \(command.prefix(200))")
+            return (-1, reason)
+        }
+        guard !Task.isCancelled else { return (-1, "Command cancelled before execution.") }
+
         // Prepend `export AGENT_PROJECT_FOLDER='<dir>'; cd '<dir>' && ` so the command runs in the right directory AND
         // has the project folder env var available the same way agent scripts do. The export is sent through the XPC boundary as part of the command string — no XPC protocol change required.
         let fullCommand: String

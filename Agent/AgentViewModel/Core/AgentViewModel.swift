@@ -291,21 +291,46 @@ final class AgentViewModel {
     // live in JevConfiguration; the protocol lives in the TypeSafeKit package.
 
     var jevAPIKey: String = KeychainService.shared.get(.jev) ?? "" {
-        didSet { KeychainService.shared.set(.jev, jevAPIKey) }
+        didSet {
+            guard jevAPIKey != oldValue else { return }
+            KeychainService.shared.set(.jev, jevAPIKey)
+            // The old account's catalog is meaningless for the new key.
+            jevModels = []
+            jevModelsError = nil
+            autoFetchJevModels()
+        }
     }
 
     var jevModel: String = UserDefaults.standard.string(forKey: JevConfiguration.modelDefaultsKey) ?? JevConfiguration.defaultModel {
         didSet { UserDefaults.standard.set(jevModel, forKey: JevConfiguration.modelDefaultsKey) }
     }
 
-    /// Models fetched from `GET /v1/models`; empty until the user hits refresh.
+    /// Models fetched from `GET /v1/models`; loaded automatically once a key is set.
     var jevModels: [ModelCard] = []
     var fetchingJevModels = false
     var jevModelsError: String?
 
+    /// Debounce handle for the key-driven auto fetch, so typing or pasting a key
+    /// one character at a time fires a single request instead of one per keystroke.
+    private var jevAutoFetchTask: Task<Void, Never>?
+
     /// Whether Jev is consulted for tool-gating decisions (off until a key is set).
     var jevAdvisoryEnabled: Bool = UserDefaults.standard.bool(forKey: JevConfiguration.advisoryDefaultsKey) {
         didSet { UserDefaults.standard.set(jevAdvisoryEnabled, forKey: JevConfiguration.advisoryDefaultsKey) }
+    }
+
+    /// Load the catalog as soon as a usable key exists — on settings appear and
+    /// whenever the key changes — so the Model field is a picker, not a free-text
+    /// box the user has to prime with the refresh button.
+    func autoFetchJevModels() {
+        jevAutoFetchTask?.cancel()
+        guard !jevAPIKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        jevAutoFetchTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(600))
+            guard !Task.isCancelled else { return }
+            guard jevModels.isEmpty, !fetchingJevModels else { return }
+            fetchJevModels()
+        }
     }
 
     func fetchJevModels() {
@@ -316,11 +341,16 @@ final class AgentViewModel {
             defer { fetchingJevModels = false }
             do {
                 jevModels = try await JevAdvisor.availableModels()
+                // A stale or defaulted selection isn't in this account's catalog.
+                if !jevModels.contains(where: { $0.name == jevModel }), let first = jevModels.first {
+                    jevModel = first.name
+                }
             } catch {
                 jevModelsError = error.localizedDescription
             }
         }
     }
+
 
 
     let ollamaEndpoint = "https://ollama.com/api/chat"
