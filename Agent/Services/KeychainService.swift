@@ -15,6 +15,7 @@ final class KeychainService: Sendable {
     enum APIKey: String, CaseIterable, Sendable {
         case tavily = "agent.tavilyAPIKey"
         case exa = "com.agent.exa-api-key"
+        case jev = "com.agent.jev-api-key"
     }
 
     func set(_ apiKey: APIKey, _ value: String) { set(key: apiKey.rawValue, value: value) }
