@@ -341,9 +341,9 @@ final class AgentViewModel {
             defer { fetchingJevModels = false }
             do {
                 jevModels = try await JevAdvisor.availableModels()
-                // A stale or defaulted selection isn't in this account's catalog.
-                if !jevModels.contains(where: { $0.name == jevModel }), let first = jevModels.first {
-                    jevModel = first.name
+                // Versioned IDs remain valid even when the catalog lists only aliases.
+                if jevModel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    jevModel = JevConfiguration.defaultModel
                 }
             } catch {
                 jevModelsError = error.localizedDescription
