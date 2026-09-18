@@ -41,11 +41,15 @@ enum JevAdvisor {
                 workingDirectory: workingDirectory,
                 threshold: destructiveBlockThreshold)
         } catch {
+            if Task.isCancelled || error is CancellationError || (error as? URLError)?.code == .cancelled {
+                return "Command cancelled during Jev check."
+            }
             // Still fail-open, but never silently: an expired key or a network
             // outage would otherwise be indistinguishable from "Jev says safe".
             JevConfiguration.report("⚠️ Jev check failed, command allowed: \(error.localizedDescription)")
             return nil
         }
+        guard !Task.isCancelled else { return "Command cancelled during Jev check." }
 
         let verdict = risk.isBlocked ? "REFUSED" : "allowed"
         JevConfiguration.report(
