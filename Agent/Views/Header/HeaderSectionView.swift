@@ -64,6 +64,7 @@ struct HeaderToolbarButtons: View {
     @Binding var showHistory: Bool
     @Binding var showClearConfirm: Bool
     @State private var showLLMUsage = false
+    @State private var showLLMCommon = false
     @State private var showCodingPrefs = false
     @State private var showFallbackChain = false
     @State private var showHUDOptions = false
@@ -97,6 +98,14 @@ struct HeaderToolbarButtons: View {
         isLLMActive ? .cyan : viewModel.llmStatusColor
     }
 
+    /// Common-settings icon color: green once anything shared is configured
+    /// (a web search key or the Jev gate), gray when it's all defaults.
+    private var llmCommonIconColor: Color {
+        let searchConfigured = !viewModel.exaAPIKey.isEmpty || !viewModel.tavilyAPIKey.isEmpty
+        let jevConfigured = !viewModel.jevAPIKey.isEmpty && viewModel.jevAdvisoryEnabled
+        return searchConfigured || jevConfigured ? .green : .secondary
+    }
+
     var body: some View {
         Button { showSettings.toggle() } label: {
             Image(systemName: "cpu")
@@ -108,6 +117,16 @@ struct HeaderToolbarButtons: View {
         .accessibilityValue(isLLMActive ? "Active" : "Idle")
         .popover(isPresented: $showSettings, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
             SettingsView(viewModel: viewModel)
+        }
+
+        Button { showLLMCommon.toggle() } label: {
+            Image(systemName: "switch.2")
+                .foregroundStyle(llmCommonIconColor)
+        }
+        .help("LLM Common Settings: Web Search, Jev, System Prompts")
+        .accessibilityLabel("LLM Common Settings")
+        .popover(isPresented: $showLLMCommon, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
+            LLMCommonSettingsView(viewModel: viewModel)
         }
 
         Button { showLLMUsage.toggle() } label: {

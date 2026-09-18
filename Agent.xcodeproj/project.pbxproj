@@ -242,6 +242,7 @@
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
 		AB7853CF1FF649C48C631F51 /* ProcessTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1821936007B7A5B592EB0FE /* ProcessTree.swift */; };
 		094F03A9F6093F2CD32452B2 /* FMServeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */; };
+		F36A58D7738933627DF110BF /* LLMCommonSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -517,6 +518,7 @@
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
 		F1821936007B7A5B592EB0FE /* ProcessTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/ProcessTree.swift; sourceTree = SOURCE_ROOT; };
 		8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FMServeService.swift"; sourceTree = "<group>"; };
+		6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LLMCommonSettingsView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -800,7 +802,8 @@
 				DF369840556805C0F5ABC259 /* FallbackChainView.swift */,
 				DFHUDA001556805C0F5ABC260 /* HUDOptionsView.swift */,
 				EASP000000000000000004 /* SystemPromptEditor.swift */,
-			);
+							6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */,
+);
 			path = Settings;
 			sourceTree = "<group>";
 		};
@@ -1479,6 +1482,7 @@
 				0A1EEB47CE2C2A8E1FEC9539 /* ProviderKeyed.swift in Sources */,
 							AB7853CF1FF649C48C631F51 /* ProcessTree.swift in Sources */,
 				094F03A9F6093F2CD32452B2 /* FMServeService.swift in Sources */,
+				F36A58D7738933627DF110BF /* LLMCommonSettingsView.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

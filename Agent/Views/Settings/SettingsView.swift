@@ -193,83 +193,6 @@ struct SettingsView: View {
         .task { await fm.checkHealth() }
     }
 
-    /// Jev (TypeSafe System One) — a decision layer, not an LLM provider, so it
-    /// lives in its own always-visible section rather than the provider picker.
-    /// Jev returns typed Choice/Score/Noul answers and cannot generate text or
-    /// tool arguments; Agent! consults it to gate and route the existing loop.
-    @ViewBuilder
-    private var jevSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 6) {
-                Text("Jev (TypeSafe)")
-                    .font(.headline)
-                Text("Decision layer")
-                    .font(.caption2).bold()
-                    .padding(.horizontal, 6).padding(.vertical, 1)
-                    .background(Color.accentColor.opacity(0.15))
-                    .clipShape(Capsule())
-            }
-
-            Text("Jev is a System One model: it answers typed yes/no, choice and rating questions about the current state instead of generating text. It advises Agent!'s tool loop — it does not replace your LLM provider.")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("API Key").font(.caption).foregroundStyle(.secondary)
-                LockedSecureField(text: $viewModel.jevAPIKey, placeholder: "TypeSafe API key", lockKey: "lock.jevAPIKey")
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Model").font(.caption).foregroundStyle(.secondary)
-                HStack {
-                    if viewModel.jevModels.isEmpty {
-                        TextField("e.g. \(JevConfiguration.defaultModel)", text: $viewModel.jevModel)
-                            .textFieldStyle(.roundedBorder)
-                    } else {
-                        Picker("Model", selection: $viewModel.jevModel) {
-                            ForEach(viewModel.jevModels, id: \.name) { model in
-                                Text(model.name).tag(model.name)
-                            }
-                        }
-                        .labelsHidden()
-                    }
-
-                    Button {
-                        viewModel.fetchJevModels()
-                    } label: {
-                        if viewModel.fetchingJevModels {
-                            ProgressView()
-                                .controlSize(.small)
-                        } else {
-                            Image(systemName: "arrow.clockwise")
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .disabled(viewModel.fetchingJevModels || viewModel.jevAPIKey.isEmpty)
-                    .help("Fetch available models")
-                }
-
-                if let error = viewModel.jevModelsError {
-                    Text(error)
-                        .font(.caption2)
-                        .foregroundStyle(.red)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-
-            HStack {
-                Text("Consult Jev before tools").font(.caption)
-                Spacer()
-                Toggle("", isOn: $viewModel.jevAdvisoryEnabled)
-                    .toggleStyle(.switch)
-                    .controlSize(.mini)
-                    .help("Ask Jev for a second opinion before running a shell command. Requires an API key.")
-            }
-            .disabled(viewModel.jevAPIKey.isEmpty)
-        }
-    }
 
 
     var body: some View {
@@ -753,35 +676,9 @@ struct SettingsView: View {
                     }
             }
 
-            // Web Search — available for all providers. Exa is preferred when
-            // configured, then Tavily, with DuckDuckGo as the keyless fallback.
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Web Search")
-                    .font(.headline)
-                Text("Exa or Tavily provides web search for all LLM providers. DuckDuckGo is used when neither key is set.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Exa API Key").font(.caption).foregroundStyle(.secondary)
-                    LockedSecureField(text: $viewModel.exaAPIKey, placeholder: "exa-...", lockKey: "lock.exaAPIKey")
-                }
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Tavily API Key").font(.caption).foregroundStyle(.secondary)
-                    LockedSecureField(text: $viewModel.tavilyAPIKey, placeholder: "tvly-...", lockKey: "lock.tavilyAPIKey")
-                }
-            }
-
             Divider()
 
-            jevSection
 
-            // System Prompts Editor
-
-            Button("Edit System Prompts...") {
-                SystemPromptWindow.shared.show()
-            }
-
-            Divider()
 
             HStack {
                 Text("Force Vision").font(.caption)
