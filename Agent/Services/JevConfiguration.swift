@@ -1,3 +1,4 @@
+import AgentAudit
 import Foundation
 import TypeSafeKit
 import TypeSafeMiddleware
@@ -49,11 +50,27 @@ enum JevConfiguration {
         UserDefaults.standard.bool(forKey: advisoryDefaultsKey)
     }
 
+    // MARK: - Activity reporting
+
+    /// Jev is consulted from the nonisolated tool loop, where there is no
+    /// AgentViewModel to call, so every Jev event is broadcast instead: the
+    /// view model appends it to the activity log, and it is mirrored into the
+    /// audit log for Console.app.
+    nonisolated static func report(_ message: String) {
+        AuditLog.log(.api, message)
+        NotificationCenter.default.post(
+            name: .jevActivity, object: nil, userInfo: ["message": message])
+    }
+
     // MARK: - Provider
 
     /// The package's decision layer, wired to this app's endpoint and key.
     /// `nil` when no key is set — callers treat that as "no opinion".
+    /// `onUsage` fires after every successful answer, which is the only proof
+    /// the user gets that Jev actually ran.
     static func provider() -> JevProvider? {
-        try? JevProvider(apiKey: apiKey, baseURL: baseURL, model: model)
+        try? JevProvider(apiKey: apiKey, baseURL: baseURL, model: model) { answeringModel, usage in
+            report("🔒 Jev answered via \(answeringModel) — \(usage.inputTokens) in / \(usage.outputTokens) out tokens")
+        }
     }
 }

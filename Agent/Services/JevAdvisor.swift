@@ -26,12 +26,19 @@ enum JevAdvisor {
     static func shellBlockReason(command: String, workingDirectory: String) async -> String? {
         guard isAdvising, let provider = JevConfiguration.provider() else { return nil }
 
-        guard let risk = try? await provider.commandRisk(
-            command: command,
-            workingDirectory: workingDirectory,
-            threshold: destructiveBlockThreshold),
-            risk.isBlocked
-        else { return nil }
+        let risk: CommandRisk
+        do {
+            risk = try await provider.commandRisk(
+                command: command,
+                workingDirectory: workingDirectory,
+                threshold: destructiveBlockThreshold)
+        } catch {
+            // Still fail-open, but never silently: an expired key or a network
+            // outage would otherwise be indistinguishable from "Jev says safe".
+            JevConfiguration.report("⚠️ Jev check failed, command allowed: \(error.localizedDescription)")
+            return nil
+        }
+        guard risk.isBlocked else { return nil }
 
         return """
         Refused: Jev rated this command \(risk.percent)% likely to irreversibly destroy data.
