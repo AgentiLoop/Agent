@@ -12,11 +12,11 @@ public struct JevProvider: DecisionProvider {
 
     public init(
         client: TypeSafeClient,
-        model: String = Model.jevLatest,
+        model: String? = nil,
         onUsage: (@Sendable (String, Usage) -> Void)? = nil
     ) {
         self.client = client
-        self.model = model
+        self.model = model ?? client.model
         self.onUsage = onUsage
     }
 
