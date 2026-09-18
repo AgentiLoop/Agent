@@ -107,6 +107,7 @@ struct LLMCommonSettingsView: View {
             }
             .disabled(viewModel.jevAPIKey.isEmpty)
         }
+        .task { viewModel.autoFetchJevModels() }
     }
 
     var body: some View {
