@@ -106,9 +106,27 @@ struct LLMCommonSettingsView: View {
                 Toggle("", isOn: $viewModel.jevAdvisoryEnabled)
                     .toggleStyle(.switch)
                     .controlSize(.mini)
+                    .tint(.green)
                     .help("Ask Jev for a second opinion before running a shell command. Requires an API key.")
             }
             .disabled(viewModel.jevAPIKey.isEmpty)
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text("Reject at").font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    Text("\(Int(viewModel.jevBlockPercent))% destructive")
+                        .font(.caption).monospacedDigit()
+                }
+                Slider(value: $viewModel.jevBlockPercent, in: 0...100, step: 10)
+                    .controlSize(.small)
+                    .tint(.green)
+                Text("Jev blocks a command it rates this likely — or more — to irreversibly destroy data. 0% rejects everything Jev is asked about; 100% only certainties.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .disabled(viewModel.jevAPIKey.isEmpty || !viewModel.jevAdvisoryEnabled)
         }
         .task { viewModel.autoFetchJevModels() }
     }

@@ -319,6 +319,15 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(jevAdvisoryEnabled, forKey: JevConfiguration.advisoryDefaultsKey) }
     }
 
+    /// How destructive Jev must rate a command before it blocks it, as a
+    /// percentage. Bound to the Settings slider in 10% steps; stored as 0.0–1.0.
+    var jevBlockPercent: Double = JevConfiguration.blockThreshold * 100 {
+        didSet {
+            UserDefaults.standard.set(jevBlockPercent / 100, forKey: JevConfiguration.blockThresholdDefaultsKey)
+        }
+    }
+
+
     /// Load the catalog as soon as a usable key exists — on settings appear and
     /// whenever the key changes — so the Model field is a picker, not a free-text
     /// box the user has to prime with the refresh button.
