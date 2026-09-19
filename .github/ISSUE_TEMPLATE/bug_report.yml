@@ -1,0 +1,86 @@
+name: 🐛 Bug report
+description: Something in Agent! isn't working the way it should
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. **Do not paste API keys** — redact them from any logs.
+  - type: input
+    id: version
+    attributes:
+      label: Agent! version
+      description: Menu bar → About Agent! (e.g. 1.1.49 build 249). Pre-release tags look like `v1.1.49.249`.
+      placeholder: "1.1.49 (249)"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: "macOS 26.0 (25A123)"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install Agent!?
+      options:
+        - Signed release / pre-release binary (.dmg / .zip)
+        - Built from source with Xcode (own Team ID)
+        - Built from source with ./build.sh (ad-hoc signed)
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: LLM provider
+      options:
+        - Claude (Anthropic)
+        - OpenAI-compatible
+        - Ollama
+        - Apple Intelligence (Foundation Models)
+        - Other / not applicable
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      placeholder: "e.g. claude-sonnet-4-5, gpt-oss:20b"
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you ask Agent! to do, and what went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Agent!
+        2. Type "..." in the task field
+        3. ...
+  - type: textarea
+    id: logs
+    attributes:
+      label: Activity log / Console output
+      description: Relevant lines from the activity log or Console.app. **Redact API keys.**
+      render: text
+  - type: checkboxes
+    id: helpers
+    attributes:
+      label: Helper status
+      options:
+        - label: Launch Agent (user helper) is registered
+        - label: Launch Daemon (root helper) is registered
+        - label: Accessibility permission is granted
