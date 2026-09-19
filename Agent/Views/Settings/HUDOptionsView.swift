@@ -44,6 +44,9 @@ struct HUDOptionsView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .controlSize(.small)
+                .labelsHidden()
+                .frame(maxWidth: .infinity)
                 .tint(.green)
             }
 
@@ -66,6 +69,7 @@ struct HUDOptionsView: View {
             }
         }
         .padding(16)
-        .frame(width: 360)
+        .frame(width: 360, alignment: .leading)
+        .clipped()
     }
 }
