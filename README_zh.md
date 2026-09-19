@@ -56,7 +56,11 @@ Agent! 是一款 100% 原生的 Swift 6.2 / SwiftUI 应用，将 **21 家 LLM �
 2. **打开 Agent!** —— 一切自动配置
 3. **选择你的 AI** —— 设置 → 选择提供商 → 输入 API 密钥
 
+> ✅ **你永远不需要从源码编译。** 每个正式版**和**每个预发布版都附带预编译的 Mac 二进制文件（`.dmg` + `.zip`），由 CI 构建，并**经 Apple 签名、公证（notarized）和装订（stapled）**，使用 AgentiLoop Team ID。因为官方二进制文件带有真实的 Developer ID，**Launch Agent 和 Launch Daemon 总能注册成功，永远不会“丢失”**——那只会发生在临时签名（ad-hoc）的源码构建中（见下方选项 B）。如果你的 helper 消失了，直接安装[最新版本的二进制文件](https://github.com/AgentiLoop/Agent/releases/latest)即可。
+
 ## 快速开始（从源码构建）
+
+> 仅当你想修改 Agent! 本身时才需要。其他人：请使用上面的已签名二进制文件。
 
 ```bash
 git clone https://github.com/AgentiLoop/agent.git

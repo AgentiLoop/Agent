@@ -56,7 +56,11 @@ No NPM, no Electron, no subscription, no telemetry. Bring your own API key, run 
 2. **Open Agent!** — it sets up everything automatically
 3. **Pick your AI** — Settings → choose a provider → enter API key
 
+> ✅ **You never need to compile from source.** Every release **and** every pre-release ships a pre-compiled Mac binary (`.dmg` + `.zip`), built by CI and **signed, notarized, and stapled by Apple** with the AgentiLoop Team ID. Because the official binaries carry a real Developer ID, the **Launch Agent and Launch Daemon always register and never get "lost"** — that only happens with ad-hoc source builds (see Option B below). If your helpers disappeared, just install the [latest release binary](https://github.com/AgentiLoop/Agent/releases/latest).
+
 ## Quick Start (Build from Source)
+
+> Only needed if you want to hack on Agent! itself. Everyone else: use the signed binary above.
 
 ```bash
 git clone https://github.com/AgentiLoop/agent.git
@@ -72,7 +76,7 @@ cd Agent
 open "build/DerivedData/Build/Products/Debug/Agent!.app"
 ```
 
-> ⚠️ Option B builds are ad-hoc signed. The Launch Agent/Daemon helpers won't register (SMAppService needs a Team ID), but the LLM loop, all tools, Accessibility, AppleScript, shell, and MCP still work.
+> ⚠️ Option B builds are ad-hoc signed. The Launch Agent/Daemon helpers won't register (SMAppService needs a Team ID), but the LLM loop, all tools, Accessibility, AppleScript, shell, and MCP still work. **Want the helpers without a developer account? Use the signed, notarized release binary — no compiling required.**
 
 > 💡 **Cheap setup:** **GLM-5.3** via **Z.ai** (fastest signup, default model) costs pennies per million tokens. Running locally? Only **GLM-4.7-Turbo** (32B) fits consumer hardware (64–128GB Apple Silicon via Ollama).
 
@@ -80,7 +84,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 - **`xcode-select` points at Command Line Tools** → `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
 - **Odd `BUILD FAILED` after pulling** → stale DerivedData: `./build.sh clean && ./build.sh`
-- **Helpers never register** → expected on Option B; use Option A for the helpers
+- **Helpers never register** → expected on Option B; use Option A, or simply install the [signed release binary](https://github.com/AgentiLoop/Agent/releases/latest) — every release and pre-release ships one
 - **Deployment target / SDK errors** → Agent! targets macOS 26; update macOS and Xcode
 - **Config argument is case-sensitive** → `./build.sh` (Debug) or `./build.sh Release`
 

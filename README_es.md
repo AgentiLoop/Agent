@@ -56,7 +56,11 @@ Sin NPM, sin Electron, sin suscripción, sin telemetría. Trae tu propia clave d
 2. **Abre Agent!** — lo configura todo automáticamente
 3. **Elige tu IA** — Ajustes → elige un proveedor → introduce la clave de API
 
+> ✅ **Nunca necesitas compilar desde el código fuente.** Cada release **y** cada pre-release incluye un binario de Mac precompilado (`.dmg` + `.zip`), construido por CI y **firmado, notarizado y grapado (stapled) por Apple** con el Team ID de AgentiLoop. Como los binarios oficiales llevan un Developer ID real, **el Launch Agent y el Launch Daemon siempre se registran y nunca se «pierden»** — eso solo ocurre con builds desde el código fuente firmados ad-hoc (ver Opción B más abajo). Si tus helpers desaparecieron, instala el [binario del último release](https://github.com/AgentiLoop/Agent/releases/latest).
+
 ## Inicio rápido (Compilar desde el código fuente)
+
+> Solo necesario si quieres modificar Agent! en sí. Todos los demás: usad el binario firmado de arriba.
 
 ```bash
 git clone https://github.com/AgentiLoop/agent.git
