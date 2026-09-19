@@ -764,16 +764,15 @@ final class AgentViewModel {
 
         // Jev speaks from the nonisolated tool loop — relay its notifications
         // into the activity log so the user can see the advisor working.
+        // Tab tasks never get here: JevConfiguration.report routes them via
+        // TabLogRouter. What arrives is a main-task line, so it goes to the
+        // main log — never to whatever tab happens to be selected.
         jevObserver = NotificationCenter.default.addObserver(
             forName: .jevActivity, object: nil, queue: .main
         ) { [weak self] note in
             guard let message = note.userInfo?["message"] as? String else { return }
             MainActor.assumeIsolated {
-                if let tabId = self?.selectedTabId, let tab = self?.tab(for: tabId) {
-                    tab.appendLog(message)
-                } else {
-                    self?.appendLog(message)
-                }
+                self?.appendLog(message)
             }
         }
 

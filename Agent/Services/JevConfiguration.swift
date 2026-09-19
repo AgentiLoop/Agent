@@ -72,11 +72,19 @@ enum JevConfiguration {
     // MARK: - Activity reporting
 
     /// Jev is consulted from the nonisolated tool loop, where there is no
-    /// AgentViewModel to call, so every Jev event is broadcast instead: the
-    /// view model appends it to the activity log, and it is mirrored into the
-    /// audit log for Console.app.
+    /// AgentViewModel to call. When a tab task is in flight the task-local
+    /// `TabLogRouter` carries the owning tab, so the line goes straight there;
+    /// otherwise it is broadcast and the view model appends it to the main
+    /// activity log. Either way it is mirrored into the audit log for Console.app.
     nonisolated static func report(_ message: String) {
         AuditLog.log(.api, message)
+        if let tab = TabLogRouter.current {
+            Task { @MainActor in
+                tab.appendLog(message)
+                tab.flush()
+            }
+            return
+        }
         NotificationCenter.default.post(
             name: .jevActivity, object: nil, userInfo: ["message": message])
     }
