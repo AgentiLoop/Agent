@@ -291,6 +291,17 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 Deleted scripts go to `~/Documents/AgentScript/agents/.Trash/` (`agent_script(action:"restore")`); `action:"pull"` fetches the upstream version from the [AgentScripts](https://github.com/AgentiLoop/AgentScripts) repo.
 
+## 🔒 Jev — a second opinion before shell commands
+
+**Jev** (TypeSafe System One) is an optional decision layer that reviews shell commands *before* Agent! runs them. It supplements your selected LLM provider — it never replaces it.
+
+- **What it does.** Every command that already passed the hard-coded `ShellSafetyService` rules is sent to Jev, which rates how likely it is to irreversibly destroy data. Above your threshold the command is refused with the rating and the command text; below it, the command runs.
+- **Where it applies.** All shell paths: the in-process shell, the user Launch Agent (`user_shell`), and the privileged Launch Daemon (`root_shell`).
+- **Tunable cut-off.** Settings → LLM Common Settings → **Reject at … % destructive**, 0–100% in 10% steps. Default **70%**.
+- **Fail-open by design.** No API key, the **Consult Jev before tools** toggle off, or a TypeSafe outage means "no opinion" — the command proceeds and the failure is logged, never silently treated as a safe verdict. Cancelling a task during a Jev check stops the command.
+- **Visible.** Every check logs the destructive-risk percentage, the allowed/refused verdict, the answering model, and input/output token counts.
+- **Configuration.** API key (stored in the Keychain), model picker with catalog refresh, and the advisory toggle all live in LLM Common Settings. The client lives in the bundled `TypeSafeKit` / `TypeSafeMiddleware` Swift package.
+
 ## Privacy & Safety
 
 Your files, screen contents and personal data never leave your Mac — cloud providers only see prompt text; local providers keep everything offline. Every action is logged.

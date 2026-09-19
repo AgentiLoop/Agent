@@ -291,6 +291,17 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 Gelöschte Skripte landen in `~/Documents/AgentScript/agents/.Trash/` (`agent_script(action:"restore")`); `action:"pull"` holt die Upstream-Version aus dem [AgentScripts](https://github.com/AgentiLoop/AgentScripts)-Repo.
 
+## 🔒 Jev — eine zweite Meinung vor Shell-Befehlen
+
+**Jev** (TypeSafe System One) ist eine optionale Entscheidungsschicht, die Shell-Befehle prüft, *bevor* Agent! sie ausführt. Sie ergänzt den von dir gewählten LLM-Anbieter — sie ersetzt ihn nie.
+
+- **Was sie tut.** Jeder Befehl, der die fest verdrahteten Regeln von `ShellSafetyService` bereits passiert hat, geht an Jev, das bewertet, wie wahrscheinlich er Daten unwiderruflich zerstört. Oberhalb deiner Schwelle wird der Befehl mit Prozentwert und Befehlstext abgelehnt; darunter läuft er.
+- **Wo sie greift.** Auf allen Shell-Pfaden: die In-Process-Shell, der Benutzer-Launch-Agent (`user_shell`) und der privilegierte Launch Daemon (`root_shell`).
+- **Einstellbare Schwelle.** Einstellungen → LLM Common Settings → **Reject at … % destructive**, 0–100 % in 10-%-Schritten. Standard: **70 %**.
+- **Bewusst fail-open.** Ohne API-Schlüssel, bei ausgeschaltetem Schalter **Consult Jev before tools** oder bei einer TypeSafe-Störung gilt „keine Meinung“: Der Befehl läuft weiter und der Fehler wird protokolliert, nie stillschweigend als sicheres Urteil ausgegeben. Wird eine Aufgabe während einer Jev-Prüfung abgebrochen, startet der Befehl nicht.
+- **Sichtbar.** Jede Prüfung protokolliert den Zerstörungsrisiko-Prozentwert, das Urteil erlaubt/abgelehnt, das antwortende Modell sowie Ein-/Ausgabe-Tokens.
+- **Konfiguration.** API-Schlüssel (im Schlüsselbund gespeichert), Modellauswahl mit Katalog-Aktualisierung und der Beratungsschalter liegen in LLM Common Settings. Der Client steckt im mitgelieferten Swift-Paket `TypeSafeKit` / `TypeSafeMiddleware`.
+
 ## Datenschutz & Sicherheit
 
 Deine Dateien, Bildschirminhalte und persönlichen Daten verlassen deinen Mac nie — Cloud-Anbieter sehen nur den Prompt-Text; lokale Anbieter halten alles offline. Jede Aktion wird protokolliert.
