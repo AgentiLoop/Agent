@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentMCP.git",
       "state" : {
-        "revision" : "1eefbb4bd16d8476d2d7490433fe62c2eb49b32b",
-        "version" : "1.6.5"
+        "revision" : "a0228872960afbbb9ba250079865e63036dfb7da",
+        "version" : "1.6.6"
       }
     },
     {
