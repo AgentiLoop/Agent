@@ -1985,7 +1985,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 1.6.5;
+				minimumVersion = 1.6.6;
 			};
 		};
 		EAE1E7102F7BF6290079432C /* XCRemoteSwiftPackageReference "AgentD1F" */ = {
