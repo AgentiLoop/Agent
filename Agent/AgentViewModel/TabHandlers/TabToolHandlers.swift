@@ -14,6 +14,17 @@ extension AgentViewModel {
     func handleTabToolCallBody(
         tab: ScriptTab, name: String, input rawInput: [String: Any], toolId: String
     ) async -> TabToolResult {
+        // Shared code reached from here (native tool handlers, completion gates,
+        // critic gate) logs via AgentViewModel.appendLog — bind the owning tab so
+        // those lines land on THIS tab instead of the main log.
+        await TabLogRouter.$current.withValue(tab) {
+            await handleTabToolCallDispatch(tab: tab, name: name, input: rawInput, toolId: toolId)
+        }
+    }
+
+    private func handleTabToolCallDispatch(
+        tab: ScriptTab, name: String, input rawInput: [String: Any], toolId: String
+    ) async -> TabToolResult {
         // Normalize empty/relative path to nil so handlers fall back to project folder
         var input = rawInput
         if let p = input["path"] as? String, (p.isEmpty || p == "." || p == "./") { input["path"] = nil }

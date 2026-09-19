@@ -1,6 +1,18 @@
 import AppKit
 import Foundation
 
+// MARK: - Tab Log Routing
+//
+// Tab tasks log through `tab.appendLog(...)`, but they also reach shared code
+// (native tool handlers, completion gates, the critic gate) that only knows
+// `AgentViewModel.appendLog`. Without a route, every one of those lines lands
+// on the main tab's log while the tab that actually ran the tool shows nothing.
+// This task-local carries the owning tab across those calls; `appendLog` /
+// `appendRawOutput` forward to it when set.
+enum TabLogRouter {
+    @TaskLocal static var current: ScriptTab?
+}
+
 // MARK: - Logging, Streaming & Media
 
 extension AgentViewModel {
@@ -408,6 +420,12 @@ extension AgentViewModel {
     }
 
     func appendLog(_ message: String) {
+        // Tab task in flight → the line belongs to that tab, not the main log.
+        if let tab = TabLogRouter.current {
+            tab.appendLog(message)
+            tab.flush()
+            return
+        }
         let timestamp = Self.timestampFormatter.string(from: Date())
         let cached = snapshotImages(in: message)
         // Multi-line messages (diffs, edit payloads, memory dumps) drop onto
@@ -430,6 +448,11 @@ extension AgentViewModel {
 
     func appendRawOutput(_ text: String) {
         guard !text.isEmpty else { return }
+        if let tab = TabLogRouter.current {
+            tab.appendOutput(text)
+            tab.flush()
+            return
+        }
         let cached = snapshotImages(in: text)
         // Ensure first line starts on its own line so it doesn't run into a timestamp prefix
         var output = cached
