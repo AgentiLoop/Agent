@@ -56,7 +56,11 @@ Kein NPM, kein Electron, kein Abo, keine Telemetrie. Bring deinen eigenen API-Sc
 2. **Öffne Agent!** — es richtet alles automatisch ein
 3. **Wähle deine KI** — Einstellungen → Anbieter wählen → API-Schlüssel eingeben
 
+> ✅ **Du musst nie aus dem Quellcode kompilieren.** Jedes Release **und** jedes Pre-Release enthält eine vorkompilierte Mac-Binary (`.dmg` + `.zip`), die von CI gebaut und **von Apple signiert, notarisiert und gestapelt** ist (AgentiLoop Team ID). Weil die offiziellen Binaries eine echte Developer ID tragen, **registrieren sich Launch Agent und Launch Daemon immer und gehen nie „verloren“** — das passiert nur bei ad-hoc signierten Quellcode-Builds (siehe Option B unten). Sind deine Helfer verschwunden, installiere einfach die [neueste Release-Binary](https://github.com/AgentiLoop/Agent/releases/latest).
+
 ## Schnellstart (Aus dem Quellcode bauen)
+
+> Nur nötig, wenn du an Agent! selbst arbeiten willst. Alle anderen: nutzt die signierte Binary oben.
 
 ```bash
 git clone https://github.com/AgentiLoop/agent.git
