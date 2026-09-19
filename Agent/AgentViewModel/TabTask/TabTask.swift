@@ -72,7 +72,13 @@ extension AgentViewModel {
     private func startTabTask(tab: ScriptTab, prompt: String) {
         tab.currentTaskPrompt = prompt
         tab.runningLLMTask = Task {
-            await executeTabTask(tab: tab, prompt: prompt)
+            // Bind the owning tab for the ENTIRE task so any shared code that
+            // logs through AgentViewModel.appendLog / JevConfiguration.report
+            // (LLM service setup, guards, triage, tool handlers, gates) lands
+            // on this tab — never on the main log or the selected tab.
+            await TabLogRouter.$current.withValue(tab) {
+                await executeTabTask(tab: tab, prompt: prompt)
+            }
             // When done, run next queued task
             if !tab.taskQueue.isEmpty && !tab.isCancelled {
                 let next = tab.taskQueue.removeFirst()
