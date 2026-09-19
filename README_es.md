@@ -22,6 +22,7 @@
 - [Français](README_fr.md)
 - [Deutsch](README_de.md)
 - [中文 (简体)](README_zh.md)
+- [Русский](README_ru.md)
 
 ## Ajedrez dentro de Agent
 <img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
