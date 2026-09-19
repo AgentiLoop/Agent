@@ -291,6 +291,17 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 Los scripts borrados van a `~/Documents/AgentScript/agents/.Trash/` (`agent_script(action:"restore")`); `action:"pull"` descarga la versión upstream del repo [AgentScripts](https://github.com/AgentiLoop/AgentScripts).
 
+## 🔒 Jev — una segunda opinión antes de los comandos de shell
+
+**Jev** (TypeSafe System One) es una capa de decisión opcional que revisa los comandos de shell *antes* de que Agent! los ejecute. Complementa al proveedor de LLM que hayas elegido — nunca lo sustituye.
+
+- **Qué hace.** Cada comando que ya pasó las reglas fijas de `ShellSafetyService` se envía a Jev, que califica qué probabilidad tiene de destruir datos de forma irreversible. Por encima de tu umbral el comando se rechaza indicando el porcentaje y el propio comando; por debajo, se ejecuta.
+- **Dónde se aplica.** En todas las rutas de shell: el shell en proceso, el Launch Agent del usuario (`user_shell`) y el Launch Daemon privilegiado (`root_shell`).
+- **Umbral ajustable.** Ajustes → LLM Common Settings → **Reject at … % destructive**, de 0 a 100 % en pasos del 10 %. Valor por defecto: **70 %**.
+- **Diseñado para fallar abierto.** Sin clave API, con el interruptor **Consult Jev before tools** desactivado o ante una caída de TypeSafe, el resultado es «sin opinión»: el comando continúa y el fallo se registra, nunca se hace pasar en silencio por un veredicto seguro. Cancelar una tarea durante una comprobación de Jev detiene el comando.
+- **Visible.** Cada comprobación registra el porcentaje de riesgo destructivo, el veredicto permitido/rechazado, el modelo que respondió y los tokens de entrada/salida.
+- **Configuración.** La clave API (guardada en el Llavero), el selector de modelo con actualización del catálogo y el interruptor de asesoramiento están en LLM Common Settings. El cliente vive en el paquete Swift incluido `TypeSafeKit` / `TypeSafeMiddleware`.
+
 ## Privacidad y seguridad
 
 Tus archivos, el contenido de la pantalla y los datos personales nunca salen de tu Mac — los proveedores en la nube solo ven el texto del prompt; los locales lo mantienen todo offline. Cada acción queda registrada.

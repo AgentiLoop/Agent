@@ -291,6 +291,17 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 Les scripts supprimés vont dans `~/Documents/AgentScript/agents/.Trash/` (`agent_script(action:"restore")`) ; `action:"pull"` récupère la version upstream depuis le dépôt [AgentScripts](https://github.com/AgentiLoop/AgentScripts).
 
+## 🔒 Jev — un second avis avant les commandes shell
+
+**Jev** (TypeSafe System One) est une couche de décision optionnelle qui examine les commandes shell *avant* qu'Agent! ne les exécute. Elle complète le fournisseur de LLM que vous avez choisi — elle ne le remplace jamais.
+
+- **Ce qu'elle fait.** Chaque commande ayant déjà passé les règles figées de `ShellSafetyService` est envoyée à Jev, qui évalue la probabilité qu'elle détruise des données de façon irréversible. Au-dessus de votre seuil, la commande est refusée avec le pourcentage et le texte de la commande ; en dessous, elle s'exécute.
+- **Où cela s'applique.** Sur tous les chemins shell : le shell in-process, le Launch Agent utilisateur (`user_shell`) et le Launch Daemon privilégié (`root_shell`).
+- **Seuil réglable.** Réglages → LLM Common Settings → **Reject at … % destructive**, de 0 à 100 % par paliers de 10 %. Valeur par défaut : **70 %**.
+- **Conçu pour échouer en mode ouvert.** Sans clé API, avec l'interrupteur **Consult Jev before tools** désactivé, ou en cas de panne de TypeSafe, le résultat est « aucun avis » : la commande continue et l'échec est journalisé, jamais présenté silencieusement comme un verdict sûr. Annuler une tâche pendant une vérification Jev empêche la commande de démarrer.
+- **Visible.** Chaque vérification journalise le pourcentage de risque destructif, le verdict autorisé/refusé, le modèle ayant répondu et le nombre de tokens en entrée/sortie.
+- **Configuration.** La clé API (stockée dans le Trousseau), le sélecteur de modèle avec rafraîchissement du catalogue et l'interrupteur d'avis se trouvent dans LLM Common Settings. Le client réside dans le paquet Swift embarqué `TypeSafeKit` / `TypeSafeMiddleware`.
+
 ## Confidentialité et sécurité
 
 Vos fichiers, le contenu de votre écran et vos données personnelles ne quittent jamais votre Mac — les fournisseurs cloud ne voient que le texte du prompt ; les fournisseurs locaux gardent tout hors ligne. Chaque action est journalisée.
