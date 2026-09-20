@@ -67,7 +67,7 @@ Nothing in this Agreement grants You any right to use the "AgentiLoop" or "Agent
 
 ### 11. Entire Agreement; Governing Law
 
-This Agreement constitutes the entire agreement between You and AgentiLoop concerning the subject matter hereof and supersedes all conflicting terms of any prior or contemporaneous agreements, representations, or understandings. This Agreement shall be governed by and construed in accordance with the laws of the State of **[GOVERNING STATE — fill in]**, United States of America, without regard to its conflict-of-laws principles. Any legal action or proceeding arising under this Agreement shall be brought exclusively in the state or federal courts located in **[GOVERNING STATE — fill in]**, and the parties hereby irrevocably consent to the personal jurisdiction and venue therein.
+This Agreement constitutes the entire agreement between You and AgentiLoop concerning the subject matter hereof and supersedes all conflicting terms of any prior or contemporaneous agreements, representations, or understandings. This Agreement shall be governed by and construed in accordance with the laws of the State of North Carolina, United States of America, without regard to its conflict-of-laws principles. Any legal action or proceeding arising under this Agreement shall be brought exclusively in the state or federal courts located in North Carolina, and the parties hereby irrevocably consent to the personal jurisdiction and venue therein.
 
 ### 12. Assignment
 
