@@ -1,0 +1,61 @@
+# CLA Assistant
+#
+# Requires every external contributor to sign the Contributor License
+# Agreement (CLA.md) before their pull request can be merged.
+#
+# How it works:
+#   - On PR open/sync the bot checks every commit author against
+#     signatures/version1/cla.json. Unsigned authors get a comment and a
+#     failing "CLA Assistant" status check.
+#   - The contributor signs by replying to the PR with exactly:
+#       I have read the CLA Document and I hereby sign the CLA
+#   - The bot records the signature (GitHub username, PR number, timestamp)
+#     in signatures/version1/cla.json on the branch below and flips the
+#     check to green. One signature covers all future PRs.
+#   - Commenting "recheck" re-runs the check.
+#
+# Uses pull_request_target so the check runs (with a write-capable token)
+# for PRs from forks. The action never checks out or executes PR code.
+#
+# Setup: add "CLA Assistant" as a required status check in the main branch
+# protection rules so unsigned PRs cannot be merged.
+
+name: CLA Assistant
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened, closed, synchronize]
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  cla:
+    name: CLA Assistant
+    runs-on: ubuntu-latest
+    steps:
+      - name: CLA Assistant
+        if: (github.event.comment.body == 'recheck' || github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA') || github.event_name == 'pull_request_target'
+        uses: contributor-assistant/github-action@v2.6.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path-to-signatures: 'signatures/version1/cla.json'
+          path-to-document: 'https://github.com/AgentiLoop/Agent/blob/main/CLA.md'
+          # Branch the signature file is committed to. If main is a protected
+          # branch, change this to an unprotected branch (e.g. cla-signatures).
+          branch: 'main'
+          # Maintainers and bots that never need to sign.
+          allowlist: 'toddbruss,dependabot[bot],github-actions[bot],bot*'
+          custom-notsigned-prcomment: |
+            Thank you for your contribution to 🦾 Agent!
+
+            Before we can merge, we need you to sign the [Contributor License Agreement](https://github.com/AgentiLoop/Agent/blob/main/CLA.md). It's a one-time step — reply to this pull request with the exact sentence below and the check will turn green:
+          custom-pr-sign-comment: 'I have read the CLA Document and I hereby sign the CLA'
+          custom-allsigned-prcomment: 'All contributors have signed the CLA ✅'
+          lock-pullrequest-aftermerge: false
