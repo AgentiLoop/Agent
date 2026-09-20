@@ -4,22 +4,19 @@ Agent! is a free, MIT-licensed, 100% native Swift macOS agent maintained by [Age
 
 **All billing happens through [GitHub Sponsors → AgentiLoop](https://github.com/sponsors/AgentiLoop)** — recurring or one-time. No invoiced billing, no credits, no other payment methods.
 
-## LLM Provider sponsorship
+## Silver, Gold, Platinum
 
-For LLM API providers, gateways, and model hosts Agent! can talk to. Simple, level-based:
+Three levels. Each has two flavors — **LLM Provider** (you run an API/gateway/model host Agent! can talk to) and **Regular** (any other company or individual). Same price, different placement.
 
-| Level | Price | What you get |
-|---|---|---|
-| **Silver** | $500 / mo | Sponsored badge on the README files (LLM Providers, name + Silver badge) |
-| **Gold** | $1,500 / mo | Silver, plus: your **logo** in the **Sponsored Providers** section of agentiloop.ai, linking to your website (shown with your Gold badge) |
-| **Platinum** | $2,500 / mo | Gold, plus top placement in the website's Sponsored Providers section (shown with your Platinum badge) |
+| Level | Price | LLM Provider | Regular sponsor |
+|---|---|---|---|
+| **Silver** | $500 / mo | Name + Silver badge under **LLM Providers** in the README files; entry in Agent!'s **Sponsors menu** (links to your website) | Name + Silver badge in the README **Sponsors** section; entry in Agent!'s **Sponsors menu** (links to your website) |
+| **Gold** | $1,500 / mo | Silver, plus your **company logo + Gold badge** in the **Sponsored Providers** section of agentiloop.ai, linking to your website | Silver, plus your **company logo + Gold badge** in the **Sponsors** section of agentiloop.ai, linking to your website |
+| **Platinum** | $2,500 / mo | Gold, plus **top placement** in the Sponsored Providers section of agentiloop.ai (logo + Platinum badge) | Gold, plus **top placement** in the Sponsors section of agentiloop.ai (logo + Platinum badge) |
 
-Every level also includes:
+Your sponsorship level is shown everywhere you appear (README, website, in-app).
 
-- **Sponsors menu inside Agent!** — pull down the menu, see your name with your sponsorship level, click through to your website
-- Your sponsorship level shown everywhere you appear (README, website, in-app)
-
-Every LLM Provider also pays a one-time **integration fee** — see [Provider Sponsorship & Integration](./PROVIDER_PROGRAM.md) ($1,500; $2,500 when more than one API must be implemented).
+**LLM Providers only:** a one-time **integration fee** also applies — see [Provider Sponsorship & Integration](./PROVIDER_PROGRAM.md) ($1,500; $2,500 when more than one API must be implemented).
 
 ## Other ways to sponsor
 
