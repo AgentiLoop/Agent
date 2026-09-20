@@ -14,22 +14,19 @@ From the provider's side, sponsorship is a customer-acquisition cost. The things
 | 2 | **A tracked signup link / promo code** in the app, README, and docs | Lets them attribute users and justify renewal — Agent! has no telemetry, so this is the *only* measurement channel |
 | 3 | **"Works with Agent!" verification** — nightly CI run of the tool-calling + streaming suite against their endpoint | Compatibility badge they can show their own customers; catches regressions before users do |
 | 4 | **A maintainer-written config guide** (`docs/providers/<name>.md`) that ranks in search | Long-tail traffic for "<provider> macOS agent" |
-| 5 | **Logo placement** (README, website, release notes) | Brand awareness; matters less than 1–4 to most providers |
-| 6 | **Co-marketing** (launch post, case study, social) | Content they can repost |
-| 7 | **Priority compatibility fixes + roadmap input** | Insurance that their endpoint keeps working across releases |
+| 5 | **Sponsor badge on the listing** (README + website, under LLM Providers) | Visible support; labeled honestly |
 
-Providers rarely pay for logo-only placement at a project this size. They pay for #1–#3 and treat #5–#7 as extras.
+We do not sell logos, banners, or header placement. Every provider appears the same way: a row under **LLM Providers**; sponsors get a sponsor badge on that row.
 
 ## Tiers
 
-Prices are USD, month-to-month, billed via [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) (custom amount) or invoice. **Cash only** — we do not accept API credits, discounts, or other in-kind consideration in place of the fee. Logo/badge placements have a 3-month minimum. Annual prepay = 12 months for the price of 10.
+Prices are USD, month-to-month, billed via [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) (custom amount) or invoice. **Cash only** — we do not accept API credits, discounts, or other in-kind consideration in place of the fee. 3-month minimum on the sponsor badge. Annual prepay = 12 months for the price of 10. No slots — every provider that qualifies is listed.
 
-| Tier | Price | Slots | Includes |
-|---|---|---|---|
-| **Listed** | Free | Unlimited | Row in the README **AI Providers** table for any endpoint that passes the compatibility suite. No logo, no link tracking. Neutral baseline — every compatible provider gets this. |
-| **Verified** | $250 / mo | Unlimited | "Works with Agent!" badge; nightly CI compatibility run against your endpoint with public status; logo + tracked signup link in the provider table; `docs/providers/<name>.md` config guide; promo code surfaced in the FAQ and guide |
-| **Featured** | $1,000 / mo | 6 | Everything in Verified, plus: first-class provider preset in the in-app picker (icon, base URL, model list, capability metadata); "Sponsored" callout in the FAQ cost section; mention in every release's notes; launch announcement in Discussions + agentiloop.ai; quarterly 30-min call |
-| **Premier** | $2,500 / mo | 2 | Everything in Featured, plus: logo in the README header + agentiloop.ai; 2-business-day acknowledgement on compatibility issues; early access to pre-release builds for testing new models; co-marketing case study; input on provider-related roadmap |
+| Tier | Price | Includes |
+|---|---|---|
+| **Listed** | Free | Row in the README **LLM Providers** table and on the agentiloop.ai **LLM Providers** page for any endpoint that passes the compatibility suite. No badge, no link tracking. Neutral baseline — every compatible provider gets this. |
+| **Sponsor** | $250 / mo | **Sponsor badge** on your row in the README and on the agentiloop.ai LLM Providers page; tracked signup link + promo code on the row and in the FAQ; "Works with Agent!" nightly CI compatibility run with public status; `docs/providers/<name>.md` config guide |
+| **Partner** | $1,000 / mo | Everything in Sponsor, plus: first-class provider preset in the in-app picker (base URL, model list, capability metadata); mention in every release's notes; launch announcement in Discussions; 2-business-day acknowledgement on compatibility issues; early access to pre-release builds; quarterly 30-min call |
 
 Providers are welcome to supply a test API key so the nightly compatibility run can hit their endpoint; that is a technical courtesy, not payment, and does not reduce the fee.
 
@@ -37,7 +34,7 @@ Providers are welcome to supply a test API key so the nightly compatibility run 
 
 | Item | Price | Notes |
 |---|---|---|
-| **Integration** | $1,500 | First-class provider entry: picker icon, base URL preset, model list, capability metadata, tool-calling + streaming tests, config guide. Delivered under MIT. **Waived** for Featured/Premier with a 6-month commitment. |
+| **Integration** | $1,500 | First-class provider entry: base URL preset, model list, capability metadata, tool-calling + streaming tests, config guide. Delivered under MIT. **Waived** for Partner with a 6-month commitment. |
 | **Model launch** | $500 | Same-week support + release-notes callout when you ship a new model (adds it to the preset, verifies tool calling, updates the guide) |
 | **Feature bounty** | from $1,000 | Provider-specific capability (e.g. prompt caching, batch API, native structured output). Scoped and quoted per issue. |
 
@@ -72,8 +69,8 @@ Not for sale, at any tier:
 
 ## Terms
 
-- Month-to-month; 3-month minimum on logo/badge placements; 30 days' notice to cancel after that
-- Invoicing (net-30) available at Featured and above; GitHub Sponsors otherwise
+- Month-to-month; 3-month minimum on the sponsor badge; 30 days' notice to cancel after that
+- Invoicing (net-30) available at Partner; GitHub Sponsors otherwise
 - Placement removed at the end of the last paid month; the config guide stays (it helps users) but loses the badge
 - Provider must keep the tracked signup link and promo code valid for the term
 - Governing law: North Carolina, USA
@@ -86,7 +83,7 @@ Not for sale, at any tier:
 | Crawl4AI | ~50k devs | $500/mo team tier · $2,000/mo infrastructure partner |
 | AgentOS | small | Featured provider-list placement, all sponsor placements labeled |
 
-Agent! is ~600 ★ with 2,000+ downloads, so tiers sit roughly 4–8× below Open WebUI's and in line with Crawl4AI's, while offering the one thing those projects don't: a native macOS picker preset and a nightly compatibility run against the provider's endpoint.
+Agent! is ~600 ★ with 2,000+ downloads, so tiers sit well below Open WebUI's and in line with Crawl4AI's entry tiers — and unlike those projects we sell no logo placement at all, only a labeled sponsor badge on an equal-footing provider listing plus a native macOS picker preset and a nightly compatibility run.
 
 ## Contact
 
