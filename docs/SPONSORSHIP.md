@@ -2,11 +2,9 @@
 
 Agent! is a free, MIT-licensed, 100% native Swift macOS agent maintained by [AgentiLoop.ai](https://agentiloop.ai) (Logos InkPen LLC, North Carolina, USA). Sponsorship keeps the project independent and funds the things that don't fund themselves: CI minutes on macOS runners, Apple Developer / notarization, provider API testing across 21 backends, and maintainer time.
 
+> **LLM API providers, gateways, and model hosts:** see the [Provider Partner Program](./PROVIDER_PROGRAM.md) — it replaces the general tiers below with provider-specific pricing (Listed / Verified / Featured / Premier) and a compatibility standard.
 
-
-> **LLM API providers, gateways, and model hosts:** see the [Provider Partner Program](./PROVIDER_PROGRAM.md) — it replaces the general tiers below with provider-specific pricing (Listed / Verified / Featured / Premier), a compatibility standard, and credit- or referral-based options.
-
-All sponsorships run through **[GitHub Sponsors → AgentiLoop](https://github.com/sponsors/AgentiLoop)** (recurring or one-time). Invoiced billing is available for company sponsors at Silver and above.
+All sponsorships run through **[GitHub Sponsors → AgentiLoop](https://github.com/sponsors/AgentiLoop)** (recurring or one-time). Invoiced billing is available for company sponsors at Silver and above. **Cash only** — API credits, discounts, hardware, and other in-kind offers are not accepted in place of a tier fee.
 
 ## Audience (public numbers, September 2026)
 
@@ -39,11 +37,9 @@ Every tier is monthly unless marked one-time. Logo placements require a minimum 
 | **Feature bounty** | from $1,000 | Fund a specific issue (new provider integration, tool, or bridge). Scoped and quoted per issue; delivered under the project's normal MIT license |
 | **Provider integration** | $2,500 | Dedicated first-class provider entry (picker icon, model list, capability metadata, tests) for an OpenAI/Anthropic/Gemini-compatible endpoint, plus the Silver placement for 3 months. *LLM providers: see the [Provider Partner Program](./PROVIDER_PROGRAM.md) for the current $1,500 integration fee and provider tiers.* |
 
-## In-kind sponsorship (API credits, discounts, hardware)
+## Perks for Agent! users
 
-We accept in-kind sponsorship and credit it at **50% of face value** toward a tier. Example: $1,000/month of API credits used for CI and provider testing counts as $500/month → Silver.
-
-Discounts or perks offered **to Agent! users** (promo codes, free credit on signup) are listed in the FAQ and the provider guide regardless of tier — they help our users, so we're happy to publish them.
+Discounts or perks offered **to Agent! users** (promo codes, free credit on signup) are listed in the FAQ and the provider guide regardless of tier — they help our users, so we're happy to publish them. They are not a substitute for a tier fee.
 
 ## Placement formats and durations
 
