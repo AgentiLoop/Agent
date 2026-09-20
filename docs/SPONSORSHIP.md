@@ -4,7 +4,7 @@ Agent! is a free, MIT-licensed, 100% native Swift macOS agent maintained by [Age
 
 > **LLM API providers, gateways, and model hosts:** see the [Provider Sponsorship & Integration](./PROVIDER_PROGRAM.md) — name + sponsorship badge in the README under LLM Providers at any tier, logo on the website at Gold/Platinum, and a flat $1,500 integration fee.
 
-All sponsorships run through **[GitHub Sponsors → AgentiLoop](https://github.com/sponsors/AgentiLoop)** (recurring or one-time). Invoiced billing is available for company sponsors at Silver and above. **Cash only** — API credits, discounts, hardware, and other in-kind offers are not accepted in place of a tier fee.
+All sponsorships run through **[GitHub Sponsors → AgentiLoop](https://github.com/sponsors/AgentiLoop)** (recurring or one-time). **Cash only** — API credits, discounts, hardware, and other in-kind offers are not accepted in place of a tier fee.
 
 ## Audience (public numbers, September 2026)
 
