@@ -23,12 +23,13 @@ Every LLM Provider also pays a one-time **integration fee** — see [Provider Sp
 
 ## Other ways to sponsor
 
-| Option | Price | What you get |
-|---|---|---|
-| **Supporter** | $5 / mo | Name in `SPONSORS.md`; sponsor badge on GitHub |
-| **Backer** | $25 / mo | Name in the README **Sponsors** section |
-| **Bronze** | $100 / mo | Name in the README Sponsors section and on agentiloop.ai |
-| **Release sponsor** (one-time) | $250 | "This release sponsored by …" line in one release's notes |
+$5, $25, and $100 tiers get your **name in the sponsor README file** (no links). Sponsoring through GitHub also adds the sponsor badge to your GitHub profile.
+
+| Tier | Price |
+|---|---|
+| **Supporter** | $5 / mo |
+| **Backer** | $25 / mo |
+| **Bronze** | $100 / mo |
 
 ## What sponsorship does not buy
 
