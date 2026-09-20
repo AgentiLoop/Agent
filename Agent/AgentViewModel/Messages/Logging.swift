@@ -581,9 +581,14 @@ extension AgentViewModel {
             tab.tabOutputTokens = 0
             tab.historyIndex = -1
             tab.savedInput = ""
+            // The selected tab's log was the one wiped — confirm there, not in
+            // the (hidden) main log, or the tab just shows the empty placeholder.
+            tab.appendLog("🧹 All cleared.")
+            tab.flush()
+        } else {
+            appendLog("🧹 All cleared.")
+            flushLog()
         }
-        appendLog("🧹 All cleared.")
-        flushLog()
     }
 
     // MARK: - LLM Streaming
