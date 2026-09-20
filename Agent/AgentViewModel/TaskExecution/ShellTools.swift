@@ -18,7 +18,7 @@ extension AgentViewModel {
                 process.currentDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory())
                 var env = ProcessInfo.processInfo.environment
                 env["HOME"] = NSHomeDirectory()
-                let extraPaths = "\(FileManager.default.homeDirectoryForCurrentUser.path)/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+                let extraPaths = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
                 env["PATH"] = extraPaths + ":" + (env["PATH"] ?? "")
                 process.environment = env
                 do {
