@@ -67,7 +67,7 @@ All contributors must sign the [AgentiLoop Contributor License Agreement](./CLA.
 2. The **CLA Assistant** bot comments on the PR.
 3. Reply with exactly: `I have read the CLA Document and I hereby sign the CLA`
 
-The bot records your GitHub username in [`signatures/version1/cla.json`](https://github.com/AgentiLoop/Agent/blob/cla-signatures/signatures/version1/cla.json) (on the `cla-signatures` branch) and the check turns green. You keep the copyright to your work — the CLA grants AgentiLoop a license to use, relicense, and distribute it. Contributing on behalf of an employer? See the "How to Sign" section in [CLA.md](./CLA.md).
+The bot records your GitHub username in [`signatures/version1/cla.json`](./signatures/version1/cla.json) and the check turns green. You keep the copyright to your work — the CLA grants AgentiLoop a license to use, relicense, and distribute it. Contributing on behalf of an employer? See the "How to Sign" section in [CLA.md](./CLA.md).
 
 ## License
 
