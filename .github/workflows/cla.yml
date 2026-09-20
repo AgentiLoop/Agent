@@ -17,8 +17,9 @@
 # Uses pull_request_target so the check runs (with a write-capable token)
 # for PRs from forks. The action never checks out or executes PR code.
 #
-# Setup: add "CLA Assistant" as a required status check in the main branch
-# protection rules so unsigned PRs cannot be merged.
+# Setup: "CLA Assistant" is a required status check in the main branch
+# ruleset, so unsigned PRs cannot be merged. Signatures live on the
+# unprotected `cla-signatures` branch because the bot commits there directly.
 
 name: CLA Assistant
 
@@ -47,9 +48,9 @@ jobs:
         with:
           path-to-signatures: 'signatures/version1/cla.json'
           path-to-document: 'https://github.com/AgentiLoop/Agent/blob/main/CLA.md'
-          # Branch the signature file is committed to. If main is a protected
-          # branch, change this to an unprotected branch (e.g. cla-signatures).
-          branch: 'main'
+          # Branch the signature file is committed to. Must be unprotected —
+          # main requires the CLA status check, which would block the bot's push.
+          branch: 'cla-signatures'
           # Maintainers and bots that never need to sign.
           allowlist: 'toddbruss,dependabot[bot],github-actions[bot],bot*'
           custom-notsigned-prcomment: |
