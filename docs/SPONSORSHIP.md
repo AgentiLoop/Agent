@@ -10,9 +10,9 @@ Three levels. Each has two flavors — **LLM Provider** (you run an API/gateway/
 
 | Level | Price | LLM Provider | Regular sponsor |
 |---|---|---|---|
-| **Silver** | $500 / mo | Name + Silver badge under **LLM Providers** in the README files; entry in Agent!'s **Sponsors menu** (links to your website) | Name + Silver badge in the README **Sponsors** section; entry in Agent!'s **Sponsors menu** (links to your website) |
-| **Gold** | $1,500 / mo | Silver, plus your **company logo + Gold badge** in the **Sponsored Providers** section of agentiloop.ai, linking to your website | Silver, plus your **company logo + Gold badge** in the **Sponsors** section of agentiloop.ai, linking to your website |
-| **Platinum** | $2,500 / mo | Gold, plus **top placement** in the Sponsored Providers section of agentiloop.ai (logo + Platinum badge) | Gold, plus **top placement** in the Sponsors section of agentiloop.ai (logo + Platinum badge) |
+| **Silver** | $500 / mo | Name + Silver badge under **LLM Providers** in the README files; **company logo + Silver badge** in the **Sponsored Providers** section of agentiloop.ai, linking to your website; entry in Agent!'s **Sponsors menu** (links to your website) | Name + Silver badge in the README **Sponsors** section; **company logo + Silver badge** in the **Sponsors** section of agentiloop.ai, linking to your website; entry in Agent!'s **Sponsors menu** (links to your website) |
+| **Gold** | $1,500 / mo | Same as Silver, with the **Gold badge** (company logo + Gold badge) | Same as Silver, with the **Gold badge** (company logo + Gold badge) |
+| **Platinum** | $2,500 / mo | Same as Gold, with the **Platinum badge** plus **top placement** in the Sponsored Providers section of agentiloop.ai (company logo + Platinum badge) | Same as Gold, with the **Platinum badge** plus **top placement** in the Sponsors section of agentiloop.ai (company logo + Platinum badge) |
 
 Your sponsorship level is shown everywhere you appear (README, website, in-app).
 
