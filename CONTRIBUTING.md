@@ -61,4 +61,4 @@ Open a [GitHub issue](https://github.com/AgentiLoop/Agent/issues) or a [discussi
 
 ## License
 
-By contributing, you agree your contributions are licensed under the [MIT License](./LICENSE). Note: the "🦾 Agent!" name and logo are trademarks of Heisenburg and not covered by the MIT license (see README Legal Notice).
+By contributing, you agree your contributions are licensed under the [MIT License](./LICENSE). Note: the "🦾 Agent!" name and logo are trademarks of AgentiLoop.ai and not covered by the MIT license (see README Legal Notice).
