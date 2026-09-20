@@ -1,6 +1,6 @@
 # 🦾 AgentiLoop Agent!
 
-### Nous avons atteint 600 étoiles ! Merci à tous pour votre soutien à Agent! Il nous reste encore un long chemin à parcourir, mais le départ est formidable. Agent! est né le 1er avril 2026 avec notre propre technologie, développée depuis 2000 et entre 2023 et 2026.
+### En toute transparence : je n'utilise plus Cursor ni Claude Code. Agent! d'AgentiLoop n'a pas seulement remplacé ces outils de codage — je l'utilise pour automatiser mes e-mails, déployer des logiciels, effectuer des recherches sur le web dans Safari avec plus de 12 moteurs de recherche et créer des sites web qui se mettent à jour tout seuls. Agent! est devenu l'outil d'IA agentique le plus puissant pour macOS 26 et 27.
 
 ### **IA agentique pour votre bureau Mac**
 
