@@ -1,3 +1,12 @@
 {
-  "signedContributors": []
+  "signedContributors": [
+    {
+      "name": "AgentiLoop",
+      "id": 52664524,
+      "comment_id": 5751318471,
+      "created_at": "2026-09-20T17:10:19Z",
+      "repoId": 1179222510,
+      "pullRequestNo": 58
+    }
+  ]
 }
