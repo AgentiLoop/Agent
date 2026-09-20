@@ -357,7 +357,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) — build from source in ~5 minutes wit
 
 ## Sponsoring
 
-Companies and LLM providers who want to support the project: see [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) for tiers, placements, and in-kind options, or sponsor directly via [GitHub Sponsors](https://github.com/sponsors/AgentiLoop).
+Companies and LLM providers who want to support the project: see [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) for tiers, placements, and in-kind options, the [Provider Partner Program](./docs/PROVIDER_PROGRAM.md) for LLM API providers, or sponsor directly via [GitHub Sponsors](https://github.com/sponsors/AgentiLoop).
 
 ## License
 

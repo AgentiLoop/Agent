@@ -2,6 +2,10 @@
 
 Agent! is a free, MIT-licensed, 100% native Swift macOS agent maintained by [AgentiLoop.ai](https://agentiloop.ai) (Logos InkPen LLC, North Carolina, USA). Sponsorship keeps the project independent and funds the things that don't fund themselves: CI minutes on macOS runners, Apple Developer / notarization, provider API testing across 21 backends, and maintainer time.
 
+
+
+> **LLM API providers, gateways, and model hosts:** see the [Provider Partner Program](./PROVIDER_PROGRAM.md) — it replaces the general tiers below with provider-specific pricing (Listed / Verified / Featured / Premier), a compatibility standard, and credit- or referral-based options.
+
 All sponsorships run through **[GitHub Sponsors → AgentiLoop](https://github.com/sponsors/AgentiLoop)** (recurring or one-time). Invoiced billing is available for company sponsors at Silver and above.
 
 ## Audience (public numbers, September 2026)
@@ -33,7 +37,7 @@ Every tier is monthly unless marked one-time. Logo placements require a minimum 
 |---|---|---|
 | **Release sponsor** | $250 | "This release sponsored by …" line in one release's notes and Discussions post |
 | **Feature bounty** | from $1,000 | Fund a specific issue (new provider integration, tool, or bridge). Scoped and quoted per issue; delivered under the project's normal MIT license |
-| **Provider integration** | $2,500 | Dedicated first-class provider entry (picker icon, model list, capability metadata, tests) for an OpenAI/Anthropic/Gemini-compatible endpoint, plus the Silver placement for 3 months |
+| **Provider integration** | $2,500 | Dedicated first-class provider entry (picker icon, model list, capability metadata, tests) for an OpenAI/Anthropic/Gemini-compatible endpoint, plus the Silver placement for 3 months. *LLM providers: see the [Provider Partner Program](./PROVIDER_PROGRAM.md) for the current $1,500 integration fee and provider tiers.* |
 
 ## In-kind sponsorship (API credits, discounts, hardware)
 
