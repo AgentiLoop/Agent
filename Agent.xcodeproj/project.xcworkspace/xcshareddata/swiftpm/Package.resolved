@@ -1,13 +1,13 @@
 {
-  "originHash" : "c6d9dfee182867b0a65456eb166d452db7301c8659d8465e386a64874764df0c",
+  "originHash" : "9c6813c435023293b78b24e8c6a1f817139f41d54c8f9c1417c29aff360cb9a3",
   "pins" : [
     {
       "identity" : "agentaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentAccess.git",
       "state" : {
-        "revision" : "4c9778873d83cffcacab9fd87c94ebb62f117d1e",
-        "version" : "2.10.18"
+        "revision" : "aa3d0142c1a51b33f66acac04f5d71b33492ec3a",
+        "version" : "2.10.19"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentAudit.git",
       "state" : {
-        "revision" : "71de8e1dbb06c6e927cf981ed71b3fe5d9987c18",
-        "version" : "1.3.5"
+        "revision" : "4e5a2529b36302a938d4916c92a39b2d49c46440",
+        "version" : "1.3.6"
       }
     },
     {
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentD1F.git",
       "state" : {
-        "revision" : "d7232f8308c61fd2a8b1ed936f299ad4a1dfbc24",
-        "version" : "1.0.11"
+        "revision" : "5ba706c406921f6e9de6bcbfc83ea7e495d1c17f",
+        "version" : "1.0.12"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentEventBridges.git",
       "state" : {
-        "revision" : "61b0752d5439721ef0461aa7c277827db53fec02",
-        "version" : "1.1.4"
+        "revision" : "91cd26b1c077aa14fee709e4240c07108095c921",
+        "version" : "1.1.5"
       }
     },
     {
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentMCP.git",
       "state" : {
-        "revision" : "a0228872960afbbb9ba250079865e63036dfb7da",
-        "version" : "1.6.6"
+        "revision" : "5da7c489d031e2110a3e62a351d8d2d44ba497df",
+        "version" : "1.6.7"
       }
     },
     {
@@ -69,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentSwift.git",
       "state" : {
-        "revision" : "ca6238b2b18fb15a22ebb581b3c414a89a9e627d",
-        "version" : "1.1.6"
+        "revision" : "3478db341d59124ac5f24e1426621886518129ee",
+        "version" : "1.1.7"
       }
     },
     {

@@ -1985,7 +1985,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 1.6.6;
+				minimumVersion = 1.6.7;
 			};
 		};
 		EAE1E7102F7BF6290079432C /* XCRemoteSwiftPackageReference "AgentD1F" */ = {
@@ -1994,7 +1994,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 1.0.11;
+				minimumVersion = 1.0.12;
 			};
 		};
 		EAE1E7132F7BF6880079432C /* XCRemoteSwiftPackageReference "AgentSwift" */ = {
@@ -2003,7 +2003,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 1.1.6;
+				minimumVersion = 1.1.7;
 			};
 		};
 		EAE1E7162F7BF6E70079432C /* XCRemoteSwiftPackageReference "AgentEventBridges" */ = {
@@ -2012,7 +2012,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 1.1.4;
+				minimumVersion = 1.1.5;
 			};
 		};
 		EAE1E7192F7BF7000079432C /* XCRemoteSwiftPackageReference "AgentAudit" */ = {
@@ -2021,7 +2021,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 1.3.5;
+				minimumVersion = 1.3.6;
 			};
 		};
 		EAE1E7242F7C02000079432C /* XCRemoteSwiftPackageReference "AgentAccess" */ = {
@@ -2030,7 +2030,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 2.10.18;
+				minimumVersion = 2.10.19;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
