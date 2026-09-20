@@ -18,7 +18,7 @@ extension AgentViewModel {
                 process.currentDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory())
                 var env = ProcessInfo.processInfo.environment
                 env["HOME"] = NSHomeDirectory()
-                let extraPaths = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+                let extraPaths = "\(FileManager.default.homeDirectoryForCurrentUser.path)/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
                 env["PATH"] = extraPaths + ":" + (env["PATH"] ?? "")
                 process.environment = env
                 do {
@@ -181,7 +181,7 @@ extension AgentViewModel {
                 env["AGENT_PROJECT_FOLDER"] = workingDirectory.isEmpty
                     ? FileManager.default.homeDirectoryForCurrentUser.path
                     : workingDirectory
-                let extraPaths = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+                let extraPaths = "\(FileManager.default.homeDirectoryForCurrentUser.path)/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
                 env["PATH"] = extraPaths + ":" + (env["PATH"] ?? "")
                 process.environment = env
 
@@ -296,7 +296,7 @@ extension AgentViewModel {
                     ? FileManager.default.homeDirectoryForCurrentUser.path
                     : workingDirectory
                 // Ensure common tool paths are in PATH
-                let extraPaths = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+                let extraPaths = "\(FileManager.default.homeDirectoryForCurrentUser.path)/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
                 env["PATH"] = extraPaths + ":" + (env["PATH"] ?? "")
                 process.environment = env
 
