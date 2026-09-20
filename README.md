@@ -353,7 +353,11 @@ Agent! is the result of three years of building agentic AI apps — ANIE, Game C
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) — build from source in ~5 minutes with `./build.sh`, no developer account needed. Pull requests run the CI Build & Test workflow. Check the [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+See [CONTRIBUTING.md](./CONTRIBUTING.md) — build from source in ~5 minutes with `./build.sh`, no developer account needed. Pull requests run the CI Build & Test workflow and require a one-time [CLA signature](./CLA.md). Check the [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+
+## Sponsoring
+
+Companies and LLM providers who want to support the project: see [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) for tiers, placements, and in-kind options, or sponsor directly via [GitHub Sponsors](https://github.com/sponsors/AgentiLoop).
 
 ## License
 
