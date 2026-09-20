@@ -166,6 +166,8 @@ struct AgentApp: App {
                     Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                         .labelStyle(.titleAndIcon)
                 }
+                Divider()
+                SponsorsMenu()
             }
             CommandGroup(after: .windowArrangement) {
                 Button("System Prompts") {
