@@ -17,11 +17,14 @@
 # Uses pull_request_target so the check runs (with a write-capable token)
 # for PRs from forks. The action never checks out or executes PR code.
 #
-# Setup: "CLA Assistant" is a required status check in the main branch
-# ruleset, so unsigned PRs cannot be merged. GitHub won't let the Actions
-# app bypass that rule, so the signature commit is written with CLA_PAT (a
-# repo-admin token, which does bypass). The action only uses the PAT when a
-# "remote" repo is configured — hence remote-* below point at this same repo.
+# Setup: "CLA Assistant" is NOT a required status check in the main branch
+# ruleset — a required check would only ever exist on PRs, so every direct
+# push to main printed "Bypassed rule violations". The check still runs and
+# shows red/green on every PR; maintainers merge only when it is green.
+# The signature commit is written with CLA_PAT (a repo-admin token) so it
+# lands on main regardless of ruleset changes. The action only uses the PAT
+# when a "remote" repo is configured — hence remote-* below point at this
+# same repo.
 
 name: CLA Assistant
 
