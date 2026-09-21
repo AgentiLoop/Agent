@@ -152,7 +152,7 @@ extension AgentViewModel {
         let workingDirectory = normalizeWorkingDirectory(workingDirectory)
         // Hard local guardrail — refuses catastrophic commands like `rm -rf /` BEFORE the Process is even constructed.
         // The verdict string is shaped to be informative to the LLM, so it understands why the command was rejected and can pick a narrower target on the retry instead of looping the same broken request.
-        let verdict = ShellSafetyService.check(command)
+        let verdict = ShellSafetyService.check(command, projectFolder: workingDirectory)
         if !verdict.allowed {
             AuditLog.log(.shell, "BLOCKED [\(verdict.rule ?? "?")]: \(command.prefix(200))")
             return (-1, verdict.reason ?? "Refused: command blocked by Agent! shell safety guardrail.")
@@ -263,7 +263,7 @@ extension AgentViewModel {
         let workingDirectory = normalizeWorkingDirectory(workingDirectory)
         // Same guardrail as executeTCC — refuse catastrophic commands before
         // the Process is constructed.
-        let verdict = ShellSafetyService.check(command)
+        let verdict = ShellSafetyService.check(command, projectFolder: workingDirectory)
         if !verdict.allowed {
             AuditLog.log(.shell, "BLOCKED [\(verdict.rule ?? "?")]: \(command.prefix(200))")
             let msg = verdict.reason ?? "Refused: command blocked by Agent! shell safety guardrail."

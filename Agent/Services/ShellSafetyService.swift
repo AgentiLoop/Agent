@@ -31,7 +31,12 @@ enum ShellSafetyService {
 
     /// / Inspect a shell command and return whether it's safe to dispatch. / Splits compound commands on shell
     /// separators (`;`, `&&`, `||`, `|`, / newline) and checks each segment independently — so `ls; rm -rf /` / is blocked even though the first half is harmless.
-    static func check(_ command: String, context: Context = .userAgent) -> Verdict {
+    ///
+    /// `projectFolder` is the agent's current working project. When set, a
+    /// recursive delete of that folder itself (or a glob of everything in it)
+    /// is refused — the agent must never wipe the project it's working in.
+    /// Deleting a named subdirectory inside it stays allowed.
+    static func check(_ command: String, context: Context = .userAgent, projectFolder: String = "") -> Verdict {
         // Root daemon: only block the three catastrophic rm patterns
         // (rm -rf /, rm -rf *, rm -rf ~). Everything else — including system
         // dirs, fork bombs, find -delete, mv to /dev/null — is the operator's
@@ -40,7 +45,7 @@ enum ShellSafetyService {
             for segment in splitOnShellSeparators(command) {
                 let trimmed = segment.trimmingCharacters(in: .whitespacesAndNewlines)
                 if trimmed.isEmpty { continue }
-                if let v = checkCatastrophicRm(trimmed), !v.allowed { return v }
+                if let v = checkCatastrophicRm(trimmed, projectFolder: projectFolder), !v.allowed { return v }
             }
             return .ok
         }
@@ -54,7 +59,7 @@ enum ShellSafetyService {
         for segment in splitOnShellSeparators(command) {
             let trimmed = segment.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmed.isEmpty { continue }
-            let verdict = checkSingleSegment(trimmed, context: context)
+            let verdict = checkSingleSegment(trimmed, context: context, projectFolder: projectFolder)
             if !verdict.allowed { return verdict }
         }
         return .ok
@@ -65,7 +70,7 @@ enum ShellSafetyService {
     /// Only the three catastrophic `rm -rf` patterns the user explicitly
     /// wants blocked even from root: `/`, `*`, and `~` (and close variants).
     /// `rm -rf /etc`, `/usr`, etc. are allowed — the daemon is for system admin.
-    private static func checkCatastrophicRm(_ command: String) -> Verdict? {
+    private static func checkCatastrophicRm(_ command: String, projectFolder: String) -> Verdict? {
         let stripped = stripPrefixWrappers(command)
         let tokens = tokenize(stripped)
         guard let rmIdx = tokens.firstIndex(of: "rm") else { return nil }
@@ -102,6 +107,12 @@ enum ShellSafetyService {
                 return .block(
                     reason: "Refused: `rm -rf \(target)` — \(reason). This is one of the three patterns blocked even from the root daemon.",
                     rule: "rm.catastrophic"
+                )
+            }
+            if let reason = projectFolderWipeReason(target, projectFolder: projectFolder) {
+                return .block(
+                    reason: "Refused: `rm -rf \(target)` — \(reason). Blocked even via the root daemon.",
+                    rule: "rm.project-folder"
                 )
             }
         }
@@ -142,7 +153,7 @@ enum ShellSafetyService {
 
     // MARK: - Single segment
 
-    private static func checkSingleSegment(_ command: String, context: Context) -> Verdict {
+    private static func checkSingleSegment(_ command: String, context: Context, projectFolder: String) -> Verdict {
         // This path only runs for `.userAgent`; `.rootDaemon` short-circuits in
         // `check(_:context:)` to the minimal catastrophic-rm matcher.
         _ = context
@@ -153,7 +164,7 @@ enum ShellSafetyService {
         if tokens.isEmpty { return .ok }
 
         // 1. rm -rf <dangerous-target>
-        if let v = checkDangerousRm(tokens: tokens), !v.allowed { return v }
+        if let v = checkDangerousRm(tokens: tokens, projectFolder: projectFolder), !v.allowed { return v }
 
         // 2. find <dangerous-root> ... -delete
         if let v = checkFindDelete(tokens: tokens), !v.allowed { return v }
@@ -178,7 +189,7 @@ enum ShellSafetyService {
 
     /// / Tokenized rm check. We collect every flag (combined like `-rf`, / separated like `-r -f`, or long-form like
     /// `--recursive --force`) and / every non-flag positional arg, then refuse the command if it has both / recursive AND force flags AND any positional that resolves to a / dangerous target.
-    private static func checkDangerousRm(tokens: [String]) -> Verdict? {
+    private static func checkDangerousRm(tokens: [String], projectFolder: String) -> Verdict? {
         guard let rmIdx = tokens.firstIndex(of: "rm") else { return nil }
         var hasR = false
         var hasF = false
@@ -217,6 +228,39 @@ enum ShellSafetyService {
                     rule: "rm.dangerous-target"
                 )
             }
+            if let reason = projectFolderWipeReason(target, projectFolder: projectFolder) {
+                return .block(
+                    reason: "Refused: `rm -rf \(target)` — \(reason). Agent! blocks this locally before it reaches any shell. Delete specific files or subdirectories instead.",
+                    rule: "rm.project-folder"
+                )
+            }
+        }
+        return nil
+    }
+
+    /// Reason when `target` would recursively delete the agent's current project
+    /// folder itself, or everything inside it. Returns nil for named
+    /// subdirectories — those are deliberate, scoped deletions.
+    private static func projectFolderWipeReason(_ target: String, projectFolder: String) -> String? {
+        let trimmed = projectFolder.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return nil }
+
+        var t = target
+        if (t.hasPrefix("\"") && t.hasSuffix("\"")) || (t.hasPrefix("'") && t.hasSuffix("'")) {
+            t = String(t.dropFirst().dropLast())
+        }
+        let expanded = (t as NSString).expandingTildeInPath
+        let folder = (trimmed as NSString).expandingTildeInPath
+            .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        let normalized = expanded.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        guard !folder.isEmpty, !normalized.isEmpty else { return nil }
+
+        // The folder itself, or a glob of everything directly inside it.
+        if normalized == folder
+            || normalized == folder + "/*"
+            || normalized == folder + "/.*"
+            || normalized == folder + "/**" {
+            return "this would wipe the current project folder (\(folder))"
         }
         return nil
     }

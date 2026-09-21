@@ -70,6 +70,26 @@ struct ShellSafetyServiceTests {
         #expect(blocked("rm -rf /Applications/*"))
     }
 
+    @Test("rm -rf of the current project folder is blocked")
+    func rmProjectFolderBlocked() {
+        let project = "/Users/toddbruss/Documents/GitHub/Agent"
+        func blockedInProject(_ command: String, context: ShellSafetyService.Context = .userAgent) -> Bool {
+            !ShellSafetyService.check(command, context: context, projectFolder: project).allowed
+        }
+        #expect(blockedInProject("rm -rf \(project)"))
+        #expect(blockedInProject("rm -rf \(project)/"))
+        #expect(blockedInProject("rm -rf \(project)/*"))
+        #expect(blockedInProject("rm -rf '\(project)'"))
+        #expect(rule("rm -rf \(project)", context: .userAgent) == nil) // no projectFolder passed → not blocked
+        #expect(ShellSafetyService.check("rm -rf \(project)", projectFolder: project).rule == "rm.project-folder")
+        // A named subdirectory inside the project stays allowed.
+        #expect(!blockedInProject("rm -rf \(project)/build"))
+        #expect(!blockedInProject("rm -rf \(project)/.build"))
+        // Also blocked from the root daemon.
+        #expect(blockedInProject("rm -rf \(project)", context: .rootDaemon))
+        #expect(!blockedInProject("rm -rf \(project)/DerivedData", context: .rootDaemon))
+    }
+
     @Test("rm -rf on a specific subdirectory is allowed")
     func rmSpecificPathAllowed() {
         #expect(!blocked("rm -rf /tmp/build"))

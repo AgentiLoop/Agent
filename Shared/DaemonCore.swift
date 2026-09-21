@@ -46,7 +46,8 @@ enum DaemonCore {
         // only refuses the three catastrophic rm patterns.
         let verdict = ShellSafetyService.check(
             script,
-            context: auditCategory == .launchDaemon ? .rootDaemon : .userAgent
+            context: auditCategory == .launchDaemon ? .rootDaemon : .userAgent,
+            projectFolder: workingDirectory
         )
         if !verdict.allowed {
             let reason = verdict.reason ?? "blocked by shell safety guardrail"
