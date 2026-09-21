@@ -54,6 +54,17 @@ extension AgentViewModel {
             || (provider == .openRouter && openRouterProtocol == .anthropic)
         let limiterKey = usesClaudeService ? APIProvider.claude.rawValue : provider.rawValue
 
+        // Output budget above the model's real ceiling ("max_tokens: X > Y,
+        // which is the maximum allowed number of output tokens for MODEL").
+        // The default is window × outputBudgetFraction with no hard-coded cap;
+        // learn Y for this model and retry the same transcript at Y.
+        if let cap = Self.parseMaxOutputCap(errMsg) {
+            if !cap.model.isEmpty { modelMaxOutputTokens[cap.model] = cap.limit }
+            appendLog("⚠️ \(cap.model.isEmpty ? "model" : cap.model) caps output at \(cap.limit) tokens (asked \(cap.requested)) — remembering it and retrying")
+            flushLog()
+            return .lowerMaxTokens(cap.limit)
+        }
+
         // Context overflow — prune messages aggressively and retry.
         // Detection narrowed: require an "exceed/too long/too many" phrase alongside
         // the keyword. Plain "max_tokens" appears in unrelated parameter errors
@@ -411,5 +422,23 @@ extension AgentViewModel {
     /// safety margin and a 3K floor so the model can still finish a thought.
     nonisolated static func loweredMaxTokens(limit: Int, input: Int) -> Int {
         max(3_000, limit - input - 1_000)
+    }
+
+    /// Parse Anthropic's "max_tokens: X > Y, which is the maximum allowed number
+    /// of output tokens for MODEL". Returns the requested budget, the model's
+    /// real ceiling, and the model id (empty when the message omits it).
+    nonisolated static func parseMaxOutputCap(_ message: String) -> (requested: Int, limit: Int, model: String)? {
+        guard message.contains("max_tokens"), message.contains("maximum allowed") else { return nil }
+        func capture(_ pattern: String, _ group: Int) -> String? {
+            guard let re = try? NSRegularExpression(pattern: pattern),
+                  let m = re.firstMatch(in: message, range: NSRange(message.startIndex..., in: message)),
+                  let r = Range(m.range(at: group), in: message) else { return nil }
+            return String(message[r])
+        }
+        let numbers = #"max_tokens:\s*(\d+)\s*>\s*(\d+)"#
+        guard let a = capture(numbers, 1).flatMap(Int.init),
+              let b = capture(numbers, 2).flatMap(Int.init) else { return nil }
+        let model = capture(#"output tokens for\s+([A-Za-z0-9._:\-]+)"#, 1) ?? ""
+        return (a, b, model)
     }
 }

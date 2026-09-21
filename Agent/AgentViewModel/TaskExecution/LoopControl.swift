@@ -137,25 +137,30 @@ extension AgentViewModel {
         + "do not repeat anything already written. Break the remaining work into smaller pieces: "
         + "one file / one edit / one tool call per turn."
 
+    /// Share of the context window offered as the output budget when the user
+    /// leaves Max Output Tokens at 0 — no hard-coded token counts. 1M → 500K,
+    /// 200K → 100K. Models whose real output ceiling is lower reject the first
+    /// request with "max_tokens: X > Y, which is the maximum allowed…"; that Y
+    /// is learned per model (`modelMaxOutputTokens`) and clamps the default
+    /// from then on, so each model runs at min(window × fraction, its own cap).
+    nonisolated static let outputBudgetFraction = 0.5
+
+    nonisolated static func defaultClaudeMaxTokens(contextWindow: Int, modelCap: Int? = nil) -> Int {
+        var budget = max(4_096, Int(Double(contextWindow) * outputBudgetFraction))
+        if let modelCap, modelCap > 0 { budget = min(budget, modelCap) }
+        return budget
+    }
+
     /// Output budget to retry the SAME request with after the first
-    /// truncation: double the current budget, cap 64K, but never past what the
-    /// context window can still hold after the input. Small windows get a
+    /// truncation: double the current budget, but never past what the context
+    /// window can still hold after the input. Small windows get a
     /// proportionate bump (32K → ~16K, 16K → whatever is left) and a 4K
     /// window gets nil — the retry would just overflow. `current` is the
     /// effective budget (pass the provider default when the user left 0).
-    /// Default Claude output budget when the user left Max Output Tokens at 0:
-    /// a quarter of the context window, capped at 64K (the hard output ceiling
-    /// on current Claude models) and floored at 16K. 200K → 50K, 1M → 64K.
-    /// A flat 16K truncated every big file write and burned a full 2× re-send;
-    /// Tier 10.3 still lowers the budget if input + output ever overflows.
-    nonisolated static func defaultClaudeMaxTokens(contextWindow: Int) -> Int {
-        max(16_384, min(64_000, contextWindow / 4))
-    }
-
     nonisolated static func escalatedMaxTokens(current: Int, contextWindow: Int, lastInputTokens: Int) -> Int? {
         guard current > 0 else { return nil }
         let room = contextWindow - max(lastInputTokens, 0) - 1_000
-        let target = min(64_000, current * 2, room)
+        let target = min(current * 2, room)
         return target > current ? target : nil
     }
 }

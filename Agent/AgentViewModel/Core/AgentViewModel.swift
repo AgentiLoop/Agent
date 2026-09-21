@@ -370,6 +370,16 @@ final class AgentViewModel {
     /// registry's static size so compaction doesn't fire far too early on local models.
     var modelContextWindows = ProviderKeyed<[String: Int]>(load: { _ in [:] })
 
+    /// Real per-model output ceilings learned from Anthropic's rejection
+    /// ("max_tokens: X > Y, which is the maximum allowed number of output tokens
+    /// for MODEL"), keyed by model id and persisted. The default output budget is
+    /// window × `outputBudgetFraction`, clamped to this once known.
+    var modelMaxOutputTokens: [String: Int] =
+        UserDefaults.standard.dictionary(forKey: "modelMaxOutputTokens") as? [String: Int] ?? [:]
+    {
+        didSet { UserDefaults.standard.set(modelMaxOutputTokens, forKey: "modelMaxOutputTokens") }
+    }
+
     /// Per-model image-input support reported by the provider's /models catalog at fetch
     /// time (OpenRouter/OrcaRouter `architecture.input_modalities`, Requesty
     /// `supports_vision`), keyed by provider then model id. Zero extra calls — it rides

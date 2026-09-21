@@ -33,16 +33,19 @@ struct CompactionState {
         self.compactThreshold = Self.threshold(for: contextWindow, maxTokens: maxTokens)
     }
 
-    /// Compact only when the transcript is about to stop fitting:
-    /// window - reserved output - safety buffer. The reserved output is the
-    /// configured max_tokens capped at 20K (enough for the summary call); the
-    /// buffer is 13K, scaled down to 10% of the window for small local models.
-    /// A 128K model now compacts at ~99K instead of 70K; Claude 1M at ~970K
-    /// instead of 400K — bigger models keep proportionally more context.
+    /// Share of the context window the transcript may fill before compaction.
+    /// The other half is the output budget (`outputBudgetFraction`), so
+    /// input + output always fit: 1M compacts at 500K, 200K at 100K.
+    static let compactionFraction = 0.5
+
+    /// Compact at `compactionFraction` of the window — a percentage, not a
+    /// fixed token count — but never so late that the reserved output no
+    /// longer fits (only matters for tiny local windows).
     static func threshold(for contextWindow: Int, maxTokens: Int = 0) -> Int {
-        let reservedOutput = min(maxTokens > 0 ? maxTokens : 8_192, 20_000)
+        let byFraction = Int(Double(contextWindow) * compactionFraction)
+        let reservedOutput = maxTokens > 0 ? maxTokens : 8_192
         let buffer = min(13_000, contextWindow / 10)
-        return max(2_000, contextWindow - reservedOutput - buffer)
+        return max(2_000, min(byFraction, contextWindow - reservedOutput - buffer))
     }
 
     /// Re-derive the threshold from the provider's current context window.
