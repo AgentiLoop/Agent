@@ -611,7 +611,7 @@ struct SettingsView: View {
                         Text(
                             viewModel.maxTokens == 0
                                 ? (viewModel.selectedProvider == .claude
-                                    ? "Defaults to \(AgentViewModel.defaultClaudeMaxTokens(contextWindow: viewModel.contextWindow(for: .claude))) (context window ÷ 16)"
+                                    ? "Defaults to \(AgentViewModel.defaultClaudeMaxTokens(contextWindow: viewModel.contextWindow(for: .claude))) (context window ÷ 4, max 64K)"
                                     : "Provider default")
                                 : "\(viewModel.maxTokens) tokens"
                         )

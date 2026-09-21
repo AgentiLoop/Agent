@@ -144,12 +144,12 @@ extension AgentViewModel {
     /// window gets nil — the retry would just overflow. `current` is the
     /// effective budget (pass the provider default when the user left 0).
     /// Default Claude output budget when the user left Max Output Tokens at 0:
-    /// a fixed slice of the context window (1/16) instead of a flat 16K.
-    /// A 200K model keeps the 16K floor; a 1M model gets the 64K ceiling
-    /// (the highest output cap any current Claude model accepts), so a big
-    /// file write no longer truncates at 16K and burns a full 2× re-send.
+    /// a quarter of the context window, capped at 64K (the hard output ceiling
+    /// on current Claude models) and floored at 16K. 200K → 50K, 1M → 64K.
+    /// A flat 16K truncated every big file write and burned a full 2× re-send;
+    /// Tier 10.3 still lowers the budget if input + output ever overflows.
     nonisolated static func defaultClaudeMaxTokens(contextWindow: Int) -> Int {
-        max(16_384, min(64_000, contextWindow / 16))
+        max(16_384, min(64_000, contextWindow / 4))
     }
 
     nonisolated static func escalatedMaxTokens(current: Int, contextWindow: Int, lastInputTokens: Int) -> Int? {
