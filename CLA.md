@@ -84,3 +84,4 @@ Signing is handled automatically on GitHub. When you open your first pull reques
 Your GitHub username, the pull request number, and the timestamp are recorded in [`signatures/version1/cla.json`](./signatures/version1/cla.json). You only need to sign once; the signature covers all future pull requests to this repository. If the CLA text changes in a material way, the version number will be bumped and you will be asked to sign again.
 
 If you are contributing on behalf of your employer, have an authorized representative open a [GitHub issue](https://github.com/AgentiLoop/Agent/issues) or contact the maintainers to arrange a Corporate CLA before opening the pull request.
+
