@@ -341,7 +341,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 ## FAQ
 
 **코딩을 알아야 하나요?** 아니요 — 평범한 한국어(또는 모국어)면 됩니다.
-**비용은 얼마인가요?** 앱은 무료입니다(MIT). 제공자 비용만 지불하면 됩니다; 진지한 작업에는 Z.ai/BigModel의 GLM-5.3이나 DeepSeek이 가장 저렴합니다. 하드웨어가 있다면 로컬 모델은 무료입니다.
+**비용은 얼마인가요?** 앱은 비상업적·개인 용도로 무료입니다(PolyForm Noncommercial 1.0.0). 제공자 비용만 지불하면 됩니다; 진지한 작업에는 Z.ai/BigModel의 GLM-5.3이나 DeepSeek이 가장 저렴합니다. 하드웨어가 있다면 로컬 모델은 무료입니다.
 **어떤 Mac이 필요한가요?** Apple Silicon, macOS 26.4.1+. 클라우드 제공자는 최신 Mac이면 충분; 30B 로컬 모델은 64GB+.
 **Siri와 어떻게 다른가요?** Siri는 답합니다. Agent!는 *행동합니다* — 앱, 파일, 코드, 시스템.
 
@@ -357,7 +357,7 @@ Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game C
 
 ## 라이선스
 
-MIT — 무료 오픈 소스.
+[PolyForm Noncommercial 1.0.0](./LICENSE) — 비상업적·개인 용도로 무료. 상업적 사용 및 소프트웨어의 상업용 버전은 Logos InkPen LLC 회사인 AgentiLoop.ai에 독점적으로 유보됩니다. 상업용 라이선스는 AgentiLoop에 문의하세요.
 
 ---
 
@@ -367,19 +367,19 @@ MIT — 무료 오픈 소스.
 >
 > "AgentiLoop Agent! for Mac"은 독립적인 소프트웨어 프로젝트이며 Apple Inc.와 제휴, 보증, 후원 또는 기타 관련이 **없습니다**. "Apple", "Mac", "Mac mini", "MacBook", "macOS" 및 관련 마크는 미국 및 기타 국가에 등록된 Apple Inc.의 상표입니다. 여기에 언급된 기타 모든 상표, 서비스 마크 및 상호는 각 소유자의 재산이며 식별 목적으로만 사용됩니다.
 >
-> "AgentiLoop Agent!"와 AgentiLoop Agent! 로고는 Logos InkPen LLC 회사인 AgentiLoop.ai의 상표입니다. 이 마크의 사용에는 사전 서면 허가가 필요합니다. 아래 MIT 라이선스는 소스 코드에 대한 권리만 부여하며 — 상표권은 **부여하지 않습니다**.
+> "AgentiLoop Agent!"와 AgentiLoop Agent! 로고는 Logos InkPen LLC 회사인 AgentiLoop.ai의 상표입니다. 이 마크의 사용에는 사전 서면 허가가 필요합니다. 아래 PolyForm Noncommercial 라이선스는 소스 코드에 대한 권리만 부여하며 — 상표권은 **부여하지 않습니다**.
 >
-> ### 소스 코드 라이선스 (MIT)
+> ### 소스 코드 라이선스 (PolyForm Noncommercial 1.0.0)
 >
-> "AgentiLoop Agent! for Mac"의 소스 코드는 오픈 소스이며 **MIT 라이선스**로 제공됩니다. [LICENSE](./LICENSE) 파일의 조건(소프트웨어의 모든 사본 또는 상당 부분에 저작권 고지와 MIT 허가 고지 유지)에 따라 소스 코드의 사본을 자유롭게 사용, 복사, 수정, 병합, 게시, 배포, 서브라이선스 및/또는 판매할 수 있습니다.
+> "AgentiLoop Agent! for Mac"의 소스 코드는 공개되어 있으며 **PolyForm Noncommercial License 1.0.0**으로 제공됩니다. [LICENSE](./LICENSE) 파일의 조건(Required Notice와 라이선스 조항의 사본 또는 링크 유지)에 따라 모든 비상업적 목적으로 소스 코드를 자유롭게 사용, 복사, 수정, 배포할 수 있습니다. 상업적 사용 및 소프트웨어의 상업용 버전은 Logos InkPen LLC 회사인 AgentiLoop.ai에 독점적으로 유보됩니다.
 >
 > ### 컴파일된 바이너리 및 릴리스
 >
-> 이 프로젝트의 GitHub Releases, [AgentiLoop.ai](https://AgentiLoop.ai) 또는 기타 공식 채널을 통해 배포되는 컴파일된 바이너리, 설치 프로그램, 코드 서명된 빌드 및 릴리스 아티팩트는 Logos InkPen LLC 회사인 AgentiLoop.ai의 저작물이며 소스 코드를 규율하는 MIT 라이선스의 적용을 **받지 않습니다**. 공식 바이너리에 대한 모든 권리 — "AgentiLoop Agent!" 이름, 로고, 코드 서명 아이덴티티, Developer ID 포함 — 는 유보됩니다.
+> 이 프로젝트의 GitHub Releases, [AgentiLoop.ai](https://AgentiLoop.ai) 또는 기타 공식 채널을 통해 배포되는 컴파일된 바이너리, 설치 프로그램, 코드 서명된 빌드 및 릴리스 아티팩트는 Logos InkPen LLC 회사인 AgentiLoop.ai의 저작물이며 소스 코드를 규율하는 PolyForm Noncommercial 라이선스의 적용을 **받지 않습니다**. 공식 바이너리에 대한 모든 권리 — "AgentiLoop Agent!" 이름, 로고, 코드 서명 아이덴티티, Developer ID 포함 — 는 유보됩니다.
 >
 > Copyright © 2026 AgentiLoop.ai, a Logos InkPen LLC company. All rights reserved.
 >
-> "AgentiLoop Agent!" 이름, 로고 또는 브랜딩을 제품 식별에 사용하지 않는 한, MIT 라이선스에 따라 소스에서 직접 바이너리를 빌드하는 것을 환영합니다.
+> "AgentiLoop Agent!" 이름, 로고 또는 브랜딩을 제품 식별에 사용하지 않는 한, PolyForm Noncommercial 라이선스에 따라 비상업적 용도로 소스에서 직접 바이너리를 빌드하는 것을 환영합니다.
 >
 > ### 보증 부인
 >

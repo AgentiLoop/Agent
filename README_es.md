@@ -341,7 +341,7 @@ Los comandos slash se ejecutan en local: `/clear [log|all|llm|history|tasks|toke
 ## FAQ
 
 **¿Necesito saber programar?** No — español llano (o tu idioma nativo).
-**¿Cuánto cuesta?** La app es gratis (MIT). Pagas a tu proveedor; GLM-5.3 vía Z.ai/BigModel o DeepSeek son los más baratos para trabajo serio. Los modelos locales son gratis si tienes el hardware.
+**¿Cuánto cuesta?** La app es gratis para uso no comercial y personal (PolyForm Noncommercial 1.0.0). Pagas a tu proveedor; GLM-5.3 vía Z.ai/BigModel o DeepSeek son los más baratos para trabajo serio. Los modelos locales son gratis si tienes el hardware.
 **¿Qué Mac necesito?** Apple Silicon, macOS 26.4.1+. Cualquier Mac moderno para proveedores en la nube; 64 GB+ para modelos locales de 30B.
 **¿En qué se diferencia de Siri?** Siri responde. Agent! *actúa* — apps, archivos, código, sistema.
 
@@ -357,7 +357,7 @@ Consulta [CONTRIBUTING.md](./CONTRIBUTING.md) — compila desde el código fuent
 
 ## Licencia
 
-MIT — gratis y de código abierto.
+[PolyForm Noncommercial 1.0.0](./LICENSE) — gratis para uso no comercial y personal. El uso comercial y las versiones comerciales del software están reservados exclusivamente a AgentiLoop.ai, una empresa de Logos InkPen LLC. Contacta a AgentiLoop para una licencia comercial.
 
 ---
 
@@ -367,19 +367,19 @@ MIT — gratis y de código abierto.
 >
 > "AgentiLoop Agent! for Mac" es un proyecto de software independiente y **no** está afiliado con, respaldado por, patrocinado por, ni asociado de ninguna otra forma con Apple Inc. "Apple," "Mac," "Mac mini," "MacBook," "macOS," y las marcas relacionadas son marcas registradas de Apple Inc., registradas en EE. UU. y otros países. Todas las demás marcas registradas, marcas de servicio y nombres comerciales mencionados aquí son propiedad de sus respectivos dueños y se usan solo con fines de identificación.
 >
-> "AgentiLoop Agent!" y el logo de AgentiLoop Agent! son marcas registradas de AgentiLoop.ai, una empresa de Logos InkPen LLC. El uso de estas marcas requiere permiso previo por escrito. La licencia MIT a continuación otorga derechos solo sobre el código fuente — **no** otorga ningún derecho de marca registrada.
+> "AgentiLoop Agent!" y el logo de AgentiLoop Agent! son marcas registradas de AgentiLoop.ai, una empresa de Logos InkPen LLC. El uso de estas marcas requiere permiso previo por escrito. La licencia PolyForm Noncommercial a continuación otorga derechos solo sobre el código fuente — **no** otorga ningún derecho de marca registrada.
 >
-> ### Licencia del Código Fuente (MIT)
+> ### Licencia del Código Fuente (PolyForm Noncommercial 1.0.0)
 >
-> El código fuente de "AgentiLoop Agent! for Mac" es de código abierto y está licenciado bajo la **Licencia MIT**. Eres libre de usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender copias del código fuente, sujeto a las condiciones del archivo [LICENSE](./LICENSE) (conservar el aviso de copyright y el aviso de permiso MIT en todas las copias o partes sustanciales del software).
+> El código fuente de "AgentiLoop Agent! for Mac" es de código disponible y está licenciado bajo la **PolyForm Noncommercial License 1.0.0**. Eres libre de usar, copiar, modificar y distribuir el código fuente para cualquier fin no comercial, sujeto a las condiciones del archivo [LICENSE](./LICENSE) (conservar el Required Notice y una copia de, o un enlace a, los términos de la licencia). El uso comercial y las versiones comerciales del software están reservados exclusivamente a AgentiLoop.ai, una empresa de Logos InkPen LLC.
 >
 > ### Binarios Compilados y Releases
 >
-> Los binarios compilados, instaladores, compilaciones firmadas y artefactos de release distribuidos a través de los GitHub Releases de este proyecto, [AgentiLoop.ai](https://AgentiLoop.ai), o cualquier otro canal oficial, son obra con derechos de autor de AgentiLoop.ai, una empresa de Logos InkPen LLC y **no** están cubiertos por la licencia MIT que rige el código fuente. Todos los derechos sobre los binarios oficiales — incluyendo el nombre "AgentiLoop Agent!", el logo, la identidad de firma de código, y el Developer ID — están reservados.
+> Los binarios compilados, instaladores, compilaciones firmadas y artefactos de release distribuidos a través de los GitHub Releases de este proyecto, [AgentiLoop.ai](https://AgentiLoop.ai), o cualquier otro canal oficial, son obra con derechos de autor de AgentiLoop.ai, una empresa de Logos InkPen LLC y **no** están cubiertos por la licencia PolyForm Noncommercial que rige el código fuente. Todos los derechos sobre los binarios oficiales — incluyendo el nombre "AgentiLoop Agent!", el logo, la identidad de firma de código, y el Developer ID — están reservados.
 >
 > Copyright © 2026 AgentiLoop.ai, una empresa de Logos InkPen LLC. Todos los derechos reservados.
 >
-> Eres bienvenido a compilar tus propios binarios desde el código fuente bajo la licencia MIT, siempre que no uses el nombre "AgentiLoop Agent!", el logo, ni la marca para identificar tu producto.
+> Eres bienvenido a compilar tus propios binarios desde el código fuente para uso no comercial bajo la licencia PolyForm Noncommercial, siempre que no uses el nombre "AgentiLoop Agent!", el logo, ni la marca para identificar tu producto.
 >
 > ### Descargo de Garantía
 >

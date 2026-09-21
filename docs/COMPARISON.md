@@ -17,7 +17,7 @@
 | **Apple Intelligence** | Autocomplete, summaries | No | No | No | No |
 | **iMessage Remote** | Built-in | Via Channels* | No | No | Via MoltBot* |
 | **Root Operations** | XPC daemon | No | No | No | Docker sandbox |
-| **Open Source** | MIT License | Partial* | No | Apache 2.0 | MIT License |
+| **Source License** | PolyForm Noncommercial 1.0.0 | Partial* | No | Apache 2.0 | MIT License |
 
 **Notes:**
 - *Claude Code AppleScript: Available via community MCP servers, not built-in
@@ -43,7 +43,7 @@
 | **Scripting** | Swift, AppleScript, JXA | None native |
 | **MCP** | Stdio + HTTP/SSE transports | HTTP/SSE + Stdio |
 | **Remote Control** | Built-in iMessage | Claude Dispatch (separate app) |
-| **Open Source** | MIT License | Proprietary (Commercial Terms of Service) |
+| **Source License** | PolyForm Noncommercial 1.0.0 | Proprietary (Commercial Terms of Service) |
 
 **Verdict**: Claude Code is excellent for terminal-based cross-platform development. Agent! is superior for macOS-specific workflows, Xcode projects, and deep system automation.
 
@@ -62,7 +62,7 @@
 | **System Automation** | Accessibility, root operations | None |
 | **Privacy** | Local processing options | Cloud-only by default |
 | **MCP Support** | Stdio + HTTP/SSE | Stdio + HTTP/SSE |
-| **Open Source** | MIT License | Proprietary |
+| **Source License** | PolyForm Noncommercial 1.0.0 | Proprietary |
 
 **Verdict**: Cursor is a VS Code fork with AI features and multi-LLM support. Agent! is a purpose-built macOS app that deeply integrates with the system. Choose Cursor if you need VS Code; choose Agent! if you need macOS automation and Xcode integration.
 
@@ -81,7 +81,7 @@
 | **Local Models** | Ollama, LM Studio, vLLM | Ollama, LM Studio |
 | **Scripting** | Swift, AppleScript, JXA | None |
 | **MCP Support** | Stdio + HTTP/SSE | Stdio |
-| **Open Source** | MIT License | Apache 2.0 |
+| **Source License** | PolyForm Noncommercial 1.0.0 | Apache 2.0 |
 
 **Verdict**: Cline is an open-source VS Code extension with strong local model support. Agent! provides native macOS integration with ScriptingBridge, Xcode project management, and Accessibility API control. Choose Cline for VS Code workflows; choose Agent! for deep macOS automation.
 
@@ -102,6 +102,6 @@
 | **Messages** | Built-in iMessage remote | Via MoltBot (WhatsApp, Telegram, Discord, Slack, iMessage) |
 | **System Access** | Full access with TCC | Sandboxed Docker containers |
 | **Privacy** | Local processing available | Local-first design |
-| **Open Source** | MIT License | MIT License |
+| **Source License** | PolyForm Noncommercial 1.0.0 | MIT License |
 
 **Verdict**: OpenClaw excels at privacy-focused automation with local LLM support and sandboxed security. Agent! provides deeper macOS integration with native ScriptingBridge, Xcode project management, and Accessibility API control. Choose OpenClaw for privacy-first workflows; choose Agent! for deep macOS automation and Xcode development.

@@ -20,7 +20,7 @@ Only if you choose a cloud AI provider, and only your prompt text is sent. Use L
 It won't delete important files or make system changes without your approval. Most actions can be undone with Command+Z.
 
 ### How much does it cost?
-Agent! is free and open source (MIT License). Cloud AI providers charge for API usage. Local models are completely free.
+Agent! is free for noncommercial and personal use (PolyForm Noncommercial License 1.0.0; commercial versions are reserved to AgentiLoop). Cloud AI providers charge for API usage. Local models are completely free.
 
 ### What Mac do I need?
 Any Mac running macOS 26 or later. Apple Silicon (M1/M2/M3/M4) recommended. 32GB+ RAM needed for local AI models.

@@ -71,4 +71,4 @@ The bot records your GitHub username in [`signatures/version1/cla.json`](./signa
 
 ## License
 
-Contributions are distributed under the [MIT License](./LICENSE) and licensed to AgentiLoop under the terms of the [CLA](./CLA.md). Note: the "🦾 Agent!" name and logo are trademarks of AgentiLoop.ai and not covered by the MIT license (see README Legal Notice).
+Contributions are distributed under the [PolyForm Noncommercial License 1.0.0](./LICENSE) and licensed to AgentiLoop under the terms of the [CLA](./CLA.md). Note: the "🦾 Agent!" name and logo are trademarks of AgentiLoop.ai and not covered by the PolyForm Noncommercial license (see README Legal Notice).

@@ -642,4 +642,4 @@ Both tools have their strengths. If you want a personal assistant across every m
 
 ## License
 
-MIT
+PolyForm Noncommercial 1.0.0 — see [LICENSE](../LICENSE). Free for noncommercial and personal use; commercial use and commercial versions are reserved to AgentiLoop.ai, a Logos InkPen LLC company.

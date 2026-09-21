@@ -341,7 +341,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 ## FAQ
 
 **コーディングの知識は必要？** いいえ — 普通の日本語（または母国語）で大丈夫です。
-**費用は？** アプリは無料（MIT）。プロバイダーへの支払いのみ。本格的な作業には Z.ai/BigModel 経由の GLM-5.3 か DeepSeek が最も安価です。ハードウェアがあればローカルモデルは無料です。
+**費用は？** アプリは非商用・個人利用であれば無料です（PolyForm Noncommercial 1.0.0）。プロバイダーへの支払いのみ。本格的な作業には Z.ai/BigModel 経由の GLM-5.3 か DeepSeek が最も安価です。ハードウェアがあればローカルモデルは無料です。
 **どの Mac が必要？** Apple Silicon、macOS 26.4.1+。クラウドプロバイダーなら最近の Mac ならどれでも。30B のローカルモデルには 64GB 以上。
 **Siri とどう違う？** Siri は答えます。Agent! は*行動します* — アプリ、ファイル、コード、システム。
 
@@ -357,7 +357,7 @@ Agent! は 3 年間にわたるエージェント型 AI アプリ開発の成果
 
 ## ライセンス
 
-MIT — 無料かつオープンソース。
+[PolyForm Noncommercial 1.0.0](./LICENSE) — 非商用・個人利用は無料。商用利用およびソフトウェアの商用バージョンは、Logos InkPen LLC の会社である AgentiLoop.ai に独占的に留保されます。商用ライセンスについては AgentiLoop にお問い合わせください。
 
 ---
 
@@ -367,19 +367,19 @@ MIT — 無料かつオープンソース。
 >
 > 「AgentiLoop Agent! for Mac」は独立したソフトウェアプロジェクトであり、Apple Inc. との提携、承認、後援、その他の関連は**ありません**。「Apple」「Mac」「Mac mini」「MacBook」「macOS」および関連するマークは、米国およびその他の国で登録された Apple Inc. の商標です。ここで言及されるその他すべての商標、サービスマーク、商号はそれぞれの所有者の財産であり、識別目的でのみ使用されています。
 >
-> 「AgentiLoop Agent!」および AgentiLoop Agent! ロゴは、Logos InkPen LLC の会社である AgentiLoop.ai の商標です。これらのマークの使用には事前の書面による許可が必要です。下記の MIT ライセンスはソースコードに対する権利のみを付与するものであり — 商標権は**付与しません**。
+> 「AgentiLoop Agent!」および AgentiLoop Agent! ロゴは、Logos InkPen LLC の会社である AgentiLoop.ai の商標です。これらのマークの使用には事前の書面による許可が必要です。下記の PolyForm Noncommercial ライセンスはソースコードに対する権利のみを付与するものであり — 商標権は**付与しません**。
 >
-> ### ソースコードライセンス（MIT）
+> ### ソースコードライセンス（PolyForm Noncommercial 1.0.0）
 >
-> 「AgentiLoop Agent! for Mac」のソースコードはオープンソースであり、**MIT ライセンス**の下で提供されます。[LICENSE](./LICENSE) ファイルの条件（ソフトウェアのすべてのコピーまたは相当部分に著作権表示と MIT 許諾表示を保持すること）に従い、ソースコードのコピーを自由に使用、複製、変更、結合、公開、配布、サブライセンス、および/または販売することができます。
+> 「AgentiLoop Agent! for Mac」のソースコードは公開されており、**PolyForm Noncommercial License 1.0.0** の下で提供されます。[LICENSE](./LICENSE) ファイルの条件（Required Notice およびライセンス条項の写しまたはリンクを保持すること）に従い、あらゆる非商用目的でソースコードを自由に使用、複製、変更、配布することができます。商用利用およびソフトウェアの商用バージョンは、Logos InkPen LLC の会社である AgentiLoop.ai に独占的に留保されます。
 >
 > ### コンパイル済みバイナリとリリース
 >
-> このプロジェクトの GitHub Releases、[AgentiLoop.ai](https://AgentiLoop.ai)、またはその他の公式チャネルを通じて配布されるコンパイル済みバイナリ、インストーラー、コード署名済みビルド、リリース成果物は、Logos InkPen LLC の会社である AgentiLoop.ai の著作物であり、ソースコードを規律する MIT ライセンスの対象**ではありません**。公式バイナリに対するすべての権利 — 「AgentiLoop Agent!」の名称、ロゴ、コード署名アイデンティティ、Developer ID を含む — は留保されます。
+> このプロジェクトの GitHub Releases、[AgentiLoop.ai](https://AgentiLoop.ai)、またはその他の公式チャネルを通じて配布されるコンパイル済みバイナリ、インストーラー、コード署名済みビルド、リリース成果物は、Logos InkPen LLC の会社である AgentiLoop.ai の著作物であり、ソースコードを規律する PolyForm Noncommercial ライセンスの対象**ではありません**。公式バイナリに対するすべての権利 — 「AgentiLoop Agent!」の名称、ロゴ、コード署名アイデンティティ、Developer ID を含む — は留保されます。
 >
 > Copyright © 2026 AgentiLoop.ai, a Logos InkPen LLC company. All rights reserved.
 >
-> 「AgentiLoop Agent!」の名称、ロゴ、ブランディングを製品の識別に使用しない限り、MIT ライセンスの下でソースから独自のバイナリをビルドすることを歓迎します。
+> 「AgentiLoop Agent!」の名称、ロゴ、ブランディングを製品の識別に使用しない限り、PolyForm Noncommercial ライセンスの下で非商用目的でソースから独自のバイナリをビルドすることを歓迎します。
 >
 > ### 保証の否認
 >

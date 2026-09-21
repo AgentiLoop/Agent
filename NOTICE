@@ -7,18 +7,20 @@ All rights reserved.
 
 Source code
 -----------
-The source code in this repository is licensed under the MIT License. See the
-LICENSE file for the full text.
+The source code in this repository is licensed under the PolyForm Noncommercial
+License 1.0.0. See the LICENSE file for the full text. Noncommercial and
+personal use is permitted; commercial use and commercial versions of the
+software are reserved exclusively to AgentiLoop.ai / Logos InkPen LLC.
 
 Trademarks
 ----------
 "AgentiLoop", "Agent!", and associated logos and product names are trademarks of
-Logos InkPen LLC. The MIT License grants rights to the software only, not to any
-trademark, service mark, or trade name.
+Logos InkPen LLC. The PolyForm Noncommercial License grants rights to the
+software only, not to any trademark, service mark, or trade name.
 
 Distributed binaries
 --------------------
 Officially distributed, signed, and notarized AgentiLoop Agent! binaries are
-owned by Todd Bruss / Logos InkPen LLC and are not covered by the MIT License in
-the LICENSE file. Building the software yourself from this source is covered by
-the MIT License.
+owned by Todd Bruss / Logos InkPen LLC and are not covered by the PolyForm Noncommercial
+License in the LICENSE file. Building the software yourself from this source
+for noncommercial purposes is covered by that license.

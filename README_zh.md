@@ -340,7 +340,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 ## 常见问题
 
 **需要会编程吗？** 不需要——用自然语言（或你的母语）即可。
-**费用多少？** 应用免费（MIT）。你只需支付提供商费用；正经工作最便宜的是通过 Z.ai/BigModel 使用 GLM-5.3 或 DeepSeek。拥有硬件的话本地模型免费。
+**费用多少？** 应用对非商业和个人用途免费（PolyForm Noncommercial 1.0.0）。你只需支付提供商费用；正经工作最便宜的是通过 Z.ai/BigModel 使用 GLM-5.3 或 DeepSeek。拥有硬件的话本地模型免费。
 **需要什么 Mac？** Apple Silicon，macOS 26.4.1+。云端提供商任何现代 Mac 都行；30B 本地模型需要 64GB+。
 **和 Siri 有什么不同？** Siri 回答问题。Agent! *执行操作*——应用、文件、代码、系统。
 
@@ -356,7 +356,7 @@ Agent! 是三年智能体 AI 应用开发的结晶——ANIE、Game Changer、Ba
 
 ## 许可证
 
-MIT —— 免费且开源。
+[PolyForm Noncommercial 1.0.0](./LICENSE) —— 非商业和个人用途免费。商业用途及本软件的商业版本由 AgentiLoop.ai（Logos InkPen LLC 旗下公司）独家保留。商业许可请联系 AgentiLoop。
 
 ---
 
@@ -366,19 +366,19 @@ MIT —— 免费且开源。
 >
 > 「AgentiLoop Agent! for Mac」是一个独立的软件项目，**并未**与 Apple Inc. 存在任何关联、认可、赞助或其他形式的关系。「Apple」、「Mac」、「Mac mini」、「MacBook」、「macOS」及相关标志均为 Apple Inc. 在美国及其他国家/地区注册的商标。此处提及的所有其他商标、服务标志和商号均归其各自所有者所有，仅用于标识目的。
 >
-> 「AgentiLoop Agent!」及 AgentiLoop Agent! 标志均为 AgentiLoop.ai（Logos InkPen LLC 旗下公司）的商标。使用这些标志需事先获得书面许可。以下的 MIT 许可证仅授予源代码方面的权利——**不**授予任何商标权利。
+> 「AgentiLoop Agent!」及 AgentiLoop Agent! 标志均为 AgentiLoop.ai（Logos InkPen LLC 旗下公司）的商标。使用这些标志需事先获得书面许可。以下的 PolyForm Noncommercial 许可证仅授予源代码方面的权利——**不**授予任何商标权利。
 >
-> ### 源代码许可证（MIT）
+> ### 源代码许可证（PolyForm Noncommercial 1.0.0）
 >
-> 「AgentiLoop Agent! for Mac」的源代码是开源的，并采用 **MIT 许可证**授权。你可以自由使用、复制、修改、合并、发布、分发、再许可和/或出售源代码的副本，但须遵守 [LICENSE](./LICENSE) 文件中的条件（在软件的所有副本或实质性部分中保留版权声明及 MIT 许可声明）。
+> 「AgentiLoop Agent! for Mac」的源代码公开可见，并采用 **PolyForm Noncommercial License 1.0.0** 授权。你可以出于任何非商业目的自由使用、复制、修改和分发源代码，但须遵守 [LICENSE](./LICENSE) 文件中的条件（保留 Required Notice 以及许可条款的副本或链接）。商业用途及本软件的商业版本由 AgentiLoop.ai（Logos InkPen LLC 旗下公司）独家保留。
 >
 > ### 已编译的二进制文件与发布版本
 >
-> 通过本项目的 GitHub Releases、[AgentiLoop.ai](https://AgentiLoop.ai) 或任何其他官方渠道分发的已编译二进制文件、安装程序、经过代码签名的构建版本以及发布产物，均属 AgentiLoop.ai（Logos InkPen LLC 旗下公司）拥有版权的作品，**不**受管辖源代码的 MIT 许可证覆盖。官方二进制文件的所有权利——包括「AgentiLoop Agent!」名称、标志、代码签名身份和 Developer ID——均予保留。
+> 通过本项目的 GitHub Releases、[AgentiLoop.ai](https://AgentiLoop.ai) 或任何其他官方渠道分发的已编译二进制文件、安装程序、经过代码签名的构建版本以及发布产物，均属 AgentiLoop.ai（Logos InkPen LLC 旗下公司）拥有版权的作品，**不**受管辖源代码的 PolyForm Noncommercial 许可证覆盖。官方二进制文件的所有权利——包括「AgentiLoop Agent!」名称、标志、代码签名身份和 Developer ID——均予保留。
 >
 > Copyright © 2026 AgentiLoop.ai（Logos InkPen LLC 旗下公司），保留所有权利。
 >
-> 你可以在 MIT 许可证下自由地从源代码构建你自己的二进制文件，前提是不使用「AgentiLoop Agent!」名称、标志或品牌来标识你的产品。
+> 你可以在 PolyForm Noncommercial 许可证下出于非商业目的自由地从源代码构建你自己的二进制文件，前提是不使用「AgentiLoop Agent!」名称、标志或品牌来标识你的产品。
 >
 > ### 免责声明
 >

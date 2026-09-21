@@ -31,7 +31,7 @@ You wish to submit one or more Contributions and recognize that AgentiLoop would
 
 ### 2. Grant of Copyright License
 
-Subject to the terms and conditions of this Agreement, You hereby grant to AgentiLoop, and to recipients of software distributed or made available by AgentiLoop, a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Your Contributions and such derivative works, under any license terms AgentiLoop chooses, including open-source licenses (such as the MIT License under which Agent! is currently distributed) and proprietary or commercial licenses.
+Subject to the terms and conditions of this Agreement, You hereby grant to AgentiLoop, and to recipients of software distributed or made available by AgentiLoop, a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Your Contributions and such derivative works, under any license terms AgentiLoop chooses, including source-available licenses (such as the PolyForm Noncommercial License 1.0.0 under which Agent! is currently distributed) and proprietary or commercial licenses.
 
 ### 3. Grant of Patent License
 

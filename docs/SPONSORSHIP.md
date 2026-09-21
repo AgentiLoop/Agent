@@ -1,6 +1,6 @@
 # Sponsoring 🦾 Agent!
 
-Agent! is a free, MIT-licensed, 100% native Swift macOS agent maintained by [AgentiLoop.ai](https://agentiloop.ai) (Logos InkPen LLC, North Carolina, USA).
+Agent! is a free-for-noncommercial-use (PolyForm Noncommercial 1.0.0), 100% native Swift macOS agent maintained by [AgentiLoop.ai](https://agentiloop.ai) (Logos InkPen LLC, North Carolina, USA).
 
 **All billing happens through [GitHub Sponsors → AgentiLoop](https://github.com/sponsors/AgentiLoop)** — recurring or one-time. No invoiced billing, no credits, no other payment methods.
 
