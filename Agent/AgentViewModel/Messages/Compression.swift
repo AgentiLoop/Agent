@@ -40,12 +40,14 @@ struct CompactionState {
 
     /// Compact at `compactionFraction` of the window — a percentage, not a
     /// fixed token count — but never so late that the reserved output no
-    /// longer fits (only matters for tiny local windows).
+    /// longer fits (only matters for tiny local windows). No extra buffer:
+    /// when max_tokens is the other half of the window, the 50% line already
+    /// leaves exactly that much room, and a buffer would pull the threshold
+    /// below it (200K/100K → 87K instead of 100K).
     static func threshold(for contextWindow: Int, maxTokens: Int = 0) -> Int {
         let byFraction = Int(Double(contextWindow) * compactionFraction)
         let reservedOutput = maxTokens > 0 ? maxTokens : 8_192
-        let buffer = min(13_000, contextWindow / 10)
-        return max(2_000, min(byFraction, contextWindow - reservedOutput - buffer))
+        return max(2_000, min(byFraction, contextWindow - reservedOutput))
     }
 
     /// Re-derive the threshold from the provider's current context window.
