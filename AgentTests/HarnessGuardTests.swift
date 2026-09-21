@@ -104,12 +104,11 @@ struct HarnessGuardTests {
         #expect(capped == .proceed)
     }
 
-    @Test("10.1: escalation doubles to 64K but never past the context window; tiny windows get none")
+    @Test("10.1: escalation doubles but never past the context window; tiny windows get none")
     func maxTokensEscalationBounds() {
-        // 1M window: plain doubling
+        // 1M window: plain doubling, no fixed cap
         #expect(AgentViewModel.escalatedMaxTokens(current: 16_384, contextWindow: 1_000_000, lastInputTokens: 50_000) == 32_768)
-        // Cap at 64K
-        #expect(AgentViewModel.escalatedMaxTokens(current: 48_000, contextWindow: 1_000_000, lastInputTokens: 50_000) == 64_000)
+        #expect(AgentViewModel.escalatedMaxTokens(current: 48_000, contextWindow: 1_000_000, lastInputTokens: 50_000) == 96_000)
         // 32K window with 10K input: room = 21K → 16384 fits
         #expect(AgentViewModel.escalatedMaxTokens(current: 8_192, contextWindow: 32_000, lastInputTokens: 10_000) == 16_384)
         // 16K window with 6K input: room 9K < 16384 → bumped only to what fits
@@ -121,13 +120,25 @@ struct HarnessGuardTests {
         #expect(AgentViewModel.escalatedMaxTokens(current: 0, contextWindow: 200_000, lastInputTokens: 0) == nil)
     }
 
-    @Test("Default Claude max_tokens is window/4, floored at 16K and capped at 64K")
+    @Test("Default Claude max_tokens is a percentage of the window, clamped to the model's learned cap")
     func defaultClaudeMaxTokensScalesWithWindow() {
-        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 200_000) == 50_000)
-        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 128_000) == 32_000)
-        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 1_000_000) == 64_000)
-        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 2_000_000) == 64_000)
-        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 0) == 16_384)
+        #expect(AgentViewModel.outputBudgetFraction == 0.5)
+        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 200_000) == 100_000)
+        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 1_000_000) == 500_000)
+        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 1_000_000, modelCap: 128_000) == 128_000)
+        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 200_000, modelCap: 64_000) == 64_000)
+        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 0) == 4_096)
+    }
+
+    @Test("Anthropic max_tokens ceiling rejection is parsed into (requested, limit, model)")
+    func parseMaxOutputCap() {
+        let msg = "Anthropic 400 (invalid_request_error): max_tokens: 500000 > 128000, which is the maximum allowed number of output tokens for claude-fable-5-1"
+        let p = AgentViewModel.parseMaxOutputCap(msg)
+        #expect(p?.requested == 500_000)
+        #expect(p?.limit == 128_000)
+        #expect(p?.model == "claude-fable-5-1")
+        #expect(AgentViewModel.parseMaxOutputCap("input length and max_tokens exceed context limit: 900000 + 200000 > 1000000") == nil)
+        #expect(AgentViewModel.parseMaxOutputCap("max_tokens must be a positive integer") == nil)
     }
 
     @Test("end_turn with open goal criteria → retry listing the criteria")

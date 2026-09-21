@@ -611,7 +611,7 @@ struct SettingsView: View {
                         Text(
                             viewModel.maxTokens == 0
                                 ? (viewModel.selectedProvider == .claude
-                                    ? "Defaults to \(AgentViewModel.defaultClaudeMaxTokens(contextWindow: viewModel.contextWindow(for: .claude))) (context window ÷ 4, max 64K)"
+                                    ? "Defaults to \(AgentViewModel.defaultClaudeMaxTokens(contextWindow: viewModel.contextWindow(for: .claude), modelCap: viewModel.modelMaxOutputTokens[viewModel.models[.claude]])) (\(Int(AgentViewModel.outputBudgetFraction * 100))% of context window, clamped to the model's real cap once learned)"
                                     : "Provider default")
                                 : "\(viewModel.maxTokens) tokens"
                         )

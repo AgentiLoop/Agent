@@ -26,14 +26,14 @@ struct LLMCompactionTests {
         return messages
     }
 
-    @Test("threshold reserves output + buffer instead of 55%")
+    @Test("threshold is a percentage of the window (compactionFraction), floored so output still fits")
     func thresholdFormula() {
-        // 128K, default reserved 8_192, buffer 12_800 → 107_008
-        #expect(CompactionState.threshold(for: 128_000) == 128_000 - 8_192 - 12_800)
-        // 200K with 16K max_tokens: reserved 16_000, buffer 13_000
-        #expect(CompactionState.threshold(for: 200_000, maxTokens: 16_000) == 171_000)
-        // 1M: reserved capped at 20K, buffer 13K — no 400K clamp any more
-        #expect(CompactionState.threshold(for: 1_000_000, maxTokens: 64_000) == 967_000)
+        #expect(CompactionState.compactionFraction == 0.5)
+        #expect(CompactionState.threshold(for: 128_000) == 64_000)
+        #expect(CompactionState.threshold(for: 200_000, maxTokens: 100_000) == 100_000)
+        #expect(CompactionState.threshold(for: 1_000_000, maxTokens: 500_000) == 500_000)
+        // Learned 128K output cap on 1M: still the 50% line, not window − cap
+        #expect(CompactionState.threshold(for: 1_000_000, maxTokens: 128_000) == 500_000)
         // Tiny window floors at 2K
         #expect(CompactionState.threshold(for: 4_096) == 2_000)
     }
