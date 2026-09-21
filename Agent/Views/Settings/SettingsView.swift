@@ -601,7 +601,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Max Output Tokens").font(.caption).foregroundStyle(.secondary)
                     HStack {
-                        TextField(viewModel.selectedProvider == .claude ? "16384" : "0 = default", text: Binding(
+                        TextField(viewModel.selectedProvider == .claude ? "0 = window/16" : "0 = default", text: Binding(
                             get: { viewModel.maxTokens == 0 ? "" : "\(viewModel.maxTokens)" },
                             set: { viewModel.maxTokens = Int($0) ?? 0 }
                         ))
@@ -609,9 +609,11 @@ struct SettingsView: View {
                         .frame(width: 100)
 
                         Text(
-                            viewModel
-                                .maxTokens == 0 ? (viewModel.selectedProvider == .claude ? "Defaults to 16384" : "Provider default") :
-                                "\(viewModel.maxTokens) tokens"
+                            viewModel.maxTokens == 0
+                                ? (viewModel.selectedProvider == .claude
+                                    ? "Defaults to \(AgentViewModel.defaultClaudeMaxTokens(contextWindow: viewModel.contextWindow(for: .claude))) (context window ÷ 16)"
+                                    : "Provider default")
+                                : "\(viewModel.maxTokens) tokens"
                         )
                         .font(.caption)
                         .foregroundStyle(.secondary)

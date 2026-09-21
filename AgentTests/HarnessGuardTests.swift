@@ -121,6 +121,15 @@ struct HarnessGuardTests {
         #expect(AgentViewModel.escalatedMaxTokens(current: 0, contextWindow: 200_000, lastInputTokens: 0) == nil)
     }
 
+    @Test("Default Claude max_tokens is window/16, floored at 16K and capped at 64K")
+    func defaultClaudeMaxTokensScalesWithWindow() {
+        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 200_000) == 16_384)
+        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 500_000) == 31_250)
+        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 1_000_000) == 64_000)
+        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 2_000_000) == 64_000)
+        #expect(AgentViewModel.defaultClaudeMaxTokens(contextWindow: 0) == 16_384)
+    }
+
     @Test("end_turn with open goal criteria → retry listing the criteria")
     func openCriteriaRetries() {
         let route = AgentViewModel.routeStopReason(

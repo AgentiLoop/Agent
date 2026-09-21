@@ -84,6 +84,11 @@ extension AgentViewModel {
         let cloudModelLogLine = "🧠 \(provider.displayName) / \(displayModel)\(isCoding ? " (code)" : "")\(isVision ? " (vision)" : "")"
 
         var mt = maxTokens
+        // Claude with Max Output Tokens left at 0: size the output budget from
+        // the model's context window (1M → 64K) instead of a flat 16K.
+        if mt == 0, provider == .claude {
+            mt = Self.defaultClaudeMaxTokens(contextWindow: contextWindow(for: provider))
+        }
         var services = buildLLMServiceBundle(
             provider: provider,
             modelName: modelName,
@@ -398,7 +403,8 @@ extension AgentViewModel {
                 // window gets no escalation) before spending a continuation.
                 if response.stopReason == "max_tokens", !hasToolUse, !maxTokensEscalated {
                     maxTokensEscalated = true
-                    let effective = mt > 0 ? mt : (services.claude != nil ? 16_384 : 8_192)
+                    let effective = mt > 0 ? mt
+                        : (services.claude != nil ? Self.defaultClaudeMaxTokens(contextWindow: contextWindow(for: provider)) : 8_192)
                     if let bigger = Self.escalatedMaxTokens(
                         current: effective,
                         contextWindow: contextWindow(for: provider),
