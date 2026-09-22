@@ -19,9 +19,14 @@ extension AgentViewModel {
         }
 
         do {
-            let models = try await Self.fetchClaudeModelsFromAPI(apiKey: apiKey)
+            let fetched = try await Self.fetchClaudeModelsFromAPI(apiKey: apiKey)
             await MainActor.run {
-                self.availableClaudeModels = models.isEmpty ? Self.defaultClaudeModels : models
+                self.availableClaudeModels = fetched.models.isEmpty ? Self.defaultClaudeModels : fetched.models
+                // Real per-model limits straight from /v1/models — the first
+                // request is sized at the model's true output ceiling instead
+                // of window × fraction and a learn-from-400 retry.
+                self.modelMaxOutputTokens.merge(fetched.maxOutputTokens) { _, new in new }
+                self.modelContextWindows[.claude].merge(fetched.contextWindows) { _, new in new }
             }
         } catch {
             AuditLog.log(.api, "Error fetching Claude models: \(error)")
@@ -31,8 +36,13 @@ extension AgentViewModel {
         }
     }
 
-    private static func fetchClaudeModelsFromAPI(apiKey: String) async throws -> [ClaudeModelInfo] {
-        guard let url = URL(string: "https://api.anthropic.com/v1/models") else {
+    /// `GET /v1/models` also reports each model's `max_tokens` (output ceiling)
+    /// and `max_input_tokens` (context window); both are parsed here so the task
+    /// loop never has to guess the output budget.
+    private static func fetchClaudeModelsFromAPI(apiKey: String) async throws
+        -> (models: [ClaudeModelInfo], maxOutputTokens: [String: Int], contextWindows: [String: Int])
+    {
+        guard let url = URL(string: "https://api.anthropic.com/v1/models?limit=1000") else {
             throw AgentError.invalidURL
         }
 
@@ -59,14 +69,18 @@ extension AgentViewModel {
         guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
               let modelsData = json["data"] as? [[String: Any]] else
         {
-            return defaultClaudeModels
+            return (defaultClaudeModels, [:], [:])
         }
 
+        var maxOutput: [String: Int] = [:]
+        var windows: [String: Int] = [:]
         let models = modelsData.compactMap { modelData -> ClaudeModelInfo? in
             guard let id = modelData["id"] as? String else { return nil }
             let displayName = modelData["display_name"] as? String ?? id
             let createdAt = modelData["created_at"] as? String
             let description = modelData["description"] as? String
+            if let cap = modelData["max_tokens"] as? Int, cap > 0 { maxOutput[id] = cap }
+            if let ctx = modelData["max_input_tokens"] as? Int, ctx > 0 { windows[id] = ctx }
 
             return ClaudeModelInfo(
                 id: id,
@@ -77,7 +91,7 @@ extension AgentViewModel {
             )
         }
 
-        return models.isEmpty ? defaultClaudeModels : models
+        return (models.isEmpty ? defaultClaudeModels : models, maxOutput, windows)
     }
 
     func fetchOllamaModels() {

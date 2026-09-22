@@ -85,8 +85,12 @@ extension AgentViewModel {
 
         var mt = maxTokens
         // Claude with Max Output Tokens left at 0: size the output budget from
-        // the model's context window (1M → 64K) instead of a flat 16K.
+        // the model's real ceiling (/v1/models `max_tokens`), fetched now if
+        // this model's cap isn't known yet, so the first request never guesses.
         if mt == 0, provider == .claude {
+            if modelMaxOutputTokens[modelName] == nil, !apiKey.isEmpty {
+                await fetchClaudeModels()
+            }
             mt = Self.defaultClaudeMaxTokens(
                 contextWindow: contextWindow(for: provider), modelCap: modelMaxOutputTokens[modelName])
         }
