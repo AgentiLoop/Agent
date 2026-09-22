@@ -33,13 +33,14 @@ struct CompactionState {
         self.compactThreshold = Self.threshold(for: contextWindow, maxTokens: maxTokens)
     }
 
-    /// Share of the context window the transcript may fill before compaction.
-    /// The other half is the output budget (`outputBudgetFraction`), so
-    /// input + output always fit: 1M compacts at 500K, 200K at 100K.
-    /// Capped at 128K: on huge advertised windows (1M–2M) an uncapped
-    /// percentage threshold delays compaction so long that any provider-side
-    /// discrepancy (a router serving a shorter window, a mis-counted system
-    /// prompt) turns into a hard context-overflow instead of a compaction.
+    /// Share of the context window the transcript may fill before compaction,
+    /// on a window capped at `compactionWindowCap`: 1M and 2M windows both
+    /// compact at 128K, 200K at 100K. The rest of the window is the output
+    /// budget (`outputBudgetFraction`), so input + output always fit.
+    /// On huge advertised windows an uncapped percentage threshold delays
+    /// compaction so long that any provider-side discrepancy (a router serving
+    /// a shorter window than it reports, a mis-counted system prompt) turns
+    /// into a hard context-overflow instead of a compaction.
     static let compactionFraction = 0.5
 
     /// Largest window honored for threshold sizing — windows advertised above
