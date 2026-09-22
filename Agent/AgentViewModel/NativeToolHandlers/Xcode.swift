@@ -286,7 +286,11 @@ extension AgentViewModel {
 
     /// Git auto-checkpoint after a successful build — saves progress for overnight runs.
     /// Title summarizes the current task and the changed files so the git log is readable.
+    /// The task prompt comes from the tab that issued the build (TabLogRouter), not the
+    /// selected tab / main task — otherwise a build fired from a background tab would be
+    /// labeled with whatever prompt the user happens to be looking at.
     func autoCheckpointAfterBuild(dir: String) async {
+        let taskPrompt = TabLogRouter.current?.currentTaskPrompt ?? currentTaskPrompt
         let status = await Self.offMain {
             let p = Process()
             p.executableURL = URL(fileURLWithPath: "/usr/bin/git")
@@ -308,7 +312,7 @@ extension AgentViewModel {
             return (final as NSString).lastPathComponent
         }
         let fileSummary = files.prefix(3).joined(separator: ", ") + (files.count > 3 ? " +\(files.count - 3) more" : "")
-        let taskLine = currentTaskPrompt
+        let taskLine = taskPrompt
             .split(whereSeparator: \.isNewline).first.map(String.init)?
             .trimmingCharacters(in: .whitespaces) ?? ""
         let taskSummary = taskLine.isEmpty ? "" : (taskLine.count > 60 ? String(taskLine.prefix(57)) + "..." : taskLine)
