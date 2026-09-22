@@ -411,7 +411,8 @@ extension AgentViewModel {
                     if let bigger = Self.escalatedMaxTokens(
                         current: effective,
                         contextWindow: contextWindow(for: provider),
-                        lastInputTokens: response.inputTokens)
+                        lastInputTokens: response.inputTokens,
+                        modelCap: modelMaxOutputTokens[modelName])
                     {
                         mt = bigger
                         services = buildLLMServiceBundle(

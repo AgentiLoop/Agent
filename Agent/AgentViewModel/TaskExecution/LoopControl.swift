@@ -153,14 +153,19 @@ extension AgentViewModel {
 
     /// Output budget to retry the SAME request with after the first
     /// truncation: double the current budget, but never past what the context
-    /// window can still hold after the input. Small windows get a
-    /// proportionate bump (32K → ~16K, 16K → whatever is left) and a 4K
-    /// window gets nil — the retry would just overflow. `current` is the
-    /// effective budget (pass the provider default when the user left 0).
-    nonisolated static func escalatedMaxTokens(current: Int, contextWindow: Int, lastInputTokens: Int) -> Int? {
+    /// window can still hold after the input, and never past the model's
+    /// learned output ceiling (`modelCap`, e.g. 128K for Fable — doubling past
+    /// it would only buy a 400). Small windows get a proportionate bump
+    /// (32K → ~16K, 16K → whatever is left) and a 4K window gets nil — the
+    /// retry would just overflow. `current` is the effective budget (pass the
+    /// provider default when the user left 0).
+    nonisolated static func escalatedMaxTokens(
+        current: Int, contextWindow: Int, lastInputTokens: Int, modelCap: Int? = nil
+    ) -> Int? {
         guard current > 0 else { return nil }
         let room = contextWindow - max(lastInputTokens, 0) - 1_000
-        let target = min(current * 2, room)
+        var target = min(current * 2, room)
+        if let modelCap, modelCap > 0 { target = min(target, modelCap) }
         return target > current ? target : nil
     }
 }

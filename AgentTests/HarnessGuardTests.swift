@@ -120,6 +120,18 @@ struct HarnessGuardTests {
         #expect(AgentViewModel.escalatedMaxTokens(current: 0, contextWindow: 200_000, lastInputTokens: 0) == nil)
     }
 
+    @Test("10.1: escalation never doubles past the model's learned output cap (Fable: 128K on a 1M window)")
+    func maxTokensEscalationRespectsModelCap() {
+        // Already at the cap → nothing to gain, no 400-bait retry
+        #expect(AgentViewModel.escalatedMaxTokens(current: 128_000, contextWindow: 1_000_000, lastInputTokens: 50_000, modelCap: 128_000) == nil)
+        // Below the cap → doubles, but clamps to the cap
+        #expect(AgentViewModel.escalatedMaxTokens(current: 100_000, contextWindow: 1_000_000, lastInputTokens: 50_000, modelCap: 128_000) == 128_000)
+        #expect(AgentViewModel.escalatedMaxTokens(current: 32_000, contextWindow: 1_000_000, lastInputTokens: 50_000, modelCap: 128_000) == 64_000)
+        // Unknown cap (nil / 0) → unchanged behaviour
+        #expect(AgentViewModel.escalatedMaxTokens(current: 128_000, contextWindow: 1_000_000, lastInputTokens: 50_000, modelCap: nil) == 256_000)
+        #expect(AgentViewModel.escalatedMaxTokens(current: 128_000, contextWindow: 1_000_000, lastInputTokens: 50_000, modelCap: 0) == 256_000)
+    }
+
     @Test("Default Claude max_tokens is a percentage of the window, clamped to the model's learned cap")
     func defaultClaudeMaxTokensScalesWithWindow() {
         #expect(AgentViewModel.outputBudgetFraction == 0.5)
