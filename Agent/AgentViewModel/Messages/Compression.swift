@@ -36,18 +36,28 @@ struct CompactionState {
     /// Share of the context window the transcript may fill before compaction.
     /// The other half is the output budget (`outputBudgetFraction`), so
     /// input + output always fit: 1M compacts at 500K, 200K at 100K.
+    /// Capped at 128K: on huge advertised windows (1M–2M) an uncapped
+    /// percentage threshold delays compaction so long that any provider-side
+    /// discrepancy (a router serving a shorter window, a mis-counted system
+    /// prompt) turns into a hard context-overflow instead of a compaction.
     static let compactionFraction = 0.5
 
+    /// Largest window honored for threshold sizing — windows advertised above
+    /// this (Claude 1M, MiniMax 1M, Gemini/Grok 2M) all compact at 128K.
+    static let compactionWindowCap = 256_000
+
     /// Compact at `compactionFraction` of the window — a percentage, not a
-    /// fixed token count — but never so late that the reserved output no
-    /// longer fits (only matters for tiny local windows). No extra buffer:
-    /// when max_tokens is the other half of the window, the 50% line already
-    /// leaves exactly that much room, and a buffer would pull the threshold
-    /// below it (200K/100K → 87K instead of 100K).
+    /// fixed token count — but never above the cap, and never so late that
+    /// the reserved output no longer fits (only matters for tiny local
+    /// windows). No extra buffer: when max_tokens is the other half of the
+    /// window, the 50% line already leaves exactly that much room, and a
+    /// buffer would pull the threshold below it (200K/100K → 87K instead of
+    /// 100K).
     static func threshold(for contextWindow: Int, maxTokens: Int = 0) -> Int {
-        let byFraction = Int(Double(contextWindow) * compactionFraction)
+        let window = min(contextWindow, compactionWindowCap)
+        let byFraction = Int(Double(window) * compactionFraction)
         let reservedOutput = maxTokens > 0 ? maxTokens : 8_192
-        return max(2_000, min(byFraction, contextWindow - reservedOutput))
+        return max(2_000, min(byFraction, window - reservedOutput))
     }
 
     /// Re-derive the threshold from the provider's current context window.

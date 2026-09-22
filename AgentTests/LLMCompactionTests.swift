@@ -31,9 +31,13 @@ struct LLMCompactionTests {
         #expect(CompactionState.compactionFraction == 0.5)
         #expect(CompactionState.threshold(for: 128_000) == 64_000)
         #expect(CompactionState.threshold(for: 200_000, maxTokens: 100_000) == 100_000)
-        #expect(CompactionState.threshold(for: 1_000_000, maxTokens: 500_000) == 500_000)
-        // Learned 128K output cap on 1M: still the 50% line, not window − cap
-        #expect(CompactionState.threshold(for: 1_000_000, maxTokens: 128_000) == 500_000)
+        #expect(CompactionState.threshold(for: 256_000, maxTokens: 128_000) == 128_000)
+        // Windows at/above the 256K cap all compact at 128K, not 50% of the
+        // advertised window — a router reporting 1M while serving far less
+        // must not delay compaction into a hard context overflow.
+        #expect(CompactionState.threshold(for: 1_000_000, maxTokens: 500_000) == 128_000)
+        #expect(CompactionState.threshold(for: 1_000_000, maxTokens: 128_000) == 128_000)
+        #expect(CompactionState.threshold(for: 2_000_000, maxTokens: 64_000) == 128_000)
         // Tiny window floors at 2K
         #expect(CompactionState.threshold(for: 4_096) == 2_000)
     }
