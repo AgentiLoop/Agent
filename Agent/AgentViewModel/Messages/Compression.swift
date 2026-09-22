@@ -54,10 +54,12 @@ struct CompactionState {
     /// buffer would pull the threshold below it (200K/100K → 87K instead of
     /// 100K).
     static func threshold(for contextWindow: Int, maxTokens: Int = 0) -> Int {
-        let window = min(contextWindow, compactionWindowCap)
-        let byFraction = Int(Double(window) * compactionFraction)
+        let byFraction = Int(Double(min(contextWindow, compactionWindowCap)) * compactionFraction)
+        // Output-fit still uses the TRUE window: with the cap, Claude's 500K
+        // default budget on 1M would turn `window - maxTokens` negative and
+        // floor the threshold at 2K. Only the percentage is capped.
         let reservedOutput = maxTokens > 0 ? maxTokens : 8_192
-        return max(2_000, min(byFraction, window - reservedOutput))
+        return max(2_000, min(byFraction, contextWindow - reservedOutput))
     }
 
     /// Re-derive the threshold from the provider's current context window.
