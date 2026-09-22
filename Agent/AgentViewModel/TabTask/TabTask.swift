@@ -178,6 +178,15 @@ extension AgentViewModel {
         tab.flush()
 
         var mt = maxTokens
+        // Same first-request sizing as the main task: Claude's real output
+        // ceiling from /v1/models, fetched now if this model's cap isn't known.
+        if mt == 0, provider == .claude {
+            if modelMaxOutputTokens[modelId] == nil, !apiKey.isEmpty {
+                await fetchClaudeModels()
+            }
+            mt = Self.defaultClaudeMaxTokens(
+                contextWindow: contextWindow(for: provider), modelCap: modelMaxOutputTokens[modelId])
+        }
         var services = buildLLMServiceBundle(
             provider: provider,
             modelName: modelId,
