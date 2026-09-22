@@ -54,7 +54,7 @@ NPM도, Electron도, 구독도, 텔레메트리도 없습니다. 직접 API 키�
 
 1. [Agent!](https://github.com/AgentiLoop/Agent/releases/latest)를 **다운로드**하여 응용 프로그램으로 드래그 — 또는 Homebrew로:
    ```sh
-   brew update && brew install --cask agentiloop-agent
+   brew update && brew install --cask agentiloop/tap/agent
    ```
 2. **Agent!를 열기** — 모든 것이 자동으로 설정됩니다
 3. **AI 선택** — 설정 → 제공자 선택 → API 키 입력

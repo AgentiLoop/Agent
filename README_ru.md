@@ -54,7 +54,7 @@ Agent! — это 100 % нативное приложение на Swift 6.2 / S
 
 1. **Скачайте** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) и перетащите в «Программы» — или через Homebrew:
    ```sh
-   brew update && brew install --cask agentiloop-agent
+   brew update && brew install --cask agentiloop/tap/agent
    ```
 2. **Откройте Agent!** — он настроит всё автоматически
 3. **Выберите свой ИИ** — Настройки → выберите провайдера → введите API-ключ

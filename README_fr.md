@@ -54,7 +54,7 @@ Pas de NPM, pas d'Electron, pas d'abonnement, pas de télémétrie. Apportez vot
 
 1. **Téléchargez** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) et glissez-le dans Applications — ou avec Homebrew :
    ```sh
-   brew update && brew install --cask agentiloop-agent
+   brew update && brew install --cask agentiloop/tap/agent
    ```
 2. **Ouvrez Agent!** — tout se configure automatiquement
 3. **Choisissez votre IA** — Réglages → choisissez un fournisseur → saisissez la clé API

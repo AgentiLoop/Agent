@@ -54,7 +54,7 @@ NPM も Electron もサブスクリプションもテレメトリもありませ
 
 1. [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) を**ダウンロード**してアプリケーションにドラッグ — または Homebrew で：
    ```sh
-   brew update && brew install --cask agentiloop-agent
+   brew update && brew install --cask agentiloop/tap/agent
    ```
 2. **Agent! を開く** — すべて自動で設定されます
 3. **AI を選ぶ** — 設定 → プロバイダーを選択 → API キーを入力

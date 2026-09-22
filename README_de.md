@@ -54,7 +54,7 @@ Kein NPM, kein Electron, kein Abo, keine Telemetrie. Bring deinen eigenen API-Sc
 
 1. **Lade** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) herunter und ziehe es in „Programme" — oder mit Homebrew:
    ```sh
-   brew update && brew install --cask agentiloop-agent
+   brew update && brew install --cask agentiloop/tap/agent
    ```
 2. **Öffne Agent!** — es richtet alles automatisch ein
 3. **Wähle deine KI** — Einstellungen → Anbieter wählen → API-Schlüssel eingeben

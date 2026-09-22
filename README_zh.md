@@ -54,7 +54,7 @@ Agent! 是一款 100% 原生的 Swift 6.2 / SwiftUI 应用，将 **21 家 LLM �
 
 1. **下载** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) 并拖入「应用程序」—— 或使用 Homebrew：
    ```sh
-   brew update && brew install --cask agentiloop-agent
+   brew update && brew install --cask agentiloop/tap/agent
    ```
 2. **打开 Agent!** —— 一切自动配置
 3. **选择你的 AI** —— 设置 → 选择提供商 → 输入 API 密钥
