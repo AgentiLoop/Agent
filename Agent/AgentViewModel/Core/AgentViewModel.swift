@@ -580,8 +580,15 @@ final class AgentViewModel {
         didSet { rebuildTabIndex() }
     }
     var selectedTabId: UUID? { // nil = Main tab
-        didSet { restoreProviderFromActiveTab() }
+        didSet {
+            // Leaving Main: remember its provider so the next tab's provider doesn't stick to Main.
+            if oldValue == nil, selectedTabId != nil { mainTabProvider = selectedProvider }
+            restoreProviderFromActiveTab()
+        }
     }
+
+    /// Main tab's provider, saved while another tab is selected (Main has no LLMConfig of its own).
+    var mainTabProvider: APIProvider?
 
     /// Re-entrancy guard: true while restoreProviderFromActiveTab is mid-flight so the
     /// chained selectedProvider.didSet doesn't overwrite the tab's user-picked model.
