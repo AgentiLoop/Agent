@@ -112,10 +112,9 @@ extension AgentViewModel {
 
     /// Restore global provider/model from the active tab's saved LLMConfig when switching tabs.
     func restoreProviderFromActiveTab() {
-        // Back on Main: put its own provider back instead of keeping the last tab's.
+        // Back on Main: put Main's own provider back instead of keeping the last tab's.
         if selectedTabId == nil {
-            if let main = mainTabProvider, selectedProvider != main { selectedProvider = main }
-            mainTabProvider = nil
+            if selectedProvider != mainTabProvider { selectedProvider = mainTabProvider }
             return
         }
         guard let tabId = selectedTabId,

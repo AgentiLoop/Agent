@@ -217,7 +217,8 @@ final class AgentViewModel {
     }
 
     var selectedProvider: APIProvider = {
-        let rawValue = UserDefaults.standard.string(forKey: "agentProvider") ?? "ollama"
+        let rawValue = UserDefaults.standard.string(forKey: "mainTabProvider")
+            ?? UserDefaults.standard.string(forKey: "agentProvider") ?? "ollama"
         let provider = APIProvider(rawValue: rawValue) ?? .ollama
         return APIProvider.selectableProviders.contains(provider) ? provider : .ollama
     }() {
@@ -227,6 +228,7 @@ final class AgentViewModel {
                 return
             }
             UserDefaults.standard.set(selectedProvider.rawValue, forKey: "agentProvider")
+            if selectedTabId == nil { mainTabProvider = selectedProvider }
             fetchModelsForSelectedProviderIfNeeded()
             // Sync to the active tab's LLMConfig so each tab remembers its own provider
             syncProviderToActiveTab()
@@ -580,15 +582,19 @@ final class AgentViewModel {
         didSet { rebuildTabIndex() }
     }
     var selectedTabId: UUID? { // nil = Main tab
-        didSet {
-            // Leaving Main: remember its provider so the next tab's provider doesn't stick to Main.
-            if oldValue == nil, selectedTabId != nil { mainTabProvider = selectedProvider }
-            restoreProviderFromActiveTab()
-        }
+        didSet { restoreProviderFromActiveTab() }
     }
 
-    /// Main tab's provider, saved while another tab is selected (Main has no LLMConfig of its own).
-    var mainTabProvider: APIProvider?
+    /// Main tab's own provider (Main has no LLMConfig). Only changes when the provider is
+    /// picked while Main is selected, so other tabs can never overwrite it. Persisted.
+    var mainTabProvider: APIProvider = {
+        let raw = UserDefaults.standard.string(forKey: "mainTabProvider")
+            ?? UserDefaults.standard.string(forKey: "agentProvider") ?? "ollama"
+        let provider = APIProvider(rawValue: raw) ?? .ollama
+        return APIProvider.selectableProviders.contains(provider) ? provider : .ollama
+    }() {
+        didSet { UserDefaults.standard.set(mainTabProvider.rawValue, forKey: "mainTabProvider") }
+    }
 
     /// Re-entrancy guard: true while restoreProviderFromActiveTab is mid-flight so the
     /// chained selectedProvider.didSet doesn't overwrite the tab's user-picked model.
