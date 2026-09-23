@@ -74,6 +74,10 @@ extension AgentViewModel {
     func apiKeyForProvider(_ provider: APIProvider) -> String {
         switch provider {
         case .codex, .localOllama, .foundationModel: return ""
+        case .oMLX:
+            // Blank field → fall back to the key in ~/.omlx/settings.json.
+            let key = apiKeys[.oMLX].trimmingCharacters(in: .whitespacesAndNewlines)
+            return key.isEmpty ? (OMLXSettings.load().apiKey ?? "") : key
         default: return apiKeys[provider].trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }

@@ -392,6 +392,11 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(vLLMEndpoint, forKey: "vLLMEndpoint") }
     }
 
+    // oMLX settings — default port comes from ~/.omlx/settings.json
+    var oMLXEndpoint: String = UserDefaults.standard.string(forKey: "oMLXEndpoint") ?? "\(OMLXSettings.load().baseURL)/chat/completions" {
+        didSet { UserDefaults.standard.set(oMLXEndpoint, forKey: "oMLXEndpoint") }
+    }
+
     // LM Studio settings
     var lmStudioProtocol: LMStudioProtocol = {
         let raw = UserDefaults.standard.string(forKey: "lmStudioProtocol") ?? "openAI"

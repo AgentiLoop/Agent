@@ -147,10 +147,10 @@ extension AgentViewModel {
                 projectFolder: projectFolder, provider: provider,
                 messagesKey: key, maxTokens: mt
             )
-        case .vLLM:
+        case .vLLM, .oMLX:
             openAICompatible = OpenAICompatibleService(
                 apiKey: apiKeyForProvider(provider), model: modelName,
-                baseURL: vLLMEndpoint, historyContext: historyContext,
+                baseURL: provider == .oMLX ? oMLXEndpoint : vLLMEndpoint, historyContext: historyContext,
                 projectFolder: projectFolder, provider: provider,
                 maxTokens: mt
             )

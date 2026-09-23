@@ -298,6 +298,23 @@ enum LLMProviderSetup {
                 apiKeyOptional: true,
                 supportedProtocols: [.openAI, .anthropic, .custom])
 
+        // oMLX (https://omlx.ai) — macOS-native MLX inference server with paged SSD KV
+        // caching and continuous batching. OpenAI-compatible Chat Completions on
+        // http://localhost:<port>/v1; port + key come from ~/.omlx/settings.json.
+        // No default model: it serves whatever is in its model directory.
+        case .oMLX:
+            let base = OMLXSettings.load().baseURL
+            return make(provider, kind: .localServer, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "\(base)/chat/completions",
+                    modelsURL: "\(base)/models",
+                    authHeader: "", authPrefix: "",
+                    defaultPort: OMLXSettings.defaultPort
+                ),
+                capabilities: [.streaming, .tools, .systemPrompt],
+                contextSize: 32_000,
+                apiKeyOptional: true)
+
         // MARK: - On-Device
 
         // Apple Foundation Models CLI (macOS 27 `/usr/bin/fm`). `fm serve` exposes a
@@ -366,4 +383,28 @@ enum LLMProviderSetup {
 
     /// OpenRouter's Anthropic-Messages-compatible chat URL (used when the user picks the Anthropic protocol).
     static let openRouterAnthropicChatURL = "https://openrouter.ai/api/v1/messages"
+}
+
+/// `server.port` and `auth.api_key` from oMLX's own `~/.omlx/settings.json`, so a
+/// locally installed oMLX server works with no configuration in Agent!.
+nonisolated struct OMLXSettings: Sendable {
+    static let defaultPort = 8000
+
+    var port: Int?
+    var apiKey: String?
+
+    /// `http://localhost:<port>/v1` — settings.json port, else 8000.
+    var baseURL: String { "http://localhost:\(port ?? Self.defaultPort)/v1" }
+
+    static func load(from url: URL = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent(".omlx/settings.json")) -> OMLXSettings {
+        guard let data = try? Data(contentsOf: url),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return OMLXSettings() }
+        let auth = json["auth"] as? [String: Any] ?? [:]
+        // A key is only required when verification is on.
+        let skip = auth["skip_api_key_verification"] as? Bool ?? false
+        let key = skip ? nil : (auth["api_key"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+        let port = (json["server"] as? [String: Any])?["port"] as? Int
+        return OMLXSettings(port: port.flatMap { (1...65535).contains($0) ? $0 : nil }, apiKey: key)
+    }
 }

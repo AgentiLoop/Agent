@@ -841,24 +841,26 @@ extension AgentViewModel {
         return (models, vision)
     }
 
-    // MARK: - vLLM Models
+    // MARK: - vLLM / oMLX Models
 
-    func fetchVLLMModels() {
-        fetchingModels.insert(.vLLM)
-        let endpoint = vLLMEndpoint
-        let key = apiKeys[.vLLM]
+    /// vLLM and oMLX both serve an OpenAI-compatible `/v1/models`; oMLX has no
+    /// fixed default model, so the first served model is selected (as in AgentiLoopCLI).
+    func fetchVLLMModels(_ provider: APIProvider = .vLLM) {
+        fetchingModels.insert(provider)
+        let endpoint = provider == .oMLX ? oMLXEndpoint : vLLMEndpoint
+        let key = provider == .oMLX ? apiKeyForProvider(.oMLX) : apiKeys[.vLLM]
         Task {
-            defer { fetchingModels.remove(.vLLM) }
+            defer { fetchingModels.remove(provider) }
             do {
                 let (models, windows) = try await Self.fetchVLLMModelsFromAPI(endpoint: endpoint, apiKey: key)
-                modelLists[.vLLM] = models
-                modelContextWindows[.vLLM] = windows
+                modelLists[provider] = models
+                modelContextWindows[provider] = windows
                 let ids = models.map(\.id)
-                if self.models[.vLLM].isEmpty || (!ids.isEmpty && !ids.contains(self.models[.vLLM])) {
-                    self.models[.vLLM] = ids.first ?? ""
+                if self.models[provider].isEmpty || (!ids.isEmpty && !ids.contains(self.models[provider])) {
+                    self.models[provider] = ids.first ?? ""
                 }
             } catch {
-                appendLog("Failed to fetch vLLM models: \(error.localizedDescription)")
+                appendLog("Failed to fetch \(provider.displayName) models: \(error.localizedDescription)")
             }
         }
     }
@@ -993,6 +995,7 @@ extension AgentViewModel {
         case .localOllama: fetchLocalOllamaModels()
         case .huggingFace: fetchHuggingFaceModels()
         case .vLLM: fetchVLLMModels()
+        case .oMLX: fetchVLLMModels(.oMLX)
         case .lmStudio: fetchLMStudioModels()
         case .zAI: fetchZAIModels()
         case .dashscope: fetchDashscopeModels()
