@@ -746,7 +746,9 @@ final class OpenAICompatibleService {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.httpBody = bodyData
-        request.timeoutInterval = llmAPITimeout
+        // Idle timeout (resets on every byte). oMLX can stall in prefill without
+        // ever answering or erroring, so give up after 2 idle minutes instead of 3 hours.
+        request.timeoutInterval = provider == .oMLX ? 120 : llmAPITimeout
 
         let (bytes, response) = try await URLSession.shared.bytes(for: request)
 
