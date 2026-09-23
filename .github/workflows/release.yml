@@ -166,8 +166,12 @@ jobs:
         run: |
           set -euo pipefail
           APP="$RUNNER_TEMP/export/$APP_NAME.app"
-          xcrun stapler staple "$APP"
-          xcrun stapler validate "$APP"
+          # Apple's CloudKit ticket service sometimes returns 503 — retry instead of failing the release
+          for i in 1 2 3 4 5 6; do
+            xcrun stapler staple "$APP" && xcrun stapler validate "$APP" && break
+            [ "$i" = 6 ] && exit 1
+            echo "stapler attempt $i failed — retrying in 60s"; sleep 60
+          done
           spctl -a -vvv --type execute "$APP"
 
       - name: Package stapled artifacts (.zip + .dmg)
@@ -196,8 +200,11 @@ jobs:
             --password "$APPLE_APP_SPECIFIC_PASSWORD" \
             --team-id "$TEAM_ID" \
             --wait --timeout 45m
-          xcrun stapler staple "$OUT/Agent-$TAG-macOS.dmg"
-          xcrun stapler validate "$OUT/Agent-$TAG-macOS.dmg"
+          for i in 1 2 3 4 5 6; do
+            xcrun stapler staple "$OUT/Agent-$TAG-macOS.dmg" && xcrun stapler validate "$OUT/Agent-$TAG-macOS.dmg" && break
+            [ "$i" = 6 ] && exit 1
+            echo "stapler attempt $i failed — retrying in 60s"; sleep 60
+          done
 
       - name: Upload artifacts to the release
         env:
