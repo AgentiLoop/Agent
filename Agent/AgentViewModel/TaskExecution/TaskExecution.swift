@@ -313,6 +313,10 @@ extension AgentViewModel {
                     response = (r.content, r.stopReason, r.inputTokens, r.outputTokens)
 
                 } else if let openAICompatible = services.openAICompatible {
+                    openAICompatible.onStatus = { [weak self] line in
+                        self?.appendLog(line)
+                        self?.flushLog()
+                    }
                     let r = try await openAICompatible
                         .sendStreaming(messages: sendMessages, activeGroups: activeGroups) { [weak self] delta in
                             Task { @MainActor in

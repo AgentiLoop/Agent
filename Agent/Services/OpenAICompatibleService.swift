@@ -52,6 +52,8 @@ final class OpenAICompatibleService {
     /// Opt-in via the Reasoning setting — providers that reject the param surface
     /// the error and the user turns it off.
     var reasoningEffort: String = ""
+    /// Status lines for the task log (oMLX preflight result).
+    var onStatus: ((String) -> Void)?
 
     /// Real OpenAI goes through `/v1/responses`. Current OpenAI models
     /// (gpt-6-astra) reject function tools on `/v1/chat/completions` unless
@@ -511,11 +513,19 @@ final class OpenAICompatibleService {
 
         // .sortedKeys for byte-stable prefix caching — see send() for rationale.
         let bodyData = try JSONSerialization.data(withJSONObject: body, options: [.sortedKeys])
+        var idleTimeout: TimeInterval?
+        if provider == .oMLX {
+            // Throws (before anything is sent) when the model can't take the prompt.
+            let report = try await OMLXPreflight.check(bodyData: bodyData, chatURL: baseURL, apiKey: apiKey, model: model)
+            onStatus?(report.summary)
+            idleTimeout = report.timeout
+        }
         return try await Self.performStreamingRequest(
             bodyData: bodyData,
             apiKey: apiKey,
             url: baseURL,
             provider: provider,
+            idleTimeout: idleTimeout,
             onTextDelta: onTextDelta
         )
     }
@@ -739,6 +749,7 @@ final class OpenAICompatibleService {
 
     nonisolated private static func performStreamingRequest(
         bodyData: Data, apiKey: String, url: URL, provider: APIProvider,
+        idleTimeout: TimeInterval? = nil,
         onTextDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         var request = URLRequest(url: url)
@@ -746,9 +757,9 @@ final class OpenAICompatibleService {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.httpBody = bodyData
-        // Idle timeout (resets on every byte). oMLX can stall in prefill without
-        // ever answering or erroring, so give up after 2 idle minutes instead of 3 hours.
-        request.timeoutInterval = provider == .oMLX ? 120 : llmAPITimeout
+        // Idle timeout (resets on every byte). oMLX is silent during prefill, so
+        // it gets the preflight's prefill-sized timeout instead of 3 hours.
+        request.timeoutInterval = idleTimeout ?? llmAPITimeout
 
         let (bytes, response) = try await URLSession.shared.bytes(for: request)
 

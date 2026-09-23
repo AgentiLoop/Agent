@@ -69,6 +69,12 @@ extension AgentViewModel {
         // memory guard, MLX/Metal OOM). Retrying or pruning can't fix it — the
         // system prompt + tool schemas alone don't fit — so stop immediately.
         let lower = errMsg.lowercased()
+        // oMLX preflight refused to send: the reason is already specific.
+        if lower.contains("omlx preflight:") {
+            appendLog("❌ \(errMsg)\nPick a smaller/faster model, a Mac with more memory, or a cloud provider.")
+            flushLog()
+            return .breakLoop
+        }
         // oMLX can also stall silently in prefill (no error, no bytes) until
         // the idle timeout fires — retrying just stalls again.
         let oMLXStalled = provider == .oMLX && (lower.contains("timed out") || lower.contains("timeout"))
@@ -77,7 +83,7 @@ extension AgentViewModel {
         {
             appendLog(
                 """
-                ❌ The selected LLM (\(provider.rawValue)) is not large enough for Agent! — it \(oMLXStalled ? "stalled for 2 minutes without answering" : "ran out of memory on") Agent!'s prompt. Stopping.
+                ❌ The selected LLM (\(provider.rawValue)) is not large enough for Agent! — it \(oMLXStalled ? "stalled without answering" : "ran out of memory on") Agent!'s prompt. Stopping.
                 Pick a model with more memory headroom / a larger context, or a cloud provider.
                 Original error: \(errMsg.prefix(300))
                 """
