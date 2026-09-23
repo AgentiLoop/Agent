@@ -69,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentSwift.git",
       "state" : {
-        "revision" : "3478db341d59124ac5f24e1426621886518129ee",
-        "version" : "1.1.7"
+        "revision" : "d3ed337a258eb8ddf8eb3afcb1758f99c3aeeb9d",
+        "version" : "1.1.8"
       }
     },
     {
@@ -123,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-syntax.git",
       "state" : {
-        "revision" : "79e4b74a295b6eb74a8b585e3a39d29e70c1dbd1",
-        "version" : "603.0.2"
+        "revision" : "050f1a346fbbac0ca2cfb15a95274f7bd1cf0ccf",
+        "version" : "604.0.0"
       }
     }
   ],
