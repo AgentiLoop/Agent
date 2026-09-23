@@ -96,6 +96,21 @@ extension AgentViewModel {
                     // through dispatchTool, so run the same gates the dispatch path
                     // runs. Blocked → feed the refusal back as this tool's result and
                     // keep looping instead of ending the task.
+                    // Server-side web search with no written reply → the user sees
+                    // no results. Refuse once so the model reports what it found.
+                    if blockedCompletion == nil,
+                       responseContent.contains(where: { $0["type"] as? String == "web_search_tool_result" }),
+                       !responseContent.contains(where: {
+                           ($0["text"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+                       }) {
+                        appendLog("↩️ Web search results not reported — asking the model to list them")
+                        blockedCompletion = (toolId: toolId, message: """
+                            Refused: you ran web_search but wrote no reply, so the user sees none \
+                            of the results. Write out what you found as text — each source's title, \
+                            URL, and what it actually says — then call task_complete.
+                            """)
+                        continue
+                    }
                     if blockedCompletion == nil, let blocker = await completionGateBlocker() {
                         blockedCompletion = (toolId: toolId, message: blocker)
                         continue

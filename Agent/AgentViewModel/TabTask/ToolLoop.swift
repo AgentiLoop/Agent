@@ -32,11 +32,40 @@ extension AgentViewModel {
         var toolResults: [[String: Any]] = []
         var hasToolUse = false
 
+        // Native (server-side) web search runs inside the API call. If the model
+        // searched but wrote no text before calling task_complete, the user never
+        // sees any results — refuse that completion once so it reports them.
+        let searchedThisTurn = content.contains { $0["type"] as? String == "web_search_tool_result" }
+        let wroteText = content.contains {
+            ($0["text"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+        }
+
         for block in content {
             guard let type = block["type"] as? String else { continue }
 
             if type == "text" {
                 // Text goes to LLM output only — streaming delta already shows it there
+            } else if type == "server_tool_use" {
+                // Server-side web search — executed by the API, just log it (mirrors parseLLMResponseContent)
+                if let query = (block["input"] as? [String: Any])?["query"] as? String {
+                    tab.appendLog("🔍 Web search: \(query)")
+                    tab.flush()
+                }
+            } else if type == "web_search_tool_result" {
+                if let results = block["content"] as? [[String: Any]] {
+                    let lines = results.compactMap { result -> String? in
+                        guard result["type"] as? String == "web_search_result",
+                              let title = result["title"] as? String,
+                              let url = result["url"] as? String else { return nil }
+                        return "  \(title)\n    \(url)"
+                    }
+                    if !lines.isEmpty {
+                        tab.appendLog("📊\n" + lines.joined(separator: "\n"))
+                    }
+                } else if let error = block["content"] as? [String: Any] {
+                    tab.appendLog("⚠️ Web search failed: \(error["error_code"] as? String ?? "unknown error")")
+                }
+                tab.flush()
             } else if type == "tool_use" {
                 // Every tool_use with an id MUST get a tool_result, or the next
                 // request 400s ("tool_use ids found without tool_result"). The id
@@ -69,6 +98,21 @@ extension AgentViewModel {
                 ]
                 if editTools.contains(name), let filePath = input["file_path"] as? String, !filePath.isEmpty {
                     filesEditedThisTask.insert(filePath)
+                }
+
+                if name == "task_complete" && searchedThisTurn && !wroteText {
+                    tab.appendLog("↩️ Web search results not reported — asking the model to list them")
+                    tab.flush()
+                    toolResults.append([
+                        "type": "tool_result",
+                        "tool_use_id": toolId,
+                        "content": """
+                            Refused: you ran web_search but wrote no reply, so the user sees none \
+                            of the results. Write out what you found as text — each source's title, \
+                            URL, and what it actually says — then call task_complete.
+                            """
+                    ])
+                    continue
                 }
 
                 let toolStart = CFAbsoluteTimeGetCurrent()
