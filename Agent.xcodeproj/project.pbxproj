@@ -3,13 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		02706156F0F8E91DF8FB4E70 /* TE-Selenium.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8FE3C1065B23B9424ED23C /* TE-Selenium.swift */; };
 		031BAABE48A31A26277EA3C6 /* Accessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7452B670C7ABBF7A1884569F /* Accessibility.swift */; };
 		088F38C5D0E90D019E33A0D9 /* Selenium.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DBCE8EADB1BBD7A0E94AD0B /* Selenium.swift */; };
+		094F03A9F6093F2CD32452B2 /* FMServeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */; };
 		0A1EEB47CE2C2A8E1FEC9539 /* ProviderKeyed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9147F16D98DBB40EA90C79 /* ProviderKeyed.swift */; };
 		0BCD82BC9C5723C7F775D244 /* GoalStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */; };
 		144AC666CD8BD1964F726B31 /* ServicesPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AF4AB55766B9B0D5CA69DFD /* ServicesPopover.swift */; };
@@ -68,11 +69,6 @@
 		AA1000000000000000003F /* DependencyChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000002D /* DependencyChecker.swift */; };
 		AA10000000000000000044 /* DependencyOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000002E /* DependencyOverlayView.swift */; };
 		AA10000000000000000047 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000000046 /* KeychainService.swift */; };
-		JEV0000000000000000001 /* JevConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = JEV0000000000000000000 /* JevConfiguration.swift */; };
-		TSK0000000000000000001 /* TypeSafeKit in Frameworks */ = {isa = PBXBuildFile; productRef = TSK0000000000000000000 /* TypeSafeKit */; };
-		TSK0000000000000000003 /* TypeSafeMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = TSK0000000000000000002 /* TypeSafeMiddleware */; };
-		JEV0000000000000000003 /* JevAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = JEV0000000000000000002 /* JevAdvisor.swift */; };
-
 		AA10000000000000000049 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000000000000000048 /* Logging.swift */; };
 		AA1000000000000000004B /* TaskExecution.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000004A /* TaskExecution.swift */; };
 		AA1000000000000000004F /* CodingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000004E /* CodingService.swift */; };
@@ -153,6 +149,7 @@
 		AB112233445566778899060A /* PackageGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899060B /* PackageGenerationTests.swift */; };
 		AB112233445566778899070A /* ScriptServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB112233445566778899070B /* ScriptServiceTests.swift */; };
 		AB1122334455667788990C70 /* ToolErrorClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1122334455667788990C71 /* ToolErrorClassifierTests.swift */; };
+		AB7853CF1FF649C48C631F51 /* Shared/ProcessTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1821936007B7A5B592EB0FE /* Shared/ProcessTree.swift */; };
 		ABC7EAA6F77F494989A1A61F /* AgentTools+AppBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC627819110EDB4BE4A30406 /* AgentTools+AppBridge.swift */; };
 		AD0E84FCAA3A3D6AF61ECD16 /* SavedScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4709078FC05AA3587261B14 /* SavedScripts.swift */; };
 		ALE0000000000000000001 /* Update.swift in Sources */ = {isa = PBXBuildFile; fileRef = ALE0000000000000000002 /* Update.swift */; };
@@ -183,8 +180,8 @@
 		D3A4F795003DE4CF29105DB6 /* HarnessGuardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1677C7175A16F2731420499 /* HarnessGuardTests.swift */; };
 		DC10000000000000000001 /* DaemonCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC10000000000000000000 /* DaemonCore.swift */; };
 		DC10000000000000000002 /* DaemonCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC10000000000000000000 /* DaemonCore.swift */; };
-		DC10000000000000000011 /* ProcessTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1821936007B7A5B592EB0FE /* ProcessTree.swift */; };
-		DC10000000000000000012 /* ProcessTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1821936007B7A5B592EB0FE /* ProcessTree.swift */; };
+		DC10000000000000000011 /* Shared/ProcessTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1821936007B7A5B592EB0FE /* Shared/ProcessTree.swift */; };
+		DC10000000000000000012 /* Shared/ProcessTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1821936007B7A5B592EB0FE /* Shared/ProcessTree.swift */; };
 		DE0C6B19A80C218E670D6C69 /* Web.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EEC654A3A0762D24BE1901 /* Web.swift */; };
 		E3E55709254183FE587097A8 /* DiffStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E185ABB626D6FCD3D74523A /* DiffStore.swift */; };
 		E5CBD1143D2B44B8B9A209FE /* RollbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C57073F5C4305AF673454 /* RollbackView.swift */; };
@@ -216,6 +213,7 @@
 		EASS000000000000000004 /* ShellSafetyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EASS000000000000000002 /* ShellSafetyService.swift */; };
 		F035BAFA78E9DDFDF6DD5A1C /* TaskBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4128E21FF13BC4029D6548B /* TaskBannerView.swift */; };
 		F123A9EA71C5383EFFFF1A8A /* Rendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = C428D9A5859B0E1BB0D2FB6B /* Rendering.swift */; };
+		F36A58D7738933627DF110BF /* LLMCommonSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */; };
 		FA10000000000000000101 /* LoopControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000100 /* LoopControl.swift */; };
 		FA10000000000000000103 /* PrefixStabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000102 /* PrefixStabilityTests.swift */; };
 		FA10000000000000000105 /* LoopReplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000104 /* LoopReplayTests.swift */; };
@@ -232,19 +230,20 @@
 		FF20000000000000000006 /* ExaSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF20000000000000000005 /* ExaSearchTests.swift */; };
 		IDX0000000000000000001 /* NTH-Index.swift in Sources */ = {isa = PBXBuildFile; fileRef = IDX0000000000000000002 /* NTH-Index.swift */; };
 		IDX0000000000000000003 /* ProjectIndexService.swift in Sources */ = {isa = PBXBuildFile; fileRef = IDX0000000000000000004 /* ProjectIndexService.swift */; };
+		JEV0000000000000000001 /* JevConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = JEV0000000000000000000 /* JevConfiguration.swift */; };
+		JEV0000000000000000003 /* JevAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = JEV0000000000000000002 /* JevAdvisor.swift */; };
 		MCPP000000000000000001 /* MCPPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = MCPP000000000000000002 /* MCPPresets.swift */; };
 		MEM0000000000000000001 /* NTH-Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = MEM0000000000000000002 /* NTH-Memory.swift */; };
 		SS110000000000000000001 /* ScriptService+Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = SS110000000000000000002 /* ScriptService+Metadata.swift */; };
 		SS110000000000000000003 /* ScriptService+Execution.swift in Sources */ = {isa = PBXBuildFile; fileRef = SS110000000000000000004 /* ScriptService+Execution.swift */; };
 		SS110000000000000000005 /* ScriptService+SavedScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = SS110000000000000000006 /* ScriptService+SavedScripts.swift */; };
 		TN10000000000000000001 /* ToolNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = TN10000000000000000000 /* ToolNames.swift */; };
+		TSK0000000000000000001 /* TypeSafeKit in Frameworks */ = {isa = PBXBuildFile; productRef = TSK0000000000000000000 /* TypeSafeKit */; };
+		TSK0000000000000000003 /* TypeSafeMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = TSK0000000000000000002 /* TypeSafeMiddleware */; };
 		WEB1000000000000000001 /* WebAutomationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000002 /* WebAutomationService.swift */; };
 		WEB1000000000000000003 /* WebAutomationService+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000004 /* WebAutomationService+Navigation.swift */; };
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
-		AB7853CF1FF649C48C631F51 /* ProcessTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1821936007B7A5B592EB0FE /* ProcessTree.swift */; };
-		094F03A9F6093F2CD32452B2 /* FMServeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */; };
-		F36A58D7738933627DF110BF /* LLMCommonSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -312,6 +311,7 @@
 		39A507049182BD42AD200EC6 /* ResponseCompletionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseCompletionTests.swift; sourceTree = "<group>"; };
 		4B0C57073F5C4305AF673454 /* RollbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollbackView.swift; sourceTree = "<group>"; };
 		5D8FE3C1065B23B9424ED23C /* TE-Selenium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TE-Selenium.swift"; sourceTree = "<group>"; };
+		6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMCommonSettingsView.swift; sourceTree = "<group>"; };
 		6CD920ED377E5386B020BC79 /* ModelFetching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelFetching.swift; sourceTree = "<group>"; };
 		6CDC0CB629A59A0594ED17DA /* AgentScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentScript.swift; sourceTree = "<group>"; };
 		70B4573B1D1FB583C85DC43C /* SearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarView.swift; sourceTree = "<group>"; };
@@ -320,6 +320,7 @@
 		7B9147F16D98DBB40EA90C79 /* ProviderKeyed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderKeyed.swift; sourceTree = "<group>"; };
 		878ED6B87793FE4A12844669 /* AboutSelf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutSelf.swift; sourceTree = "<group>"; };
 		87F1A988F00C4E7050FED023 /* WebTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebTools.swift; sourceTree = "<group>"; };
+		8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FMServeService.swift; sourceTree = "<group>"; };
 		93C673DDB50E956B2E5FD610 /* NativeToolHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeToolHandler.swift; sourceTree = "<group>"; };
 		A3804F32B8914764A3690CB5 /* TokenUsageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenUsageStore.swift; sourceTree = "<group>"; };
 		AA1000000000000000001A /* AgentApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentApp.swift; sourceTree = "<group>"; };
@@ -343,9 +344,6 @@
 		AA1000000000000000002D /* DependencyChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyChecker.swift; sourceTree = "<group>"; };
 		AA1000000000000000002E /* DependencyOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyOverlayView.swift; sourceTree = "<group>"; };
 		AA10000000000000000046 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
-		JEV0000000000000000000 /* JevConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JevConfiguration.swift; sourceTree = "<group>"; };
-		JEV0000000000000000002 /* JevAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JevAdvisor.swift; sourceTree = "<group>"; };
-
 		AA10000000000000000048 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		AA1000000000000000004A /* TaskExecution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskExecution.swift; sourceTree = "<group>"; };
 		AA1000000000000000004E /* CodingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodingService.swift; sourceTree = "<group>"; };
@@ -495,6 +493,7 @@
 		EF914BA393B97296A51A534F /* Git.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Git.swift; sourceTree = "<group>"; };
 		EFC0549F9001505AC8375592 /* SubAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubAgent.swift; sourceTree = "<group>"; };
 		F03E40CE4E05384C443BA8A9 /* KeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcuts.swift; sourceTree = "<group>"; };
+		F1821936007B7A5B592EB0FE /* Shared/ProcessTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/ProcessTree.swift; sourceTree = SOURCE_ROOT; };
 		F212F6A04076958DD46FD1E4 /* CriticGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CriticGate.swift; sourceTree = "<group>"; };
 		FA10000000000000000100 /* LoopControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopControl.swift; sourceTree = "<group>"; };
 		FA10000000000000000102 /* PrefixStabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefixStabilityTests.swift; sourceTree = "<group>"; };
@@ -510,6 +509,8 @@
 		FF20000000000000000005 /* ExaSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExaSearchTests.swift; sourceTree = "<group>"; };
 		IDX0000000000000000002 /* NTH-Index.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NTH-Index.swift"; sourceTree = "<group>"; };
 		IDX0000000000000000004 /* ProjectIndexService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectIndexService.swift; sourceTree = "<group>"; };
+		JEV0000000000000000000 /* JevConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JevConfiguration.swift; sourceTree = "<group>"; };
+		JEV0000000000000000002 /* JevAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JevAdvisor.swift; sourceTree = "<group>"; };
 		MCPP000000000000000002 /* MCPPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPPresets.swift; sourceTree = "<group>"; };
 		MEM0000000000000000002 /* NTH-Memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NTH-Memory.swift"; sourceTree = "<group>"; };
 		SS110000000000000000002 /* ScriptService+Metadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScriptService+Metadata.swift"; sourceTree = "<group>"; };
@@ -520,9 +521,6 @@
 		WEB1000000000000000004 /* WebAutomationService+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Navigation.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
-		F1821936007B7A5B592EB0FE /* ProcessTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/ProcessTree.swift; sourceTree = SOURCE_ROOT; };
-		8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FMServeService.swift"; sourceTree = "<group>"; };
-		6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LLMCommonSettingsView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -808,8 +806,8 @@
 				DF369840556805C0F5ABC259 /* FallbackChainView.swift */,
 				DFHUDA001556805C0F5ABC260 /* HUDOptionsView.swift */,
 				EASP000000000000000004 /* SystemPromptEditor.swift */,
-							6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */,
-);
+				6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */,
+			);
 			path = Settings;
 			sourceTree = "<group>";
 		};
@@ -852,8 +850,8 @@
 				AA1000000000000000005F /* PulseRingView.swift */,
 				AA10000000000000000E00 /* ShimmerText.swift */,
 				4B0C57073F5C4305AF673454 /* RollbackView.swift */,
-							F1821936007B7A5B592EB0FE /* ProcessTree.swift */,
-);
+				F1821936007B7A5B592EB0FE /* Shared/ProcessTree.swift */,
+			);
 			path = Shared;
 			sourceTree = "<group>";
 		};
@@ -964,7 +962,6 @@
 				AA10000000000000000046 /* KeychainService.swift */,
 				JEV0000000000000000000 /* JevConfiguration.swift */,
 				JEV0000000000000000002 /* JevAdvisor.swift */,
-
 				WEB1000000000000000002 /* WebAutomationService.swift */,
 				WEB1000000000000000004 /* WebAutomationService+Navigation.swift */,
 				WEB1000000000000000006 /* WebAutomationService+Utilities.swift */,
@@ -996,8 +993,8 @@
 				30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */,
 				BB5A29F2E735D900C78C575E /* PlanStateStore.swift */,
 				B73CC1C22C23AAC6CD8E7BD5 /* ToolErrorClassifier.swift */,
-							8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */,
-);
+				8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */,
+			);
 			path = Services;
 			sourceTree = "<group>";
 		};
@@ -1392,7 +1389,6 @@
 				AA10000000000000000047 /* KeychainService.swift in Sources */,
 				JEV0000000000000000001 /* JevConfiguration.swift in Sources */,
 				JEV0000000000000000003 /* JevAdvisor.swift in Sources */,
-
 				AA10000000000000000049 /* Logging.swift in Sources */,
 				AA1000000000000000004B /* TaskExecution.swift in Sources */,
 				7FA36E1A9CC0DFA5A3ECB9AD /* NativeToolHandler.swift in Sources */,
@@ -1488,10 +1484,10 @@
 				1DCD8313ABDDD50E52BDA2E0 /* CriticGate.swift in Sources */,
 				40A6BBABC40BC543080ED54E /* APIProvider.swift in Sources */,
 				0A1EEB47CE2C2A8E1FEC9539 /* ProviderKeyed.swift in Sources */,
-							AB7853CF1FF649C48C631F51 /* ProcessTree.swift in Sources */,
+				AB7853CF1FF649C48C631F51 /* Shared/ProcessTree.swift in Sources */,
 				094F03A9F6093F2CD32452B2 /* FMServeService.swift in Sources */,
 				F36A58D7738933627DF110BF /* LLMCommonSettingsView.swift in Sources */,
-);
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BB10000000000000000050 /* Sources */ = {
@@ -1501,7 +1497,7 @@
 				BB10000000000000000030 /* main.swift in Sources */,
 				BB10000000000000000031 /* HelperProtocol.swift in Sources */,
 				DC10000000000000000001 /* DaemonCore.swift in Sources */,
-				DC10000000000000000011 /* ProcessTree.swift in Sources */,
+				DC10000000000000000011 /* Shared/ProcessTree.swift in Sources */,
 				FA10000000000000000109 /* XPCClientTrust.swift in Sources */,
 				EASS000000000000000003 /* ShellSafetyService.swift in Sources */,
 			);
@@ -1514,7 +1510,7 @@
 				CC10000000000000000030 /* main.swift in Sources */,
 				CC10000000000000000031 /* UserProtocol.swift in Sources */,
 				DC10000000000000000002 /* DaemonCore.swift in Sources */,
-				DC10000000000000000012 /* ProcessTree.swift in Sources */,
+				DC10000000000000000012 /* Shared/ProcessTree.swift in Sources */,
 				FA1000000000000000010A /* XPCClientTrust.swift in Sources */,
 				EASS000000000000000004 /* ShellSafetyService.swift in Sources */,
 			);
@@ -1699,7 +1695,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 257;
+				CURRENT_PROJECT_VERSION = 258;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
@@ -1728,7 +1724,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				MARKETING_VERSION = 1.1.57;
+				MARKETING_VERSION = 1.1.58;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1753,7 +1749,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 257;
+				CURRENT_PROJECT_VERSION = 258;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
@@ -1782,7 +1778,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				MARKETING_VERSION = 1.1.57;
+				MARKETING_VERSION = 1.1.58;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
