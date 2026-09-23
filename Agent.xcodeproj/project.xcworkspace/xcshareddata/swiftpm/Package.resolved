@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentAccess.git",
       "state" : {
-        "revision" : "aa3d0142c1a51b33f66acac04f5d71b33492ec3a",
-        "version" : "2.10.19"
+        "revision" : "ec8819a20124fb943a5cffb9d5ac662d2ee506c7",
+        "version" : "2.10.20"
       }
     },
     {
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/steipete/AXorcist.git",
       "state" : {
-        "revision" : "eaf808877546228ee4b0a4e260083a9b938e567f",
-        "version" : "0.1.10"
+        "revision" : "c3838bfa47358202331c4cd4b71a783893825fd9",
+        "version" : "0.2.0"
       }
     },
     {
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/steipete/Commander.git",
       "state" : {
-        "revision" : "bd219c4ee9032fee3e009856f81fcc6ec09a85f4",
-        "version" : "0.2.4"
+        "revision" : "3f5a3cb1f19ce7ca79fdc2111a09dfb3da200c1c",
+        "version" : "0.3.0"
       }
     },
     {
