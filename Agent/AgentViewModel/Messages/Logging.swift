@@ -410,8 +410,11 @@ extension AgentViewModel {
     /// Shared log formatting — prepends spacing for first task, strips blank lines before Cancelled.
     static func prepareLogBuffer(message: String, buffer: inout String, existingLog: String) {
         let combined = existingLog + buffer
-        if message.contains(newTaskMarker) && !combined.contains(newTaskMarker) {
-            buffer += String(repeating: "\n", count: 1)
+        if message.contains(newTaskMarker) && !combined.hasSuffix("\n\n") {
+            // Every new task starts after a blank line so it isn't jammed
+            // against the previous task's output.
+            if !combined.isEmpty && !combined.hasSuffix("\n") { buffer += "\n" }
+            buffer += "\n"
         }
         if message.contains("Cancelled") {
             while buffer.hasSuffix("\n\n") { buffer.removeLast() }
