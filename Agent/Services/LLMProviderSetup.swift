@@ -116,6 +116,17 @@ enum LLMProviderSetup {
                 capabilities: [.streaming, .tools, .vision, .systemPrompt],
                 contextSize: 200_000)
 
+        // Fluxion AI — OpenAI-compatible gateway (GPT, Claude, Grok, DeepSeek, Gemini,
+        // GLM, Kimi) behind one sk-fx-… key. Model list comes from /v1/models.
+        case .fluxion:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://fluxionai.world/v1/chat/completions",
+                    modelsURL: "https://fluxionai.world/v1/models"
+                ),
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 200_000)
+
         case .miniMax:
             return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
                 endpoint: LLMEndpoint(

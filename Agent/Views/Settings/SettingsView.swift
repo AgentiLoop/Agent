@@ -15,13 +15,14 @@ struct SettingsView: View {
     /// Claude, Codex, Ollama, LM Studio and vLLM keep bespoke sections (OAuth, endpoints, protocols).
     private static let standardProviders: Set<APIProvider> = [
         .openAI, .deepSeek, .huggingFace, .zAI, .bigModel, .miniMax, .openRouter,
-        .requesty, .a2Agent, .orcaRouter, .dashscope, .qwen, .qwenCoder, .gemini, .grok, .mistral, .vibe,
+        .requesty, .a2Agent, .orcaRouter, .fluxion, .dashscope, .qwen, .qwenCoder, .gemini, .grok, .mistral, .vibe,
     ]
 
     private func keyPlaceholder(_ provider: APIProvider) -> String {
         switch provider {
         case .openAI, .deepSeek, .a2Agent: "sk-..."
         case .orcaRouter: "sk-orca-..."
+        case .fluxion: "sk-fx-..."
         case .huggingFace: "hf_..."
         case .openRouter: "sk-or-..."
         case .dashscope: "sk-... (Model Studio) or sk-ws-... (QwenCloud pay-as-you-go)"
