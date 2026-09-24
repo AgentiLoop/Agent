@@ -149,7 +149,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **OpenAI** | Платно | Общего назначения, вызов инструментов, зрение, `reasoning_effort` |
 | **OpenRouter** | Платно | 200+ моделей, один ключ; Claude маршрутизируется через протокол Anthropic |
 | **OrcaRouter** | Платно | 190+ моделей через один OpenAI-совместимый ключ по цене провайдера; маршрутизация auto/fusion/fallback |
-| **Alibaba DashScope** (Model Studio / QwenCloud pay-as-you-go) | Дёшево | Qwen 3.8 через DashScope; ключи Model Studio `sk-` и QwenCloud `sk-ws-` |
+| **Alibaba DashScope** | Дёшево | Qwen 3.8 через DashScope; ключи Model Studio `sk-` и QwenCloud `sk-ws-` |
 | **Qwen** (qwen.ai Token Plan) | Подписка | QwenCloud Token Plan (ключ `sk-sp-`, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
 | **Qwen Code** | Подписка | Alibaba Coding Plan (ключ `sk-sp-`): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
 | **Requesty** | Платно | 300+ моделей через один OpenAI-совместимый ключ; цены и метаданные возможностей по каждой модели |

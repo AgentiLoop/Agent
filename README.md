@@ -152,7 +152,7 @@ Companies and LLM providers who want to support the project: see [docs/SPONSORSH
 | **OpenAI** | | Paid | General purpose, tool calling, vision, `reasoning_effort` |
 | **OpenRouter** | | Paid | 200+ models, one key; Claude routed via Anthropic protocol |
 | **OrcaRouter** | | Paid | 190+ models via one OpenAI-compatible key at provider cost; auto/fusion/fallback routing |
-| **Alibaba DashScope** (Model Studio / QwenCloud pay-as-you-go) | | Cheap | Qwen 3.8 via DashScope; Model Studio `sk-` and QwenCloud `sk-ws-` keys |
+| **Alibaba DashScope** | | Cheap | Qwen 3.8 via DashScope; Model Studio `sk-` and QwenCloud `sk-ws-` keys |
 | **Qwen** (qwen.ai Token Plan) | | Subscription | QwenCloud Token Plan (`sk-sp-` key, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
 | **Qwen Code** | | Subscription | Alibaba Coding Plan (`sk-sp-` key): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
 | **Requesty** | | Paid | 300+ models via one OpenAI-compatible key; per-model pricing and capability metadata |
