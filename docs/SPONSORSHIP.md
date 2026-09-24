@@ -8,7 +8,7 @@ Agent! is a free-for-noncommercial-use (PolyForm Noncommercial 1.0.0), 100% nati
 
 <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
 
-| Sponsor | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Level&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | |
+| Sponsor | &nbsp;&nbsp;&nbsp;Level&nbsp;&nbsp;&nbsp; | |
 |---|---|---|
 | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | One unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing, and get $3 in API credits when you sign up through the link (promo code `AIAGENT`). |
 
