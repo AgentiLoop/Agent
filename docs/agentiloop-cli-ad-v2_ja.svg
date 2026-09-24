@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="360" viewBox="0 0 1100 360" role="img" aria-label="AgentiLoop CLI：Rust 版と Go 版の 2 バージョン、機能はまったく同じ。macOS、Windows、Linux。">
+  <defs>
+    <linearGradient id="stripe" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f97316"/><stop offset=".25" stop-color="#ec4899"/><stop offset=".5" stop-color="#8b5cf6"/><stop offset=".75" stop-color="#3b82f6"/><stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f97316"/><stop offset=".5" stop-color="#ec4899"/><stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <clipPath id="card"><rect width="1100" height="360" rx="22"/></clipPath>
+    <style>
+      .s { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+      .m { font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 14px; fill: #e2e8f0; }
+    </style>
+  </defs>
+  <g clip-path="url(#card)">
+    <rect width="1100" height="360" fill="#ffffff"/>
+    <rect width="1100" height="5" fill="url(#stripe)"/>
+  </g>
+
+  <!-- tag -->
+  <rect x="40" y="34" width="92" height="30" rx="15" fill="#fff7ed" stroke="#fed7aa"/>
+  <circle cx="58" cy="49" r="4" fill="#f97316"/>
+  <text x="70" y="54" class="s" font-size="12" font-weight="700" letter-spacing="1.2" fill="#c2410c">開発中</text>
+
+  <!-- title -->
+  <text x="40" y="122" class="s" font-size="44" font-weight="800" letter-spacing="-0.8" fill="#0f172a">AgentiLoop <tspan fill="#f97316">C</tspan><tspan fill="#ec4899">L</tspan><tspan fill="#a855f7">I</tspan></text>
+
+  <!-- sub -->
+  <text x="40" y="160" class="s" font-size="14" fill="#475569">ターミナルのためのエージェント型コーディングループ。2 つのバージョン：</text>
+  <text x="40" y="185" class="s" font-size="17" fill="#475569"><tspan font-weight="700" fill="#ea580c">Rust</tspan> と <tspan font-weight="700" fill="#0891b2">Go</tspan>。機能・コマンド・設定はまったく同じです。</text>
+
+  <!-- OS chips -->
+  <rect x="40" y="202" width="72" height="28" rx="8" fill="#eff6ff"/>
+  <text x="76" y="221" class="s" font-size="13" font-weight="600" fill="#1d4ed8" text-anchor="middle">macOS</text>
+  <rect x="120" y="202" width="86" height="28" rx="8" fill="#ecfeff"/>
+  <text x="163" y="221" class="s" font-size="13" font-weight="600" fill="#0e7490" text-anchor="middle">Windows</text>
+  <rect x="214" y="202" width="64" height="28" rx="8" fill="#f5f3ff"/>
+  <text x="246" y="221" class="s" font-size="13" font-weight="600" fill="#6d28d9" text-anchor="middle">Linux</text>
+
+  <!-- points -->
+  <g class="s" font-size="15" fill="#334155">
+    <text x="44" y="266"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">Claude、OpenAI、Ollama、oMLX、あらゆる OpenAI 互換モデル</tspan></text>
+    <text x="44" y="292"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">フルスクリーン TUI、ストリーミング、セッション、自動コンパクション</tspan></text>
+    <text x="44" y="318"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">MCP サーバー — Agent! と同じ設定</tspan></text>
+  </g>
+
+
+  <!-- terminal -->
+  <rect x="628" y="118" width="432" height="214" rx="14" fill="#0f172a"/>
+  <circle cx="648" cy="138" r="5.5" fill="#ef4444"/>
+  <circle cx="666" cy="138" r="5.5" fill="#f59e0b"/>
+  <circle cx="684" cy="138" r="5.5" fill="#22c55e"/>
+  <text x="648" y="184" class="m"><tspan fill="#f472b6">$</tspan> agentiloop --tui</text>
+  <text x="648" y="212" class="m"><tspan fill="#22d3ee">●</tspan> provider <tspan fill="#a78bfa">anthropic</tspan> · model <tspan fill="#a78bfa">claude-sonnet-5</tspan></text>
+  <text x="648" y="240" class="m"><tspan fill="#f472b6">›</tspan> 失敗しているテストを直して</text>
+  <text x="648" y="268" class="m"><tspan fill="#22d3ee">✓</tspan> read_file  <tspan fill="#22d3ee">✓</tspan> edit_file  <tspan fill="#22d3ee">✓</tspan> bash</text>
+  <text x="648" y="296" class="m" fill="#4ade80" font-weight="600" style="fill:#4ade80">全テスト合格。完了！</text>
+</svg>

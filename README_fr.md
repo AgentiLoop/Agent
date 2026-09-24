@@ -21,12 +21,12 @@
 
 Découvrez les nouveaux membres de la famille Agent! : deux CLI multiplateformes aux **capacités strictement identiques**. Choisissez votre saveur :
 
-<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad-v2.svg" width="900" alt="AgentiLoop CLI: two versions, Rust and Go, with the exact same capabilities. macOS, Windows, Linux." /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad-v2_fr.svg" width="900" alt="AgentiLoop CLI : deux versions, Rust et Go, aux capacités strictement identiques. macOS, Windows, Linux." /></a>
 
 *Créé avec AgentiLoop Agent! pour Mac. Oui, l'agent a écrit ses propres petits frères.* 🤖✨ Essayez la préversion dès aujourd'hui !
 
-<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-rust-cli-button.svg" width="222" height="44" alt="Rust CLI on GitHub" /></a>
-<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="docs/agentiloop-go-cli-button.svg" width="212" height="44" alt="Go CLI on GitHub" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-rust-cli-button_fr.svg" width="220" height="44" alt="Rust CLI sur GitHub" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="docs/agentiloop-go-cli-button_fr.svg" width="203" height="44" alt="Go CLI sur GitHub" /></a>
 
 ## Traductions du README
 
