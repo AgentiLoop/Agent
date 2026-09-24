@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="49.5" viewBox="0 0 120 49.5" role="img" aria-label="AgentiLoop Silver"><g transform="translate(0 5.5)">
+  <title>AgentiLoop Silver</title>
+  <defs>
+    <linearGradient id="m" x1="0" y1="0" x2="1" y2="0"><stop offset="0.00" stop-color="#6b7280"/><stop offset="0.25" stop-color="#c7ccd4"/><stop offset="0.50" stop-color="#f8fafc"/><stop offset="0.75" stop-color="#aab2bf"/><stop offset="1.00" stop-color="#6b7280"/></linearGradient>
+    <linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".32"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect x=".5" y=".5" width="119" height="43" rx="22" fill="url(#m)" stroke="#8b95a5"/>
+  <rect x=".5" y=".5" width="119" height="43" rx="22" fill="url(#s)"/>
+  <circle cx="22" cy="22" r="14" fill="#1f2937" fill-opacity=".14" stroke="#1f2937" stroke-opacity=".45"/>
+  <path d="M22 12.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L22 27.3l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z" fill="#1f2937"/>
+  <text x="46" y="27.5" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="800" letter-spacing="1.4" fill="#ffffff" fill-opacity=".55">SILVER</text>
+  <text x="46" y="26.5" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="800" letter-spacing="1.4" fill="#1f2937">SILVER</text>
+</g></svg>
