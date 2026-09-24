@@ -52,6 +52,7 @@ extension AgentViewModel {
         let usesClaudeService = provider == .claude
             || (provider == .lmStudio && lmStudioProtocol == .anthropic)
             || (provider == .openRouter && openRouterProtocol == .anthropic)
+            || (provider == .fluxion && fluxionProtocol == .anthropic)
         let limiterKey = usesClaudeService ? APIProvider.claude.rawValue : provider.rawValue
 
         // Output budget above the model's real ceiling ("max_tokens: X > Y,

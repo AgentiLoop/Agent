@@ -125,7 +125,8 @@ enum LLMProviderSetup {
                     modelsURL: "https://fluxionai.world/v1/models"
                 ),
                 capabilities: [.streaming, .tools, .vision, .systemPrompt],
-                contextSize: 200_000)
+                contextSize: 200_000,
+                supportedProtocols: [.openAI, .anthropic])
 
         case .miniMax:
             return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
@@ -394,6 +395,8 @@ enum LLMProviderSetup {
 
     /// OpenRouter's Anthropic-Messages-compatible chat URL (used when the user picks the Anthropic protocol).
     static let openRouterAnthropicChatURL = "https://openrouter.ai/api/v1/messages"
+    /// Fluxion AI Anthropic-group keys speak the native Messages API here.
+    static let fluxionAnthropicChatURL = "https://fluxionai.world/v1/messages"
 }
 
 /// `server.port` and `auth.api_key` from oMLX's own `~/.omlx/settings.json`, so a

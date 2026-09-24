@@ -54,6 +54,20 @@ struct SettingsView: View {
                 }
             }
 
+            if provider == .fluxion {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("API Protocol").font(.caption).foregroundStyle(.secondary)
+                    Picker("Protocol", selection: $viewModel.fluxionProtocol) {
+                        ForEach(APIProvider.fluxion.config.supportedProtocols, id: \.self) { proto in
+                            Text(proto.displayName).tag(proto)
+                        }
+                    }
+                    .labelsHidden()
+                    Text("Match your key's group: Anthropic-group keys use Anthropic; OpenAI and Other (Grok) keys use OpenAI.")
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+
             VStack(alignment: .leading, spacing: 4) {
                 Text("API Key").font(.caption).foregroundStyle(.secondary)
                 LockedSecureField(text: $viewModel.apiKeys[provider], placeholder: keyPlaceholder(provider), lockKey: "lock.apiKeys[.\(provider.rawValue)]")

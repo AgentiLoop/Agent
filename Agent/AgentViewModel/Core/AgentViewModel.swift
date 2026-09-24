@@ -421,6 +421,14 @@ final class AgentViewModel {
         didSet { UserDefaults.standard.set(openRouterProtocol.rawValue, forKey: "openRouterProtocol") }
     }
 
+    /// Fluxion AI key groups: Anthropic-group keys use /v1/messages, OpenAI/Other groups use chat completions.
+    var fluxionProtocol: LLMAPIProtocol = {
+        let raw = UserDefaults.standard.string(forKey: "fluxionProtocol") ?? "openAI"
+        return LLMAPIProtocol(rawValue: raw) ?? .openAI
+    }() {
+        didSet { UserDefaults.standard.set(fluxionProtocol.rawValue, forKey: "fluxionProtocol") }
+    }
+
 
     var maxHistoryBeforeSummary: Int = UserDefaults.standard.object(forKey: "agentMaxHistory") as? Int ?? 10 {
         didSet { UserDefaults.standard.set(maxHistoryBeforeSummary, forKey: "agentMaxHistory") }

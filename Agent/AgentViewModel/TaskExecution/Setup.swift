@@ -128,6 +128,13 @@ extension AgentViewModel {
                 projectFolder: projectFolder,
                 baseURL: LLMProviderSetup.openRouterAnthropicChatURL, maxTokens: mt
             )
+        } else if provider == .fluxion && fluxionProtocol == .anthropic {
+            claude = ClaudeService(
+                apiKey: apiKeys[.fluxion], model: modelName,
+                historyContext: historyContext,
+                projectFolder: projectFolder,
+                baseURL: LLMProviderSetup.fluxionAnthropicChatURL, maxTokens: mt
+            )
         } else {
             claude = nil
         }
@@ -138,6 +145,8 @@ extension AgentViewModel {
         case .lmStudio where lmStudioProtocol == .anthropic:
             openAICompatible = nil
         case .openRouter where openRouterProtocol == .anthropic:
+            openAICompatible = nil
+        case .fluxion where fluxionProtocol == .anthropic:
             openAICompatible = nil
         case .lmStudio:
             let key = lmStudioProtocol == .lmStudio ? "input" : "messages"
