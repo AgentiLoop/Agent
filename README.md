@@ -134,29 +134,29 @@ Companies and LLM providers who want to support the project: see [docs/SPONSORSH
 
 ## 🤖 21 LLM Providers
 
-| Provider | Cost | Best for |
-|---|---|---|
-| **A2Agent** | Cheap | DeepSeek, GLM, Kimi, MiniMax and Qwen via one OpenAI-compatible key at a fraction of official pricing |
-| **Apple Intelligence** | Free, on-device | Triage, summaries, token compression (brain icon, not available on the provider picker) |
-| **Claude** | Per-token (API key) or subscription (OAuth) | Long autonomous tasks, extended thinking, prompt caching |
-| **Codex** | ChatGPT subscription | OpenAI models via ChatGPT OAuth — no API key, no per-token charges |
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a><br><a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/badges/sponsor-silver.svg" height="24" alt="Silver sponsor" /></a> | Up to 70% off official pricing | GPT, Claude, Grok, DeepSeek, Gemini, GLM and Kimi via one key; OpenAI or Anthropic protocol per key group; $3 credit with promo `AIAGENT` |
-| **DeepSeek** | Cheap | Budget coding, cache-hit reporting |
-| **Google Gemini** | Paid (free tier) | Long context, vision |
-| **Grok** (xAI) | Paid | Real-time info |
-| **Hugging Face** | Varies | Open models, serverless or dedicated endpoints |
-| **Local Ollama** / **vLLM** / **LM Studio** / **oMLX** | Free + hardware | Fully offline; real per-model context window detected |
-| **MiniMax** | Cheap | 1M-token context |
-| **Mistral** / **Mistral Vibe** | Paid | Open-weight cloud, code, agent product |
-| **Ollama** (cloud) | Free tier | Hosted open models |
-| **OpenAI** | Paid | General purpose, tool calling, vision, `reasoning_effort` |
-| **OpenRouter** | Paid | 200+ models, one key; Claude routed via Anthropic protocol |
-| **OrcaRouter** | Paid | 190+ models via one OpenAI-compatible key at provider cost; auto/fusion/fallback routing |
-| **Alibaba DashScope** (Model Studio / QwenCloud pay-as-you-go) | Cheap | Qwen 3.8 via DashScope; Model Studio `sk-` and QwenCloud `sk-ws-` keys |
-| **Qwen** (qwen.ai Token Plan) | Subscription | QwenCloud Token Plan (`sk-sp-` key, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
-| **Qwen Code** | Subscription | Alibaba Coding Plan (`sk-sp-` key): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
-| **Requesty** | Paid | 300+ models via one OpenAI-compatible key; per-model pricing and capability metadata |
-| **Z.ai** / **BigModel** | Cheap | GLM-5.3 — recommended starting point |
+| Provider | Sponsor | Cost | Best for |
+|---|---|---|---|
+| **A2Agent** | | Cheap | DeepSeek, GLM, Kimi, MiniMax and Qwen via one OpenAI-compatible key at a fraction of official pricing |
+| **Apple Intelligence** | | Free, on-device | Triage, summaries, token compression (brain icon, not available on the provider picker) |
+| **Claude** | | Per-token (API key) or subscription (OAuth) | Long autonomous tasks, extended thinking, prompt caching |
+| **Codex** | | ChatGPT subscription | OpenAI models via ChatGPT OAuth — no API key, no per-token charges |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver.svg" height="28" alt="Silver" /> | Up to 70% off official pricing | GPT, Claude, Grok, DeepSeek, Gemini, GLM and Kimi via one key; OpenAI or Anthropic protocol per key group; $3 credit with promo `AIAGENT` |
+| **DeepSeek** | | Cheap | Budget coding, cache-hit reporting |
+| **Google Gemini** | | Paid (free tier) | Long context, vision |
+| **Grok** (xAI) | | Paid | Real-time info |
+| **Hugging Face** | | Varies | Open models, serverless or dedicated endpoints |
+| **Local Ollama** / **vLLM** / **LM Studio** / **oMLX** | | Free + hardware | Fully offline; real per-model context window detected |
+| **MiniMax** | | Cheap | 1M-token context |
+| **Mistral** / **Mistral Vibe** | | Paid | Open-weight cloud, code, agent product |
+| **Ollama** (cloud) | | Free tier | Hosted open models |
+| **OpenAI** | | Paid | General purpose, tool calling, vision, `reasoning_effort` |
+| **OpenRouter** | | Paid | 200+ models, one key; Claude routed via Anthropic protocol |
+| **OrcaRouter** | | Paid | 190+ models via one OpenAI-compatible key at provider cost; auto/fusion/fallback routing |
+| **Alibaba DashScope** (Model Studio / QwenCloud pay-as-you-go) | | Cheap | Qwen 3.8 via DashScope; Model Studio `sk-` and QwenCloud `sk-ws-` keys |
+| **Qwen** (qwen.ai Token Plan) | | Subscription | QwenCloud Token Plan (`sk-sp-` key, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
+| **Qwen Code** | | Subscription | Alibaba Coding Plan (`sk-sp-` key): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
+| **Requesty** | | Paid | 300+ models via one OpenAI-compatible key; per-model pricing and capability metadata |
+| **Z.ai** / **BigModel** | | Cheap | GLM-5.3 — recommended starting point |
 
 > 💡 Self-hosted providers are free only in the API-fee sense — a usable 30B+ model needs an M2/M3/M4 Ultra Mac Studio (64–128GB). Without that hardware, the cheap cloud paths above are dramatically cheaper.
 
