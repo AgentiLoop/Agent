@@ -409,4 +409,6 @@ Agent! は 3 年間にわたるエージェント型 AI アプリ開発の成果
 > - Web サイト: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent
 
+---
+
 <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ja.svg" width="900" alt="Fluxion AI（シルバースポンサー）：GPT、Claude などの主要 AI モデルをひとつの統合 API で。公式 API 価格と比べて最大 70% お得、さらに $3 分の API クレジット。" /></a>

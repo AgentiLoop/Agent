@@ -409,4 +409,6 @@ Agent! — результат трёх лет создания агентных 
 > - Сайт: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent
 
+---
+
 <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ru.svg" width="900" alt="Fluxion AI, серебряный спонсор: единый API для GPT, Claude и других ведущих моделей ИИ. Экономия до 70 % по сравнению с официальными ценами API и $3 кредитов на API." /></a>

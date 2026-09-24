@@ -409,4 +409,6 @@ Consulta [CONTRIBUTING.md](./CONTRIBUTING.md) — compila desde el código fuent
 > - Website: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent
 
+---
+
 <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_es.svg" width="900" alt="Fluxion AI, patrocinador Silver: una API unificada para GPT, Claude y otros modelos de IA líderes. Ahorra hasta un 70 % frente a los precios oficiales de la API y consigue $3 en créditos API." /></a>
