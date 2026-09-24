@@ -120,6 +120,16 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 - **🗂 Tabs, Verlauf, Gedächtnis, Pläne, Skills** — jeder Tab hat eigenen Projektordner und eigenes Log; persistentes Nutzergedächtnis; Multi-Plan-Checklisten in jedem Prompt.
 - **🔄 Fallback-Kette** — automatischer Wechsel zum nächsten konfigurierten Anbieter bei 429/Timeout/Netzwerkfehler.
 
+## Sponsoring
+
+### Sponsoren
+
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+
+<img src="docs/badges/sponsor-silver.svg" height="28" alt="Silver" /> **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)**: zuverlässiger, kostengünstiger Zugang zu GPT, Claude und anderen führenden KI-Modellen über eine einheitliche API. Spare bis zu 70 % gegenüber den offiziellen API-Preisen und erhalte $3 API-Guthaben, wenn du dich über [diesen Link](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) registrierst (Promo-Code `AIAGENT`).
+
+Unternehmen und LLM-Anbieter, die das Projekt unterstützen möchten: siehe [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (Stufen, Platzierungen) und [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (LLM-Anbieter-Integration), oder direkt über [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) sponsern. Die gesamte Abrechnung läuft über GitHub Sponsors.
+
 ## 🤖 21 KI-Anbieter
 
 | Anbieter | Kosten | Am besten für |
@@ -360,16 +370,6 @@ Agent! ist das Ergebnis von drei Jahren Entwicklung agentischer KI-Apps — ANIE
 ## Mitwirken
 
 Siehe [CONTRIBUTING.md](./CONTRIBUTING.md) — in ~5 Minuten mit `./build.sh` aus dem Quellcode bauen, kein Developer-Konto nötig. Pull Requests durchlaufen den CI-Build-&-Test-Workflow. Schau dir die [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) an.
-
-## Sponsoring
-
-### Sponsoren
-
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
-
-<img src="docs/badges/sponsor-silver.svg" height="28" alt="Silver" /> **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)**: zuverlässiger, kostengünstiger Zugang zu GPT, Claude und anderen führenden KI-Modellen über eine einheitliche API. Spare bis zu 70 % gegenüber den offiziellen API-Preisen und erhalte $3 API-Guthaben, wenn du dich über [diesen Link](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) registrierst (Promo-Code `AIAGENT`).
-
-Unternehmen und LLM-Anbieter, die das Projekt unterstützen möchten: siehe [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (Stufen, Platzierungen) und [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (LLM-Anbieter-Integration), oder direkt über [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) sponsern. Die gesamte Abrechnung läuft über GitHub Sponsors.
 
 ## Lizenz
 
