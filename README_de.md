@@ -39,7 +39,7 @@ Lerne die neuesten Mitglieder der Agent!-Familie kennen: zwei plattformübergre
 
 **Eine App. Jede KI. Volle Kontrolle über deinen Mac.**
 
-Agent! ist eine zu 100 % native Swift-6.2-/SwiftUI-App, die **21 LLM-Anbieter** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (Cloud und lokal), vLLM und LM Studio — plus die geräteinterne **Apple Intelligence** — mit einer autonomen Aufgabenschleife verbindet, die wirklich *etwas tut*: Sie liest deinen Code, behebt den Fehler, baut das Xcode-Projekt, committet den Diff, steuert jede Mac-App über die Accessibility-API, führt Shell-Befehle als du oder als root aus, schickt dir Ergebnisse per iMessage und reagiert auf ein gesprochenes *„Agent!"*.
+Agent! ist eine zu 100 % native Swift-6.2-/SwiftUI-App, die **23 LLM-Anbieter** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (Cloud und lokal), vLLM, LM Studio und oMLX — plus die geräteinterne **Apple Intelligence** — mit einer autonomen Aufgabenschleife verbindet, die wirklich *etwas tut*: Sie liest deinen Code, behebt den Fehler, baut das Xcode-Projekt, committet den Diff, steuert jede Mac-App über die Accessibility-API, führt Shell-Befehle als du oder als root aus, schickt dir Ergebnisse per iMessage und reagiert auf ein gesprochenes *„Agent!"*.
 
 Kein NPM, kein Electron, kein Abo, keine Telemetrie. Bring deinen eigenen API-Schlüssel mit, lauf komplett lokal oder kostenlos mit Apple Intelligence. Jedes Swift-Paket, von dem die App abhängt, wurde vom selben Autor geschrieben. Siehe [Entstehungsgeschichte](#entstehungsgeschichte) unten.
 
@@ -130,7 +130,7 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 
 Unternehmen und LLM-Anbieter, die das Projekt unterstützen möchten: siehe [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (Stufen, Platzierungen) und [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (LLM-Anbieter-Integration), oder direkt über [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) sponsern. Die gesamte Abrechnung läuft über GitHub Sponsors.
 
-## 🤖 21 LLM-Anbieter
+## 🤖 23 LLM-Anbieter
 
 | Anbieter | Kosten | Am besten für |
 |---|---|---|
@@ -142,7 +142,7 @@ Unternehmen und LLM-Anbieter, die das Projekt unterstützen möchten: siehe [doc
 | **Google Gemini** | Kostenpflichtig (Free Tier) | Langer Kontext, Vision |
 | **Grok** (xAI) | Kostenpflichtig | Echtzeit-Informationen |
 | **Hugging Face** | Variabel | Offene Modelle, serverless oder dedizierte Endpunkte |
-| **Lokales Ollama** / **vLLM** / **LM Studio** | Kostenlos + Hardware | Komplett offline; echtes Kontextfenster pro Modell wird erkannt |
+| **Lokales Ollama** / **vLLM** / **LM Studio** / **oMLX** | Kostenlos + Hardware | Komplett offline; echtes Kontextfenster pro Modell wird erkannt |
 | **MiniMax** | Günstig | 1M-Token-Kontext |
 | **Mistral** / **Mistral Vibe** | Kostenpflichtig | Open-Weight-Cloud, Code, Agent-Produkt |
 | **Ollama** (Cloud) | Free Tier | Gehostete offene Modelle |
