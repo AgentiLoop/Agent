@@ -128,7 +128,7 @@ Just type what you want. Agent! figures out how and makes it happen.
 
 | Sponsor | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Level&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | |
 |---|---|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="131" height="58" alt="Silver" /> | Reliable, cost-efficient access to GPT, Claude and other leading AI models through one unified API. Save up to 70% compared with official API pricing, and get $3 in API credits when you sign up through [this link](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) (promo code `AIAGENT`). |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Reliable, cost-efficient access to GPT, Claude and other leading AI models through one unified API. Save up to 70% compared with official API pricing, and get $3 in API credits when you sign up through [this link](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) (promo code `AIAGENT`). |
 
 Companies and LLM providers who want to support the project: see [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (levels, placements) and [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (LLM provider integration), or sponsor directly via [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). All billing via GitHub Sponsors.
 
@@ -140,7 +140,7 @@ Companies and LLM providers who want to support the project: see [docs/SPONSORSH
 | **Apple Intelligence** | | Free, on-device | Triage, summaries, token compression (brain icon, not available on the provider picker) |
 | **Claude** | | Per-token (API key) or subscription (OAuth) | Long autonomous tasks, extended thinking, prompt caching |
 | **Codex** | | ChatGPT subscription | OpenAI models via ChatGPT OAuth — no API key, no per-token charges |
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="131" height="58" alt="Silver" /> | Up to 70% off official pricing | GPT, Claude, Grok, DeepSeek, Gemini, GLM and Kimi via one key; OpenAI or Anthropic protocol per key group; $3 credit with promo `AIAGENT` |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Up to 70% off official pricing | GPT, Claude, Grok, DeepSeek, Gemini, GLM and Kimi via one key; OpenAI or Anthropic protocol per key group; $3 credit with promo `AIAGENT` |
 | **DeepSeek** | | Cheap | Budget coding, cache-hit reporting |
 | **Google Gemini** | | Paid (free tier) | Long context, vision |
 | **Grok** (xAI) | | Paid | Real-time info |
