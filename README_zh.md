@@ -1,15 +1,15 @@
 # 🦾 AgentiLoop Agent!
 
-### 坦白说：我已经不再使用 Cursor 和 Claude Code 了。AgentiLoop 的 Agent! 不仅取代了这些编程工具——我还用它自动处理邮件、部署软件、通过 Safari 在 12 个以上的搜索引擎中搜索网页，以及构建能够自我更新的网站。Agent! 已成为 macOS 26 和 27 上最强大的智能体 AI 工具。
+### **来自赞助商 Fluxion AI 的消息**
 
-### **为你的 Mac 桌面打造的智能体 AI**
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 26.4+](https://img.shields.io/badge/macOS-26.4.1-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
-<a href="https://www.paypal.com/ncp/payment/9C6RY2UAE5M3S"><img src="https://img.shields.io/badge/Donation-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Tip Jar" /></a>
+<a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
 <img src="agent-demo.gif" width="900" alt="Agent! 通过 macOS 辅助功能 API 自动操作 Photo Booth——仅凭一句自然语言指令即可端到端完成拍照" />
 
@@ -30,14 +30,7 @@
 
 ## README 翻译
 
-- [English](README.md)
-- [Español](README_es.md)
-- [Français](README_fr.md)
-- [Deutsch](README_de.md)
-- [中文 (简体)](README_zh.md)
-- [Русский](README_ru.md)
-- [한국어](README_ko.md)
-- [日本語](README_ja.md)
+[English](README.md) · [Español](README_es.md) · [Français](README_fr.md) · [Deutsch](README_de.md) · [中文 (简体)](README_zh.md) · [Русский](README_ru.md) · [한국어](README_ko.md) · [日本語](README_ja.md)
 
 ## 在 Agent 中下棋
 <img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
@@ -367,6 +360,16 @@ Agent! 是三年智能体 AI 应用开发的结晶——ANIE、Game Changer、Ba
 
 见 [CONTRIBUTING.md](./CONTRIBUTING.md)——用 `./build.sh` 约 5 分钟即可从源码构建，无需开发者账户。Pull request 会运行 CI Build & Test 工作流。可查看 [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)。
 
+## 赞助
+
+### 赞助商
+
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+
+<img src="docs/badges/sponsor-silver.svg" height="28" alt="Silver" /> **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)**: 通过一个统一的 API，稳定且经济地访问 GPT、Claude 及其他领先的 AI 模型。与官方 API 价格相比最多可节省 70%，通过[此链接](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)注册即可获得 $3 API 额度（优惠码 `AIAGENT`）。
+
+希望支持本项目的企业和 LLM 提供商：请参阅 [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)（赞助等级、展示位置）和 [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)（LLM 提供商集成），或直接通过 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) 赞助。所有费用均通过 GitHub Sponsors 结算。
+
 ## 许可证
 
 [PolyForm Noncommercial 1.0.0](./LICENSE) —— 非商业和个人用途免费。商业用途及本软件的商业版本由 AgentiLoop.ai（Logos InkPen LLC 旗下公司）独家保留。商业许可请联系 AgentiLoop。
@@ -403,3 +406,7 @@ Agent! 是三年智能体 AI 应用开发的结晶——ANIE、Game Changer、Ba
 >
 > - Website: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent
+
+### **来自赞助商 Fluxion AI 的消息**
+
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>

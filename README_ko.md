@@ -1,15 +1,15 @@
 # 🦾 AgentiLoop Agent!
 
-### 솔직히 말씀드리면: 저는 더 이상 Cursor나 Claude Code를 사용하지 않습니다. AgentiLoop의 Agent!는 그 코딩 도구들을 대체했을 뿐만 아니라, 이메일 자동화, 소프트웨어 배포, 12개 이상의 검색 엔진을 활용한 Safari 웹 검색, 그리고 스스로 업데이트되는 웹사이트 구축에도 사용하고 있습니다. Agent!는 macOS 26 및 27을 위한 가장 강력한 에이전틱 AI 도구가 되었습니다.
+### **스폰서 Fluxion AI의 메시지**
 
-### **Mac 데스크톱을 위한 에이전틱 AI**
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 26.4+](https://img.shields.io/badge/macOS-26.4.1-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
-<a href="https://www.paypal.com/ncp/payment/9C6RY2UAE5M3S"><img src="https://img.shields.io/badge/Donation-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Tip Jar" /></a>
+<a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
 <img src="agent-demo.gif" width="900" alt="Agent!가 macOS 손쉬운 사용 API를 통해 Photo Booth를 자동화 — 자연어 요청 한 번으로 사진 촬영을 처음부터 끝까지 수행" />
 
@@ -30,14 +30,7 @@ Agent! 패밀리의 최신 멤버를 ᄆ�
 
 ## README 번역
 
-- [English](README.md)
-- [Español](README_es.md)
-- [Français](README_fr.md)
-- [Deutsch](README_de.md)
-- [中文 (简体)](README_zh.md)
-- [Русский](README_ru.md)
-- [한국어](README_ko.md)
-- [日本語](README_ja.md)
+[English](README.md) · [Español](README_es.md) · [Français](README_fr.md) · [Deutsch](README_de.md) · [中文 (简体)](README_zh.md) · [Русский](README_ru.md) · [한국어](README_ko.md) · [日本語](README_ja.md)
 
 ## Agent 안의 체스
 <img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
@@ -368,6 +361,16 @@ Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game C
 
 [CONTRIBUTING.md](./CONTRIBUTING.md)를 참고하세요 — `./build.sh`로 ~5분 만에 소스에서 빌드, 개발자 계정 불필요. Pull request는 CI Build & Test 워크플로를 실행합니다. [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)를 확인하세요.
 
+## 후원
+
+### 스폰서
+
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+
+<img src="docs/badges/sponsor-silver.svg" height="28" alt="Silver" /> **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)**: 하나의 통합 API로 GPT, Claude 및 기타 주요 AI 모델에 안정적이고 비용 효율적으로 접근할 수 있습니다. 공식 API 가격 대비 최대 70% 절약하고, [이 링크](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)로 가입하면 $3의 API 크레딧을 받을 수 있습니다(프로모션 코드 `AIAGENT`).
+
+프로젝트를 후원하고 싶은 기업 및 LLM 제공업체: [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)(등급, 노출 위치)와 [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)(LLM 제공업체 연동)를 참고하거나 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop)로 직접 후원해 주세요. 모든 결제는 GitHub Sponsors를 통해 이루어집니다.
+
 ## 라이선스
 
 [PolyForm Noncommercial 1.0.0](./LICENSE) — 비상업적·개인 용도로 무료. 상업적 사용 및 소프트웨어의 상업용 버전은 Logos InkPen LLC 회사인 AgentiLoop.ai에 독점적으로 유보됩니다. 상업용 라이선스는 AgentiLoop에 문의하세요.
@@ -404,3 +407,7 @@ Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game C
 >
 > - 웹사이트: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent
+
+### **스폰서 Fluxion AI의 메시지**
+
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>

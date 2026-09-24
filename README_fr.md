@@ -1,15 +1,15 @@
 # 🦾 AgentiLoop Agent!
 
-### En toute transparence : je n'utilise plus Cursor ni Claude Code. Agent! d'AgentiLoop n'a pas seulement remplacé ces outils de codage — je l'utilise pour automatiser mes e-mails, déployer des logiciels, effectuer des recherches sur le web dans Safari avec plus de 12 moteurs de recherche et créer des sites web qui se mettent à jour tout seuls. Agent! est devenu l'outil d'IA agentique le plus puissant pour macOS 26 et 27.
+### **Un message de notre sponsor, Fluxion AI**
 
-### **IA agentique pour votre bureau Mac**
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 26.4+](https://img.shields.io/badge/macOS-26.4.1-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
-<a href="https://www.paypal.com/ncp/payment/9C6RY2UAE5M3S"><img src="https://img.shields.io/badge/Donation-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Tip Jar" /></a>
+<a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
 <img src="agent-demo.gif" width="900" alt="Agent! automatisant Photo Booth via l'API d'Accessibilité de macOS — prend une photo de bout en bout à partir d'une seule requête en langage naturel" />
 
@@ -30,14 +30,7 @@ Découvrez les nouveaux membres de la famille Agent! : deux CLI multiplateforme
 
 ## Traductions du README
 
-- [English](README.md)
-- [Español](README_es.md)
-- [Français](README_fr.md)
-- [Deutsch](README_de.md)
-- [中文 (简体)](README_zh.md)
-- [Русский](README_ru.md)
-- [한국어](README_ko.md)
-- [日本語](README_ja.md)
+[English](README.md) · [Español](README_es.md) · [Français](README_fr.md) · [Deutsch](README_de.md) · [中文 (简体)](README_zh.md) · [Русский](README_ru.md) · [한국어](README_ko.md) · [日本語](README_ja.md)
 
 ## Les échecs dans Agent
 <img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
@@ -368,6 +361,16 @@ Agent! est le fruit de trois années de développement d'apps d'IA agentique —
 
 Voir [CONTRIBUTING.md](./CONTRIBUTING.md) — compilez depuis les sources en ~5 minutes avec `./build.sh`, sans compte développeur. Les pull requests passent par le workflow CI Build & Test. Consultez les [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 
+## Parrainage
+
+### Sponsors
+
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+
+<img src="docs/badges/sponsor-silver.svg" height="28" alt="Silver" /> **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)**: un accès fiable et économique à GPT, Claude et d'autres modèles d'IA de pointe via une API unifiée. Économisez jusqu'à 70 % par rapport aux tarifs officiels des API et recevez 3 $ de crédits API en vous inscrivant via [ce lien](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) (code promo `AIAGENT`).
+
+Entreprises et fournisseurs de LLM souhaitant soutenir le projet : consultez [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (niveaux, emplacements) et [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (intégration des fournisseurs de LLM), ou parrainez directement via [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). Toute la facturation passe par GitHub Sponsors.
+
 ## Licence
 
 [PolyForm Noncommercial 1.0.0](./LICENSE) — gratuit pour un usage non commercial et personnel. L'usage commercial et les versions commerciales du logiciel sont réservés exclusivement à AgentiLoop.ai, une société de Logos InkPen LLC. Contactez AgentiLoop pour une licence commerciale.
@@ -404,3 +407,7 @@ Voir [CONTRIBUTING.md](./CONTRIBUTING.md) — compilez depuis les sources en ~5 
 >
 > - Website: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent
+
+### **Un message de notre sponsor, Fluxion AI**
+
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>

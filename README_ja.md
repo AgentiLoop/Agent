@@ -1,15 +1,15 @@
 # 🦾 AgentiLoop Agent!
 
-### 正直に言います：私はもう Cursor も Claude Code も使っていません。AgentiLoop の Agent! はそれらのコーディングツールを置き換えただけではありません。メールの自動化、ソフトウェアのデプロイ、12 以上の検索エンジンを使った Safari でのウェブ検索、そして自動更新されるウェブサイトの構築にも使っています。Agent! は macOS 26 および 27 向けの最も強力なエージェント型 AI ツールになりました。
+### **スポンサー Fluxion AI からのお知らせ**
 
-### **Mac デスクトップのためのエージェント型 AI**
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 26.4+](https://img.shields.io/badge/macOS-26.4.1-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
-<a href="https://www.paypal.com/ncp/payment/9C6RY2UAE5M3S"><img src="https://img.shields.io/badge/Donation-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Tip Jar" /></a>
+<a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
 <img src="agent-demo.gif" width="900" alt="Agent! が macOS のアクセシビリティ API を通じて Photo Booth を自動操作 — 自然言語のリクエスト一つで写真撮影を最初から最後まで実行" />
 
@@ -30,14 +30,7 @@ Agent! ファミリーの新メンバーを紹介します。**まったく�
 
 ## README 翻訳
 
-- [English](README.md)
-- [Español](README_es.md)
-- [Français](README_fr.md)
-- [Deutsch](README_de.md)
-- [中文 (简体)](README_zh.md)
-- [Русский](README_ru.md)
-- [한국어](README_ko.md)
-- [日本語](README_ja.md)
+[English](README.md) · [Español](README_es.md) · [Français](README_fr.md) · [Deutsch](README_de.md) · [中文 (简体)](README_zh.md) · [Русский](README_ru.md) · [한국어](README_ko.md) · [日本語](README_ja.md)
 
 ## Agent の中でチェス
 <img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
@@ -368,6 +361,16 @@ Agent! は 3 年間にわたるエージェント型 AI アプリ開発の成果
 
 [CONTRIBUTING.md](./CONTRIBUTING.md) をご覧ください — `./build.sh` で約 5 分でソースからビルド、開発者アカウント不要。Pull request は CI Build & Test ワークフローを実行します。[good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) をチェックしてください。
 
+## スポンサーシップ
+
+### スポンサー
+
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+
+<img src="docs/badges/sponsor-silver.svg" height="28" alt="Silver" /> **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)**: GPT、Claude をはじめとする主要な AI モデルに、ひとつの統合 API で信頼性が高く低コストにアクセスできます。公式 API 価格と比べて最大 70% 節約でき、[こちらのリンク](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)から登録すると $3 分の API クレジットがもらえます（プロモコード `AIAGENT`）。
+
+プロジェクトを支援したい企業や LLM プロバイダーの方は、[docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)（レベル、掲載場所）と [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)（LLM プロバイダー連携）をご覧いただくか、[GitHub Sponsors](https://github.com/sponsors/AgentiLoop) から直接スポンサーになってください。請求はすべて GitHub Sponsors 経由です。
+
 ## ライセンス
 
 [PolyForm Noncommercial 1.0.0](./LICENSE) — 非商用・個人利用は無料。商用利用およびソフトウェアの商用バージョンは、Logos InkPen LLC の会社である AgentiLoop.ai に独占的に留保されます。商用ライセンスについては AgentiLoop にお問い合わせください。
@@ -404,3 +407,7 @@ Agent! は 3 年間にわたるエージェント型 AI アプリ開発の成果
 >
 > - Web サイト: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent
+
+### **スポンサー Fluxion AI からのお知らせ**
+
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
