@@ -21,7 +21,7 @@
 
 Знакомьтесь с новыми членами семьи Agent!: два кроссплатформенных CLI с **абсолютно одинаковыми возможностями**. Выбирайте свой вкус:
 
-<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad.svg" width="900" alt="AgentiLoop CLI: two versions, Rust and Go, with the exact same capabilities. macOS, Windows, Linux." /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad-v2.svg" width="900" alt="AgentiLoop CLI: two versions, Rust and Go, with the exact same capabilities. macOS, Windows, Linux." /></a>
 
 *Создано с помощью AgentiLoop Agent! для Mac. Да, агент сам написал своих младших братьев.* 🤖✨ Попробуйте пре-релиз уже сегодня!
 
