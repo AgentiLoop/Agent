@@ -138,11 +138,12 @@ Companies and LLM providers who want to support the project: see [docs/SPONSORSH
 | **Apple Intelligence** | Free, on-device | Triage, summaries, token compression (brain icon, not available on the provider picker) |
 | **Claude** | Per-token (API key) or subscription (OAuth) | Long autonomous tasks, extended thinking, prompt caching |
 | **Codex** | ChatGPT subscription | OpenAI models via ChatGPT OAuth — no API key, no per-token charges |
+| **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)** <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/badges/sponsor-silver.svg" height="20" alt="Silver sponsor" /></a> | Up to 70% off official pricing | GPT, Claude, Grok, DeepSeek, Gemini, GLM and Kimi via one key; OpenAI or Anthropic protocol per key group; $3 credit with promo `AIAGENT` |
 | **DeepSeek** | Cheap | Budget coding, cache-hit reporting |
 | **Google Gemini** | Paid (free tier) | Long context, vision |
 | **Grok** (xAI) | Paid | Real-time info |
 | **Hugging Face** | Varies | Open models, serverless or dedicated endpoints |
-| **Local Ollama** / **vLLM** / **LM Studio** | Free + hardware | Fully offline; real per-model context window detected |
+| **Local Ollama** / **vLLM** / **LM Studio** / **oMLX** | Free + hardware | Fully offline; real per-model context window detected |
 | **MiniMax** | Cheap | 1M-token context |
 | **Mistral** / **Mistral Vibe** | Paid | Open-weight cloud, code, agent product |
 | **Ollama** (cloud) | Free tier | Hosted open models |
