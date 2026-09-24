@@ -15,6 +15,8 @@
 
 *Agent! driving Photo Booth via Accessibility — no clicks, no scripts, just "take a photo".*
 
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+
 ## 🆕 New Kid on the Block: AgentiLoop CLI ⚡️
 
 **The agentic loop, unleashed in your terminal. Mac. Windows. Linux. Your call.**
