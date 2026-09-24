@@ -21,8 +21,7 @@ enum SponsorDirectory {
 
     /// Static fallback list. LLM provider sponsors appear here with their tier.
     static let providers: [Entry] = [
-        // Example (uncomment and edit when the first Silver+ provider signs):
-        // Entry(name: "OpenRouter", url: "https://openrouter.ai", tier: "Gold"),
+        Entry(name: "Fluxion AI", url: "https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT", tier: "Silver"),
     ]
 
     static func load() -> [Entry] {

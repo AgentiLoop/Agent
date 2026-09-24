@@ -166,7 +166,8 @@ struct AgentApp: App {
                     Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                         .labelStyle(.titleAndIcon)
                 }
-                Divider()
+            }
+            CommandMenu("Sponsors") {
                 SponsorsMenu()
             }
             CommandGroup(after: .windowArrangement) {
