@@ -2,7 +2,7 @@
 
 ### **스폰서 Fluxion AI의 메시지**
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
@@ -124,36 +124,39 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ### 스폰서
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>
 
-<img src="docs/badges/sponsor-silver.svg" height="28" alt="Silver" /> **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)**: 하나의 통합 API로 GPT, Claude 및 기타 주요 AI 모델에 안정적이고 비용 효율적으로 접근할 수 있습니다. 공식 API 가격 대비 최대 70% 절약하고, [이 링크](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)로 가입하면 $3의 API 크레딧을 받을 수 있습니다(프로모션 코드 `AIAGENT`).
+| 스폰서 | &nbsp;&nbsp;&nbsp;등급&nbsp;&nbsp;&nbsp; | |
+|---|:---:|---|
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 하나의 통합 API로 GPT, Claude 및 기타 주요 AI 모델에 안정적이고 비용 효율적으로 접근할 수 있습니다. 공식 API 가격 대비 최대 70% 절약하고, [이 링크](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)로 가입하면 $3의 API 크레딧을 받을 수 있습니다(프로모션 코드 `AIAGENT`). |
 
 프로젝트를 후원하고 싶은 기업 및 LLM 제공업체: [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)(등급, 노출 위치)와 [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)(LLM 제공업체 연동)를 참고하거나 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop)로 직접 후원해 주세요. 모든 결제는 GitHub Sponsors를 통해 이루어집니다.
 
 ## 🤖 23개 LLM 제공자
 
-| 제공자 | 비용 | 최적 용도 |
-|---|---|---|
-| **A2Agent** | 저렴 | 공식 가격의 일부로 하나의 OpenAI 호환 키를 통해 DeepSeek, GLM, Kimi, MiniMax, Qwen |
-| **Apple Intelligence** | 무료, 온디바이스 | 분류, 요약, 토큰 압축(두뇌 아이콘, 제공자 선택기에는 없음) |
-| **Claude** | 토큰당(API 키) 또는 구독(OAuth) | 긴 자율 작업, 확장 사고, 프롬프트 캐싱 |
-| **Codex** | ChatGPT 구독 | ChatGPT OAuth를 통한 OpenAI 모델 — API 키 없음, 토큰당 요금 없음 |
-| **DeepSeek** | 저렴 | 저예산 코딩, 캐시 히트 보고 |
-| **Google Gemini** | 유료(무료 티어 있음) | 긴 컨텍스트, 비전 |
-| **Grok** (xAI) | 유료 | 실시간 정보 |
-| **Hugging Face** | 다양 | 오픈 모델, 서버리스 또는 전용 엔드포인트 |
-| **로컬 Ollama** / **vLLM** / **LM Studio** / **oMLX** | 무료 + 하드웨어 | 완전 오프라인; 모델별 실제 컨텍스트 윈도우 감지 |
-| **MiniMax** | 저렴 | 1M 토큰 컨텍스트 |
-| **Mistral** / **Mistral Vibe** | 유료 | 오픈 웨이트 클라우드, 코드, 에이전트 제품 |
-| **Ollama** (클라우드) | 무료 티어 | 호스팅된 오픈 모델 |
-| **OpenAI** | 유료 | 범용, 도구 호출, 비전, `reasoning_effort` |
-| **OpenRouter** | 유료 | 200개 이상 모델, 하나의 키; Claude는 Anthropic 프로토콜로 라우팅 |
-| **OrcaRouter** | 유료 | 하나의 OpenAI 호환 키로 제공자 원가에 190개 이상 모델; auto/fusion/fallback 라우팅 |
-| **Alibaba DashScope** (Model Studio / QwenCloud 종량제) | 저렴 | DashScope를 통한 Qwen 3.8; Model Studio `sk-` 및 QwenCloud `sk-ws-` 키 |
-| **Qwen** (qwen.ai Token Plan) | 구독 | QwenCloud Token Plan(`sk-sp-` 키, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
-| **Qwen Code** | 구독 | Alibaba Coding Plan(`sk-sp-` 키): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
-| **Requesty** | 유료 | 하나의 OpenAI 호환 키로 300개 이상 모델; 모델별 가격 및 기능 메타데이터 |
-| **Z.ai** / **BigModel** | 저렴 | GLM-5.3 — 추천 시작점 |
+| 제공자 | &nbsp;&nbsp;&nbsp;스폰서&nbsp;&nbsp;&nbsp; | 비용 | 최적 용도 |
+|---|:---:|---|---|
+| **A2Agent** | | 저렴 | 공식 가격의 일부로 하나의 OpenAI 호환 키를 통해 DeepSeek, GLM, Kimi, MiniMax, Qwen |
+| **Apple Intelligence** | | 무료, 온디바이스 | 분류, 요약, 토큰 압축(두뇌 아이콘, 제공자 선택기에는 없음) |
+| **Claude** | | 토큰당(API 키) 또는 구독(OAuth) | 긴 자율 작업, 확장 사고, 프롬프트 캐싱 |
+| **Codex** | | ChatGPT 구독 | ChatGPT OAuth를 통한 OpenAI 모델 — API 키 없음, 토큰당 요금 없음 |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 공식 가격 대비 최대 70% 할인 | 하나의 키로 GPT, Claude, Grok, DeepSeek, Gemini, GLM, Kimi 사용; 키 그룹별 OpenAI 또는 Anthropic 프로토콜; 프로모 코드 `AIAGENT`로 $3 크레딧 |
+| **DeepSeek** | | 저렴 | 저예산 코딩, 캐시 히트 보고 |
+| **Google Gemini** | | 유료(무료 티어 있음) | 긴 컨텍스트, 비전 |
+| **Grok** (xAI) | | 유료 | 실시간 정보 |
+| **Hugging Face** | | 다양 | 오픈 모델, 서버리스 또는 전용 엔드포인트 |
+| **로컬 Ollama** / **vLLM** / **LM Studio** / **oMLX** | | 무료 + 하드웨어 | 완전 오프라인; 모델별 실제 컨텍스트 윈도우 감지 |
+| **MiniMax** | | 저렴 | 1M 토큰 컨텍스트 |
+| **Mistral** / **Mistral Vibe** | | 유료 | 오픈 웨이트 클라우드, 코드, 에이전트 제품 |
+| **Ollama** (클라우드) | | 무료 티어 | 호스팅된 오픈 모델 |
+| **OpenAI** | | 유료 | 범용, 도구 호출, 비전, `reasoning_effort` |
+| **OpenRouter** | | 유료 | 200개 이상 모델, 하나의 키; Claude는 Anthropic 프로토콜로 라우팅 |
+| **OrcaRouter** | | 유료 | 하나의 OpenAI 호환 키로 제공자 원가에 190개 이상 모델; auto/fusion/fallback 라우팅 |
+| **Alibaba DashScope** | | 저렴 | DashScope를 통한 Qwen 3.8; Model Studio `sk-` 및 QwenCloud `sk-ws-` 키 |
+| **Qwen** (qwen.ai Token Plan) | | 구독 | QwenCloud Token Plan(`sk-sp-` 키, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
+| **Qwen Code** | | 구독 | Alibaba Coding Plan(`sk-sp-` 키): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
+| **Requesty** | | 유료 | 하나의 OpenAI 호환 키로 300개 이상 모델; 모델별 가격 및 기능 메타데이터 |
+| **Z.ai** / **BigModel** | | 저렴 | GLM-5.3 — 추천 시작점 |
 
 > 💡 자체 호스팅 제공자는 API 요금 측면에서만 무료입니다 — 쓸 만한 30B+ 모델에는 M2/M3/M4 Ultra Mac Studio(64–128GB)가 필요합니다. 그런 하드웨어가 없다면 위의 저렴한 클라우드 경로가 훨씬 더 저렴합니다.
 
@@ -410,4 +413,4 @@ Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game C
 
 ### **스폰서 Fluxion AI의 메시지**
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>

@@ -2,7 +2,7 @@
 
 ### **Eine Nachricht unseres Sponsors Fluxion AI**
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_de.svg" width="900" alt="Fluxion AI, Silver-Sponsor: eine einheitliche API für GPT, Claude und andere führende KI-Modelle. Spare bis zu 70 % gegenüber den offiziellen API-Preisen und erhalte $3 API-Guthaben." /></a>
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
@@ -124,36 +124,39 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 
 ### Sponsoren
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_de.svg" width="900" alt="Fluxion AI, Silver-Sponsor: eine einheitliche API für GPT, Claude und andere führende KI-Modelle. Spare bis zu 70 % gegenüber den offiziellen API-Preisen und erhalte $3 API-Guthaben." /></a>
 
-<img src="docs/badges/sponsor-silver.svg" height="28" alt="Silver" /> **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)**: zuverlässiger, kostengünstiger Zugang zu GPT, Claude und anderen führenden KI-Modellen über eine einheitliche API. Spare bis zu 70 % gegenüber den offiziellen API-Preisen und erhalte $3 API-Guthaben, wenn du dich über [diesen Link](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) registrierst (Promo-Code `AIAGENT`).
+| Sponsor | &nbsp;&nbsp;&nbsp;Stufe&nbsp;&nbsp;&nbsp; | |
+|---|:---:|---|
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Zuverlässiger, kostengünstiger Zugang zu GPT, Claude und anderen führenden KI-Modellen über eine einheitliche API. Spare bis zu 70 % gegenüber den offiziellen API-Preisen und erhalte $3 API-Guthaben, wenn du dich über [diesen Link](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) registrierst (Promo-Code `AIAGENT`). |
 
 Unternehmen und LLM-Anbieter, die das Projekt unterstützen möchten: siehe [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (Stufen, Platzierungen) und [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (LLM-Anbieter-Integration), oder direkt über [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) sponsern. Die gesamte Abrechnung läuft über GitHub Sponsors.
 
 ## 🤖 23 LLM-Anbieter
 
-| Anbieter | Kosten | Am besten für |
-|---|---|---|
-| **A2Agent** | Günstig | DeepSeek, GLM, Kimi, MiniMax und Qwen mit einem OpenAI-kompatiblen Schlüssel zu einem Bruchteil der offiziellen Preise |
-| **Apple Intelligence** | Kostenlos, auf dem Gerät | Triage, Zusammenfassungen, Token-Kompression (Gehirn-Symbol, nicht in der Anbieterauswahl verfügbar) |
-| **Claude** | Pro Token (API-Key) oder Abo (OAuth) | Lange autonome Aufgaben, Extended Thinking, Prompt-Caching |
-| **Codex** | ChatGPT-Abo | OpenAI-Modelle über ChatGPT-OAuth — kein API-Key, keine Token-Kosten |
-| **DeepSeek** | Günstig | Budget-Coding, Cache-Hit-Reporting |
-| **Google Gemini** | Kostenpflichtig (Free Tier) | Langer Kontext, Vision |
-| **Grok** (xAI) | Kostenpflichtig | Echtzeit-Informationen |
-| **Hugging Face** | Variabel | Offene Modelle, serverless oder dedizierte Endpunkte |
-| **Lokales Ollama** / **vLLM** / **LM Studio** / **oMLX** | Kostenlos + Hardware | Komplett offline; echtes Kontextfenster pro Modell wird erkannt |
-| **MiniMax** | Günstig | 1M-Token-Kontext |
-| **Mistral** / **Mistral Vibe** | Kostenpflichtig | Open-Weight-Cloud, Code, Agent-Produkt |
-| **Ollama** (Cloud) | Free Tier | Gehostete offene Modelle |
-| **OpenAI** | Kostenpflichtig | Allzweck, Tool-Calling, Vision, `reasoning_effort` |
-| **OpenRouter** | Kostenpflichtig | 200+ Modelle, ein Schlüssel; Claude über Anthropic-Protokoll |
-| **OrcaRouter** | Kostenpflichtig | 190+ Modelle mit einem OpenAI-kompatiblen Schlüssel zum Anbieterpreis; Auto-/Fusion-/Fallback-Routing |
-| **Alibaba DashScope** (Model Studio / QwenCloud Pay-as-you-go) | Günstig | Qwen 3.8 über DashScope |
-| **Qwen** (qwen.ai Token Plan) | Abo | QwenCloud Token Plan (`sk-sp-`-Schlüssel): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
-| **Qwen Code** | Abo | Alibaba Coding Plan (`sk-sp-`-Schlüssel): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
-| **Requesty** | Kostenpflichtig | 300+ Modelle mit einem OpenAI-kompatiblen Schlüssel; Preise und Fähigkeiten pro Modell |
-| **Z.ai** / **BigModel** | Günstig | GLM-5.3 — empfohlener Einstieg |
+| Anbieter | &nbsp;&nbsp;&nbsp;Sponsor&nbsp;&nbsp;&nbsp; | Kosten | Am besten für |
+|---|:---:|---|---|
+| **A2Agent** | | Günstig | DeepSeek, GLM, Kimi, MiniMax und Qwen mit einem OpenAI-kompatiblen Schlüssel zu einem Bruchteil der offiziellen Preise |
+| **Apple Intelligence** | | Kostenlos, auf dem Gerät | Triage, Zusammenfassungen, Token-Kompression (Gehirn-Symbol, nicht in der Anbieterauswahl verfügbar) |
+| **Claude** | | Pro Token (API-Key) oder Abo (OAuth) | Lange autonome Aufgaben, Extended Thinking, Prompt-Caching |
+| **Codex** | | ChatGPT-Abo | OpenAI-Modelle über ChatGPT-OAuth — kein API-Key, keine Token-Kosten |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Bis zu 70 % unter den offiziellen Preisen | GPT, Claude, Grok, DeepSeek, Gemini, GLM und Kimi mit einem Schlüssel; OpenAI- oder Anthropic-Protokoll pro Schlüsselgruppe; $3 Guthaben mit Promo-Code `AIAGENT` |
+| **DeepSeek** | | Günstig | Budget-Coding, Cache-Hit-Reporting |
+| **Google Gemini** | | Kostenpflichtig (Free Tier) | Langer Kontext, Vision |
+| **Grok** (xAI) | | Kostenpflichtig | Echtzeit-Informationen |
+| **Hugging Face** | | Variabel | Offene Modelle, serverless oder dedizierte Endpunkte |
+| **Lokales Ollama** / **vLLM** / **LM Studio** / **oMLX** | | Kostenlos + Hardware | Komplett offline; echtes Kontextfenster pro Modell wird erkannt |
+| **MiniMax** | | Günstig | 1M-Token-Kontext |
+| **Mistral** / **Mistral Vibe** | | Kostenpflichtig | Open-Weight-Cloud, Code, Agent-Produkt |
+| **Ollama** (Cloud) | | Free Tier | Gehostete offene Modelle |
+| **OpenAI** | | Kostenpflichtig | Allzweck, Tool-Calling, Vision, `reasoning_effort` |
+| **OpenRouter** | | Kostenpflichtig | 200+ Modelle, ein Schlüssel; Claude über Anthropic-Protokoll |
+| **OrcaRouter** | | Kostenpflichtig | 190+ Modelle mit einem OpenAI-kompatiblen Schlüssel zum Anbieterpreis; Auto-/Fusion-/Fallback-Routing |
+| **Alibaba DashScope** | | Günstig | Qwen 3.8 über DashScope |
+| **Qwen** (qwen.ai Token Plan) | | Abo | QwenCloud Token Plan (`sk-sp-`-Schlüssel): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
+| **Qwen Code** | | Abo | Alibaba Coding Plan (`sk-sp-`-Schlüssel): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
+| **Requesty** | | Kostenpflichtig | 300+ Modelle mit einem OpenAI-kompatiblen Schlüssel; Preise und Fähigkeiten pro Modell |
+| **Z.ai** / **BigModel** | | Günstig | GLM-5.3 — empfohlener Einstieg |
 
 > 💡 Selbst gehostete Anbieter sind nur im Sinne der API-Gebühren kostenlos — ein brauchbares 30B+-Modell braucht einen M2/M3/M4 Ultra Mac Studio (64–128 GB). Ohne diese Hardware sind die günstigen Cloud-Wege oben deutlich billiger.
 
@@ -410,4 +413,4 @@ Siehe [CONTRIBUTING.md](./CONTRIBUTING.md) — in ~5 Minuten mit `./build.sh` au
 
 ### **Eine Nachricht unseres Sponsors Fluxion AI**
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_de.svg" width="900" alt="Fluxion AI, Silver-Sponsor: eine einheitliche API für GPT, Claude und andere führende KI-Modelle. Spare bis zu 70 % gegenüber den offiziellen API-Preisen und erhalte $3 API-Guthaben." /></a>

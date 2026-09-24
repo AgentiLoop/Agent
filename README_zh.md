@@ -2,7 +2,7 @@
 
 ### **来自赞助商 Fluxion AI 的消息**
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
@@ -124,35 +124,38 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ### 赞助商
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
 
-<img src="docs/badges/sponsor-silver.svg" height="28" alt="Silver" /> **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)**: 通过一个统一的 API，稳定且经济地访问 GPT、Claude 及其他领先的 AI 模型。与官方 API 价格相比最多可节省 70%，通过[此链接](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)注册即可获得 $3 API 额度（优惠码 `AIAGENT`）。
+| 赞助商 | &nbsp;&nbsp;&nbsp;等级&nbsp;&nbsp;&nbsp; | |
+|---|:---:|---|
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 通过一个统一的 API，稳定且经济地访问 GPT、Claude 及其他领先的 AI 模型。与官方 API 价格相比最多可节省 70%，通过[此链接](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)注册即可获得 $3 API 额度（优惠码 `AIAGENT`）。 |
 
 希望支持本项目的企业和 LLM 提供商：请参阅 [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)（赞助等级、展示位置）和 [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)（LLM 提供商集成），或直接通过 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) 赞助。所有费用均通过 GitHub Sponsors 结算。
 
 ## 🤖 23 家 LLM 提供商
 
-| 提供商 | 费用 | 适合 |
-|---|---|---|
-| **A2Agent** | 便宜 | 一把 OpenAI 兼容密钥即可使用 DeepSeek、GLM、Kimi、MiniMax 和 Qwen，价格远低于官方 |
-| **Apple Intelligence** | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，提供商选择器中不可用） |
-| **Claude** | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
-| **Codex** | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
-| **DeepSeek** | 便宜 | 低成本编码、缓存命中报告 |
-| **Google Gemini** | 付费（有免费额度） | 长上下文、视觉 |
-| **Grok** (xAI) | 付费 | 实时信息 |
-| **Hugging Face** | 不定 | 开源模型，serverless 或专用端点 |
-| **MiniMax** | 便宜 | 1M token 上下文 |
-| **Mistral** / **Mistral Vibe** | 付费 | 开放权重云端、代码、智能体产品 |
-| **Ollama**（云端） | 免费额度 | 托管的开源模型 |
-| **本地 Ollama** / **vLLM** / **LM Studio** / **oMLX** | 免费 + 硬件 | 完全离线；自动检测各模型真实上下文窗口 |
-| **OpenAI** | 付费 | 通用、工具调用、视觉、`reasoning_effort` |
-| **OpenRouter** | 付费 | 200+ 模型，一把密钥；Claude 经 Anthropic 协议路由 |
-| **OrcaRouter** | 付费 | 一把 OpenAI 兼容密钥即可访问 190+ 模型，按提供商原价计费；支持 auto/fusion/fallback 路由 |
-| **阿里巴巴**（qwen.ai / 百炼） | 便宜 | 通过 DashScope 使用 Qwen 3.8 |
-| **Qwen Coder** | 订阅 | 阿里云 Coding Plan（`sk-sp-` 密钥）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
-| **Requesty** | 付费 | 一把 OpenAI 兼容密钥即可访问 300+ 模型；按模型提供价格与能力信息 |
-| **Z.ai** / **BigModel** | 便宜 | GLM-5.3 —— 推荐起点 |
+| 提供商 | &nbsp;&nbsp;&nbsp;赞助&nbsp;&nbsp;&nbsp; | 费用 | 适合 |
+|---|:---:|---|---|
+| **A2Agent** | | 便宜 | 一把 OpenAI 兼容密钥即可使用 DeepSeek、GLM、Kimi、MiniMax 和 Qwen，价格远低于官方 |
+| **Apple Intelligence** | | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，提供商选择器中不可用） |
+| **Claude** | | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
+| **Codex** | | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 比官方价格最多低 70% | 一把密钥即可使用 GPT、Claude、Grok、DeepSeek、Gemini、GLM 和 Kimi；每个密钥组可选 OpenAI 或 Anthropic 协议；使用优惠码 `AIAGENT` 获得 $3 额度 |
+| **DeepSeek** | | 便宜 | 低成本编码、缓存命中报告 |
+| **Google Gemini** | | 付费（有免费额度） | 长上下文、视觉 |
+| **Grok** (xAI) | | 付费 | 实时信息 |
+| **Hugging Face** | | 不定 | 开源模型，serverless 或专用端点 |
+| **MiniMax** | | 便宜 | 1M token 上下文 |
+| **Mistral** / **Mistral Vibe** | | 付费 | 开放权重云端、代码、智能体产品 |
+| **Ollama**（云端） | | 免费额度 | 托管的开源模型 |
+| **本地 Ollama** / **vLLM** / **LM Studio** / **oMLX** | | 免费 + 硬件 | 完全离线；自动检测各模型真实上下文窗口 |
+| **OpenAI** | | 付费 | 通用、工具调用、视觉、`reasoning_effort` |
+| **OpenRouter** | | 付费 | 200+ 模型，一把密钥；Claude 经 Anthropic 协议路由 |
+| **OrcaRouter** | | 付费 | 一把 OpenAI 兼容密钥即可访问 190+ 模型，按提供商原价计费；支持 auto/fusion/fallback 路由 |
+| **阿里巴巴**（qwen.ai / 百炼） | | 便宜 | 通过 DashScope 使用 Qwen 3.8 |
+| **Qwen Coder** | | 订阅 | 阿里云 Coding Plan（`sk-sp-` 密钥）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
+| **Requesty** | | 付费 | 一把 OpenAI 兼容密钥即可访问 300+ 模型；按模型提供价格与能力信息 |
+| **Z.ai** / **BigModel** | | 便宜 | GLM-5.3 —— 推荐起点 |
 
 > 💡 自托管提供商只是在 API 费用意义上免费——要以可用速度运行 30B+ 模型，需要 M2/M3/M4 Ultra Mac Studio（64–128GB）。没有这类硬件的话，上面的低价云端方案要便宜得多。
 
@@ -409,4 +412,4 @@ Agent! 是三年智能体 AI 应用开发的结晶——ANIE、Game Changer、Ba
 
 ### **来自赞助商 Fluxion AI 的消息**
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>

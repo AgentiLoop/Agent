@@ -2,7 +2,7 @@
 
 ### **スポンサー Fluxion AI からのお知らせ**
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ja.svg" width="900" alt="Fluxion AI（シルバースポンサー）：GPT、Claude などの主要 AI モデルをひとつの統合 API で。公式 API 価格と比べて最大 70% お得、さらに $3 分の API クレジット。" /></a>
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
@@ -124,36 +124,39 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ### スポンサー
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ja.svg" width="900" alt="Fluxion AI（シルバースポンサー）：GPT、Claude などの主要 AI モデルをひとつの統合 API で。公式 API 価格と比べて最大 70% お得、さらに $3 分の API クレジット。" /></a>
 
-<img src="docs/badges/sponsor-silver.svg" height="28" alt="Silver" /> **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)**: GPT、Claude をはじめとする主要な AI モデルに、ひとつの統合 API で信頼性が高く低コストにアクセスできます。公式 API 価格と比べて最大 70% 節約でき、[こちらのリンク](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)から登録すると $3 分の API クレジットがもらえます（プロモコード `AIAGENT`）。
+| スポンサー | &nbsp;&nbsp;&nbsp;レベル&nbsp;&nbsp;&nbsp; | |
+|---|:---:|---|
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | GPT、Claude をはじめとする主要な AI モデルに、ひとつの統合 API で信頼性が高く低コストにアクセスできます。公式 API 価格と比べて最大 70% 節約でき、[こちらのリンク](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)から登録すると $3 分の API クレジットがもらえます（プロモコード `AIAGENT`）。 |
 
 プロジェクトを支援したい企業や LLM プロバイダーの方は、[docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)（レベル、掲載場所）と [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)（LLM プロバイダー連携）をご覧いただくか、[GitHub Sponsors](https://github.com/sponsors/AgentiLoop) から直接スポンサーになってください。請求はすべて GitHub Sponsors 経由です。
 
 ## 🤖 23 の LLM プロバイダー
 
-| プロバイダー | コスト | 最適な用途 |
-|---|---|---|
-| **A2Agent** | 安価 | 一つの OpenAI 互換キーで公式価格の一部で DeepSeek、GLM、Kimi、MiniMax、Qwen |
-| **Apple Intelligence** | 無料、オンデバイス | トリアージ、要約、トークン圧縮（脳アイコン、プロバイダーピッカーにはなし） |
-| **Claude** | トークン単位（API キー）またはサブスクリプション（OAuth） | 長い自律タスク、拡張思考、プロンプトキャッシング |
-| **Codex** | ChatGPT サブスクリプション | ChatGPT OAuth 経由の OpenAI モデル — API キー不要、トークン課金なし |
-| **DeepSeek** | 安価 | 低予算コーディング、キャッシュヒット報告 |
-| **Google Gemini** | 有料（無料枠あり） | 長いコンテキスト、ビジョン |
-| **Grok**（xAI） | 有料 | リアルタイム情報 |
-| **Hugging Face** | さまざま | オープンモデル、サーバーレスまたは専用エンドポイント |
-| **ローカル Ollama** / **vLLM** / **LM Studio** / **oMLX** | 無料 + ハードウェア | 完全オフライン。モデルごとの実際のコンテキストウィンドウを検出 |
-| **MiniMax** | 安価 | 1M トークンコンテキスト |
-| **Mistral** / **Mistral Vibe** | 有料 | オープンウェイトクラウド、コード、エージェント製品 |
-| **Ollama**（クラウド） | 無料枠 | ホスト型オープンモデル |
-| **OpenAI** | 有料 | 汎用、ツール呼び出し、ビジョン、`reasoning_effort` |
-| **OpenRouter** | 有料 | 200 以上のモデル、一つのキー。Claude は Anthropic プロトコル経由でルーティング |
-| **OrcaRouter** | 有料 | 一つの OpenAI 互換キーでプロバイダー原価の 190 以上のモデル。auto/fusion/fallback ルーティング |
-| **Alibaba DashScope**（Model Studio / QwenCloud 従量課金） | 安価 | DashScope 経由の Qwen 3.8。Model Studio `sk-` および QwenCloud `sk-ws-` キー |
-| **Qwen**（qwen.ai Token Plan） | サブスクリプション | QwenCloud Token Plan（`sk-sp-` キー、`token-plan.*.maas.aliyuncs.com`）：qwen3.8-max、qwen3.7-plus、GLM-5.2、DeepSeek V4 |
-| **Qwen Code** | サブスクリプション | Alibaba Coding Plan（`sk-sp-` キー）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
-| **Requesty** | 有料 | 一つの OpenAI 互換キーで 300 以上のモデル。モデルごとの価格と機能メタデータ |
-| **Z.ai** / **BigModel** | 安価 | GLM-5.3 — 推奨の出発点 |
+| プロバイダー | &nbsp;&nbsp;&nbsp;スポンサー&nbsp;&nbsp;&nbsp; | コスト | 最適な用途 |
+|---|:---:|---|---|
+| **A2Agent** | | 安価 | 一つの OpenAI 互換キーで公式価格の一部で DeepSeek、GLM、Kimi、MiniMax、Qwen |
+| **Apple Intelligence** | | 無料、オンデバイス | トリアージ、要約、トークン圧縮（脳アイコン、プロバイダーピッカーにはなし） |
+| **Claude** | | トークン単位（API キー）またはサブスクリプション（OAuth） | 長い自律タスク、拡張思考、プロンプトキャッシング |
+| **Codex** | | ChatGPT サブスクリプション | ChatGPT OAuth 経由の OpenAI モデル — API キー不要、トークン課金なし |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 公式価格から最大 70% オフ | GPT、Claude、Grok、DeepSeek、Gemini、GLM、Kimi をひとつのキーで。キーグループごとに OpenAI または Anthropic プロトコル。プロモコード `AIAGENT` で $3 クレジット |
+| **DeepSeek** | | 安価 | 低予算コーディング、キャッシュヒット報告 |
+| **Google Gemini** | | 有料（無料枠あり） | 長いコンテキスト、ビジョン |
+| **Grok**（xAI） | | 有料 | リアルタイム情報 |
+| **Hugging Face** | | さまざま | オープンモデル、サーバーレスまたは専用エンドポイント |
+| **ローカル Ollama** / **vLLM** / **LM Studio** / **oMLX** | | 無料 + ハードウェア | 完全オフライン。モデルごとの実際のコンテキストウィンドウを検出 |
+| **MiniMax** | | 安価 | 1M トークンコンテキスト |
+| **Mistral** / **Mistral Vibe** | | 有料 | オープンウェイトクラウド、コード、エージェント製品 |
+| **Ollama**（クラウド） | | 無料枠 | ホスト型オープンモデル |
+| **OpenAI** | | 有料 | 汎用、ツール呼び出し、ビジョン、`reasoning_effort` |
+| **OpenRouter** | | 有料 | 200 以上のモデル、一つのキー。Claude は Anthropic プロトコル経由でルーティング |
+| **OrcaRouter** | | 有料 | 一つの OpenAI 互換キーでプロバイダー原価の 190 以上のモデル。auto/fusion/fallback ルーティング |
+| **Alibaba DashScope** | | 安価 | DashScope 経由の Qwen 3.8。Model Studio `sk-` および QwenCloud `sk-ws-` キー |
+| **Qwen**（qwen.ai Token Plan） | | サブスクリプション | QwenCloud Token Plan（`sk-sp-` キー、`token-plan.*.maas.aliyuncs.com`）：qwen3.8-max、qwen3.7-plus、GLM-5.2、DeepSeek V4 |
+| **Qwen Code** | | サブスクリプション | Alibaba Coding Plan（`sk-sp-` キー）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
+| **Requesty** | | 有料 | 一つの OpenAI 互換キーで 300 以上のモデル。モデルごとの価格と機能メタデータ |
+| **Z.ai** / **BigModel** | | 安価 | GLM-5.3 — 推奨の出発点 |
 
 > 💡 セルフホストのプロバイダーは API 料金の意味でのみ無料です — 実用的な 30B+ モデルには M2/M3/M4 Ultra の Mac Studio（64〜128GB）が必要です。そのハードウェアがなければ、上の安価なクラウド経路のほうが圧倒的に安くなります。
 
@@ -410,4 +413,4 @@ Agent! は 3 年間にわたるエージェント型 AI アプリ開発の成果
 
 ### **スポンサー Fluxion AI からのお知らせ**
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ja.svg" width="900" alt="Fluxion AI（シルバースポンサー）：GPT、Claude などの主要 AI モデルをひとつの統合 API で。公式 API 価格と比べて最大 70% お得、さらに $3 分の API クレジット。" /></a>
