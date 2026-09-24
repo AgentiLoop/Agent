@@ -4,6 +4,20 @@ Agent! is a free-for-noncommercial-use (PolyForm Noncommercial 1.0.0), 100% nati
 
 **All billing happens through [GitHub Sponsors → AgentiLoop](https://github.com/sponsors/AgentiLoop)** — recurring or one-time. No invoiced billing, no credits, no other payment methods.
 
+## Current sponsors
+
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+
+| Sponsor | Level | |
+|---|---|---|
+| **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)** | <img src="badges/sponsor-silver.svg" height="28" alt="Silver Sponsor" /> | One unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing, and get $3 in API credits when you sign up through the link (promo code `AIAGENT`). |
+
+## Badges
+
+Bronze, Silver, Gold and Platinum each have their own badge.
+
+<img src="badges/sponsor-bronze.svg" height="32" alt="Bronze Sponsor" /> <img src="badges/sponsor-silver.svg" height="32" alt="Silver Sponsor" /> <img src="badges/sponsor-gold.svg" height="32" alt="Gold Sponsor" /> <img src="badges/sponsor-platinum.svg" height="32" alt="Platinum Sponsor" />
+
 ## Silver, Gold, Platinum
 
 Three levels. Each has two flavors — **LLM Provider** (you run an API/gateway/model host Agent! can talk to) and **Regular** (any other company or individual). Same price, different placement.
