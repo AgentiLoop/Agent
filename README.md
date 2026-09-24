@@ -128,7 +128,7 @@ Just type what you want. Agent! figures out how and makes it happen.
 
 | Sponsor | Level | |
 |---|---|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/badges/sponsor-silver-offset.svg" height="58" alt="Silver" /></a> | Reliable, cost-efficient access to GPT, Claude and other leading AI models through one unified API. Save up to 70% compared with official API pricing, and get $3 in API credits when you sign up through [this link](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) (promo code `AIAGENT`). |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" height="58" alt="Silver" /> | Reliable, cost-efficient access to GPT, Claude and other leading AI models through one unified API. Save up to 70% compared with official API pricing, and get $3 in API credits when you sign up through [this link](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) (promo code `AIAGENT`). |
 
 Companies and LLM providers who want to support the project: see [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (levels, placements) and [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (LLM provider integration), or sponsor directly via [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). All billing via GitHub Sponsors.
 
