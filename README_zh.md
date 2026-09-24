@@ -118,8 +118,6 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **🗂 标签页、历史、记忆、计划、技能** —— 每个标签页有独立的项目文件夹和日志；持久化用户记忆；多计划清单出现在每个提示词中。
 - **🔄 回退链** —— 遇到 429/超时/网络故障时自动切换到下一个已配置的提供商。
 
-## 赞助
-
 ### 赞助商
 
 <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
@@ -127,6 +125,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | 赞助商 | &nbsp;&nbsp;&nbsp;等级&nbsp;&nbsp;&nbsp; | |
 |---|:---:|---|
 | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 通过一个统一的 API，稳定且经济地访问 GPT、Claude 及其他领先的 AI 模型。与官方 API 价格相比最多可节省 70%，通过[此链接](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)注册即可获得 $3 API 额度（优惠码 `AIAGENT`）。 |
+
+## 赞助
 
 希望支持本项目的企业和 LLM 提供商：请参阅 [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)（赞助等级、展示位置）和 [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)（LLM 提供商集成），或直接通过 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) 赞助。所有费用均通过 GitHub Sponsors 结算。
 

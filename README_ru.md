@@ -118,8 +118,6 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **🗂 Вкладки, история, память, планы, навыки** — у каждой вкладки своя папка проекта и журнал; постоянная память пользователя; чек-листы нескольких планов показываются в каждом промпте.
 - **🔄 Цепочка резервирования** — автопереключение на следующего настроенного провайдера при 429/таймауте/сетевом сбое.
 
-## Спонсорство
-
 ### Спонсоры
 
 <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ru.svg" width="900" alt="Fluxion AI, серебряный спонсор: единый API для GPT, Claude и других ведущих моделей ИИ. Экономия до 70 % по сравнению с официальными ценами API и $3 кредитов на API." /></a>
@@ -127,6 +125,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | Спонсор | &nbsp;&nbsp;&nbsp;Уровень&nbsp;&nbsp;&nbsp; | |
 |---|:---:|---|
 | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Надёжный и экономичный доступ к GPT, Claude и другим ведущим моделям ИИ через единый API. Экономьте до 70 % по сравнению с официальными ценами API и получите $3 в виде API-кредитов при регистрации по [этой ссылке](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) (промокод `AIAGENT`). |
+
+## Спонсорство
 
 Компаниям и LLM-провайдерам, которые хотят поддержать проект: см. [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (уровни, размещения) и [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (интеграция LLM-провайдеров) или станьте спонсором напрямую через [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). Все платежи проходят через GitHub Sponsors.
 

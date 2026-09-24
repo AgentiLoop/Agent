@@ -118,8 +118,6 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **🗂 タブ、履歴、メモリ、計画、スキル** — 各タブは独自のプロジェクトフォルダとログを持ちます。永続的なユーザーメモリ。すべてのプロンプトに表示されるマルチプラン チェックリスト。
 - **🔄 フォールバックチェーン** — 429/タイムアウト/ネットワーク障害時に次に設定されたプロバイダーへ自動切り替え。
 
-## スポンサーシップ
-
 ### スポンサー
 
 <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ja.svg" width="900" alt="Fluxion AI（シルバースポンサー）：GPT、Claude などの主要 AI モデルをひとつの統合 API で。公式 API 価格と比べて最大 70% お得、さらに $3 分の API クレジット。" /></a>
@@ -127,6 +125,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | スポンサー | &nbsp;&nbsp;&nbsp;レベル&nbsp;&nbsp;&nbsp; | |
 |---|:---:|---|
 | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | GPT、Claude をはじめとする主要な AI モデルに、ひとつの統合 API で信頼性が高く低コストにアクセスできます。公式 API 価格と比べて最大 70% 節約でき、[こちらのリンク](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)から登録すると $3 分の API クレジットがもらえます（プロモコード `AIAGENT`）。 |
+
+## スポンサーシップ
 
 プロジェクトを支援したい企業や LLM プロバイダーの方は、[docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)（レベル、掲載場所）と [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)（LLM プロバイダー連携）をご覧いただくか、[GitHub Sponsors](https://github.com/sponsors/AgentiLoop) から直接スポンサーになってください。請求はすべて GitHub Sponsors 経由です。
 

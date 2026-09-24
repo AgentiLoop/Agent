@@ -118,8 +118,6 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **🗂 탭, 기록, 메모리, 계획, 스킬** — 각 탭은 자체 프로젝트 폴더와 로그를 가짐; 영구 사용자 메모리; 모든 프롬프트에 표시되는 다중 계획 체크리스트.
 - **🔄 폴백 체인** — 429/타임아웃/네트워크 실패 시 다음 구성된 제공자로 자동 전환.
 
-## 후원
-
 ### 스폰서
 
 <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>
@@ -127,6 +125,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | 스폰서 | &nbsp;&nbsp;&nbsp;등급&nbsp;&nbsp;&nbsp; | |
 |---|:---:|---|
 | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 하나의 통합 API로 GPT, Claude 및 기타 주요 AI 모델에 안정적이고 비용 효율적으로 접근할 수 있습니다. 공식 API 가격 대비 최대 70% 절약하고, [이 링크](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)로 가입하면 $3의 API 크레딧을 받을 수 있습니다(프로모션 코드 `AIAGENT`). |
+
+## 후원
 
 프로젝트를 후원하고 싶은 기업 및 LLM 제공업체: [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)(등급, 노출 위치)와 [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)(LLM 제공업체 연동)를 참고하거나 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop)로 직접 후원해 주세요. 모든 결제는 GitHub Sponsors를 통해 이루어집니다.
 
