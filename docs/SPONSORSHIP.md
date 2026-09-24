@@ -10,13 +10,13 @@ Agent! is a free-for-noncommercial-use (PolyForm Noncommercial 1.0.0), 100% nati
 
 | Sponsor | Level | |
 |---|---|---|
-| **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)** | <img src="badges/sponsor-silver.svg" height="28" alt="Silver Sponsor" /> | One unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing, and get $3 in API credits when you sign up through the link (promo code `AIAGENT`). |
+| **[Fluxion AI](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)** | <img src="badges/sponsor-silver.svg" height="28" alt="Silver" /> | One unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing, and get $3 in API credits when you sign up through the link (promo code `AIAGENT`). |
 
 ## Badges
 
 Bronze, Silver, Gold and Platinum each have their own badge.
 
-<img src="badges/sponsor-bronze.svg" height="32" alt="Bronze Sponsor" /> <img src="badges/sponsor-silver.svg" height="32" alt="Silver Sponsor" /> <img src="badges/sponsor-gold.svg" height="32" alt="Gold Sponsor" /> <img src="badges/sponsor-platinum.svg" height="32" alt="Platinum Sponsor" />
+<img src="badges/sponsor-bronze.svg" height="32" alt="Bronze" /> <img src="badges/sponsor-silver.svg" height="32" alt="Silver" /> <img src="badges/sponsor-gold.svg" height="32" alt="Gold" /> <img src="badges/sponsor-platinum.svg" height="32" alt="Platinum" />
 
 ## Silver, Gold, Platinum
 
