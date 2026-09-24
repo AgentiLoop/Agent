@@ -32,6 +32,24 @@ final class ArrowCursorTextView: NSTextView {
     }
 }
 
+/// Scroll view that keeps the bottom pinned when its own height changes (e.g. the LLM
+/// Output HUD above it grows while streaming with "Activity Log Below HUD" on). AppKit keeps
+/// the clip origin fixed on resize, so without this the last lines drop out of view until
+/// the next throttled snap pulls them back — the up/down jump.
+final class BottomPinnedScrollView: NSScrollView {
+    /// True when the log is following the bottom (the coordinator's `userIsAtBottom`).
+    var shouldPinBottom: (() -> Bool)?
+
+    override func resizeSubviews(withOldSize oldSize: NSSize) {
+        let pin = frame.height != oldSize.height && (shouldPinBottom?() ?? false)
+        super.resizeSubviews(withOldSize: oldSize)
+        guard pin, let doc = documentView else { return }
+        let bottomY = max(0, (doc.frame.height - contentView.bounds.height).rounded(.up))
+        contentView.scroll(to: NSPoint(x: contentView.bounds.origin.x, y: bottomY))
+        reflectScrolledClipView(contentView)
+    }
+}
+
 /// / NSTextView-backed activity log — avoids SwiftUI Text layout storms. / Detects image/HTML paths and shows clickable
 /// links. Optimized for streaming. / Rendering, scroll, search, markdown, and cache live on `Coordinator`, split across: / ActivityLogView+Update.swift, +Scroll, +Search, +Markdown, +MarkdownBlock, / +MarkdownInline, +Cache, +Rendering.
 struct ActivityLogView: NSViewRepresentable {
@@ -46,7 +64,8 @@ struct ActivityLogView: NSViewRepresentable {
     var onMatchCount: ((Int) -> Void)? = nil
 
     func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = NSScrollView()
+        let scrollView = BottomPinnedScrollView()
+        scrollView.shouldPinBottom = { [weak coord = context.coordinator] in coord?.userIsAtBottom ?? false }
         let contentSize = scrollView.contentSize
         let textContainer = NSTextContainer(
             containerSize: NSSize(width: contentSize.width, height: CGFloat.greatestFiniteMagnitude)
