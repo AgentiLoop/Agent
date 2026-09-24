@@ -21,24 +21,12 @@
 
 Знакомьтесь с новыми членами семьи Agent!: два кроссплатформенных CLI с **абсолютно одинаковыми возможностями**. Выбирайте свой вкус:
 
-|  | Вариант | Репозиторий |
-|---|---|---|
-| 🦀 | **Rust** — AgentiLoopCLI | [github.com/AgentiLoop/AgentiLoopCLI](https://github.com/AgentiLoop/AgentiLoopCLI) |
-| 🐹 | **Go** — AgentiLoopGo | [github.com/AgentiLoop/AgentiLoopGo](https://github.com/AgentiLoop/AgentiLoopGo) |
-
-- 🖥️ **macOS · Windows · Linux**: один крошечный бинарник, никакого лишнего рантайма
-- 🧠 **Claude, OpenAI, Ollama, oMLX** и любая OpenAI-совместимая модель
-- 🎛️ **Полноэкранный TUI**, стриминг, сессии и автосжатие
-- 🔌 **MCP-серверы** с той же конфигурацией, что и в Agent!
-
-```sh
-$ agentiloop --tui
-› fix the failing test
-✓ read_file  ✓ edit_file  ✓ bash
-All tests passed. Done!
-```
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad.svg" width="900" alt="AgentiLoop CLI: two versions, Rust and Go, with the exact same capabilities. macOS, Windows, Linux." /></a>
 
 *Создано с помощью AgentiLoop Agent! для Mac. Да, агент сам написал своих младших братьев.* 🤖✨ Попробуйте пре-релиз уже сегодня!
+
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="https://img.shields.io/badge/Rust_on_GitHub_→-ea580c?style=for-the-badge&logo=rust&logoColor=white" alt="Rust on GitHub" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="https://img.shields.io/badge/Go_on_GitHub_→-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go on GitHub" /></a>
 
 ## Переводы README
 

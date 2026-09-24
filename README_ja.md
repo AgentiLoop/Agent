@@ -21,24 +21,12 @@
 
 Agent! ファミリーの新メンバーを紹介します。**まったく同じ機能**を持つ 2 つのクロスプラットフォーム CLI です。好きな方を選んでください：
 
-|  | バージョン | リポジトリ |
-|---|---|---|
-| 🦀 | **Rust** — AgentiLoopCLI | [github.com/AgentiLoop/AgentiLoopCLI](https://github.com/AgentiLoop/AgentiLoopCLI) |
-| 🐹 | **Go** — AgentiLoopGo | [github.com/AgentiLoop/AgentiLoopGo](https://github.com/AgentiLoop/AgentiLoopGo) |
-
-- 🖥️ **macOS · Windows · Linux**：小さなバイナリ 1 つ、ランタイムの荷物はゼロ
-- 🧠 **Claude、OpenAI、Ollama、oMLX**、そしてあらゆる OpenAI 互換モデル
-- 🎛️ **フルスクリーン TUI**、ストリーミング、セッション、自動コンパクション
-- 🔌 **MCP サーバー**、Agent! と同じ設定で利用可能
-
-```sh
-$ agentiloop --tui
-› fix the failing test
-✓ read_file  ✓ edit_file  ✓ bash
-All tests passed. Done!
-```
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad.svg" width="900" alt="AgentiLoop CLI: two versions, Rust and Go, with the exact same capabilities. macOS, Windows, Linux." /></a>
 
 *AgentiLoop Agent! for Mac で作られました。そう、エージェントが自分の弟分を書き上げたのです。* 🤖✨ 今すぐプレリリース版をお試しください！
+
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="https://img.shields.io/badge/Rust_on_GitHub_→-ea580c?style=for-the-badge&logo=rust&logoColor=white" alt="Rust on GitHub" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="https://img.shields.io/badge/Go_on_GitHub_→-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go on GitHub" /></a>
 
 ## README 翻訳
 

@@ -21,24 +21,12 @@
 
 Agent! 패밀리의 최신 멤버를 만나보세요: **완전히 동일한 기능**을 갖춘 두 개의 크로스 플랫폼 CLI. 취향대로 고르세요:
 
-|  | 버전 | 저장소 |
-|---|---|---|
-| 🦀 | **Rust** — AgentiLoopCLI | [github.com/AgentiLoop/AgentiLoopCLI](https://github.com/AgentiLoop/AgentiLoopCLI) |
-| 🐹 | **Go** — AgentiLoopGo | [github.com/AgentiLoop/AgentiLoopGo](https://github.com/AgentiLoop/AgentiLoopGo) |
-
-- 🖥️ **macOS · Windows · Linux**: 작은 바이너리 하나, 런타임 부담 제로
-- 🧠 **Claude, OpenAI, Ollama, oMLX** 및 모든 OpenAI 호환 모델
-- 🎛️ **전체 화면 TUI**, 스트리밍, 세션 및 자동 압축
-- 🔌 **MCP 서버**, Agent!와 동일한 설정 사용
-
-```sh
-$ agentiloop --tui
-› fix the failing test
-✓ read_file  ✓ edit_file  ✓ bash
-All tests passed. Done!
-```
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad.svg" width="900" alt="AgentiLoop CLI: two versions, Rust and Go, with the exact same capabilities. macOS, Windows, Linux." /></a>
 
 *AgentiLoop Agent! for Mac으로 제작. 네, 에이전트가 직접 자기 동생들을 만들었습니다.* 🤖✨ 지금 바로 프리릴리스를 사용해 보세요!
+
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="https://img.shields.io/badge/Rust_on_GitHub_→-ea580c?style=for-the-badge&logo=rust&logoColor=white" alt="Rust on GitHub" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="https://img.shields.io/badge/Go_on_GitHub_→-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go on GitHub" /></a>
 
 ## README 번역
 
