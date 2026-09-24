@@ -1,8 +1,8 @@
 # 🦾 AgentiLoop Agent!
 
-### Full disclosure: I don't use Cursor or Claude Code anymore. Agent! by AgentiLoop hasn't just replaced those coding tools — I use it to automate email, deploy software, search the web in Safari with over 12 search engines, and build websites that update themselves. Agent! has become the most powerful agentic AI tool for macOS 26 and 27.
-
 ### **Agentic AI for your Mac Desktop**
+
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
@@ -14,8 +14,6 @@
 <img src="agent-demo.gif" width="900" alt="Agent! automating Photo Booth through the macOS Accessibility API — takes a photo end-to-end from a single natural-language request" />
 
 *Agent! driving Photo Booth via Accessibility — no clicks, no scripts, just "take a photo".*
-
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
 
 ## 🆕 New Kid on the Block: AgentiLoop CLI ⚡️
 
