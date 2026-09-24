@@ -130,7 +130,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 Компаниям и LLM-провайдерам, которые хотят поддержать проект: см. [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (уровни, размещения) и [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (интеграция LLM-провайдеров) или станьте спонсором напрямую через [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). Все платежи проходят через GitHub Sponsors.
 
-## 🤖 21 ИИ-провайдер
+## 🤖 21 LLM-провайдер
 
 | Провайдер | Стоимость | Лучше всего для |
 |---|---|---|

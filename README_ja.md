@@ -130,7 +130,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 プロジェクトを支援したい企業や LLM プロバイダーの方は、[docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)（レベル、掲載場所）と [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)（LLM プロバイダー連携）をご覧いただくか、[GitHub Sponsors](https://github.com/sponsors/AgentiLoop) から直接スポンサーになってください。請求はすべて GitHub Sponsors 経由です。
 
-## 🤖 21 の AI プロバイダー
+## 🤖 21 の LLM プロバイダー
 
 | プロバイダー | コスト | 最適な用途 |
 |---|---|---|

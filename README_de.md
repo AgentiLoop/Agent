@@ -130,7 +130,7 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 
 Unternehmen und LLM-Anbieter, die das Projekt unterstützen möchten: siehe [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (Stufen, Platzierungen) und [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (LLM-Anbieter-Integration), oder direkt über [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) sponsern. Die gesamte Abrechnung läuft über GitHub Sponsors.
 
-## 🤖 21 KI-Anbieter
+## 🤖 21 LLM-Anbieter
 
 | Anbieter | Kosten | Am besten für |
 |---|---|---|

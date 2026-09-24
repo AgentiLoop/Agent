@@ -130,7 +130,7 @@ Just type what you want. Agent! figures out how and makes it happen.
 
 Companies and LLM providers who want to support the project: see [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (levels, placements) and [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (LLM provider integration), or sponsor directly via [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). All billing via GitHub Sponsors.
 
-## 🤖 21 AI Providers
+## 🤖 21 LLM Providers
 
 | Provider | Cost | Best for |
 |---|---|---|

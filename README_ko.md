@@ -130,7 +130,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 프로젝트를 후원하고 싶은 기업 및 LLM 제공업체: [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)(등급, 노출 위치)와 [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)(LLM 제공업체 연동)를 참고하거나 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop)로 직접 후원해 주세요. 모든 결제는 GitHub Sponsors를 통해 이루어집니다.
 
-## 🤖 21개 AI 제공자
+## 🤖 21개 LLM 제공자
 
 | 제공자 | 비용 | 최적 용도 |
 |---|---|---|

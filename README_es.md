@@ -130,7 +130,7 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 
 Empresas y proveedores de LLM que quieran apoyar el proyecto: consulta [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (niveles, ubicaciones) y [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (integración de proveedores de LLM), o patrocina directamente a través de [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). Toda la facturación se realiza a través de GitHub Sponsors.
 
-## 🤖 21 proveedores de IA
+## 🤖 21 proveedores de LLM
 
 | Proveedor | Coste | Ideal para |
 |---|---|---|

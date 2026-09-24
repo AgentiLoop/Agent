@@ -130,7 +130,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 希望支持本项目的企业和 LLM 提供商：请参阅 [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)（赞助等级、展示位置）和 [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)（LLM 提供商集成），或直接通过 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) 赞助。所有费用均通过 GitHub Sponsors 结算。
 
-## 🤖 21 家 AI 提供商
+## 🤖 21 家 LLM 提供商
 
 | 提供商 | 费用 | 适合 |
 |---|---|---|
