@@ -1,7 +1,5 @@
 # 🦾 AgentiLoop Agent!
 
-### **Сообщение от нашего спонсора Fluxion AI**
-
 <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ru.svg" width="900" alt="Fluxion AI, серебряный спонсор: единый API для GPT, Claude и других ведущих моделей ИИ. Экономия до 70 % по сравнению с официальными ценами API и $3 кредитов на API." /></a>
 
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
@@ -410,7 +408,5 @@ Agent! — результат трёх лет создания агентных 
 >
 > - Сайт: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent
-
-### **Сообщение от нашего спонсора Fluxion AI**
 
 <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ru.svg" width="900" alt="Fluxion AI, серебряный спонсор: единый API для GPT, Claude и других ведущих моделей ИИ. Экономия до 70 % по сравнению с официальными ценами API и $3 кредитов на API." /></a>
