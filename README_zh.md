@@ -25,8 +25,8 @@
 
 *由 AgentiLoop Agent! for Mac 打造。没错，这个智能体亲手写出了自己的小弟弟。* 🤖✨ 立即试用预发布版！
 
-<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="https://img.shields.io/badge/Rust_on_GitHub_→-ea580c?style=for-the-badge&logo=rust&logoColor=white" alt="Rust on GitHub" /></a>
-<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="https://img.shields.io/badge/Go_on_GitHub_→-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go on GitHub" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-rust-button.svg" width="186" height="44" alt="Rust on GitHub" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="docs/agentiloop-go-button.svg" width="176" height="44" alt="Go on GitHub" /></a>
 
 ## README 翻译
 
