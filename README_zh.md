@@ -15,6 +15,31 @@
 
 *Agent! 通过辅助功能驱动 Photo Booth——无需点击、无需脚本，只需说"拍张照片"。*
 
+## 🆕 新面孔登场：AgentiLoop CLI ⚡️
+
+**智能体循环，在你的终端中全面释放。Mac、Windows、Linux，随你挑选。**
+
+认识 Agent! 家族的最新成员：两款跨平台 CLI，**功能完全相同**。选择你喜欢的版本：
+
+|  | 版本 | 仓库 |
+|---|---|---|
+| 🦀 | **Rust** — AgentiLoopCLI | [github.com/AgentiLoop/AgentiLoopCLI](https://github.com/AgentiLoop/AgentiLoopCLI) |
+| 🐹 | **Go** — AgentiLoopGo | [github.com/AgentiLoop/AgentiLoopGo](https://github.com/AgentiLoop/AgentiLoopGo) |
+
+- 🖥️ **macOS · Windows · Linux**：一个小巧的二进制文件，零运行时负担
+- 🧠 **Claude、OpenAI、Ollama、oMLX** 以及任何兼容 OpenAI 的模型
+- 🎛️ **全屏 TUI**、流式输出、会话与自动压缩
+- 🔌 **MCP 服务器**，与 Agent! 使用相同配置
+
+```sh
+$ agentiloop --tui
+› fix the failing test
+✓ read_file  ✓ edit_file  ✓ bash
+All tests passed. Done!
+```
+
+*由 AgentiLoop Agent! for Mac 打造。没错，这个智能体亲手写出了自己的小弟弟。* 🤖✨ 立即试用预发布版！
+
 ## README 翻译
 
 - [English](README.md)

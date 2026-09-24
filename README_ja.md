@@ -15,6 +15,31 @@
 
 *Agent! がアクセシビリティで Photo Booth を操作 — クリックもスクリプトも不要、ただ「写真を撮って」と言うだけ。*
 
+## 🆕 期待の新星：AgentiLoop CLI ⚡️
+
+**エージェントループを、あなたのターミナルで解き放て。Mac、Windows、Linux、お好きなものを。**
+
+Agent! ファミリーの新メンバーを紹介します。**まったく同じ機能**を持つ 2 つのクロスプラットフォーム CLI です。好きな方を選んでください：
+
+|  | バージョン | リポジトリ |
+|---|---|---|
+| 🦀 | **Rust** — AgentiLoopCLI | [github.com/AgentiLoop/AgentiLoopCLI](https://github.com/AgentiLoop/AgentiLoopCLI) |
+| 🐹 | **Go** — AgentiLoopGo | [github.com/AgentiLoop/AgentiLoopGo](https://github.com/AgentiLoop/AgentiLoopGo) |
+
+- 🖥️ **macOS · Windows · Linux**：小さなバイナリ 1 つ、ランタイムの荷物はゼロ
+- 🧠 **Claude、OpenAI、Ollama、oMLX**、そしてあらゆる OpenAI 互換モデル
+- 🎛️ **フルスクリーン TUI**、ストリーミング、セッション、自動コンパクション
+- 🔌 **MCP サーバー**、Agent! と同じ設定で利用可能
+
+```sh
+$ agentiloop --tui
+› fix the failing test
+✓ read_file  ✓ edit_file  ✓ bash
+All tests passed. Done!
+```
+
+*AgentiLoop Agent! for Mac で作られました。そう、エージェントが自分の弟分を書き上げたのです。* 🤖✨ 今すぐプレリリース版をお試しください！
+
 ## README 翻訳
 
 - [English](README.md)

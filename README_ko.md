@@ -15,6 +15,31 @@
 
 *Agent!가 손쉬운 사용으로 Photo Booth를 조작 — 클릭도, 스크립트도 없이 그저 "사진 찍어줘".*
 
+## 🆕 새로운 강자 등장: AgentiLoop CLI ⚡️
+
+**에이전틱 루프, 이제 당신의 터미널에서 해방됩니다. Mac. Windows. Linux. 선택은 당신의 몫.**
+
+Agent! 패밀리의 최신 멤버를 만나보세요: **완전히 동일한 기능**을 갖춘 두 개의 크로스 플랫폼 CLI. 취향대로 고르세요:
+
+|  | 버전 | 저장소 |
+|---|---|---|
+| 🦀 | **Rust** — AgentiLoopCLI | [github.com/AgentiLoop/AgentiLoopCLI](https://github.com/AgentiLoop/AgentiLoopCLI) |
+| 🐹 | **Go** — AgentiLoopGo | [github.com/AgentiLoop/AgentiLoopGo](https://github.com/AgentiLoop/AgentiLoopGo) |
+
+- 🖥️ **macOS · Windows · Linux**: 작은 바이너리 하나, 런타임 부담 제로
+- 🧠 **Claude, OpenAI, Ollama, oMLX** 및 모든 OpenAI 호환 모델
+- 🎛️ **전체 화면 TUI**, 스트리밍, 세션 및 자동 압축
+- 🔌 **MCP 서버**, Agent!와 동일한 설정 사용
+
+```sh
+$ agentiloop --tui
+› fix the failing test
+✓ read_file  ✓ edit_file  ✓ bash
+All tests passed. Done!
+```
+
+*AgentiLoop Agent! for Mac으로 제작. 네, 에이전트가 직접 자기 동생들을 만들었습니다.* 🤖✨ 지금 바로 프리릴리스를 사용해 보세요!
+
 ## README 번역
 
 - [English](README.md)

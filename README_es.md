@@ -15,6 +15,31 @@
 
 *Agent! controlando Photo Booth mediante Accesibilidad — sin clics, sin scripts, solo "toma una foto".*
 
+## 🆕 El nuevo del barrio: AgentiLoop CLI ⚡️
+
+**El bucle agéntico, desatado en tu terminal. Mac. Windows. Linux. Tú eliges.**
+
+Conoce a los nuevos miembros de la familia Agent!: dos CLI multiplataforma con **exactamente las mismas capacidades**. Elige tu sabor:
+
+|  | Sabor | Repositorio |
+|---|---|---|
+| 🦀 | **Rust** — AgentiLoopCLI | [github.com/AgentiLoop/AgentiLoopCLI](https://github.com/AgentiLoop/AgentiLoopCLI) |
+| 🐹 | **Go** — AgentiLoopGo | [github.com/AgentiLoop/AgentiLoopGo](https://github.com/AgentiLoop/AgentiLoopGo) |
+
+- 🖥️ **macOS · Windows · Linux**: un binario diminuto, sin equipaje de runtime
+- 🧠 **Claude, OpenAI, Ollama, oMLX** y cualquier modelo compatible con OpenAI
+- 🎛️ **TUI a pantalla completa**, streaming, sesiones y autocompactación
+- 🔌 **Servidores MCP**, con la misma configuración que Agent!
+
+```sh
+$ agentiloop --tui
+› fix the failing test
+✓ read_file  ✓ edit_file  ✓ bash
+All tests passed. Done!
+```
+
+*Creado con AgentiLoop Agent! para Mac. Sí, el agente escribió a sus propios hermanitos.* 🤖✨ ¡Prueba la versión preliminar hoy!
+
 ## Traducciones del README
 
 - [English](README.md)
