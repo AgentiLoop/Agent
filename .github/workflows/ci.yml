@@ -26,7 +26,7 @@ env:
 jobs:
   test:
     name: Build & Test (macOS)
-    runs-on: macos-26   # deployment target is macOS 26 — needs the newest image/Xcode
+    runs-on: xcode-27   # macOS 27 + Xcode 27 (Swift 6.4) — TypeSafeKit needs swift-tools 6.4
     timeout-minutes: 60
 
     steps:
