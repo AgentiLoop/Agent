@@ -646,8 +646,13 @@ final class OllamaService {
                 }
 
                 // If buffer might be the start of a tag, hold it back
-                if check.contains("<") {
-                    continue // Keep buffering — might be XML tag
+                // Hold back only while the text after the last "<" could still grow into one of
+                // the markers — an unconditional hold froze streaming at any "<" (e.g. Array<Int>).
+                if let lt = check.range(of: "<", options: .backwards) {
+                    let tail = String(check[lt.lowerBound...])
+                    if ["<|tool_calls_begin|>", "<function_calls>", "<invoke "].contains(where: { $0.hasPrefix(tail) }) {
+                        continue // Keep buffering — might be XML tag
+                    }
                 }
 
                 // If buffer ends with a known tool name, hold it back — the '{' with arguments may arrive in the next chunk. Flush if buffer grows too large without '{'.

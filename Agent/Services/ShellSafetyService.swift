@@ -428,6 +428,12 @@ enum ShellSafetyService {
             let segment = stripPrefixWrappers(rawSegment)
             // Backgrounded segment (`cmd &`) — can't observe its result, not a plain read.
             if segment.hasSuffix("&") { return false }
+            // A mid-segment `&` (e.g. `ls & rm -rf build`) isn't split by splitOnShellSeparators,
+            // so the second command would hide behind the read-only first verb.
+            let withoutRedirects = segment
+                .replacingOccurrences(of: "2>&1", with: "")
+                .replacingOccurrences(of: "&>/dev/null", with: "")
+            if withoutRedirects.contains("&") { return false }
             let tokens = tokenize(segment)
             guard let verb = tokens.first.map({ ($0 as NSString).lastPathComponent }) else { continue }
             guard readOnlyVerbs.contains(verb) else { return false }
