@@ -443,7 +443,9 @@ nonisolated enum OMLXPreflight {
         // ~4 bytes of JSON per token (tool schemas + prose).
         let tokens = bodyData.count / 4
         var notes: [String] = []
-        var timeout: TimeInterval = 120
+        // No measured prefill rate (new model, or remote oMLX without local stats):
+        // don't guess a short cap — a big model's silent prefill can take minutes.
+        var timeout: TimeInterval = llmAPITimeout
 
         // 1. Server-side model status: context window + memory ceiling.
         let statusURL = chatURL.deletingLastPathComponent().deletingLastPathComponent()
