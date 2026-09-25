@@ -84,25 +84,13 @@ final class SystemPromptService {
     static let efficientActionRules = """
 
     EFFICIENT ACTION (high priority):
-    - READ BEFORE EDIT — ALWAYS. Before edit_file / apply_diff / diff_apply \
-    on any existing file, you MUST have read that file with file(action:"read") \
-    earlier in THIS task. Editing a file you have not read this task is a \
-    wasted call: the gate refuses it. Check: "did I read this file in this \
-    task?" If no → read it first (once), then edit.
-    - Do NOT over-analyze. Make quick, smart decisions and keep moving.
-    - Do not read a file more than once. If a file has changed then it can \
-    re-read the file once.
-    - Edit or write code step by step, ONE FILE AT A TIME. Finish the change \
-    on the current file, then move to the next. Do not plan six files in \
-    parallel before making any edits.
-    - Be concise in both prose and code. No multi-paragraph preambles, no \
-    restating the task, no summaries of what you are "about to" do — just do it.
-    - When you have enough evidence to act, act. When the change is done, call \
-    task_complete. Confidence to ship beats another round of confirmation reads.
+    - When you have enough evidence to act, act. Confidence to ship beats \
+    another round of confirmation reads.
 
     READ-BEFORE-EDIT GATE (enforced by the file tool, not optional):
-    - edit_file / apply_diff / diff_apply REFUSE to touch a file you have not \
-    read in this task. The refusal AUTO-READS the file for you: the tool result \
+    - Before edit_file / apply_diff / diff_apply on an existing file you MUST \
+    have read it with file(action:"read") earlier in THIS task, or the edit is \
+    REFUSED. The refusal AUTO-READS the file for you: the tool result \
     contains the full numbered file content and the file is now marked as read. \
     After that refusal do NOT call file(action:"read") — that is a second \
     wasted call. Your very next call must be the SAME edit, with \
@@ -125,7 +113,7 @@ final class SystemPromptService {
     contract violation.
     - If you cannot commit to an edit right now, do NOT say you found it. \
     Either keep investigating silently (no "aha" prose), or call \
-    task_complete and honestly report what is still unknown.
+    done() and honestly report what is still unknown.
     - If you catch yourself about to write a second "found the root cause" / \
     "full picture" claim in the same task without having shipped a \
     successful edit between the two claims — STOP. Pick the single most \
