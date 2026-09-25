@@ -17,7 +17,7 @@ Agent! 패밀리의 최신 멤버를 ᄆ�
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad-v2_ko.svg" width="900" alt="AgentiLoop CLI: Rust와 Go 두 가지 버전, 완전히 동일한 기능. macOS, Windows, Linux." /></a>
 
-*AgentiLoop Agent! for Mac으로 제작. 네, 에이전트가 직접 자기 동생들을 만들었습니다.* 🤖✨ 지금 바로 프리릴리스를 사용해 보세요!
+*AgentiLoop Agent! for Mac으로 제작. 네, 에이전트가 직접 자기 동생들을 만들었습니다.* 🤖✨ 지금 바로 얼리 릴리스를 사용해 보세요!
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-rust-cli-button_ko.svg" width="238" height="44" alt="GitHub에서 Rust CLI" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="docs/agentiloop-go-cli-button_ko.svg" width="221" height="44" alt="GitHub에서 Go CLI" /></a>

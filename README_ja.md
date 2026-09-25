@@ -17,7 +17,7 @@ Agent! ファミリーの新メンバーを紹介します。**まったく�
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad-v2_ja.svg" width="900" alt="AgentiLoop CLI：Rust 版と Go 版の 2 バージョン、機能はまったく同じ。macOS、Windows、Linux。" /></a>
 
-*AgentiLoop Agent! for Mac で作られました。そう、エージェントが自分の弟分を書き上げたのです。* 🤖✨ 今すぐプレリリース版をお試しください！
+*AgentiLoop Agent! for Mac で作られました。そう、エージェントが自分の弟分を書き上げたのです。* 🤖✨ 今すぐアーリーリリース版をお試しください！
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-rust-cli-button_ja.svg" width="246" height="44" alt="Rust CLI を GitHub で" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="docs/agentiloop-go-cli-button_ja.svg" width="229" height="44" alt="Go CLI を GitHub で" /></a>

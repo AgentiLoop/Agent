@@ -17,7 +17,7 @@ Conoce a los nuevos miembros de la familia Agent!: dos CLI multiplataforma con *
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad-v2_es.svg" width="900" alt="AgentiLoop CLI: dos versiones, Rust y Go, con exactamente las mismas capacidades. macOS, Windows, Linux." /></a>
 
-*Creado con AgentiLoop Agent! para Mac. Sí, el agente escribió a sus propios hermanitos.* 🤖✨ ¡Prueba la versión preliminar hoy!
+*Creado con AgentiLoop Agent! para Mac. Sí, el agente escribió a sus propios hermanitos.* 🤖✨ ¡Prueba la versión anticipada hoy!
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-rust-cli-button_es.svg" width="211" height="44" alt="Rust CLI en GitHub" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="docs/agentiloop-go-cli-button_es.svg" width="194" height="44" alt="Go CLI en GitHub" /></a>
