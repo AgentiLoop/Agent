@@ -256,9 +256,9 @@ final class ScriptTab: Identifiable {
     func appendLog(_ message: String) {
         let timestamp = AgentViewModel.timestampFormatter.string(from: Date())
         AgentViewModel.prepareLogBuffer(message: message, buffer: &logBuffer, existingLog: activityLog)
-        // Multi-line messages (diffs, edit payloads) drop onto their own line
-        // so the first content line isn't jammed next to the timestamp.
-        if message.contains("\n") {
+        // Keep the first line inline with the timestamp. Only a leading code
+        // fence drops to its own line, since ``` must start a line to render.
+        if message.hasPrefix("```") {
             logBuffer += "[\(timestamp)]\n\(message)\n"
         } else {
             logBuffer += "[\(timestamp)] \(message)\n"

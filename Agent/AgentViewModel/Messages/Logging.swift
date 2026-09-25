@@ -439,13 +439,9 @@ extension AgentViewModel {
         }
         let timestamp = Self.timestampFormatter.string(from: Date())
         let cached = snapshotImages(in: message)
-        // Multi-line messages (diffs, edit payloads, memory dumps) drop onto
-        // their own line so the first content line isn't jammed next to the
-        // timestamp — EXCEPT status summaries (✅/❌/⚠️/🛑) which should keep
-        // the status prefix inline with the timestamp for scannability.
-        let keepInlinePattern = #"^(✅|❌|⚠️|🛑|🚫|🍎|🧠|🧹|🔌|⏱|⏭|⏳|📝|📸|🔍|🔄|📎|📍|📊|📋|💭|🔒|🔓|👤|🤖|💬|📖|📁|📂)\s"#
-        let keepInline = cached.range(of: keepInlinePattern, options: .regularExpression) != nil
-        let formattedMessage = (cached.contains("\n") && !keepInline)
+        // Keep the first line inline with the timestamp. Only a leading code
+        // fence drops to its own line, since ``` must start a line to render.
+        let formattedMessage = cached.hasPrefix("```")
             ? "[\(timestamp)]\n\(cached)"
             : "[\(timestamp)] \(cached)"
 
