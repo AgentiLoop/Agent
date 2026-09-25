@@ -396,9 +396,13 @@ extension AgentViewModel {
 
         // Physical-evidence pass: every file this task edited must still exist
         // and be non-empty. Catches truncated writes and deleted-by-accident files.
+        // Missing files outside the current project folder are skipped — they were
+        // moved/deleted in another project and can't be fixed from here.
         var brokenFiles: [String] = []
+        let folderPrefix = projectFolder.hasSuffix("/") ? projectFolder : projectFolder + "/"
         for path in FileBackupService.shared.snapshottedFiles() {
             let attrs = try? FileManager.default.attributesOfItem(atPath: path)
+            if attrs == nil && !path.hasPrefix(folderPrefix) { continue }
             guard let attrs, let size = attrs[.size] as? Int, size > 0 else {
                 brokenFiles.append(path)
                 continue
