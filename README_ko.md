@@ -9,10 +9,6 @@
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
-<img src="agent-demo.gif" width="900" alt="Agent!가 macOS 손쉬운 사용 API를 통해 Photo Booth를 자동화 — 자연어 요청 한 번으로 사진 촬영을 처음부터 끝까지 수행" />
-
-*Agent!가 손쉬운 사용으로 Photo Booth를 조작 — 클릭도, 스크립트도 없이 그저 "사진 찍어줘".*
-
 ## 🆕 새로운 강자 등장: AgentiLoop CLI ⚡️
 
 **에이전틱 루프, 이제 당신의 터미널에서 해방됩니다. Mac. Windows. Linux. 선택은 당신의 몫.**

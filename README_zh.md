@@ -9,10 +9,6 @@
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
-<img src="agent-demo.gif" width="900" alt="Agent! 通过 macOS 辅助功能 API 自动操作 Photo Booth——仅凭一句自然语言指令即可端到端完成拍照" />
-
-*Agent! 通过辅助功能驱动 Photo Booth——无需点击、无需脚本，只需说"拍张照片"。*
-
 ## 🆕 新面孔登场：AgentiLoop CLI ⚡️
 
 **智能体循环，在你的终端中全面释放。Mac、Windows、Linux，随你挑选。**

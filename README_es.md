@@ -9,10 +9,6 @@
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
-<img src="agent-demo.gif" width="900" alt="Agent! automatizando Photo Booth a través de la API de Accesibilidad de macOS — toma una foto de principio a fin a partir de una sola petición en lenguaje natural" />
-
-*Agent! controlando Photo Booth mediante Accesibilidad — sin clics, sin scripts, solo "toma una foto".*
-
 ## 🆕 El nuevo del barrio: AgentiLoop CLI ⚡️
 
 **El bucle agéntico, desatado en tu terminal. Mac. Windows. Linux. Tú eliges.**
