@@ -26,6 +26,17 @@ extension AgentViewModel {
             let gateFolder = Self.resolvedWorkingDirectory(
                 tab.projectFolder.isEmpty ? projectFolder : tab.projectFolder
             )
+            if let refusal = Self.missingOutputRefusal(
+                summary: input["summary"] as? String ?? "",
+                responseText: tab.rawLLMOutput
+            ) {
+                tab.appendLog("↩️ Requested output missing — asking the model to write it out")
+                tab.flush()
+                return TabToolResult(
+                    toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": refusal],
+                    isComplete: false
+                )
+            }
             if let blocker = await completionGateBlocker(
                 commandsRun: tab.taskCommandsRun,
                 projectFolder: gateFolder,

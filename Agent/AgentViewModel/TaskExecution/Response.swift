@@ -111,6 +111,15 @@ extension AgentViewModel {
                             """)
                         continue
                     }
+                    if blockedCompletion == nil,
+                       let refusal = Self.missingOutputRefusal(
+                           summary: input["summary"] as? String ?? "",
+                           responseText: responseContent.compactMap { $0["text"] as? String }.joined()
+                       ) {
+                        appendLog("↩️ Requested output missing — asking the model to write it out")
+                        blockedCompletion = (toolId: toolId, message: refusal)
+                        continue
+                    }
                     if blockedCompletion == nil, let blocker = await completionGateBlocker() {
                         blockedCompletion = (toolId: toolId, message: blocker)
                         continue
@@ -198,6 +207,31 @@ extension AgentViewModel {
             taskCompleted: false,
             blockedCompletion: blockedCompletion
         )
+    }
+
+    /// Refuse task_complete when the summary points at content ("below",
+    /// "above", "here's the story:") that was never actually written — the
+    /// user would see a promise with nothing behind it. Returns nil when the
+    /// summary or the turn's text carries real content.
+    nonisolated static func missingOutputRefusal(summary: String, responseText: String) -> String? {
+        let s = summary.trimmingCharacters(in: .whitespacesAndNewlines)
+        let text = responseText.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Enough delivered content already — nothing missing.
+        if s.count >= 600 || text.count >= 600 { return nil }
+        let lower = s.lowercased()
+        let pointers = [
+            "(below)", "see below", "shown below", "written below", "is below", "are below",
+            "provided below", "included below", "below:", "as follows", "the following:",
+            "(above)", "see above", "shown above", "written above", "provided above"
+        ]
+        let pointsElsewhere = pointers.contains { lower.contains($0) } || lower.hasSuffix(":")
+        guard pointsElsewhere else { return nil }
+        return """
+            Refused: your summary refers to content ("below"/"above"/"as follows") that you \
+            never wrote, so the user sees nothing. Call task_complete again with the COMPLETE \
+            requested output (the full story, answer, list, code, etc.) written directly in \
+            the summary — not a description of it.
+            """
     }
 
     /// Coerce a tool_use `input` into a dictionary. Accepts a dictionary as-is,
