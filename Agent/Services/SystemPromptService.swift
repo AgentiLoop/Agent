@@ -144,6 +144,22 @@ final class SystemPromptService {
         return base + "\n" + antiHallucinationRules + "\n" + efficientActionRules
     }
 
+    /// Condensed rules for the compact prompt (Apple AI / local endpoints) —
+    /// same contract as the full rules at roughly a fifth of the size.
+    static let compactRules = """
+
+    RULES:
+    - Never fabricate. Claim only what a tool result shows; cite file:line. If unsure, say so or call done() — never guess.
+    - Never claim an action you did not perform with a tool call.
+    - Read a file once before editing it; edits to unread files are refused (the refusal returns the file — retry the edit with it, don't re-read).
+    - One file at a time. Be concise. Act when you have enough evidence.
+    - After saying you found the fix, the next call must be an edit.
+    """
+
+    static func wrapWithCompactRules(_ base: String) -> String {
+        return base + "\n" + compactRules
+    }
+
     /// Combined version stamp written into each prompt file's first line.
     /// Format: `<marketing>.<build>` — e.g. `1.0.68.156`. Any change to either
     /// component triggers a re-sync of the on-disk defaults on next launch.
@@ -333,6 +349,6 @@ final class SystemPromptService {
     /// The built-in default compact prompt (Apple AI).
     private static func defaultCompactPrompt() -> String {
         let base = AgentTools.compactSystemPrompt(userName: "{userName}", userHome: "{userHome}", projectFolder: "{projectFolder}")
-        return wrapWithRules(base)
+        return wrapWithCompactRules(base)
     }
 }

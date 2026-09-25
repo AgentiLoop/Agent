@@ -73,7 +73,7 @@ final class ClaudeService {
         if let override = overrideSystemPrompt { return override }
         if isLocalhostEndpoint {
             // Local Claude-protocol endpoints (LM Studio) bypass SystemPromptService — wrap with anti-hallucination rules to match other providers.
-            return SystemPromptService.wrapWithRules(
+            return SystemPromptService.wrapWithCompactRules(
                 AgentTools.compactSystemPrompt(userName: userName, userHome: userHome, projectFolder: projectFolder)
             )
         }

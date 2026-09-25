@@ -127,7 +127,7 @@ final class OpenAICompatibleService {
         if let override = overrideSystemPrompt { return override }
         if isLMStudio {
             // LM Studio bypasses SystemPromptService — wrap with anti-hallucination rules to match disk-seeded prompts.
-            return SystemPromptService.wrapWithRules(
+            return SystemPromptService.wrapWithCompactRules(
                 AgentTools.compactSystemPrompt(userName: userName, userHome: userHome, projectFolder: projectFolder)
             )
         }
