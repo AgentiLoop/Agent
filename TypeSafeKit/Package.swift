@@ -1,4 +1,4 @@
-// swift-tools-version: 6.4
+// swift-tools-version: 6.2
 // TypeSafeKit — Swift client for the TypeSafe AI System One API (Jev).
 // Wire protocol: POST https://api.typesafe.ai/v1/systemone, GET /v1/models.
 
