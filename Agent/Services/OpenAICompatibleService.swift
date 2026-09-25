@@ -857,7 +857,6 @@ final class OpenAICompatibleService {
             // Skip empty lines and SSE comments
             guard line.hasPrefix("data: ") else { continue }
             let payload = String(line.dropFirst(6))
-            if firstByte == nil { firstByte = Date() }
 
             // End of stream
             if payload == "[DONE]" { break }
@@ -897,6 +896,14 @@ final class OpenAICompatibleService {
             }
 
             guard let delta = firstChoice["delta"] as? [String: Any] else { continue }
+            // Stamp first REAL token — the opening role-only chunk arrives before prefill finishes.
+            if firstByte == nil,
+               !((delta["content"] as? String) ?? "").isEmpty
+               || !((delta["reasoning_content"] as? String) ?? "").isEmpty
+               || delta["tool_calls"] != nil
+            {
+                firstByte = Date()
+            }
 
             // Gemini thought_signature — nested under extra_content.google.thought_signature
             if let extra = delta["extra_content"] as? [String: Any],
