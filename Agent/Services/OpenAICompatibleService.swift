@@ -150,12 +150,22 @@ final class OpenAICompatibleService {
         if supportsVision {
             prompt += "\nYou have VISION. When images are attached, you can see and analyze them."
         }
+        if splitsVolatileContext { return prompt }
         if !historyContext.isEmpty {
             prompt += historyContext
         }
         prompt += stateBlocks
         return prompt
     }
+
+    /// oMLX / vLLM: keep the system message byte-stable across tasks so the
+    /// server's prefix cache covers system + tool schemas; the per-task tab
+    /// history and state blocks go on the first user turn (convertMessages).
+    private var splitsVolatileContext: Bool {
+        overrideSystemPrompt == nil && (provider == .oMLX || provider == .vLLM)
+    }
+
+    private var volatileContext: String { historyContext + stateBlocks }
 
     func tools(activeGroups: Set<String>? = nil, compact: Bool = false) -> [[String: Any]] {
         // No mode-based narrowing — every user-enabled tool flows through.
@@ -334,6 +344,26 @@ final class OpenAICompatibleService {
                         }
                     }
                     chatMessages.append(assistantMsg)
+                }
+            }
+        }
+        // Local chat templates (Qwen etc.) render tool schemas AFTER the system text, so
+        // per-task context in the system message forced a full re-prefill of every tool.
+        // Carry it on the first user turn instead — system + tools stay prefix-cached.
+        if splitsVolatileContext {
+            let context = volatileContext.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !context.isEmpty {
+                let note = "[Context]\n\(context)\n\n"
+                if chatMessages.count > 1, chatMessages[1]["role"] as? String == "user",
+                   let text = chatMessages[1]["content"] as? String
+                {
+                    chatMessages[1]["content"] = note + text
+                } else if chatMessages.count > 1, chatMessages[1]["role"] as? String == "user",
+                          let parts = chatMessages[1]["content"] as? [[String: Any]]
+                {
+                    chatMessages[1]["content"] = [["type": "text", "text": note]] + parts
+                } else {
+                    chatMessages.insert(["role": "user", "content": note], at: 1)
                 }
             }
         }
