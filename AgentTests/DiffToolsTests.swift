@@ -505,4 +505,12 @@ struct CodingServiceRegressionTests {
         #expect(a != b)
         #expect(FileBackupService.shared.listBackups(tabID: tab).count == 2)
     }
+
+    @Test("isReadOnly rejects a write hidden behind a mid-segment &")
+    func readOnlyBackgroundAmpersand() {
+        #expect(!ShellSafetyService.isReadOnly("ls & rm -rf build"))
+        #expect(!ShellSafetyService.isReadOnly("cat a.txt&touch b"))
+        #expect(ShellSafetyService.isReadOnly("ls -la 2>&1"))
+        #expect(ShellSafetyService.isReadOnly("ls -la &>/dev/null"))
+    }
 }
