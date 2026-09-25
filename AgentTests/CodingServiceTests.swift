@@ -304,4 +304,59 @@ struct CodingServiceTests {
         let result = AgentViewModel.preview("", lines: 3)
         #expect(result == "")
     }
+
+    // MARK: - Regression tests (bug fixes)
+
+    @Test("readFile with negative limit does not crash")
+    func readFileNegativeLimit() throws {
+        let dir = try makeTempDir()
+        defer { cleanup(dir) }
+        let file = "\(dir)/neg.txt"
+        try "a\nb\nc".write(toFile: file, atomically: true, encoding: .utf8)
+        let result = CodingService.readFile(path: file, offset: 2, limit: -5)
+        #expect(result.contains("2\tb"))
+    }
+
+    @Test("diffAndApply rejects out-of-range and inverted line ranges")
+    func diffApplyBadRange() throws {
+        let dir = try makeTempDir()
+        defer { cleanup(dir) }
+        let file = "\(dir)/range.txt"
+        try "one\ntwo\nthree".write(toFile: file, atomically: true, encoding: .utf8)
+        let beyond = CodingService.diffAndApply(path: file, source: nil, destination: "x", startLine: 10, endLine: 12)
+        #expect(beyond.output.hasPrefix("Error: invalid line range"))
+        let inverted = CodingService.diffAndApply(path: file, source: nil, destination: "x", startLine: 3, endLine: 1)
+        #expect(inverted.output.hasPrefix("Error: invalid line range"))
+        #expect(try String(contentsOfFile: file, encoding: .utf8) == "one\ntwo\nthree")
+    }
+
+    @Test("fuzzyMatchLines spans interior blank lines")
+    func fuzzyMatchBlankLines() {
+        let file = "a\nfunc foo() {\n\n    return 1\n}\nb"
+        let source = "func foo()  {\n\n  return 1\n}"
+        #expect(CodingService.fuzzyMatchLines(source: source, in: file) == 1..<5)
+    }
+
+    @Test("diffAndApply fuzzy path does not leave stale lines")
+    func diffApplyFuzzyBlankLines() throws {
+        let dir = try makeTempDir()
+        defer { cleanup(dir) }
+        let file = "\(dir)/fuzzy.txt"
+        try "a\nfunc foo() {\n\n    return 1\n}\nb".write(toFile: file, atomically: true, encoding: .utf8)
+        let r = CodingService.diffAndApply(path: file, source: "func foo()  {\n\n  return 1\n}", destination: "func foo() { 2 }")
+        #expect(r.output.hasPrefix("Applied"))
+        #expect(try String(contentsOfFile: file, encoding: .utf8) == "a\nfunc foo() { 2 }\nb")
+    }
+
+    @Test("editFile replace_all works with fuzzy whitespace match")
+    func editReplaceAllFuzzy() throws {
+        let dir = try makeTempDir()
+        defer { cleanup(dir) }
+        let file = "\(dir)/ra.txt"
+        try "\tlet value = 1\nother".write(toFile: file, atomically: true, encoding: .utf8)
+        let r = CodingService.editFile(path: file, oldString: "    let value = 1", newString: "    let value = 2", replaceAll: true)
+        #expect(r.hasPrefix("Replaced 1 occurrence"))
+        #expect(try String(contentsOfFile: file, encoding: .utf8).contains("let value = 2"))
+    }
 }
+

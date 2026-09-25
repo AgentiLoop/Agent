@@ -112,7 +112,7 @@ enum CodingService {
 
         let lines = content.components(separatedBy: "\n")
         let startLine = max((offset ?? 1) - 1, 0)
-        let maxLines = limit ?? 2000
+        let maxLines = max(limit ?? 2000, 1)
 
         guard startLine < lines.count else {
             return "Error: offset \(startLine + 1) exceeds file length (\(lines.count) lines)"
@@ -271,7 +271,7 @@ enum CodingService {
 
         // 3. Compute the proposed updated content
         let updated: String
-        if replaceAll {
+        if replaceAll && occurrences > 0 {
             updated = original.replacingOccurrences(of: needle, with: replacement)
         } else if let range = matchRange {
             updated = original.replacingCharacters(in: range, with: replacement)
@@ -325,7 +325,7 @@ enum CodingService {
         // 8. Return d1f's .ai-format preview + label + line-number metadata
         let preview = MultiLineDiff.displayDiff(diff: diff, source: original, format: .ai)
         let label: String
-        if replaceAll {
+        if replaceAll && occurrences > 0 {
             label = "\(occurrences) occurrence(s)"
         } else {
             label = "1 occurrence" + matchNote
@@ -459,9 +459,12 @@ enum CodingService {
     /// line-level similarity score. Returns a `Range<Int>` (line indices) suitable
     /// for `Array.replaceSubrange`. Returns nil when no reasonable match exists.
     static func fuzzyMatchLines(source: String, in fullText: String) -> Range<Int>? {
-        let srcLines = source.components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty }
-        guard srcLines.count >= 2 else { return nil }
+        // Keep interior blank lines so the matched window spans the same number of
+        // file lines as the source; only strip leading/trailing blank lines.
+        var srcLines = source.components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
+        while srcLines.first?.isEmpty == true { srcLines.removeFirst() }
+        while srcLines.last?.isEmpty == true { srcLines.removeLast() }
+        guard srcLines.filter({ !$0.isEmpty }).count >= 2 else { return nil }
 
         let fileLines = fullText.components(separatedBy: "\n")
         let srcCount = srcLines.count
@@ -478,7 +481,8 @@ enum CodingService {
                 let fileTrimmed = fileLines[i + j].trimmingCharacters(in: .whitespaces)
                 if fileTrimmed == srcLines[j] {
                     score += 2  // exact match (ignoring whitespace)
-                } else if fileTrimmed.contains(srcLines[j]) || srcLines[j].contains(fileTrimmed) {
+                } else if !fileTrimmed.isEmpty, !srcLines[j].isEmpty,
+                          fileTrimmed.contains(srcLines[j]) || srcLines[j].contains(fileTrimmed) {
                     score += 1  // partial match
                 }
             }
@@ -550,6 +554,9 @@ enum CodingService {
             let allLines = fullText.components(separatedBy: "\n")
             let s = max(sl - 1, 0)
             let e = min(el, allLines.count)
+            guard s < e else {
+                return ("Error: invalid line range \(sl)-\(el) for file with \(allLines.count) lines. start_line must be <= end_line and within the file.", "")
+            }
             actualSource = allLines[s..<e].joined(separator: "\n")
 
             guard actualSource != destination else {
@@ -566,7 +573,7 @@ enum CodingService {
                     let providedLines = providedSource.components(separatedBy: "\n")
                     let mismatchLine = zip(actualLines, providedLines).enumerated().first(where: { $0.element.0 != $0.element.1 })
                     let detail = mismatchLine.map { "First mismatch at line \($0.offset + 1) within the range." } ?? "Line counts differ (actual: \(actualLines.count), provided: \(providedLines.count))."
-                    return ("Error: source verification failed — the file content at lines \(sl+1)–\(e) does not match the provided source parameter. \(detail) The file may have changed since your last read. Recovery: re-read the file, then retry with updated line numbers and source.", "")
+                    return ("Error: source verification failed — the file content at lines \(s + 1)–\(e) does not match the provided source parameter. \(detail) The file may have changed since your last read. Recovery: re-read the file, then retry with updated line numbers and source.", "")
                 }
             }
 
