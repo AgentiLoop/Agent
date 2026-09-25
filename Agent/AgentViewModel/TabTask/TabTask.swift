@@ -124,6 +124,9 @@ extension AgentViewModel {
         // Tier 8: edits in this task must be preceded by a read in this task.
         Self.clearEditGateForTab(tabID: tab.id)
         Self.resetEditCycleTracking()
+        // Verify gate reads these — without this, files edited (then moved) in a
+        // previous tab task kept blocking completion in every later task.
+        FileBackupService.shared.clearTaskSnapshots()
         if let stale = GoalStateStore.shared.clearIfStale() {
             tab.appendLog("🎯 Cleared stale goal (untouched >24h): \(stale.prefix(60))")
         }
