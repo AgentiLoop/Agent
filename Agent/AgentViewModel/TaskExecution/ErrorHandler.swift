@@ -66,33 +66,6 @@ extension AgentViewModel {
             return .lowerMaxTokens(cap.limit)
         }
 
-        // Local server ran out of memory for Agent!'s prompt (oMLX prefill
-        // memory guard, MLX/Metal OOM). Retrying or pruning can't fix it — the
-        // system prompt + tool schemas alone don't fit — so stop immediately.
-        let lower = errMsg.lowercased()
-        // oMLX preflight refused to send: the reason is already specific.
-        if lower.contains("omlx preflight:") {
-            appendLog("❌ \(errMsg)\nPick a smaller/faster model, a Mac with more memory, or a cloud provider.")
-            flushLog()
-            return .breakLoop
-        }
-        // oMLX can also stall silently in prefill (no error, no bytes) until
-        // the idle timeout fires — retrying just stalls again.
-        let oMLXStalled = provider == .oMLX && (lower.contains("timed out") || lower.contains("timeout"))
-        if oMLXStalled || lower.contains("memory guard") || lower.contains("prefill would require")
-            || lower.contains("out of memory") || lower.contains("insufficient memory")
-        {
-            appendLog(
-                """
-                ❌ The selected LLM (\(provider.rawValue)) is not large enough for Agent! — it \(oMLXStalled ? "stalled without answering" : "ran out of memory on") Agent!'s prompt. Stopping.
-                Pick a model with more memory headroom / a larger context, or a cloud provider.
-                Original error: \(errMsg.prefix(300))
-                """
-            )
-            flushLog()
-            return .breakLoop
-        }
-
         // Context overflow — prune messages aggressively and retry.
         // Detection narrowed: require an "exceed/too long/too many" phrase alongside
         // the keyword. Plain "max_tokens" appears in unrelated parameter errors

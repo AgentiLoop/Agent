@@ -52,8 +52,6 @@ final class OpenAICompatibleService {
     /// Opt-in via the Reasoning setting — providers that reject the param surface
     /// the error and the user turns it off.
     var reasoningEffort: String = ""
-    /// Status lines for the task log (oMLX preflight result).
-    var onStatus: ((String) -> Void)?
 
     /// Real OpenAI goes through `/v1/responses`. Current OpenAI models
     /// (gpt-6-astra) reject function tools on `/v1/chat/completions` unless
@@ -150,24 +148,12 @@ final class OpenAICompatibleService {
         if supportsVision {
             prompt += "\nYou have VISION. When images are attached, you can see and analyze them."
         }
-        if splitsVolatileContext { return prompt }
         if !historyContext.isEmpty {
             prompt += historyContext
         }
         prompt += stateBlocks
         return prompt
     }
-
-    /// oMLX / vLLM: keep the system message byte-stable across tasks so the
-    /// server's prefix cache covers system + tool schemas; the per-task tab
-    /// history and state blocks go on the first user turn (convertMessages).
-    private var splitsVolatileContext: Bool {
-        overrideSystemPrompt == nil && (provider == .oMLX || provider == .vLLM)
-    }
-
-    // Memory (stable across tasks) first, chat history (changes every task) last,
-    // so the server's prefix cache extends through the memory block.
-    private var volatileContext: String { stateBlocks + historyContext }
 
     func tools(activeGroups: Set<String>? = nil, compact: Bool = false) -> [[String: Any]] {
         // No mode-based narrowing — every user-enabled tool flows through.
@@ -349,26 +335,6 @@ final class OpenAICompatibleService {
                 }
             }
         }
-        // Local chat templates (Qwen etc.) render tool schemas AFTER the system text, so
-        // per-task context in the system message forced a full re-prefill of every tool.
-        // Carry it on the first user turn instead — system + tools stay prefix-cached.
-        if splitsVolatileContext {
-            let context = volatileContext.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !context.isEmpty {
-                let note = "[Context]\n\(context)\n\n"
-                if chatMessages.count > 1, chatMessages[1]["role"] as? String == "user",
-                   let text = chatMessages[1]["content"] as? String
-                {
-                    chatMessages[1]["content"] = note + text
-                } else if chatMessages.count > 1, chatMessages[1]["role"] as? String == "user",
-                          let parts = chatMessages[1]["content"] as? [[String: Any]]
-                {
-                    chatMessages[1]["content"] = [["type": "text", "text": note]] + parts
-                } else {
-                    chatMessages.insert(["role": "user", "content": note], at: 1)
-                }
-            }
-        }
         // Mistral requires strict tool message ordering: tool messages follow assistant with tool_calls, response count equals tool_calls count
         if provider == .mistral || provider == .vibe {
             var cleaned: [[String: Any]] = []
@@ -543,32 +509,15 @@ final class OpenAICompatibleService {
             }
         }
 
-        // Ask for the final usage chunk so the oMLX timing line can show cached tokens.
-        if provider == .oMLX { body["stream_options"] = ["include_usage": true] }
         // .sortedKeys for byte-stable prefix caching — see send() for rationale.
         let bodyData = try JSONSerialization.data(withJSONObject: body, options: [.sortedKeys])
-        var idleTimeout: TimeInterval?
-        if provider == .oMLX {
-            // Throws (before anything is sent) when the model can't take the prompt.
-            let report = try await OMLXPreflight.check(bodyData: bodyData, chatURL: baseURL, apiKey: apiKey, model: model)
-            onStatus?(report.summary)
-            idleTimeout = report.timeout
-        }
-        let started = Date()
-        let result = try await Self.performStreamingRequest(
+        return try await Self.performStreamingRequest(
             bodyData: bodyData,
             apiKey: apiKey,
             url: baseURL,
             provider: provider,
-            idleTimeout: idleTimeout,
             onTextDelta: onTextDelta
         )
-        if provider == .oMLX, let t = result.timing {
-            let first = t.firstByte.map { String(format: "%.1fs", $0.timeIntervalSince(started)) } ?? "–"
-            let cached = t.cachedTokens.map { " (\($0) cached)" } ?? ""
-            onStatus?("⏱️ oMLX: first token \(first), total \(String(format: "%.1fs", Date().timeIntervalSince(started))) — prompt \(result.inputTokens) tok\(cached), output \(result.outputTokens) tok")
-        }
-        return (result.content, result.stopReason, result.inputTokens, result.outputTokens)
     }
     // MARK: - OpenAI Responses API
 
@@ -790,18 +739,14 @@ final class OpenAICompatibleService {
 
     nonisolated private static func performStreamingRequest(
         bodyData: Data, apiKey: String, url: URL, provider: APIProvider,
-        idleTimeout: TimeInterval? = nil,
         onTextDelta: @escaping @Sendable (String) -> Void
-    ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int,
-                       timing: (firstByte: Date?, cachedTokens: Int?)?) {
+    ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.httpBody = bodyData
-        // Idle timeout (resets on every byte). oMLX is silent during prefill, so
-        // it gets the preflight's prefill-sized timeout instead of 3 hours.
-        request.timeoutInterval = idleTimeout ?? llmAPITimeout
+        request.timeoutInterval = llmAPITimeout
 
         let (bytes, response) = try await URLSession.shared.bytes(for: request)
 
@@ -829,8 +774,6 @@ final class OpenAICompatibleService {
         var finishReason = "stop"
         var streamInputTokens = 0
         var streamOutputTokens = 0
-        var firstByte: Date?
-        var cachedTokens: Int?
 
         // Accumulate streamed tool calls: index -> (id, name, arguments)
         var toolCallAccum: [Int: (id: String, name: String, arguments: String)] = [:]
@@ -878,7 +821,6 @@ final class OpenAICompatibleService {
             if let usage = json["usage"] as? [String: Any] {
                 streamInputTokens = usage["prompt_tokens"] as? Int ?? streamInputTokens
                 streamOutputTokens = usage["completion_tokens"] as? Int ?? streamOutputTokens
-                cachedTokens = (usage["prompt_tokens_details"] as? [String: Any])?["cached_tokens"] as? Int ?? cachedTokens
                 Self.recordCacheHits(from: usage)
             }
 
@@ -898,14 +840,6 @@ final class OpenAICompatibleService {
             }
 
             guard let delta = firstChoice["delta"] as? [String: Any] else { continue }
-            // Stamp first REAL token — the opening role-only chunk arrives before prefill finishes.
-            if firstByte == nil,
-               !((delta["content"] as? String) ?? "").isEmpty
-               || !((delta["reasoning_content"] as? String) ?? "").isEmpty
-               || delta["tool_calls"] != nil
-            {
-                firstByte = Date()
-            }
 
             // Gemini thought_signature — nested under extra_content.google.thought_signature
             if let extra = delta["extra_content"] as? [String: Any],
@@ -1101,6 +1035,6 @@ final class OpenAICompatibleService {
         let hasToolCalls = !toolCallAccum.isEmpty || parsedToolFromText
         let stopReason = hasToolCalls ? "tool_use" :
             (finishReason == "tool_calls" ? "tool_use" : (finishReason == "length" ? "max_tokens" : "end_turn"))
-        return (contentBlocks, stopReason, streamInputTokens, streamOutputTokens, (firstByte, cachedTokens))
+        return (contentBlocks, stopReason, streamInputTokens, streamOutputTokens)
     }
 }

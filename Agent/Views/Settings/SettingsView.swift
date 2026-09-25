@@ -402,36 +402,32 @@ struct SettingsView: View {
                         }
                     }
                 }
-            } else if viewModel.selectedProvider == .vLLM || viewModel.selectedProvider == .oMLX {
-                // vLLM / oMLX settings (both OpenAI-compatible local servers)
-                let isOMLX = viewModel.selectedProvider == .oMLX
+            } else if viewModel.selectedProvider == .vLLM {
+                // vLLM settings
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(viewModel.selectedProvider.displayName)
+                    Text("vLLM")
                         .font(.headline)
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Endpoint").font(.caption).foregroundStyle(.secondary)
-                        TextField("http://localhost:8000/v1/chat/completions",
-                                  text: isOMLX ? $viewModel.oMLXEndpoint : $viewModel.vLLMEndpoint)
+                        TextField("http://localhost:8000/v1/chat/completions", text: $viewModel.vLLMEndpoint)
                             .textFieldStyle(.roundedBorder)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key (optional)").font(.caption).foregroundStyle(.secondary)
-                        LockedSecureField(text: $viewModel.apiKeys[viewModel.selectedProvider],
-                                          placeholder: isOMLX ? "Optional — defaults to ~/.omlx/settings.json" : "Optional",
-                                          lockKey: "lock.apiKeys[.\(viewModel.selectedProvider.rawValue)]")
+                        LockedSecureField(text: $viewModel.apiKeys[.vLLM], placeholder: "Optional", lockKey: "lock.apiKeys[.vLLM]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Model").font(.caption).foregroundStyle(.secondary)
                         HStack {
-                            if viewModel.modelLists[viewModel.selectedProvider].isEmpty {
-                                TextField("Model name", text: $viewModel.models[viewModel.selectedProvider])
+                            if viewModel.modelLists[.vLLM].isEmpty {
+                                TextField("Model name", text: $viewModel.models[.vLLM])
                                     .textFieldStyle(.roundedBorder)
                             } else {
-                                Picker("Model", selection: $viewModel.models[viewModel.selectedProvider]) {
-                                    ForEach(viewModel.modelLists[viewModel.selectedProvider]) { model in
+                                Picker("Model", selection: $viewModel.models[.vLLM]) {
+                                    ForEach(viewModel.modelLists[.vLLM]) { model in
                                         Text(model.name).tag(model.id)
                                     }
                                 }
@@ -439,9 +435,9 @@ struct SettingsView: View {
                             }
 
                             Button {
-                                viewModel.fetchModelsIfNeeded(for: viewModel.selectedProvider, force: true)
+                                viewModel.fetchModelsIfNeeded(for: .vLLM, force: true)
                             } label: {
-                                if viewModel.fetchingModels.contains(viewModel.selectedProvider) {
+                                if viewModel.fetchingModels.contains(.vLLM) {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
@@ -450,7 +446,7 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .disabled(viewModel.fetchingModels.contains(viewModel.selectedProvider))
+                            .disabled(viewModel.fetchingModels.contains(.vLLM))
                             .help("Fetch available models")
                         }
                     }

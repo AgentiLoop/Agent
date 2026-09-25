@@ -33,7 +33,7 @@ Agent! ファミリーの新メンバーを紹介します。**まったく�
 
 **一つのアプリ。どんな AI でも。Mac を完全に掌握。**
 
-Agent! は 100% ネイティブの Swift 6.2 / SwiftUI アプリで、**23 の LLM プロバイダー** — Claude、Codex、OpenAI、Gemini、Grok、Mistral、Mistral Vibe、DeepSeek、Hugging Face、Z.ai、BigModel、Alibaba DashScope、Qwen、Qwen Code、MiniMax、OpenRouter、Requesty、A2Agent、OrcaRouter、Ollama（クラウドおよびローカル）、vLLM、LM Studio、oMLX — に加えてオンデバイスの **Apple Intelligence** を、実際に*物事を成し遂げる*自律タスクループへとつなぎます：コードベースを読み、バグを修正し、Xcode プロジェクトをビルドし、diff をコミットし、アクセシビリティ API であらゆる Mac アプリを操作し、あなたまたは root としてシェルコマンドを実行し、iMessage で結果を送り、話しかけた*「Agent!」*に応答します。
+Agent! は 100% ネイティブの Swift 6.2 / SwiftUI アプリで、**22 の LLM プロバイダー** — Claude、Codex、OpenAI、Gemini、Grok、Mistral、Mistral Vibe、DeepSeek、Hugging Face、Z.ai、BigModel、Alibaba DashScope、Qwen、Qwen Code、MiniMax、OpenRouter、Requesty、A2Agent、OrcaRouter、Ollama（クラウドおよびローカル）、vLLM、LM Studio — に加えてオンデバイスの **Apple Intelligence** を、実際に*物事を成し遂げる*自律タスクループへとつなぎます：コードベースを読み、バグを修正し、Xcode プロジェクトをビルドし、diff をコミットし、アクセシビリティ API であらゆる Mac アプリを操作し、あなたまたは root としてシェルコマンドを実行し、iMessage で結果を送り、話しかけた*「Agent!」*に応答します。
 
 NPM も Electron もサブスクリプションもテレメトリもありません。自分の API キーを使うか、完全にローカルで実行するか、Apple Intelligence で無料で実行してください。依存するすべての Swift パッケージは同じ作者が書きました。下の[背景](#背景)をご覧ください。
 
@@ -126,7 +126,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Google Gemini** | | 有料（無料枠あり） | 長いコンテキスト、ビジョン |
 | **Grok**（xAI） | | 有料 | リアルタイム情報 |
 | **Hugging Face** | | さまざま | オープンモデル、サーバーレスまたは専用エンドポイント |
-| **ローカル Ollama** / **vLLM** / **LM Studio** / **oMLX** | | 無料 + ハードウェア | 完全オフライン。モデルごとの実際のコンテキストウィンドウを検出 |
+| **ローカル Ollama** / **vLLM** / **LM Studio** | | 無料 + ハードウェア | 完全オフライン。モデルごとの実際のコンテキストウィンドウを検出 |
 | **MiniMax** | | 安価 | 1M トークンコンテキスト |
 | **Mistral** / **Mistral Vibe** | | 有料 | オープンウェイトクラウド、コード、エージェント製品 |
 | **Ollama**（クラウド） | | 無料枠 | ホスト型オープンモデル |

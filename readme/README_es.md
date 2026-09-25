@@ -33,7 +33,7 @@ Conoce a los nuevos miembros de la familia Agent!: dos CLI multiplataforma con *
 
 **Una app. Cualquier IA. Control total de tu Mac.**
 
-Agent! es una app 100 % nativa en Swift 6.2 / SwiftUI que conecta **23 proveedores de LLM** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (nube y local), vLLM, LM Studio y oMLX — más **Apple Intelligence** en el dispositivo — a un bucle de tareas autónomo que realmente *hace cosas*: lee tu código, corrige el bug, compila el proyecto de Xcode, hace commit del diff, controla cualquier app de Mac mediante la API de Accesibilidad, ejecuta comandos de shell como tú o como root, te envía los resultados por iMessage y responde a un *«Agent!»* hablado.
+Agent! es una app 100 % nativa en Swift 6.2 / SwiftUI que conecta **22 proveedores de LLM** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (nube y local), vLLM y LM Studio — más **Apple Intelligence** en el dispositivo — a un bucle de tareas autónomo que realmente *hace cosas*: lee tu código, corrige el bug, compila el proyecto de Xcode, hace commit del diff, controla cualquier app de Mac mediante la API de Accesibilidad, ejecuta comandos de shell como tú o como root, te envía los resultados por iMessage y responde a un *«Agent!»* hablado.
 
 Sin NPM, sin Electron, sin suscripción, sin telemetría. Trae tu propia clave de API, ejecútalo totalmente en local o gratis con Apple Intelligence. Cada paquete Swift del que depende fue escrito por el mismo autor. Consulta la [Historia](#historia) más abajo.
 
@@ -129,7 +129,7 @@ Empresas y proveedores de LLM que quieran apoyar el proyecto: consulta [docs/SPO
 | **MiniMax** | | Barato | Contexto de 1M tokens |
 | **Mistral** / **Mistral Vibe** | | De pago | Nube de pesos abiertos, código, producto agente |
 | **Ollama** (nube) | | Nivel gratuito | Modelos abiertos alojados |
-| **Ollama local** / **vLLM** / **LM Studio** / **oMLX** | | Gratis + hardware | Totalmente offline; ventana de contexto real por modelo detectada |
+| **Ollama local** / **vLLM** / **LM Studio** | | Gratis + hardware | Totalmente offline; ventana de contexto real por modelo detectada |
 | **OpenAI** | | De pago | Uso general, llamadas a herramientas, visión, `reasoning_effort` |
 | **OpenRouter** | | De pago | 200+ modelos, una clave; Claude enrutado por protocolo Anthropic |
 | **OrcaRouter** | | De pago | 190+ modelos con una sola clave compatible con OpenAI al precio del proveedor; enrutado auto/fusion/fallback |

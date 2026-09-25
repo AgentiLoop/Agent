@@ -74,12 +74,8 @@ extension AgentViewModel {
         flushLog()
 
         // Use ChatHistoryStore for LLM context (summaries for older tasks, full messages for recent)
+        let historyContext = ChatHistoryStore.shared.buildLLMContext()
         var (provider, modelName, isVision) = resolveInitialProviderConfig()
-        // Local MLX/vLLM servers re-prefill this block every task (it changes each
-        // time) at a few hundred tok/s — keep the recent-task log short there.
-        let isLocalPrefill = provider == .oMLX || provider == .vLLM
-        let historyContext = ChatHistoryStore.shared.buildLLMContext(
-            maxRecentChars: isLocalPrefill ? 3_000 : LogLimits.historyContextChars)
         // Defer the "🧠 provider/model" log line until AFTER triage has run and we know we're actually going to the
         // cloud LLM. Logging it up-front (the previous behavior) made the activity log misleading when Apple AI handled the request locally — users saw both "🧠 Z.ai/glm-5.1" and "🍎 Opened Photo Booth and took a photo" for the same task even though the cloud LLM never ran.
         let displayModel = modelDisplayName(provider: provider, modelId: modelName)
@@ -317,10 +313,6 @@ extension AgentViewModel {
                     response = (r.content, r.stopReason, r.inputTokens, r.outputTokens)
 
                 } else if let openAICompatible = services.openAICompatible {
-                    openAICompatible.onStatus = { [weak self] line in
-                        self?.appendLog(line)
-                        self?.flushLog()
-                    }
                     let r = try await openAICompatible
                         .sendStreaming(messages: sendMessages, activeGroups: activeGroups) { [weak self] delta in
                             Task { @MainActor in

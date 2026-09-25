@@ -17193,6 +17193,9 @@
         }
       }
     },
+    "vLLM" : {
+
+    },
     "Web Search" : {
       "localizations" : {
         "de" : {

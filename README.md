@@ -33,7 +33,7 @@ Meet the Agent! family's newest members: two cross-platform CLIs with the **exac
 
 **One app. Any AI. Total command over your Mac.**
 
-Agent! is a 100% native Swift 6.4 / SwiftUI app that wires **23 LLM providers** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (cloud and local), vLLM, LM Studio, and oMLX — plus on-device **Apple Intelligence** — into an autonomous task loop that actually *does things*: reads your codebase, fixes the bug, builds the Xcode project, commits the diff, drives any Mac app through the Accessibility API, runs shell commands as you or as root, texts you results over iMessage, and answers to a spoken *"Agent!"*.
+Agent! is a 100% native Swift 6.4 / SwiftUI app that wires **22 LLM providers** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (cloud and local), vLLM, and LM Studio — plus on-device **Apple Intelligence** — into an autonomous task loop that actually *does things*: reads your codebase, fixes the bug, builds the Xcode project, commits the diff, drives any Mac app through the Accessibility API, runs shell commands as you or as root, texts you results over iMessage, and answers to a spoken *"Agent!"*.
 
 No NPM, no Electron, no subscription, no telemetry. Bring your own API key, run fully local, or run free on Apple Intelligence. Every Swift package it depends on was written by the same author. See [Backstory](#backstory) below.
 
@@ -126,7 +126,7 @@ Companies and LLM providers who want to support the project: see [docs/SPONSORSH
 | **Google Gemini** | | Paid (free tier) | Long context, vision |
 | **Grok** (xAI) | | Paid | Real-time info |
 | **Hugging Face** | | Varies | Open models, serverless or dedicated endpoints |
-| **Local Ollama** / **vLLM** / **LM Studio** / **oMLX** | | Free + hardware | Fully offline; real per-model context window detected |
+| **Local Ollama** / **vLLM** / **LM Studio** | | Free + hardware | Fully offline; real per-model context window detected |
 | **MiniMax** | | Cheap | 1M-token context |
 | **Mistral** / **Mistral Vibe** | | Paid | Open-weight cloud, code, agent product |
 | **Ollama** (cloud) | | Free tier | Hosted open models |
