@@ -198,9 +198,18 @@ extension AgentViewModel {
                 }
                 box.set(process)
 
-                // Read pipes then wait — osascript output is small, no deadlock risk
+                // Drain stderr concurrently: reading the pipes one after another deadlocks
+                // when the child writes >64 KB to stderr while stdout is still open.
+                let stderrBox = StderrBox()
+                let stderrGroup = DispatchGroup()
+                stderrGroup.enter()
+                DispatchQueue.global().async {
+                    stderrBox.data = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+                    stderrGroup.leave()
+                }
                 let stdoutData = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
-                let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+                stderrGroup.wait()
+                let stderrData = stderrBox.data
                 process.waitUntilExit()
 
                 var output = String(data: stdoutData, encoding: .utf8) ?? ""
@@ -213,6 +222,11 @@ extension AgentViewModel {
                 continuation.resume(returning: (process.terminationStatus, output))
             }
         }
+    }
+
+    /// Written once by the stderr drain thread, read after DispatchGroup.wait().
+    final class StderrBox: @unchecked Sendable {
+        var data = Data()
     }
 
     /// Holds the in-process `Process` so a Swift Task cancellation can kill it (and its
