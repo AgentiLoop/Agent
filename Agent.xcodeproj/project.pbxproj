@@ -205,7 +205,6 @@
 		EAE1E7262F7C02000079432C /* AgentAccess in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7252F7C02000079432C /* AgentAccess */; };
 		EAF3666F2F623D6A004B7E38 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = EAF3666E2F623D6A004B7E38 /* AppIcon.icon */; };
 		EAFA000000000000000001 /* FoundationModelService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFA000000000000000002 /* FoundationModelService.swift */; };
-		F4EDE7E05ED9DA2FF7BFEDD1 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F4EDE7E05ED9DA2FF7BFEDD0 /* Localizable.xcstrings */; };
 		EAHELP0000000000000001 /* Resources/Agent.help in Resources */ = {isa = PBXBuildFile; fileRef = EAHELP0000000000000002 /* Resources/Agent.help */; };
 		EASP000000000000000001 /* SystemPromptService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EASP000000000000000002 /* SystemPromptService.swift */; };
 		EASP000000000000000003 /* SystemPromptEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EASP000000000000000004 /* SystemPromptEditor.swift */; };
@@ -215,6 +214,7 @@
 		F035BAFA78E9DDFDF6DD5A1C /* TaskBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4128E21FF13BC4029D6548B /* TaskBannerView.swift */; };
 		F123A9EA71C5383EFFFF1A8A /* Rendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = C428D9A5859B0E1BB0D2FB6B /* Rendering.swift */; };
 		F36A58D7738933627DF110BF /* LLMCommonSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */; };
+		F4EDE7E05ED9DA2FF7BFEDD1 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F4EDE7E05ED9DA2FF7BFEDD0 /* Localizable.xcstrings */; };
 		FA10000000000000000101 /* LoopControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000100 /* LoopControl.swift */; };
 		FA10000000000000000103 /* PrefixStabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000102 /* PrefixStabilityTests.swift */; };
 		FA10000000000000000105 /* LoopReplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000104 /* LoopReplayTests.swift */; };
@@ -496,6 +496,7 @@
 		F03E40CE4E05384C443BA8A9 /* KeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcuts.swift; sourceTree = "<group>"; };
 		F1821936007B7A5B592EB0FE /* Shared/ProcessTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/ProcessTree.swift; sourceTree = SOURCE_ROOT; };
 		F212F6A04076958DD46FD1E4 /* CriticGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CriticGate.swift; sourceTree = "<group>"; };
+		F4EDE7E05ED9DA2FF7BFEDD0 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		FA10000000000000000100 /* LoopControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopControl.swift; sourceTree = "<group>"; };
 		FA10000000000000000102 /* PrefixStabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefixStabilityTests.swift; sourceTree = "<group>"; };
 		FA10000000000000000104 /* LoopReplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopReplayTests.swift; sourceTree = "<group>"; };
@@ -522,7 +523,6 @@
 		WEB1000000000000000004 /* WebAutomationService+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Navigation.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
-		F4EDE7E05ED9DA2FF7BFEDD0 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1205,7 +1205,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 2620;
+				LastUpgradeCheck = 2700;
 			};
 			buildConfigurationList = AA10000000000000000090 /* Build configuration list for PBXProject "Agent" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -1578,6 +1578,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -1644,6 +1645,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";

@@ -14,6 +14,8 @@ struct LLMUsageView: View {
     }
 
     @State private var scope: Scope = .current
+    /// Measured height of the model rows; drives the scroll area's height.
+    @State private var rowsHeight: CGFloat = 480
 
     /// Usage dictionary selected by the current scope.
     private var scopedUsage: [String: TokenUsageStore.ModelUsage] {
@@ -85,6 +87,10 @@ struct LLMUsageView: View {
                 let sorted = usage.sorted { $0.value.totalTokens > $1.value.totalTokens }
                 let maxTokens = sorted.first?.value.totalTokens ?? 1
 
+                // Model rows scroll; header and totals stay pinned. Height tracks
+                // the measured content, capped so the popover fits on screen.
+                ScrollView {
+                VStack(spacing: 0) {
                 ForEach(sorted, id: \.key) { model, usage in
                     VStack(spacing: 0) {
                         Divider()
@@ -167,6 +173,10 @@ struct LLMUsageView: View {
                         .padding(.horizontal)
                     }
                 }
+                }
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { rowsHeight = $0 }
+                }
+                .frame(height: min(rowsHeight, 480))
 
                 // Totals
                 VStack(spacing: 0) {
