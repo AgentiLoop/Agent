@@ -92,9 +92,7 @@ final class CodexService {
             userHome: userHome,
             projectFolder: projectFolder
         )
-        if !projectFolder.isEmpty {
-            s = "CURRENT PROJECT FOLDER: \(projectFolder)\n\n" + s
-        }
+        // Project folder is already in the base prompt ("Project: …").
         if !historyContext.isEmpty { s += historyContext }
         s += stateBlocks
         return s
