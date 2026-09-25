@@ -169,8 +169,6 @@ extension AgentViewModel {
             directCommandContext = ctx
         }
 
-        let tabHistoryContext = buildTabHistoryContext(tab: tab)
-
         // Use tab's project folder if set, otherwise fall back to main project folder
         // Resolve to directory (strip filename if path points to a file like .xcodeproj)
         let rawFolder = tab.projectFolder.isEmpty ? self.projectFolder : tab.projectFolder
@@ -179,6 +177,11 @@ extension AgentViewModel {
         var (provider, modelId) = resolvedLLMConfig(for: tab)
         tab.appendLog("🧠 \(provider.displayName) / \(modelId)")
         tab.flush()
+
+        // Local prefill servers (oMLX/vLLM) reprocess the tab output every task — keep it short.
+        let tabHistoryContext = buildTabHistoryContext(
+            tab: tab, maxChars: (provider == .oMLX || provider == .vLLM) ? 2000 : 8000
+        )
 
         var mt = maxTokens
         // Same first-request sizing as the main task: Claude's real output

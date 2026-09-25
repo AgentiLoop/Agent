@@ -11,9 +11,9 @@ extension AgentViewModel {
 
     /// / Build the tab's system history context string used as the LLM's / history context argument. Mirrors the inline
     /// block in the legacy / monolithic executeTabTask.
-    func buildTabHistoryContext(tab: ScriptTab) -> String {
-        // Build tab context from the existing log (cap at 8K characters)
-        let tabContext = String(tab.activityLog.suffix(8000))
+    func buildTabHistoryContext(tab: ScriptTab, maxChars: Int = 8000) -> String {
+        // Build tab context from the existing log (cap at maxChars characters)
+        let tabContext = String(tab.activityLog.suffix(maxChars))
         let tccNote: String
         let lowerName = tab.scriptName.lowercased()
         if lowerName == "osascript" {
