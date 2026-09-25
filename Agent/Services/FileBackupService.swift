@@ -37,7 +37,11 @@ final class FileBackupService {
         }
 
         let fileName = (filePath as NSString).lastPathComponent
-        let timestamp = ISO8601DateFormatter().string(from: Date())
+        // Millisecond resolution: two edits of the same file within one second
+        // previously collided on the backup name and copyItem failed.
+        let stampFormatter = ISO8601DateFormatter()
+        stampFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let timestamp = stampFormatter.string(from: Date())
             .replacingOccurrences(of: ":", with: "-")
         let backupName = "\(timestamp)_\(fileName)"
         let backupURL = tabDir.appendingPathComponent(backupName)
@@ -61,9 +65,13 @@ final class FileBackupService {
         guard let files = try? fm.contentsOfDirectory(atPath: tabDir.path) else { return [] }
 
         let formatter = ISO8601DateFormatter()
+        let fractionalFormatter = ISO8601DateFormatter()
+        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return files.compactMap { name -> (String, String, Date)? in
             // Parse timestamp_filename format: 2026-04-03T04-46-51Z_README.md
-            guard let underscoreRange = name.range(of: "_", range: name.index(name.startIndex, offsetBy: 15)..<name.endIndex)
+            // Names shorter than the timestamp prefix (e.g. ".DS_Store") would trap in index(offsetBy:).
+            guard let searchStart = name.index(name.startIndex, offsetBy: 15, limitedBy: name.endIndex),
+                  let underscoreRange = name.range(of: "_", range: searchStart..<name.endIndex)
             else { return nil }
             var timestampStr = String(name[..<underscoreRange.lowerBound])
             // Only restore colons in the time portion (after T), not the date hyphens
@@ -72,7 +80,7 @@ final class FileBackupService {
                     .replacingOccurrences(of: "-", with: ":")
                 timestampStr = String(timestampStr[...tIdx]) + timePart
             }
-            guard let date = formatter.date(from: timestampStr) else { return nil }
+            guard let date = fractionalFormatter.date(from: timestampStr) ?? formatter.date(from: timestampStr) else { return nil }
             let fileName = String(name[underscoreRange.upperBound...])
             let backupPath = tabDir.appendingPathComponent(name).path
             return (fileName, backupPath, date)
