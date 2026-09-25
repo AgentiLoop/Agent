@@ -39,7 +39,7 @@
 
   <!-- points -->
   <g class="s" font-size="15" fill="#334155">
-    <text x="44" y="266"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">Claude, OpenAI, Ollama, oMLX 및 모든 OpenAI 호환 모델</tspan></text>
+    <text x="44" y="266"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">Claude, OpenAI, Ollama 및 모든 OpenAI 호환 모델</tspan></text>
     <text x="44" y="292"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">전체 화면 TUI, 스트리밍, 세션 및 자동 압축</tspan></text>
     <text x="44" y="318"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">MCP 서버 — Agent!와 동일한 설정</tspan></text>
   </g>

@@ -39,7 +39,7 @@
 
   <!-- points -->
   <g class="s" font-size="15" fill="#334155">
-    <text x="44" y="266"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">Claude、OpenAI、Ollama、oMLX、あらゆる OpenAI 互換モデル</tspan></text>
+    <text x="44" y="266"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">Claude、OpenAI、Ollama、あらゆる OpenAI 互換モデル</tspan></text>
     <text x="44" y="292"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">フルスクリーン TUI、ストリーミング、セッション、自動コンパクション</tspan></text>
     <text x="44" y="318"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">MCP サーバー — Agent! と同じ設定</tspan></text>
   </g>

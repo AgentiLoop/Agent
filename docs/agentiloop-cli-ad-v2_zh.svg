@@ -39,7 +39,7 @@
 
   <!-- points -->
   <g class="s" font-size="15" fill="#334155">
-    <text x="44" y="266"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">Claude、OpenAI、Ollama、oMLX 以及任何兼容 OpenAI 的模型</tspan></text>
+    <text x="44" y="266"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">Claude、OpenAI、Ollama 以及任何兼容 OpenAI 的模型</tspan></text>
     <text x="44" y="292"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">全屏 TUI、流式输出、会话与自动压缩</tspan></text>
     <text x="44" y="318"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">MCP 服务器 — 与 Agent! 使用相同配置</tspan></text>
   </g>

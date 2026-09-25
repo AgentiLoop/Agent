@@ -39,7 +39,7 @@
 
   <!-- points -->
   <g class="s" font-size="15" fill="#334155">
-    <text x="44" y="266"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">Claude, OpenAI, Ollama, oMLX &amp; any OpenAI-compatible model</tspan></text>
+    <text x="44" y="266"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">Claude, OpenAI, Ollama &amp; any OpenAI-compatible model</tspan></text>
     <text x="44" y="292"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">Full-screen TUI, streaming, sessions &amp; auto-compaction</tspan></text>
     <text x="44" y="318"><tspan fill="#ec4899" font-weight="700">▸</tspan><tspan x="64">MCP servers — same config as Agent!</tspan></text>
   </g>
