@@ -249,6 +249,12 @@ extension AgentViewModel {
             let lines = fullText.components(separatedBy: "\n")
             let s = max(startLine - 1, 0)
             let e = min(endLine, lines.count)
+            guard s < e else {
+                let err = "Error: invalid line range \(startLine)-\(endLine) (file has \(lines.count) lines)"
+                appendLog(err)
+                toolResults.append(["type": "tool_result", "tool_use_id": toolId, "content": err])
+                return true
+            }
             let source = lines[s..<e].joined(separator: "\n")
 
             let algorithm = CodingService.selectDiffAlgorithm(source: source, destination: destination)
@@ -429,6 +435,12 @@ extension AgentViewModel {
                 let lines = fullText.components(separatedBy: "\n")
                 let s = max(sl - 1, 0)
                 let e = min(el, lines.count)
+                guard s < e else {
+                    let err = "Error: invalid line range \(sl)-\(el) (file has \(lines.count) lines)"
+                    appendLog(err)
+                    toolResults.append(["type": "tool_result", "tool_use_id": toolId, "content": err])
+                    return true
+                }
                 source = lines[s..<e].joined(separator: "\n")
                 usedSnippet = false
             } else {
