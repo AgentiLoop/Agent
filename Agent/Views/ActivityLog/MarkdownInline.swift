@@ -24,7 +24,7 @@ extension ActivityLogView.Coordinator {
         // SAFETY: Skip markdown parsing if text contains Swift raw strings with backticks (e.g., #"...`..."#). Apple's
         // markdown parser mangles these. Also skip if text looks like numbered code output (e.g., "1 | code")
         let hasRawStringWithBacktick = text.contains("#\"") && text.contains("\"#") && text.contains("`")
-        let looksLikeNumberedCode = text.contains(#"\d+\s*\|"#) && text.split(separator: "\n").allSatisfy {
+        let looksLikeNumberedCode = text.range(of: #"\d+\s*\|"#, options: .regularExpression) != nil && text.split(separator: "\n").allSatisfy {
             $0.trimmingCharacters(in: .whitespaces).isEmpty || $0.range(of: #"^\s*\d+\s*\|"#, options: .regularExpression) != nil
         }
         if hasRawStringWithBacktick || looksLikeNumberedCode {

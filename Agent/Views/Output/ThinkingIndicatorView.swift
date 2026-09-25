@@ -492,8 +492,8 @@ private struct LLMOutputBox: View {
                     for (c, cell) in cells.enumerated() where c < colCount {
                         parts.append(" " + padCell(cell, width: widths[c]) + " ")
                     }
-                    // Fill missing columns
-                    for c in cells.count..<colCount {
+                    // Fill missing columns (rows wider than the header would make this range invalid)
+                    for c in min(cells.count, colCount)..<colCount {
                         parts.append(" " + String(repeating: " ", count: widths[c]) + " ")
                     }
                     return "│" + parts.joined(separator: "│") + "│"

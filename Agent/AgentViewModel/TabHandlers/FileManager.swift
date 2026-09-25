@@ -162,6 +162,11 @@ extension AgentViewModel {
                         let lines = text.components(separatedBy: "\n")
                         let s = max(sl - 1, 0)
                         let e = min(el, lines.count)
+                        guard s < e else {
+                            let err = "Error: invalid line range \(sl)-\(el) (file has \(lines.count) lines)"
+                            tab.appendLog(err); tab.flush()
+                            return TabToolResult(toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": err], isComplete: false)
+                        }
                         source = lines[s..<e].joined(separator: "\n")
                     } else {
                         source = text
@@ -304,6 +309,11 @@ extension AgentViewModel {
                 let lines = fullText.components(separatedBy: "\n")
                 let s = max(sl - 1, 0)
                 let e = min(el, lines.count)
+                guard s < e else {
+                    let err = "Error: invalid line range \(sl)-\(el) (file has \(lines.count) lines)"
+                    tab.appendLog(err); tab.flush()
+                    return TabToolResult(toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": err], isComplete: false)
+                }
                 source = lines[s..<e].joined(separator: "\n")
                 usedSnippet = false
             } else {
