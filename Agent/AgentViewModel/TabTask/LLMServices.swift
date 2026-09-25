@@ -13,7 +13,8 @@ extension AgentViewModel {
     /// block in the legacy / monolithic executeTabTask.
     func buildTabHistoryContext(tab: ScriptTab) -> String {
         // Build tab context from the existing log (cap at 8K characters)
-        let tabContext = String(tab.activityLog.suffix(8000))
+        // Timestamps stripped — this goes into the system prompt (cache prefix).
+        let tabContext = LogLimits.stripTimestamps(String(tab.activityLog.suffix(8000)))
         let tccNote: String
         let lowerName = tab.scriptName.lowercased()
         if lowerName == "osascript" {

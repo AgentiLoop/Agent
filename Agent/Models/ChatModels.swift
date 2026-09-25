@@ -361,18 +361,18 @@ final class ChatHistoryStore {
 
         var result = "\n\nChat history (most recent last):\n"
 
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm:ss"
+        // No timestamps anywhere in this block — it is part of the system
+        // prompt, and wall-clock values would vary its bytes between otherwise
+        // identical prompts and defeat the provider's prompt cache.
 
         // Older tasks: use summary only (skip those without a summary)
         let olderTasks = allTasks.dropFirst(recentFullTasks).prefix(maxOlderSummaries).reversed()
         for task in olderTasks {
-            let time = formatter.string(from: task.startTime)
             let prompt = String(task.prompt.prefix(LogLimits.historyLineChars))
             if let summary = task.summary, !summary.isEmpty {
-                result += "[\(time)] Task: \(prompt) → \(summary.prefix(LogLimits.historyLineChars))\n"
+                result += "Task: \(prompt) → \(summary.prefix(LogLimits.historyLineChars))\n"
             } else {
-                result += "[\(time)] Task: \(prompt)\n"
+                result += "Task: \(prompt)\n"
             }
         }
 
@@ -391,12 +391,13 @@ final class ChatHistoryStore {
                     body += "\n"
                 }
             }
+            body = LogLimits.stripTimestamps(body)
             if body.count > LogLimits.historyContextChars {
                 let dropped = body.count - LogLimits.historyContextChars
                 body = "[... \(dropped) chars of earlier log omitted]\n" + String(body.suffix(LogLimits.historyContextChars))
             }
             result += "--- Recent Task ---\n"
-            result += "[\(formatter.string(from: task.startTime))] Task: \(task.prompt.prefix(LogLimits.historyLineChars))\n"
+            result += "Task: \(task.prompt.prefix(LogLimits.historyLineChars))\n"
             result += body
             if let summary = task.summary {
                 result += "Result: \(summary.prefix(LogLimits.historyLineChars))\n"

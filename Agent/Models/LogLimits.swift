@@ -52,4 +52,14 @@ enum LogLimits {
         banner += "]"
         return String(text.prefix(cap)) + banner
     }
+
+    /// Strip the `[HH:mm:ss]` line prefixes the activity log adds, so log text
+    /// injected into a system prompt carries no wall-clock values.
+    static func stripTimestamps(_ text: String) -> String {
+        text.replacingOccurrences(
+            of: #"(?m)^\[\d{2}:\d{2}:\d{2}\](?: |\n)?"#,
+            with: "",
+            options: .regularExpression
+        )
+    }
 }
