@@ -205,6 +205,7 @@
 		EAE1E7262F7C02000079432C /* AgentAccess in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7252F7C02000079432C /* AgentAccess */; };
 		EAF3666F2F623D6A004B7E38 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = EAF3666E2F623D6A004B7E38 /* AppIcon.icon */; };
 		EAFA000000000000000001 /* FoundationModelService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFA000000000000000002 /* FoundationModelService.swift */; };
+		F4EDE7E05ED9DA2FF7BFEDD1 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F4EDE7E05ED9DA2FF7BFEDD0 /* Localizable.xcstrings */; };
 		EAHELP0000000000000001 /* Resources/Agent.help in Resources */ = {isa = PBXBuildFile; fileRef = EAHELP0000000000000002 /* Resources/Agent.help */; };
 		EASP000000000000000001 /* SystemPromptService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EASP000000000000000002 /* SystemPromptService.swift */; };
 		EASP000000000000000003 /* SystemPromptEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EASP000000000000000004 /* SystemPromptEditor.swift */; };
@@ -521,6 +522,7 @@
 		WEB1000000000000000004 /* WebAutomationService+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Navigation.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
+		F4EDE7E05ED9DA2FF7BFEDD0 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -606,6 +608,7 @@
 				EA60000000000000000002 /* SDEFs */,
 				BB10000000000000000041 /* LaunchDaemons */,
 				CC10000000000000000041 /* LaunchAgents */,
+				F4EDE7E05ED9DA2FF7BFEDD0 /* Localizable.xcstrings */,
 			);
 			path = Agent;
 			sourceTree = "<group>";
@@ -1211,6 +1214,13 @@
 			knownRegions = (
 				en,
 				Base,
+				es,
+				fr,
+				de,
+				"zh-Hans",
+				ru,
+				ko,
+				ja,
 			);
 			mainGroup = AA10000000000000000040;
 			packageReferences = (
@@ -1248,6 +1258,7 @@
 				AA100000000000000000B3 /* StartupTwentiethAnniversaryMac.wav in Resources */,
 				EA60000000000000000001 /* SDEFs in Resources */,
 				EAHELP0000000000000001 /* Resources/Agent.help in Resources */,
+				F4EDE7E05ED9DA2FF7BFEDD1 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
