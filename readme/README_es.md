@@ -1,4 +1,4 @@
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_es.svg" width="900" alt="Fluxion AI, patrocinador Silver: una API unificada para GPT, Claude y otros modelos de IA líderes. Ahorra hasta un 70 % frente a los precios oficiales de la API y consigue $3 en créditos API." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_es.svg" width="900" alt="Fluxion AI, patrocinador Silver: una API unificada para GPT, Claude y otros modelos de IA líderes. Ahorra hasta un 70 % frente a los precios oficiales de la API y consigue $3 en créditos API." /></a>
 
 # 🦾 AgentiLoop Agent!
 
@@ -15,16 +15,16 @@
 
 Conoce a los nuevos miembros de la familia Agent!: dos CLI multiplataforma con **exactamente las mismas capacidades**. Elige tu sabor:
 
-<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad-v2_es.svg" width="900" alt="AgentiLoop CLI: dos versiones, Rust y Go, con exactamente las mismas capacidades. macOS, Windows, Linux." /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-cli-ad-v2_es.svg" width="900" alt="AgentiLoop CLI: dos versiones, Rust y Go, con exactamente las mismas capacidades. macOS, Windows, Linux." /></a>
 
 *Creado con AgentiLoop Agent! para Mac. Sí, el agente escribió a sus propios hermanitos.* 🤖✨ ¡Prueba la versión anticipada hoy!
 
-<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-rust-cli-button_es.svg" width="211" height="44" alt="Rust CLI en GitHub" /></a>
-<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="docs/agentiloop-go-cli-button_es.svg" width="194" height="44" alt="Go CLI en GitHub" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-rust-cli-button_es.svg" width="211" height="44" alt="Rust CLI en GitHub" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="../docs/agentiloop-go-cli-button_es.svg" width="194" height="44" alt="Go CLI en GitHub" /></a>
 
 ## Traducciones del README
 
-[English](README.md) · [Español](README_es.md) · [Français](README_fr.md) · [Deutsch](README_de.md) · [中文 (简体)](README_zh.md) · [Русский](README_ru.md) · [한국어](README_ko.md) · [日本語](README_ja.md)
+[English](../README.md) · [Español](README_es.md) · [Français](README_fr.md) · [Deutsch](README_de.md) · [中文 (简体)](README_zh.md) · [Русский](README_ru.md) · [한국어](README_ko.md) · [日本語](README_ja.md)
 
 ## Ajedrez dentro de Agent
 <img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
@@ -92,7 +92,7 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 - **🛠 Programación agéntica** — lee bases de código, edita con diffs de sustitución de cadenas, compila proyectos de Xcode de forma nativa (errores clicables), gestiona git, indexa repos en un mapa JSONL portable. Cada edición se guarda — rollback con un clic o `rewind_task` de toda la tarea.
 - **🖥 Automatización del escritorio** — controla cualquier app de Mac mediante la API de Accesibilidad ([AXorcist](https://github.com/steipete/AXorcist)), basada en elementos con reintento difuso automático. Además NSAppleScript, JXA y 51 puentes ScriptingBridge, todo en proceso con TCC.
 - **📜 AgentScript** — dylibs Swift compiladas en tiempo de ejecución y cargadas con `dlopen` en proceso con TCC completo. Los scripts borrados van a `.Trash` y son recuperables.
-- **🛡 Ejecución privilegiada** — shell como tú mediante un Launch Agent, o como root mediante un Launch Daemon que apruebas exactamente una vez (SMAppService + XPC). Consulta [docs/SECURITY.md](docs/SECURITY.md) para saber por qué SMAppService ya impone la identidad de firma.
+- **🛡 Ejecución privilegiada** — shell como tú mediante un Launch Agent, o como root mediante un Launch Daemon que apruebas exactamente una vez (SMAppService + XPC). Consulta [docs/SECURITY.md](../docs/SECURITY.md) para saber por qué SMAppService ya impone la identidad de firma.
 - **🎙 Voz** — di **«Agent!»** seguido de tu tarea; `SFSpeechRecognizer` en el dispositivo, se ejecuta tras ~2,5 s de silencio, en bucle.
 - **📱 Control remoto por iMessage** — escribe `Agent! next song` desde tu iPhone; solo remitentes aprobados. Necesita Acceso total al disco para `chat.db`.
 - **🌐 Web** — automatización de Safari integrada (JavaScript + AppleScript); Selenium y [Playwright MCP](https://github.com/microsoft/playwright-mcp) opcionales para varios navegadores.
@@ -103,15 +103,15 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 
 ### Patrocinadores
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_es.svg" width="900" alt="Fluxion AI, patrocinador Silver: una API unificada para GPT, Claude y otros modelos de IA líderes. Ahorra hasta un 70 % frente a los precios oficiales de la API y consigue $3 en créditos API." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_es.svg" width="900" alt="Fluxion AI, patrocinador Silver: una API unificada para GPT, Claude y otros modelos de IA líderes. Ahorra hasta un 70 % frente a los precios oficiales de la API y consigue $3 en créditos API." /></a>
 
 | Patrocinador | &nbsp;&nbsp;&nbsp;Nivel&nbsp;&nbsp;&nbsp; | |
 |---|:---:|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Acceso fiable y económico a GPT, Claude y otros modelos de IA líderes a través de una API unificada. Ahorra hasta un 70 % frente a los precios oficiales de la API y recibe $3 en créditos de API al registrarte a través de [este enlace](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) (código promocional `AIAGENT`). |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Acceso fiable y económico a GPT, Claude y otros modelos de IA líderes a través de una API unificada. Ahorra hasta un 70 % frente a los precios oficiales de la API y recibe $3 en créditos de API al registrarte a través de [este enlace](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) (código promocional `AIAGENT`). |
 
 ## Patrocinio
 
-Empresas y proveedores de LLM que quieran apoyar el proyecto: consulta [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md) (niveles, ubicaciones) y [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md) (integración de proveedores de LLM), o patrocina directamente a través de [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). Toda la facturación se realiza a través de GitHub Sponsors.
+Empresas y proveedores de LLM que quieran apoyar el proyecto: consulta [docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md) (niveles, ubicaciones) y [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md) (integración de proveedores de LLM), o patrocina directamente a través de [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). Toda la facturación se realiza a través de GitHub Sponsors.
 
 ## 🤖 23 proveedores de LLM
 
@@ -121,7 +121,7 @@ Empresas y proveedores de LLM que quieran apoyar el proyecto: consulta [docs/SPO
 | **Apple Intelligence** | | Gratis, en el dispositivo | Triaje, resúmenes, compresión de tokens (icono del cerebro, no disponible en el selector de proveedor) |
 | **Claude** | | Por token (clave API) o suscripción (OAuth) | Tareas autónomas largas, pensamiento extendido, caché de prompts |
 | **Codex** | | Suscripción ChatGPT | Modelos de OpenAI vía OAuth de ChatGPT — sin clave API, sin cobro por token |
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Hasta un 70 % menos que el precio oficial | GPT, Claude, Grok, DeepSeek, Gemini, GLM y Kimi con una sola clave; protocolo OpenAI o Anthropic por grupo de claves; $3 de crédito con el código `AIAGENT` |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Hasta un 70 % menos que el precio oficial | GPT, Claude, Grok, DeepSeek, Gemini, GLM y Kimi con una sola clave; protocolo OpenAI o Anthropic por grupo de claves; $3 de crédito con el código `AIAGENT` |
 | **DeepSeek** | | Barato | Programación económica, informe de aciertos de caché |
 | **Google Gemini** | | De pago (nivel gratuito) | Contexto largo, visión |
 | **Grok** (xAI) | | De pago | Información en tiempo real |
@@ -154,7 +154,7 @@ Los nombres canónicos vienen de `AgentTools.Name.*` (fuente: el paquete [AgentT
 | **Web** | `safari` · `selenium` · `mcp_playwright_browser_*` (opcional) |
 | **Subagentes** | `spawn_agent` · `tell_agent` |
 
-Referencia completa por acción: [docs/TECHNICAL.md](docs/TECHNICAL.md).
+Referencia completa por acción: [docs/TECHNICAL.md](../docs/TECHNICAL.md).
 
 ## AgentScript — Scripts Swift con TCC completo
 
@@ -345,7 +345,7 @@ Los comandos slash se ejecutan en local: `/clear [log|all|llm|history|tasks|toke
 **¿Qué Mac necesito?** Apple Silicon, macOS 26.4.1+. Cualquier Mac moderno para proveedores en la nube; 64 GB+ para modelos locales de 30B.
 **¿En qué se diferencia de Siri?** Siri responde. Agent! *actúa* — apps, archivos, código, sistema.
 
-Más: [docs/FAQ.md](docs/FAQ.md) · [Arquitectura técnica](docs/TECHNICAL.md) · [Comparativas](docs/COMPARISON.md) (vs Claude Code, Cursor, Cline, OpenClaw) · [Modelo de seguridad](docs/SECURITY.md)
+Más: [docs/FAQ.md](../docs/FAQ.md) · [Arquitectura técnica](../docs/TECHNICAL.md) · [Comparativas](../docs/COMPARISON.md) (vs Claude Code, Cursor, Cline, OpenClaw) · [Modelo de seguridad](../docs/SECURITY.md)
 
 ## Historia
 
@@ -353,11 +353,11 @@ Agent! es el resultado de tres años construyendo apps de IA agéntica — ANIE,
 
 ## Contribuir
 
-Consulta [CONTRIBUTING.md](./CONTRIBUTING.md) — compila desde el código fuente en ~5 minutos con `./build.sh`, sin cuenta de desarrollador. Los pull requests ejecutan el flujo de CI Build & Test. Revisa los [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+Consulta [CONTRIBUTING.md](../CONTRIBUTING.md) — compila desde el código fuente en ~5 minutos con `./build.sh`, sin cuenta de desarrollador. Los pull requests ejecutan el flujo de CI Build & Test. Revisa los [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 
 ## Licencia
 
-[PolyForm Noncommercial 1.0.0](./LICENSE) — gratis para uso no comercial y personal. El uso comercial y las versiones comerciales del software están reservados exclusivamente a AgentiLoop.ai, una empresa de Logos InkPen LLC. Contacta a AgentiLoop para una licencia comercial.
+[PolyForm Noncommercial 1.0.0](../LICENSE) — gratis para uso no comercial y personal. El uso comercial y las versiones comerciales del software están reservados exclusivamente a AgentiLoop.ai, una empresa de Logos InkPen LLC. Contacta a AgentiLoop para una licencia comercial.
 
 ---
 
@@ -371,7 +371,7 @@ Consulta [CONTRIBUTING.md](./CONTRIBUTING.md) — compila desde el código fuent
 >
 > ### Licencia del Código Fuente (PolyForm Noncommercial 1.0.0)
 >
-> El código fuente de "AgentiLoop Agent! for Mac" es de código disponible y está licenciado bajo la **PolyForm Noncommercial License 1.0.0**. Eres libre de usar, copiar, modificar y distribuir el código fuente para cualquier fin no comercial, sujeto a las condiciones del archivo [LICENSE](./LICENSE) (conservar el Required Notice y una copia de, o un enlace a, los términos de la licencia). El uso comercial y las versiones comerciales del software están reservados exclusivamente a AgentiLoop.ai, una empresa de Logos InkPen LLC.
+> El código fuente de "AgentiLoop Agent! for Mac" es de código disponible y está licenciado bajo la **PolyForm Noncommercial License 1.0.0**. Eres libre de usar, copiar, modificar y distribuir el código fuente para cualquier fin no comercial, sujeto a las condiciones del archivo [LICENSE](../LICENSE) (conservar el Required Notice y una copia de, o un enlace a, los términos de la licencia). El uso comercial y las versiones comerciales del software están reservados exclusivamente a AgentiLoop.ai, una empresa de Logos InkPen LLC.
 >
 > ### Binarios Compilados y Releases
 >
@@ -394,4 +394,4 @@ Consulta [CONTRIBUTING.md](./CONTRIBUTING.md) — compila desde el código fuent
 
 ---
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_es.svg" width="900" alt="Fluxion AI, patrocinador Silver: una API unificada para GPT, Claude y otros modelos de IA líderes. Ahorra hasta un 70 % frente a los precios oficiales de la API y consigue $3 en créditos API." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_es.svg" width="900" alt="Fluxion AI, patrocinador Silver: una API unificada para GPT, Claude y otros modelos de IA líderes. Ahorra hasta un 70 % frente a los precios oficiales de la API y consigue $3 en créditos API." /></a>

@@ -1,4 +1,4 @@
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>
 
 # 🦾 AgentiLoop Agent!
 
@@ -15,16 +15,16 @@
 
 Agent! 패밀리의 최신 멤버를 만나보세요: **완전히 동일한 기능**을 갖춘 두 개의 크로스 플랫폼 CLI. 취향대로 고르세요:
 
-<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad-v2_ko.svg" width="900" alt="AgentiLoop CLI: Rust와 Go 두 가지 버전, 완전히 동일한 기능. macOS, Windows, Linux." /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-cli-ad-v2_ko.svg" width="900" alt="AgentiLoop CLI: Rust와 Go 두 가지 버전, 완전히 동일한 기능. macOS, Windows, Linux." /></a>
 
 *AgentiLoop Agent! for Mac으로 제작. 네, 에이전트가 직접 자기 동생들을 만들었습니다.* 🤖✨ 지금 바로 얼리 릴리스를 사용해 보세요!
 
-<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-rust-cli-button_ko.svg" width="238" height="44" alt="GitHub에서 Rust CLI" /></a>
-<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="docs/agentiloop-go-cli-button_ko.svg" width="221" height="44" alt="GitHub에서 Go CLI" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-rust-cli-button_ko.svg" width="238" height="44" alt="GitHub에서 Rust CLI" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="../docs/agentiloop-go-cli-button_ko.svg" width="221" height="44" alt="GitHub에서 Go CLI" /></a>
 
 ## README 번역
 
-[English](README.md) · [Español](README_es.md) · [Français](README_fr.md) · [Deutsch](README_de.md) · [中文 (简体)](README_zh.md) · [Русский](README_ru.md) · [한국어](README_ko.md) · [日本語](README_ja.md)
+[English](../README.md) · [Español](README_es.md) · [Français](README_fr.md) · [Deutsch](README_de.md) · [中文 (简体)](README_zh.md) · [Русский](README_ru.md) · [한국어](README_ko.md) · [日本語](README_ja.md)
 
 ## Agent 안의 체스
 <img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
@@ -92,7 +92,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **🛠 에이전틱 코딩** — 코드베이스를 읽고, 문자열 치환 diff로 편집하고, Xcode 프로젝트를 네이티브로 빌드(클릭 가능한 오류)하고, git을 관리하고, 저장소를 이식 가능한 JSONL 리포 맵으로 색인합니다. 모든 편집은 스냅샷됩니다 — 원클릭 롤백 또는 작업 전체 `rewind_task`.
 - **🖥 데스크톱 자동화** — 손쉬운 사용 API([AXorcist](https://github.com/steipete/AXorcist))로 모든 Mac 앱을 조작, 퍼지 자동 재시도가 있는 요소 기반. 여기에 NSAppleScript, JXA, 51개 ScriptingBridge 앱 브리지 — 모두 TCC와 함께 인프로세스.
 - **📜 AgentScript** — 런타임에 컴파일되어 전체 TCC로 인프로세스 `dlopen`되는 Swift dylib. 삭제된 스크립트는 `.Trash`로 이동하며 복원 가능합니다.
-- **🛡 권한 있는 실행** — Launch Agent로 사용자 권한 셸, 또는 딱 한 번 승인하는 Launch Daemon으로 root 셸(SMAppService + XPC). SMAppService가 이미 서명 아이덴티티를 강제하는 이유는 [docs/SECURITY.md](docs/SECURITY.md)를 참고하세요.
+- **🛡 권한 있는 실행** — Launch Agent로 사용자 권한 셸, 또는 딱 한 번 승인하는 Launch Daemon으로 root 셸(SMAppService + XPC). SMAppService가 이미 서명 아이덴티티를 강제하는 이유는 [docs/SECURITY.md](../docs/SECURITY.md)를 참고하세요.
 - **🎙 음성** — **"Agent!"**라고 말한 뒤 작업을 말하세요; 온디바이스 `SFSpeechRecognizer`, ~2.5초 무음 후 자동 실행, 반복.
 - **📱 iMessage 원격 제어** — iPhone에서 `Agent! next song`을 문자로 보내세요; 승인된 발신자만. `chat.db`를 위해 전체 디스크 접근 권한이 필요합니다.
 - **🌐 웹** — 내장 Safari 자동화(JavaScript + AppleScript); 크로스 브라우저를 위한 선택적 Selenium과 [Playwright MCP](https://github.com/microsoft/playwright-mcp).
@@ -103,15 +103,15 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ### 스폰서
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>
 
 | 스폰서 | &nbsp;&nbsp;&nbsp;등급&nbsp;&nbsp;&nbsp; | |
 |---|:---:|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 하나의 통합 API로 GPT, Claude 및 기타 주요 AI 모델에 안정적이고 비용 효율적으로 접근할 수 있습니다. 공식 API 가격 대비 최대 70% 절약하고, [이 링크](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)로 가입하면 $3의 API 크레딧을 받을 수 있습니다(프로모션 코드 `AIAGENT`). |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 하나의 통합 API로 GPT, Claude 및 기타 주요 AI 모델에 안정적이고 비용 효율적으로 접근할 수 있습니다. 공식 API 가격 대비 최대 70% 절약하고, [이 링크](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)로 가입하면 $3의 API 크레딧을 받을 수 있습니다(프로모션 코드 `AIAGENT`). |
 
 ## 후원
 
-프로젝트를 후원하고 싶은 기업 및 LLM 제공업체: [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)(등급, 노출 위치)와 [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)(LLM 제공업체 연동)를 참고하거나 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop)로 직접 후원해 주세요. 모든 결제는 GitHub Sponsors를 통해 이루어집니다.
+프로젝트를 후원하고 싶은 기업 및 LLM 제공업체: [docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md)(등급, 노출 위치)와 [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md)(LLM 제공업체 연동)를 참고하거나 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop)로 직접 후원해 주세요. 모든 결제는 GitHub Sponsors를 통해 이루어집니다.
 
 ## 🤖 23개 LLM 제공자
 
@@ -121,7 +121,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Apple Intelligence** | | 무료, 온디바이스 | 분류, 요약, 토큰 압축(두뇌 아이콘, 제공자 선택기에는 없음) |
 | **Claude** | | 토큰당(API 키) 또는 구독(OAuth) | 긴 자율 작업, 확장 사고, 프롬프트 캐싱 |
 | **Codex** | | ChatGPT 구독 | ChatGPT OAuth를 통한 OpenAI 모델 — API 키 없음, 토큰당 요금 없음 |
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 공식 가격 대비 최대 70% 할인 | 하나의 키로 GPT, Claude, Grok, DeepSeek, Gemini, GLM, Kimi 사용; 키 그룹별 OpenAI 또는 Anthropic 프로토콜; 프로모 코드 `AIAGENT`로 $3 크레딧 |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 공식 가격 대비 최대 70% 할인 | 하나의 키로 GPT, Claude, Grok, DeepSeek, Gemini, GLM, Kimi 사용; 키 그룹별 OpenAI 또는 Anthropic 프로토콜; 프로모 코드 `AIAGENT`로 $3 크레딧 |
 | **DeepSeek** | | 저렴 | 저예산 코딩, 캐시 히트 보고 |
 | **Google Gemini** | | 유료(무료 티어 있음) | 긴 컨텍스트, 비전 |
 | **Grok** (xAI) | | 유료 | 실시간 정보 |
@@ -154,7 +154,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **웹** | `safari` · `selenium` · `mcp_playwright_browser_*` (선택) |
 | **서브 에이전트** | `spawn_agent` · `tell_agent` |
 
-액션별 전체 참조: [docs/TECHNICAL.md](docs/TECHNICAL.md).
+액션별 전체 참조: [docs/TECHNICAL.md](../docs/TECHNICAL.md).
 
 ## AgentScript — 전체 TCC를 가진 Swift 스크립트
 
@@ -345,7 +345,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 **어떤 Mac이 필요한가요?** Apple Silicon, macOS 26.4.1+. 클라우드 제공자는 최신 Mac이면 충분; 30B 로컬 모델은 64GB+.
 **Siri와 어떻게 다른가요?** Siri는 답합니다. Agent!는 *행동합니다* — 앱, 파일, 코드, 시스템.
 
-더 보기: [docs/FAQ.md](docs/FAQ.md) · [기술 아키텍처](docs/TECHNICAL.md) · [비교](docs/COMPARISON.md) (Claude Code, Cursor, Cline, OpenClaw 대비) · [보안 모델](docs/SECURITY.md)
+더 보기: [docs/FAQ.md](../docs/FAQ.md) · [기술 아키텍처](../docs/TECHNICAL.md) · [비교](../docs/COMPARISON.md) (Claude Code, Cursor, Cline, OpenClaw 대비) · [보안 모델](../docs/SECURITY.md)
 
 ## 비하인드 스토리
 
@@ -353,11 +353,11 @@ Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game C
 
 ## 기여하기
 
-[CONTRIBUTING.md](./CONTRIBUTING.md)를 참고하세요 — `./build.sh`로 ~5분 만에 소스에서 빌드, 개발자 계정 불필요. Pull request는 CI Build & Test 워크플로를 실행합니다. [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)를 확인하세요.
+[CONTRIBUTING.md](../CONTRIBUTING.md)를 참고하세요 — `./build.sh`로 ~5분 만에 소스에서 빌드, 개발자 계정 불필요. Pull request는 CI Build & Test 워크플로를 실행합니다. [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)를 확인하세요.
 
 ## 라이선스
 
-[PolyForm Noncommercial 1.0.0](./LICENSE) — 비상업적·개인 용도로 무료. 상업적 사용 및 소프트웨어의 상업용 버전은 Logos InkPen LLC 회사인 AgentiLoop.ai에 독점적으로 유보됩니다. 상업용 라이선스는 AgentiLoop에 문의하세요.
+[PolyForm Noncommercial 1.0.0](../LICENSE) — 비상업적·개인 용도로 무료. 상업적 사용 및 소프트웨어의 상업용 버전은 Logos InkPen LLC 회사인 AgentiLoop.ai에 독점적으로 유보됩니다. 상업용 라이선스는 AgentiLoop에 문의하세요.
 
 ---
 
@@ -371,7 +371,7 @@ Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game C
 >
 > ### 소스 코드 라이선스 (PolyForm Noncommercial 1.0.0)
 >
-> "AgentiLoop Agent! for Mac"의 소스 코드는 공개되어 있으며 **PolyForm Noncommercial License 1.0.0**으로 제공됩니다. [LICENSE](./LICENSE) 파일의 조건(Required Notice와 라이선스 조항의 사본 또는 링크 유지)에 따라 모든 비상업적 목적으로 소스 코드를 자유롭게 사용, 복사, 수정, 배포할 수 있습니다. 상업적 사용 및 소프트웨어의 상업용 버전은 Logos InkPen LLC 회사인 AgentiLoop.ai에 독점적으로 유보됩니다.
+> "AgentiLoop Agent! for Mac"의 소스 코드는 공개되어 있으며 **PolyForm Noncommercial License 1.0.0**으로 제공됩니다. [LICENSE](../LICENSE) 파일의 조건(Required Notice와 라이선스 조항의 사본 또는 링크 유지)에 따라 모든 비상업적 목적으로 소스 코드를 자유롭게 사용, 복사, 수정, 배포할 수 있습니다. 상업적 사용 및 소프트웨어의 상업용 버전은 Logos InkPen LLC 회사인 AgentiLoop.ai에 독점적으로 유보됩니다.
 >
 > ### 컴파일된 바이너리 및 릴리스
 >
@@ -394,4 +394,4 @@ Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game C
 
 ---
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>

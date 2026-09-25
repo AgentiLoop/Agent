@@ -1,4 +1,4 @@
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
 
 # 🦾 AgentiLoop Agent!
 
@@ -15,16 +15,16 @@
 
 认识 Agent! 家族的最新成员：两款跨平台 CLI，**功能完全相同**。选择你喜欢的版本：
 
-<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad-v2_zh.svg" width="900" alt="AgentiLoop CLI：Rust 与 Go 两个版本，功能完全相同。macOS、Windows、Linux。" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-cli-ad-v2_zh.svg" width="900" alt="AgentiLoop CLI：Rust 与 Go 两个版本，功能完全相同。macOS、Windows、Linux。" /></a>
 
 *由 AgentiLoop Agent! for Mac 打造。没错，这个智能体亲手写出了自己的小弟弟。* 🤖✨ 立即试用早期版本！
 
-<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-rust-cli-button_zh.svg" width="246" height="44" alt="在 GitHub 查看 Rust CLI" /></a>
-<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="docs/agentiloop-go-cli-button_zh.svg" width="229" height="44" alt="在 GitHub 查看 Go CLI" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-rust-cli-button_zh.svg" width="246" height="44" alt="在 GitHub 查看 Rust CLI" /></a>
+<a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="../docs/agentiloop-go-cli-button_zh.svg" width="229" height="44" alt="在 GitHub 查看 Go CLI" /></a>
 
 ## README 翻译
 
-[English](README.md) · [Español](README_es.md) · [Français](README_fr.md) · [Deutsch](README_de.md) · [中文 (简体)](README_zh.md) · [Русский](README_ru.md) · [한국어](README_ko.md) · [日本語](README_ja.md)
+[English](../README.md) · [Español](README_es.md) · [Français](README_fr.md) · [Deutsch](README_de.md) · [中文 (简体)](README_zh.md) · [Русский](README_ru.md) · [한국어](README_ko.md) · [日本語](README_ja.md)
 
 ## 在 Agent 中下棋
 <img width="1176" height="724" alt="Screenshot 2026-08-23 at 7 34 10 PM" src="https://github.com/user-attachments/assets/d3b2f1e5-1dab-44f7-95f6-008424ee794c" />
@@ -92,7 +92,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **🛠 智能体编码** —— 读取代码库，用字符串替换 diff 精确编辑，原生构建 Xcode 项目（错误可点击），管理 git，将仓库索引为可移植的 JSONL 仓库地图。每次编辑都有快照——一键回滚或整任务 `rewind_task`。
 - **🖥 桌面自动化** —— 通过辅助功能 API（[AXorcist](https://github.com/steipete/AXorcist)）驱动任何 Mac 应用，基于元素并带模糊自动重试。另有 NSAppleScript、JXA 和 51 个 ScriptingBridge 应用桥接，全部进程内运行并持有 TCC 权限。
 - **📜 AgentScript** —— 运行时编译的 Swift dylib，以 `dlopen` 在进程内加载并拥有完整 TCC。删除的脚本进入 `.Trash`，可恢复。
-- **🛡 特权执行** —— 通过 Launch Agent 以你的身份运行 shell，或通过你只需批准一次的 Launch Daemon 以 root 运行（SMAppService + XPC）。关于 SMAppService 为何已强制签名身份，见 [docs/SECURITY.md](docs/SECURITY.md)。
+- **🛡 特权执行** —— 通过 Launch Agent 以你的身份运行 shell，或通过你只需批准一次的 Launch Daemon 以 root 运行（SMAppService + XPC）。关于 SMAppService 为何已强制签名身份，见 [docs/SECURITY.md](../docs/SECURITY.md)。
 - **🎙 语音** —— 说出 **「Agent!」** 再说任务；设备端 `SFSpeechRecognizer`，静默约 2.5 秒后自动运行，循环监听。
 - **📱 iMessage 远程控制** —— 从 iPhone 发送 `Agent! next song`；仅限已批准的发送者。读取 `chat.db` 需要「完全磁盘访问权限」。
 - **🌐 Web** —— 内置 Safari 自动化（JavaScript + AppleScript）；可选 Selenium 和 [Playwright MCP](https://github.com/microsoft/playwright-mcp) 实现跨浏览器。
@@ -103,15 +103,15 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ### 赞助商
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
 
 | 赞助商 | &nbsp;&nbsp;&nbsp;等级&nbsp;&nbsp;&nbsp; | |
 |---|:---:|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 通过一个统一的 API，稳定且经济地访问 GPT、Claude 及其他领先的 AI 模型。与官方 API 价格相比最多可节省 70%，通过[此链接](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)注册即可获得 $3 API 额度（优惠码 `AIAGENT`）。 |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 通过一个统一的 API，稳定且经济地访问 GPT、Claude 及其他领先的 AI 模型。与官方 API 价格相比最多可节省 70%，通过[此链接](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)注册即可获得 $3 API 额度（优惠码 `AIAGENT`）。 |
 
 ## 赞助
 
-希望支持本项目的企业和 LLM 提供商：请参阅 [docs/SPONSORSHIP.md](./docs/SPONSORSHIP.md)（赞助等级、展示位置）和 [docs/PROVIDER_PROGRAM.md](./docs/PROVIDER_PROGRAM.md)（LLM 提供商集成），或直接通过 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) 赞助。所有费用均通过 GitHub Sponsors 结算。
+希望支持本项目的企业和 LLM 提供商：请参阅 [docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md)（赞助等级、展示位置）和 [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md)（LLM 提供商集成），或直接通过 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) 赞助。所有费用均通过 GitHub Sponsors 结算。
 
 ## 🤖 23 家 LLM 提供商
 
@@ -121,7 +121,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Apple Intelligence** | | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，提供商选择器中不可用） |
 | **Claude** | | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
 | **Codex** | | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 比官方价格最多低 70% | 一把密钥即可使用 GPT、Claude、Grok、DeepSeek、Gemini、GLM 和 Kimi；每个密钥组可选 OpenAI 或 Anthropic 协议；使用优惠码 `AIAGENT` 获得 $3 额度 |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 比官方价格最多低 70% | 一把密钥即可使用 GPT、Claude、Grok、DeepSeek、Gemini、GLM 和 Kimi；每个密钥组可选 OpenAI 或 Anthropic 协议；使用优惠码 `AIAGENT` 获得 $3 额度 |
 | **DeepSeek** | | 便宜 | 低成本编码、缓存命中报告 |
 | **Google Gemini** | | 付费（有免费额度） | 长上下文、视觉 |
 | **Grok** (xAI) | | 付费 | 实时信息 |
@@ -153,7 +153,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Web** | `safari` · `selenium` · `mcp_playwright_browser_*`（可选） |
 | **子代理** | `spawn_agent` · `tell_agent` |
 
-完整的逐操作参考：[docs/TECHNICAL.md](docs/TECHNICAL.md)。
+完整的逐操作参考：[docs/TECHNICAL.md](../docs/TECHNICAL.md)。
 
 ## AgentScript —— 拥有完整 TCC 的 Swift 脚本
 
@@ -344,7 +344,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 **需要什么 Mac？** Apple Silicon，macOS 26.4.1+。云端提供商任何现代 Mac 都行；30B 本地模型需要 64GB+。
 **和 Siri 有什么不同？** Siri 回答问题。Agent! *执行操作*——应用、文件、代码、系统。
 
-更多：[docs/FAQ.md](docs/FAQ.md) · [技术架构](docs/TECHNICAL.md) · [对比](docs/COMPARISON.md)（vs Claude Code、Cursor、Cline、OpenClaw）· [安全模型](docs/SECURITY.md)
+更多：[docs/FAQ.md](../docs/FAQ.md) · [技术架构](../docs/TECHNICAL.md) · [对比](../docs/COMPARISON.md)（vs Claude Code、Cursor、Cline、OpenClaw）· [安全模型](../docs/SECURITY.md)
 
 ## 项目背景
 
@@ -352,11 +352,11 @@ Agent! 是三年智能体 AI 应用开发的结晶——ANIE、Game Changer、Ba
 
 ## 参与贡献
 
-见 [CONTRIBUTING.md](./CONTRIBUTING.md)——用 `./build.sh` 约 5 分钟即可从源码构建，无需开发者账户。Pull request 会运行 CI Build & Test 工作流。可查看 [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)。
+见 [CONTRIBUTING.md](../CONTRIBUTING.md)——用 `./build.sh` 约 5 分钟即可从源码构建，无需开发者账户。Pull request 会运行 CI Build & Test 工作流。可查看 [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)。
 
 ## 许可证
 
-[PolyForm Noncommercial 1.0.0](./LICENSE) —— 非商业和个人用途免费。商业用途及本软件的商业版本由 AgentiLoop.ai（Logos InkPen LLC 旗下公司）独家保留。商业许可请联系 AgentiLoop。
+[PolyForm Noncommercial 1.0.0](../LICENSE) —— 非商业和个人用途免费。商业用途及本软件的商业版本由 AgentiLoop.ai（Logos InkPen LLC 旗下公司）独家保留。商业许可请联系 AgentiLoop。
 
 ---
 
@@ -370,7 +370,7 @@ Agent! 是三年智能体 AI 应用开发的结晶——ANIE、Game Changer、Ba
 >
 > ### 源代码许可证（PolyForm Noncommercial 1.0.0）
 >
-> 「AgentiLoop Agent! for Mac」的源代码公开可见，并采用 **PolyForm Noncommercial License 1.0.0** 授权。你可以出于任何非商业目的自由使用、复制、修改和分发源代码，但须遵守 [LICENSE](./LICENSE) 文件中的条件（保留 Required Notice 以及许可条款的副本或链接）。商业用途及本软件的商业版本由 AgentiLoop.ai（Logos InkPen LLC 旗下公司）独家保留。
+> 「AgentiLoop Agent! for Mac」的源代码公开可见，并采用 **PolyForm Noncommercial License 1.0.0** 授权。你可以出于任何非商业目的自由使用、复制、修改和分发源代码，但须遵守 [LICENSE](../LICENSE) 文件中的条件（保留 Required Notice 以及许可条款的副本或链接）。商业用途及本软件的商业版本由 AgentiLoop.ai（Logos InkPen LLC 旗下公司）独家保留。
 >
 > ### 已编译的二进制文件与发布版本
 >
@@ -393,4 +393,4 @@ Agent! 是三年智能体 AI 应用开发的结晶——ANIE、Game Changer、Ba
 
 ---
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
+<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
