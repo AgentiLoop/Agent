@@ -11,7 +11,7 @@ A macOS SwiftUI app that uses SMAppService + a privileged Launch Daemon to give 
 - Open `Agent.xcodeproj` in Xcode
 - Two targets: **Agent** (app) and **AgentHelper** (privileged daemon tool)
 - Development Team: **469UCUB275**
-- Deployment target: macOS 26.0, Swift 6.2
+- Deployment target: macOS 26.4, Swift 6.4 (Xcode 27)
 - Build with XCF: `xcf build` (ensure Agent.xcodeproj is selected, NOT CloneTool)
 - After successful xcf build, do a git commit
 

@@ -6,7 +6,7 @@ Thanks for your interest! Agent! is a 100% Swift, native macOS agentic AI app �
 
 ```bash
 git clone https://github.com/AgentiLoop/Agent.git
-cd Agent
+cd agent
 ./build.sh              # Debug build (requires only Xcode Command Line Tools)
 open "build/DerivedData/Build/Products/Debug/Agent!.app"
 ```
@@ -16,10 +16,10 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 ### With Xcode (full experience)
 
 1. Open `Agent.xcodeproj`
-2. Select the **Agent** scheme, set your own Development Team
+2. Select the **Agent!** scheme, set your own Development Team
 3. Build & Run — approve the helper daemon when prompted
 
-**Requirements:** macOS 26.0+, Xcode with Swift 6.2.
+**Requirements:** macOS 26.4+, Xcode 27 (Swift 6.4).
 
 ## Project Layout
 
@@ -38,7 +38,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 1. **Fork** and create a branch: `git checkout -b fix/my-thing`
 2. **Small, focused changes** — one concern per PR
 3. **Build** (`./build.sh` or Xcode) and run the tests (`AgentTests` target)
-4. **Match existing style** — the codebase uses Swift 6.2, `@Observable` view models, and async/await
+4. **Match existing style** — the codebase uses Swift 6.4, `@Observable` view models, and async/await
 5. Open a PR with a clear description of what and why
 
 PRs are reviewed quickly — usually within a day or two.

@@ -5,8 +5,8 @@
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
-[![macOS 26.4+](https://img.shields.io/badge/macOS-26.4.1-green?style=for-the-badge)](https://github.com/apple)
-[![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
+[![macOS 26.4+](https://img.shields.io/badge/macOS-26.4+-green?style=for-the-badge)](https://github.com/apple)
+[![Swift 6.4](https://img.shields.io/badge/Swift-6.4-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
 ## 🆕 New Kid on the Block: AgentiLoop CLI ⚡️
@@ -33,7 +33,7 @@ Meet the Agent! family's newest members: two cross-platform CLIs with the **exac
 
 **One app. Any AI. Total command over your Mac.**
 
-Agent! is a 100% native Swift 6.2 / SwiftUI app that wires **23 LLM providers** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (cloud and local), vLLM, LM Studio, and oMLX — plus on-device **Apple Intelligence** — into an autonomous task loop that actually *does things*: reads your codebase, fixes the bug, builds the Xcode project, commits the diff, drives any Mac app through the Accessibility API, runs shell commands as you or as root, texts you results over iMessage, and answers to a spoken *"Agent!"*.
+Agent! is a 100% native Swift 6.4 / SwiftUI app that wires **23 LLM providers** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (cloud and local), vLLM, LM Studio, and oMLX — plus on-device **Apple Intelligence** — into an autonomous task loop that actually *does things*: reads your codebase, fixes the bug, builds the Xcode project, commits the diff, drives any Mac app through the Accessibility API, runs shell commands as you or as root, texts you results over iMessage, and answers to a spoken *"Agent!"*.
 
 No NPM, no Electron, no subscription, no telemetry. Bring your own API key, run fully local, or run free on Apple Intelligence. Every Swift package it depends on was written by the same author. See [Backstory](#backstory) below.
 
@@ -54,10 +54,10 @@ No NPM, no Electron, no subscription, no telemetry. Bring your own API key, run 
 
 ```bash
 git clone https://github.com/AgentiLoop/agent.git
-cd Agent
+cd agent
 ```
 
-**Option A — Xcode (Apple Developer account):** open `Agent.xcodeproj`, set your Development Team, Build & Run the `Agent` target, approve the helper when prompted.
+**Option A — Xcode (Apple Developer account):** open `Agent.xcodeproj`, set your Development Team, Build & Run the `Agent!` scheme, approve the helper when prompted.
 
 **Option B — no developer account (Xcode Command Line Tools only):**
 ```bash
@@ -75,7 +75,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **`xcode-select` points at Command Line Tools** → `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
 - **Odd `BUILD FAILED` after pulling** → stale DerivedData: `./build.sh clean && ./build.sh`
 - **Helpers never register** → expected on Option B; use Option A, or simply install the [signed release binary](https://github.com/AgentiLoop/Agent/releases/latest) — every release and pre-release ships one
-- **Deployment target / SDK errors** → Agent! targets macOS 26; update macOS and Xcode
+- **Deployment target / SDK errors** → Agent! targets macOS 26.4 and Swift 6.4 (Xcode 27, the same toolchain CI uses); update macOS and Xcode
 - **Config argument is case-sensitive** → `./build.sh` (Debug) or `./build.sh Release`
 
 ## What Can It Do?
@@ -342,7 +342,7 @@ Slash commands run locally: `/clear [log|all|llm|history|tasks|tokens]`, `/memor
 
 **Do I need to know how to code?** No — plain English (or your native language).
 **How much does it cost?** The app is free for noncommercial and personal use (PolyForm Noncommercial 1.0.0). You pay your provider; GLM-5.3 via Z.ai/BigModel or DeepSeek are the cheapest for serious work. Local models are free if you own the hardware.
-**What Mac do I need?** Apple Silicon, macOS 26.4.1+. Any modern Mac for cloud providers; 64GB+ for 30B local models.
+**What Mac do I need?** Apple Silicon, macOS 26.4+. Any modern Mac for cloud providers; 64GB+ for 30B local models.
 **How is this different from Siri?** Siri answers. Agent! *acts* — apps, files, code, system.
 
 More: [docs/FAQ.md](docs/FAQ.md) · [Technical Architecture](docs/TECHNICAL.md) · [Comparisons](docs/COMPARISON.md) (vs Claude Code, Cursor, Cline, OpenClaw) · [Security Model](docs/SECURITY.md)

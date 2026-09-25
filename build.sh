@@ -4,10 +4,10 @@
 #
 # Usage:
 #   ./build.sh              # Debug build
-#   ./build.sh release      # Release build
+#   ./build.sh Release      # Release build (config name is case-sensitive)
 #   ./build.sh clean        # Clean build folder
 #
-# The app lands in build/Debug/ or build/Release/.
+# The app lands in build/DerivedData/Build/Products/<Debug|Release>/
 # Note: without a developer account, the app is ad-hoc signed and
 # won't have entitlements for sandboxing, iCloud, or push notifications.
 # The Launch Agent and Launch Daemon helpers also won't register with
