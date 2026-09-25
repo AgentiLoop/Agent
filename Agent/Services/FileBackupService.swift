@@ -41,10 +41,15 @@ final class FileBackupService {
         // previously collided on the backup name and copyItem failed.
         let stampFormatter = ISO8601DateFormatter()
         stampFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let timestamp = stampFormatter.string(from: Date())
-            .replacingOccurrences(of: ":", with: "-")
-        let backupName = "\(timestamp)_\(fileName)"
-        let backupURL = tabDir.appendingPathComponent(backupName)
+        // Back-to-back edits can land in the same millisecond — bump by 1 ms until the name is free.
+        var stamp = Date()
+        var backupURL: URL
+        repeat {
+            let timestamp = stampFormatter.string(from: stamp)
+                .replacingOccurrences(of: ":", with: "-")
+            backupURL = tabDir.appendingPathComponent("\(timestamp)_\(fileName)")
+            stamp = stamp.addingTimeInterval(0.001)
+        } while fm.fileExists(atPath: backupURL.path)
 
         do {
             try fm.copyItem(atPath: filePath, toPath: backupURL.path)
