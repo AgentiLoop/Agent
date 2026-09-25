@@ -85,16 +85,9 @@ final class ClaudeService {
     /// it in a separate system block means the (large) base prompt stays cached
     /// even though historyContext/stateBlocks change on every new task.
     private var stableSystemPrompt: String {
-        var prompt = SystemPromptService.shared.prompt(for: .claude, userName: userName, userHome: userHome, projectFolder: projectFolder)
-        if !projectFolder.isEmpty {
-            prompt =
-                "CURRENT PROJECT FOLDER: \(projectFolder)\n"
-                    + "Always cd to this directory before running any "
-                    + "shell commands. Use it as the default for all file "
-                    + "operations. You may go outside it when needed.\n\n" +
-                prompt
-        }
-        return prompt
+        // The base prompt already carries the project folder ("Project: …") and
+        // states that shells start there — no separate folder header needed.
+        SystemPromptService.shared.prompt(for: .claude, userName: userName, userHome: userHome, projectFolder: projectFolder)
     }
 
     /// Per-task suffix: tab history context + frozen state snapshots. Changes
