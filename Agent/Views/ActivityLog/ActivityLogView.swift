@@ -231,6 +231,8 @@ struct ActivityLogView: NSViewRepresentable {
         var userIsAtBottom = true
         /// Suppresses scroll tracking during programmatic scrolls
         var isProgrammaticScroll = false
+        /// Bumped per smooth-scroll animation so only the latest completion clears isProgrammaticScroll
+        var smoothScrollGeneration = 0
         /// Observation token for scroll notifications
         nonisolated(unsafe) var scrollObserver: NSObjectProtocol?
         /// Last known appearance name — used to detect light/dark mode changes
