@@ -74,7 +74,10 @@ extension AgentViewModel {
         flushLog()
 
         // Use ChatHistoryStore for LLM context (summaries for older tasks, full messages for recent)
-        let historyContext = ChatHistoryStore.shared.buildLLMContext()
+        // When the prior task's messages carry over (lastTaskMessages), its full log is
+        // already in the conversation — keep it out of the system prompt (summary line only).
+        let historyContext = ChatHistoryStore.shared.buildLLMContext(
+            recentFullTasks: lastTaskMessages.isEmpty ? 1 : 0)
         var (provider, modelName, isVision) = resolveInitialProviderConfig()
         // Defer the "🧠 provider/model" log line until AFTER triage has run and we know we're actually going to the
         // cloud LLM. Logging it up-front (the previous behavior) made the activity log misleading when Apple AI handled the request locally — users saw both "🧠 Z.ai/glm-5.1" and "🍎 Opened Photo Booth and took a photo" for the same task even though the cloud LLM never ran.
