@@ -397,56 +397,6 @@ final class TaskHistory {
         save()
     }
 
-    /// Returns the last task as a user/assistant message pair so the LLM sees it in conversation.
-    func lastTaskMessages() -> [[String: Any]] {
-        guard let last = records.last else { return [] }
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-        let date = formatter.string(from: last.date)
-
-        let recap: String
-        if last.isSummary {
-            recap = "Here is a summary of our previous work:\n\(last.summary)"
-        } else {
-            var parts = ["Previous task [\(date)]: \(last.prompt)", "Result: \(last.summary)"]
-            if !last.commandsRun.isEmpty {
-                parts.append("Commands run: \(last.commandsRun.prefix(5).joined(separator: "; "))")
-            }
-            recap = parts.joined(separator: "\n")
-        }
-
-        return [
-            ["role": "user", "content": recap],
-            ["role": "assistant", "content": "Understood, I have context from our previous work. What would you like to do next?"]
-        ]
-    }
-
-    /// Build a context string of recent history for the system prompt
-    func contextForPrompt(maxRecent: Int = 20) -> String {
-        guard !records.isEmpty else { return "" }
-        let recent = records.suffix(maxRecent)
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-
-        var lines: [String] = ["\n\nPrevious task history (most recent last):"]
-        for record in recent {
-            let date = formatter.string(from: record.date)
-            if record.isSummary {
-                lines.append("[\(date)] Earlier work summary:")
-                lines.append("  \(record.summary)")
-            } else {
-                lines.append("[\(date)] Task: \(record.prompt)")
-                lines.append("  Result: \(record.summary)")
-                if !record.commandsRun.isEmpty {
-                    let cmds = record.commandsRun.prefix(5).joined(separator: "; ")
-                    lines.append("  Commands: \(cmds)")
-                }
-            }
-        }
-        return lines.joined(separator: "\n")
-    }
 
     private func load() {
         guard FileManager.default.fileExists(atPath: fileURL.path) else { return }
