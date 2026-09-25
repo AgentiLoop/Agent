@@ -462,3 +462,47 @@ struct CodingServiceRegressionTests {
         #expect(try String(contentsOfFile: file, encoding: .utf8).contains("let value = 2"))
     }
 }
+
+/// Regression tests from the app-wide bug hunt.
+@Suite("AppWideRegression")
+@MainActor struct AppWideRegressionTests {
+
+    @Test("executeTCC does not deadlock when stderr exceeds the 64 KB pipe buffer")
+    func executeTCCLargeStderr() async {
+        let r = await AgentViewModel.executeTCC(
+            command: "yes x | head -c 200000 1>&2; echo done",
+            workingDirectory: NSTemporaryDirectory()
+        )
+        #expect(r.status == 0)
+        #expect(r.output.hasPrefix("done"))
+        #expect(r.output.count > 200000)
+    }
+
+    @Test("listBackups ignores short names like .DS_Store without crashing")
+    func listBackupsShortName() throws {
+        let tab = UUID()
+        defer { FileBackupService.shared.clearBackups(tabID: tab) }
+        let src = NSTemporaryDirectory() + "agent_backup_src_\(UUID().uuidString).txt"
+        try "v1".write(toFile: src, atomically: true, encoding: .utf8)
+        let backupPath = try #require(FileBackupService.shared.backup(filePath: src, tabID: tab))
+        let dir = (backupPath as NSString).deletingLastPathComponent
+        try "junk".write(toFile: dir + "/.DS_Store", atomically: true, encoding: .utf8)
+        let list = FileBackupService.shared.listBackups(tabID: tab)
+        #expect(list.count == 1)
+        #expect(list.first?.original == (src as NSString).lastPathComponent)
+    }
+
+    @Test("two backups of the same file within one second both succeed")
+    func backupSameSecond() throws {
+        let tab = UUID()
+        defer { FileBackupService.shared.clearBackups(tabID: tab) }
+        let src = NSTemporaryDirectory() + "agent_backup_src_\(UUID().uuidString).txt"
+        try "v1".write(toFile: src, atomically: true, encoding: .utf8)
+        let a = FileBackupService.shared.backup(filePath: src, tabID: tab)
+        let b = FileBackupService.shared.backup(filePath: src, tabID: tab)
+        #expect(a != nil)
+        #expect(b != nil)
+        #expect(a != b)
+        #expect(FileBackupService.shared.listBackups(tabID: tab).count == 2)
+    }
+}
