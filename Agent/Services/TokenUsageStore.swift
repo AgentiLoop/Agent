@@ -298,6 +298,17 @@ final class TokenUsageStore {
         taskLinesRemoved = 0
     }
 
+    /// Drop per-tab usage for tabs that no longer exist (closed tabs would otherwise
+    /// pile up in the popover's scope picker forever). Session totals are untouched.
+    func pruneTabUsage(keeping liveTabIds: Set<UUID>) {
+        let stale = tabModelUsage.keys.filter { $0 != Self.mainTabKey && !liveTabIds.contains($0) }
+        let staleLabels = tabLabel.keys.filter { $0 != Self.mainTabKey && !liveTabIds.contains($0) }
+        guard !stale.isEmpty || !staleLabels.isEmpty else { return }
+        for id in stale { tabModelUsage.removeValue(forKey: id) }
+        for id in staleLabels { tabLabel.removeValue(forKey: id) }
+        saveSession()
+    }
+
     /// Reset session-level model usage — clears the popover AND the persisted
     /// snapshot so the next app launch starts fresh.
     func resetModelUsage() {

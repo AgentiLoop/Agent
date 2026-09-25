@@ -152,6 +152,7 @@ extension AgentViewModel {
             }
         }
         scriptTabs.removeAll { $0.id == id }
+        TokenUsageStore.shared.pruneTabUsage(keeping: Set(scriptTabs.map(\.id)))
         persistScriptTabs()
     }
 
@@ -267,7 +268,10 @@ extension AgentViewModel {
     /// Restore script tabs from UserDefaults (order) + SwiftData (data).
     func restoreScriptTabs() {
         guard let ids = UserDefaults.standard.stringArray(forKey: "agentScriptTabIds"),
-              !ids.isEmpty else { return }
+              !ids.isEmpty else {
+            TokenUsageStore.shared.pruneTabUsage(keeping: [])
+            return
+        }
 
         let records = ChatHistoryStore.shared.fetchScriptTabs()
         let recordMap = Dictionary(records.compactMap { r in (r.tabId, r) }, uniquingKeysWith: { first, _ in first })
@@ -278,6 +282,9 @@ extension AgentViewModel {
             let tab = ScriptTab(record: record)
             scriptTabs.append(tab)
         }
+
+        // Clear usage left behind by tabs closed in earlier sessions
+        TokenUsageStore.shared.pruneTabUsage(keeping: Set(scriptTabs.map(\.id)))
 
         // Always start on Main tab
         selectedTabId = nil
