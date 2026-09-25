@@ -183,17 +183,15 @@ extension AgentViewModel {
             var found = false
             for i in 0..<lines.count {
                 let trimmed = lines[i].trimmingCharacters(in: .whitespaces)
-                if trimmed
-                    .contains(target) &&
-                    (trimmed.hasPrefix("- [") || trimmed.hasPrefix("- [x]") || trimmed.hasPrefix("- [⏳]") || trimmed.hasPrefix("- [❌]"))
-                {
-                    if let bracketEnd = lines[i].range(of: "] ") {
-                        let rest = String(lines[i][bracketEnd.upperBound...])
-                        let indent = String(lines[i].prefix(while: { $0 == " " || $0 == "\t" }))
-                        lines[i] = "\(indent)\(marker) \(rest)"
-                        found = true
-                        break
-                    }
+                // Match the step number right after the checkbox — a plain contains()
+                // let step 2 match "- [ ] 1. Bump version to 1.2.3".
+                guard trimmed.hasPrefix("- ["), let bracketEnd = lines[i].range(of: "] ") else { continue }
+                let rest = String(lines[i][bracketEnd.upperBound...])
+                if rest.hasPrefix(target) {
+                    let indent = String(lines[i].prefix(while: { $0 == " " || $0 == "\t" }))
+                    lines[i] = "\(indent)\(marker) \(rest)"
+                    found = true
+                    break
                 }
             }
 
