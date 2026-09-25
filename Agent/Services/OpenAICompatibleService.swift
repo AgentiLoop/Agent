@@ -541,6 +541,8 @@ final class OpenAICompatibleService {
             }
         }
 
+        // Ask for the final usage chunk so the oMLX timing line can show cached tokens.
+        if provider == .oMLX { body["stream_options"] = ["include_usage": true] }
         // .sortedKeys for byte-stable prefix caching — see send() for rationale.
         let bodyData = try JSONSerialization.data(withJSONObject: body, options: [.sortedKeys])
         var idleTimeout: TimeInterval?
@@ -550,7 +552,8 @@ final class OpenAICompatibleService {
             onStatus?(report.summary)
             idleTimeout = report.timeout
         }
-        return try await Self.performStreamingRequest(
+        let started = Date()
+        let result = try await Self.performStreamingRequest(
             bodyData: bodyData,
             apiKey: apiKey,
             url: baseURL,
@@ -558,6 +561,12 @@ final class OpenAICompatibleService {
             idleTimeout: idleTimeout,
             onTextDelta: onTextDelta
         )
+        if provider == .oMLX, let t = result.timing {
+            let first = t.firstByte.map { String(format: "%.1fs", $0.timeIntervalSince(started)) } ?? "–"
+            let cached = t.cachedTokens.map { " (\($0) cached)" } ?? ""
+            onStatus?("⏱️ oMLX: first token \(first), total \(String(format: "%.1fs", Date().timeIntervalSince(started))) — prompt \(result.inputTokens) tok\(cached), output \(result.outputTokens) tok")
+        }
+        return (result.content, result.stopReason, result.inputTokens, result.outputTokens)
     }
     // MARK: - OpenAI Responses API
 
@@ -781,7 +790,8 @@ final class OpenAICompatibleService {
         bodyData: Data, apiKey: String, url: URL, provider: APIProvider,
         idleTimeout: TimeInterval? = nil,
         onTextDelta: @escaping @Sendable (String) -> Void
-    ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
+    ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int,
+                       timing: (firstByte: Date?, cachedTokens: Int?)?) {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -817,6 +827,8 @@ final class OpenAICompatibleService {
         var finishReason = "stop"
         var streamInputTokens = 0
         var streamOutputTokens = 0
+        var firstByte: Date?
+        var cachedTokens: Int?
 
         // Accumulate streamed tool calls: index -> (id, name, arguments)
         var toolCallAccum: [Int: (id: String, name: String, arguments: String)] = [:]
@@ -845,6 +857,7 @@ final class OpenAICompatibleService {
             // Skip empty lines and SSE comments
             guard line.hasPrefix("data: ") else { continue }
             let payload = String(line.dropFirst(6))
+            if firstByte == nil { firstByte = Date() }
 
             // End of stream
             if payload == "[DONE]" { break }
@@ -864,6 +877,7 @@ final class OpenAICompatibleService {
             if let usage = json["usage"] as? [String: Any] {
                 streamInputTokens = usage["prompt_tokens"] as? Int ?? streamInputTokens
                 streamOutputTokens = usage["completion_tokens"] as? Int ?? streamOutputTokens
+                cachedTokens = (usage["prompt_tokens_details"] as? [String: Any])?["cached_tokens"] as? Int ?? cachedTokens
                 Self.recordCacheHits(from: usage)
             }
 
@@ -1078,6 +1092,6 @@ final class OpenAICompatibleService {
         let hasToolCalls = !toolCallAccum.isEmpty || parsedToolFromText
         let stopReason = hasToolCalls ? "tool_use" :
             (finishReason == "tool_calls" ? "tool_use" : (finishReason == "length" ? "max_tokens" : "end_turn"))
-        return (contentBlocks, stopReason, streamInputTokens, streamOutputTokens)
+        return (contentBlocks, stopReason, streamInputTokens, streamOutputTokens, (firstByte, cachedTokens))
     }
 }
