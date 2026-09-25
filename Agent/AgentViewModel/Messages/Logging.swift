@@ -414,6 +414,7 @@ extension AgentViewModel {
         // block: a blank line before the iteration header keeps its tool calls,
         // Jev checks and timings visually together.
         let startsGroup = message.hasPrefix("🕐 LLM ") || message.hasPrefix("✅ Completed")
+            || message.hasPrefix("📎 Attached")
         if startsGroup && !combined.isEmpty && !combined.hasSuffix("\n\n") {
             if !combined.hasSuffix("\n") { buffer += "\n" }
             buffer += "\n"
