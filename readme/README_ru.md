@@ -33,7 +33,7 @@
 
 **Одно приложение. Любой ИИ. Полный контроль над вашим Mac.**
 
-Agent! — это 100 % нативное приложение на Swift 6.2 / SwiftUI, которое объединяет **23 LLM-провайдера** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (облако и локально), vLLM и LM Studio — плюс встроенный **Apple Intelligence** — в автономный цикл задач, который действительно *делает дела*: читает вашу кодовую базу, исправляет баг, собирает Xcode-проект, коммитит diff, управляет любым Mac-приложением через API универсального доступа, выполняет shell-команды от вашего имени или от root, отправляет результаты по iMessage и отзывается на произнесённое *«Agent!»*.
+Agent! — это 100 % нативное приложение на Swift 6.2 / SwiftUI, которое объединяет **22 LLM-провайдера** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (облако и локально), vLLM и LM Studio — плюс встроенный **Apple Intelligence** — в автономный цикл задач, который действительно *делает дела*: читает вашу кодовую базу, исправляет баг, собирает Xcode-проект, коммитит diff, управляет любым Mac-приложением через API универсального доступа, выполняет shell-команды от вашего имени или от root, отправляет результаты по iMessage и отзывается на произнесённое *«Agent!»*.
 
 Никакого NPM, Electron, подписок и телеметрии. Используйте свой API-ключ, работайте полностью локально или бесплатно на Apple Intelligence. Каждый Swift-пакет, от которого зависит приложение, написан тем же автором. См. раздел [Предыстория](#предыстория) ниже.
 
@@ -113,7 +113,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 Компаниям и LLM-провайдерам, которые хотят поддержать проект: см. [docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md) (уровни, размещения) и [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md) (интеграция LLM-провайдеров) или станьте спонсором напрямую через [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). Все платежи проходят через GitHub Sponsors.
 
-## 🤖 23 LLM-провайдера
+## 🤖 22 LLM-провайдера
 
 | Провайдер | &nbsp;&nbsp;&nbsp;Спонсор&nbsp;&nbsp;&nbsp; | Стоимость | Лучше всего для |
 |---|:---:|---|---|
