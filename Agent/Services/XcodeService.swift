@@ -269,7 +269,7 @@ final class XcodeService: @unchecked Sendable {
         }
 
         let sorted = projects.sorted()
-        guard (1...sorted.count).contains(number) else {
+        guard number >= 1, number <= sorted.count else {
             return "Error: Project number \(number) out of range (1-\(sorted.count))"
         }
 
@@ -651,7 +651,8 @@ final class XcodeService: @unchecked Sendable {
         if parts.isEmpty { return "Error: unexpected version format '\(oldVersion)'" }
         parts[parts.count - 1] = max(0, parts[parts.count - 1] + delta)
         let newVersion = parts.map(String.init).joined(separator: ".")
-        content = content.replacingOccurrences(of: "MARKETING_VERSION = \(oldVersion)", with: "MARKETING_VERSION = \(newVersion)")
+        // Anchor on ";" so "1.2" doesn't also rewrite "1.25" in another target.
+        content = content.replacingOccurrences(of: "MARKETING_VERSION = \(oldVersion);", with: "MARKETING_VERSION = \(newVersion);")
 
         // Also bump build by same delta
         guard let bPattern = try? NSRegularExpression(pattern: #"CURRENT_PROJECT_VERSION\s*=\s*(\d+)"#) else {
@@ -665,8 +666,8 @@ final class XcodeService: @unchecked Sendable {
             if let n = Int(oldBuild) {
                 newBuild = String(max(1, n + delta))
                 content = content.replacingOccurrences(
-                    of: "CURRENT_PROJECT_VERSION = \(oldBuild)",
-                    with: "CURRENT_PROJECT_VERSION = \(newBuild)"
+                    of: "CURRENT_PROJECT_VERSION = \(oldBuild);",
+                    with: "CURRENT_PROJECT_VERSION = \(newBuild);"
                 )
             }
         }
@@ -702,7 +703,7 @@ final class XcodeService: @unchecked Sendable {
         let oldBuild = nsContent.substring(with: match.range(at: 1))
         guard let buildNum = Int(oldBuild) else { return "Error: unexpected build format '\(oldBuild)'" }
         let newBuild = String(max(1, buildNum + delta))
-        content = content.replacingOccurrences(of: "CURRENT_PROJECT_VERSION = \(oldBuild)", with: "CURRENT_PROJECT_VERSION = \(newBuild)")
+        content = content.replacingOccurrences(of: "CURRENT_PROJECT_VERSION = \(oldBuild);", with: "CURRENT_PROJECT_VERSION = \(newBuild);")
 
         do {
             try content.write(toFile: pbxPath, atomically: true, encoding: .utf8)
