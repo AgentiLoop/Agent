@@ -37,19 +37,6 @@ Agent! 是一款 100% 原生的 Swift 6.2 / SwiftUI 应用，将 **23 家 LLM �
 
 没有 NPM，没有 Electron，没有订阅，没有遥测。使用你自己的 API 密钥，完全本地运行，或用 Apple Intelligence 免费运行。它依赖的每个 Swift 包都出自同一位作者之手。详见下方的[项目背景](#项目背景)。
 
-## 最新动态 🚀
-
-**v1.1.x — Hardened Harness 版本** · [Releases →](https://github.com/AgentiLoop/Agent/releases/latest)
-
-- **上下文压缩全面重建。** 阈值 = 模型窗口 − 预留输出 − 缓冲，由真实的 `input_tokens` 驱动。提供商侧的 9 段式 LLM 摘要取代了设备端的 4K 摘要；每次压缩后都会重新附加未完成的目标、计划清单和已编辑文件。过大的工具结果在产生时即落盘，可通过 `restore_tool_result` 恢复。413 溢出会走强制压缩并以更短的请求重试；`max_tokens` 超限先升级、再以自身计数继续。
-- **先读后改门禁。** `edit_file` / `apply_diff` / `diff_apply` 拒绝修改 LLM 在本次任务中未读取过、或自上次读取后在磁盘上已变更（SHA-256）的文件。拒绝时会自动读取文件，使下一次调用即为编辑。外部文件变更会在每一轮以 diff 片段呈现。
-- **本地模型的真实上下文窗口。** LM Studio、Ollama 和 vLLM 报告各自模型的实际上下文长度——不再硬编码假设 32K。
-- **更快的回合。** 只读工具在 Claude 响应仍在流式输出时就开始运行；感知输入的 shell 并发；429/529 时带抖动的指数退避重试并遵循 `Retry-After`；所有提供商的 SSE 流中错误都会被暴露。
-- **纵深防御。** `ShellSafetyService` 现在同时在守护进程侧（AgentHelper + AgentUser）和客户端侧执行；Release 构建拒绝无团队签名的 XPC 客户端；两个 XPC 监听器都要求由应用自身签名派生的同团队代码签名。
-- **活动日志。** 不再有 50K 截断或重启时的 500K 裁剪——大日志在主线程外渲染并显示「Processing tab data…」遮罩；可选的「Activity Log Below HUD」布局。
-- **应用菜单：** 检查更新…（GitHub Releases）、网站、GitHub。每个 PR 都运行 CI Build & Test 工作流；**273 个测试全部通过**。
-- 此外：带证据验证标准的 `goal_state`、完成前可选的评审者 diff 审查、任务级 `rewind_task`、Claude 的扩展思考、`reasoning_effort` 透传、可按代理指定模型的子代理（3 个并发，6 个只读）、带恢复提示的类型化工具错误、事件钩子。
-
 ## 快速开始（下载）
 
 1. **下载** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) 并拖入「应用程序」—— 或使用 Homebrew：

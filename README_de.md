@@ -37,19 +37,6 @@ Agent! ist eine zu 100 % native Swift-6.2-/SwiftUI-App, die **23 LLM-Anbieter** 
 
 Kein NPM, kein Electron, kein Abo, keine Telemetrie. Bring deinen eigenen API-Schlüssel mit, lauf komplett lokal oder kostenlos mit Apple Intelligence. Jedes Swift-Paket, von dem die App abhängt, wurde vom selben Autor geschrieben. Siehe [Entstehungsgeschichte](#entstehungsgeschichte) unten.
 
-## Was ist neu 🚀
-
-**v1.1.x — Das Hardened-Harness-Release** · [Releases →](https://github.com/AgentiLoop/Agent/releases/latest)
-
-- **Kontext-Kompaktierung, neu gebaut.** Schwellwert = Modellfenster − reservierte Ausgabe − Puffer, gesteuert durch echte `input_tokens`. Eine anbieterseitige 9-Abschnitte-LLM-Zusammenfassung ersetzt die geräteinternen 4K-Zusammenfassungen; offenes Ziel, Plan-Checkliste und bearbeitete Dateien werden nach jeder Kompaktierung wieder angehängt. Übergroße Tool-Ergebnisse werden beim Entstehen auf die Festplatte ausgelagert und sind über `restore_tool_result` wiederherstellbar. 413-Überläufe laufen durch erzwungene Kompaktierung mit kürzerem Retry; `max_tokens`-Überschreitungen erholen sich durch Eskalation und anschließendes Fortsetzen.
-- **Read-before-edit-Gate.** `edit_file` / `apply_diff` / `diff_apply` verweigern Änderungen an Dateien, die das LLM in dieser Aufgabe nicht gelesen hat oder die sich seit dem letzten Lesen auf der Festplatte geändert haben (SHA-256). Die Verweigerung liest die Datei automatisch, sodass der nächste Aufruf die Bearbeitung ist. Externe Dateiänderungen werden in jedem Zug als Diff-Snippets angezeigt.
-- **Echte Kontextfenster für lokale Modelle.** LM Studio, Ollama und vLLM melden ihre tatsächliche Kontextlänge pro Modell — keine fest kodierte 32K-Annahme mehr.
-- **Schnellere Züge.** Nur-Lese-Tools starten, während die Claude-Antwort noch streamt; eingabebewusste Shell-Parallelität; gejitterter exponentieller Retry mit `Retry-After` bei 429/529; Fehler mitten im SSE-Stream werden bei jedem Anbieter sichtbar.
-- **Defense-in-Depth.** `ShellSafetyService` wird jetzt sowohl daemon-seitig (AgentHelper + AgentUser) als auch client-seitig durchgesetzt; Release-Builds lehnen XPC-Clients ohne Team ab; beide XPC-Listener verlangen Code-Signing mit demselben Team, abgeleitet aus der eigenen Signatur der App.
-- **Aktivitätsprotokoll.** Keine 50K-Kürzung und kein 500K-Trimmen beim Neustart mehr — große Logs werden abseits des Main-Threads mit einem „Processing tab data…"-Overlay gerendert; optionales Layout „Activity Log Below HUD".
-- **App-Menü:** Nach Updates suchen… (GitHub-Releases), Website, GitHub. CI-Build-&-Test-Workflow bei jedem PR; **273 bestandene Tests**.
-- Außerdem: `goal_state` mit evidenzgeprüften Kriterien, optionale Kritiker-Diff-Prüfung vor Abschluss, aufgabenbezogenes `rewind_task`, Extended Thinking für Claude, `reasoning_effort`-Durchreichung, Sub-Agenten mit Modell-Override pro Agent (3 parallel, 6 nur lesend), typisierte Tool-Fehler mit Wiederherstellungshinweisen, Event-Hooks.
-
 ## Schnellstart (Download)
 
 1. **Lade** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) herunter und ziehe es in „Programme" — oder mit Homebrew:

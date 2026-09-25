@@ -37,19 +37,6 @@ Agent! est une app 100 % native Swift 6.2 / SwiftUI qui relie **23 fournisseurs 
 
 Pas de NPM, pas d'Electron, pas d'abonnement, pas de télémétrie. Apportez votre propre clé API, tournez entièrement en local, ou gratuitement avec Apple Intelligence. Chaque package Swift dont l'app dépend a été écrit par le même auteur. Voir l'[Histoire](#histoire) ci-dessous.
 
-## Nouveautés 🚀
-
-**v1.1.x — La version Hardened Harness** · [Releases →](https://github.com/AgentiLoop/Agent/releases/latest)
-
-- **Compactage du contexte, reconstruit.** Seuil = fenêtre du modèle − sortie réservée − marge, piloté par les vrais `input_tokens`. Un résumé LLM en 9 sections côté fournisseur remplace les résumés 4K sur l'appareil ; l'objectif ouvert, la checklist du plan et les fichiers modifiés sont rattachés après chaque compactage. Les résultats d'outils trop volumineux sont écrits sur disque dès leur émission et récupérables via `restore_tool_result`. Les dépassements 413 passent par un compactage forcé avec une requête plus courte ; les dépassements de `max_tokens` se rétablissent par escalade, puis continuation.
-- **Garde read-before-edit.** `edit_file` / `apply_diff` / `diff_apply` refusent de toucher un fichier que le LLM n'a pas lu dans cette tâche, ou qui a changé sur le disque depuis la dernière lecture (SHA-256). Le refus lit automatiquement le fichier pour que l'appel suivant soit la modification. Les changements externes de fichiers sont affichés à chaque tour sous forme d'extraits de diff.
-- **Vraies fenêtres de contexte pour les modèles locaux.** LM Studio, Ollama et vLLM rapportent leur longueur de contexte réelle par modèle — fini l'hypothèse fixe de 32K.
-- **Tours plus rapides.** Les outils en lecture seule démarrent pendant que la réponse de Claude est encore en streaming ; concurrence shell tenant compte des entrées ; nouvelle tentative exponentielle avec jitter et `Retry-After` sur 429/529 ; erreurs en cours de flux SSE remontées pour chaque fournisseur.
-- **Défense en profondeur.** `ShellSafetyService` est désormais appliqué côté daemon (AgentHelper + AgentUser) en plus du client ; les builds release rejettent les clients XPC sans équipe ; les deux listeners XPC exigent une signature de code de la même équipe, dérivée de la propre signature de l'app.
-- **Journal d'activité.** Plus de troncature à 50K ni de coupe à 500K au relancement — les gros journaux sont rendus hors du thread principal avec une superposition « Processing tab data… » ; disposition optionnelle « Activity Log Below HUD ».
-- **Menu de l'app :** Rechercher des mises à jour… (releases GitHub), Site web, GitHub. Workflow CI Build & Test sur chaque PR ; **273 tests réussis**.
-- Et aussi : `goal_state` avec critères vérifiés par des preuves, revue critique optionnelle du diff avant la fin, `rewind_task` par tâche, réflexion étendue pour Claude, transmission de `reasoning_effort`, sous-agents avec modèle propre par agent (3 simultanés, 6 en lecture seule), erreurs d'outils typées avec indices de récupération, hooks d'événements.
-
 ## Démarrage rapide (Téléchargement)
 
 1. **Téléchargez** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) et glissez-le dans Applications — ou avec Homebrew :

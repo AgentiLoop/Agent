@@ -37,19 +37,6 @@ Agent!는 100% 네이티브 Swift 6.2 / SwiftUI 앱으로, **21개 LLM 제공자
 
 NPM도, Electron도, 구독도, 텔레메트리도 없습니다. 직접 API 키를 가져오거나, 완전히 로컬로 실행하거나, Apple Intelligence로 무료로 실행하세요. 의존하는 모든 Swift 패키지는 같은 저자가 작성했습니다. 아래 [비하인드 스토리](#비하인드-스토리)를 참고하세요.
 
-## 새로운 소식 🚀
-
-**v1.1.x — The Hardened Harness Release** · [릴리스 →](https://github.com/AgentiLoop/Agent/releases/latest)
-
-- **컨텍스트 압축, 재구축.** 임계값 = 모델 윈도우 − 예약 출력 − 버퍼, 실제 `input_tokens` 기반. 제공자 측 9섹션 LLM 요약이 온디바이스 4K 요약을 대체; 열린 목표, 계획 체크리스트, 편집된 파일은 매 압축 후 다시 첨부됩니다. 과도하게 큰 도구 결과는 발생 시 디스크로 넘기고 `restore_tool_result`로 복구할 수 있습니다. 413 오버플로는 강제 압축과 더 짧은 재시도로 처리; `max_tokens` 초과는 확대 후 계속하는 방식으로 복구됩니다.
-- **편집 전 읽기 게이트.** `edit_file` / `apply_diff` / `diff_apply`는 이 작업에서 LLM이 읽지 않았거나 마지막 읽기 이후 디스크에서 변경된(SHA-256) 파일은 건드리지 않습니다. 거부 시 파일을 자동으로 읽어 다음 호출이 바로 편집이 되게 합니다. 외부 파일 변경은 매 턴 diff 스니펫으로 표시됩니다.
-- **로컬 모델의 실제 컨텍스트 윈도우.** LM Studio, Ollama, vLLM이 모델별 실제 컨텍스트 길이를 보고합니다 — 더 이상 하드코딩된 32K 가정이 없습니다.
-- **더 빠른 턴.** 읽기 전용 도구는 Claude 응답이 스트리밍되는 동안 시작; 입력 인식 셸 동시성; 429/529에 `Retry-After`를 반영한 지터 지수 재시도; 모든 제공자에서 스트림 중 SSE 오류 표시.
-- **심층 방어.** `ShellSafetyService`가 이제 클라이언트 측뿐 아니라 데몬 측(AgentHelper + AgentUser)에서도 적용; 릴리스 빌드는 팀 없는 XPC 클라이언트를 거부; 두 XPC 리스너 모두 앱 자체 서명에서 파생된 동일 팀 코드 서명을 요구합니다.
-- **활동 로그.** 더 이상 50K 잘림이나 500K 재시작 트림이 없습니다 — 큰 로그는 "Processing tab data…" 오버레이와 함께 메인 스레드 밖에서 렌더링; 선택적 "Activity Log Below HUD" 레이아웃.
-- **앱 메뉴:** 업데이트 확인…(GitHub 릴리스), 웹사이트, GitHub. 모든 PR에 CI Build & Test 워크플로; **273개 테스트 통과**.
-- 추가: 증거로 검증되는 기준을 가진 `goal_state`, 완료 전 선택적 크리틱 diff 리뷰, 작업 범위 `rewind_task`, Claude 확장 사고, `reasoning_effort` 전달, 에이전트별 모델 오버라이드가 가능한 서브 에이전트(동시 3개, 읽기 전용 6개), 복구 힌트가 있는 타입 도구 오류, 이벤트 훅.
-
 ## 빠른 시작 (다운로드)
 
 1. [Agent!](https://github.com/AgentiLoop/Agent/releases/latest)를 **다운로드**하여 응용 프로그램으로 드래그 — 또는 Homebrew로:

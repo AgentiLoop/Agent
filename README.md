@@ -37,19 +37,6 @@ Agent! is a 100% native Swift 6.2 / SwiftUI app that wires **23 LLM providers** 
 
 No NPM, no Electron, no subscription, no telemetry. Bring your own API key, run fully local, or run free on Apple Intelligence. Every Swift package it depends on was written by the same author. See [Backstory](#backstory) below.
 
-## What's New 🚀
-
-**v1.1.x — The Hardened Harness Release** · [Releases →](https://github.com/AgentiLoop/Agent/releases/latest)
-
-- **Context compaction, rebuilt.** Threshold = model window − reserved output − buffer, driven by real `input_tokens`. Provider-side 9-section LLM summary replaces on-device 4K summaries; open goal, plan checklist and edited files are re-attached after every compaction. Oversized tool results are spilled to disk at emission and recoverable via `restore_tool_result`. 413 overflow routes through forced compaction with a shorter retry; `max_tokens` overruns recover by escalating, then continuing.
-- **Read-before-edit gate.** `edit_file` / `apply_diff` / `diff_apply` refuse to touch a file the LLM hasn't read this task, or that changed on disk since the last read (SHA-256). The refusal auto-reads the file so the next call is the edit. External file changes are surfaced each turn as diff snippets.
-- **Real context windows for local models.** LM Studio, Ollama and vLLM report their actual per-model context length — no more hardcoded 32K assumption.
-- **Faster turns.** Read-only tools start while the Claude response is still streaming; input-aware shell concurrency; jittered exponential retry with `Retry-After` on 429/529; mid-stream SSE errors surfaced on every provider.
-- **Defense-in-depth.** `ShellSafetyService` is now enforced daemon-side (AgentHelper + AgentUser) as well as client-side; release builds reject un-teamed XPC clients; both XPC listeners require same-team code signing derived from the app's own signature.
-- **Activity log.** No more 50K truncation or 500K relaunch trim — large logs render off-main with a "Processing tab data…" overlay; optional "Activity Log Below HUD" layout.
-- **App menu:** Check for Updates… (GitHub releases), Website, GitHub. CI Build & Test workflow on every PR; **273 passing tests**.
-- Plus: `goal_state` with evidence-verified criteria, opt-in critic diff review before completion, task-scoped `rewind_task`, extended thinking for Claude, `reasoning_effort` pass-through, sub-agents with per-agent model override (3 concurrent, 6 read-only), typed tool errors with recovery hints, event hooks.
-
 ## Quick Start (Download)
 
 1. **Download** [Agent!](https://github.com/AgentiLoop/Agent/releases/latest) and drag to Applications — or with Homebrew:
