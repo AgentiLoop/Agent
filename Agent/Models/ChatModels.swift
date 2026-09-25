@@ -350,7 +350,11 @@ final class ChatHistoryStore {
 
     /// Build a concise context string for the LLM system prompt.
     /// Recent tasks get full messages; older tasks use their summary if available.
-    func buildLLMContext(recentFullTasks: Int = 1, maxOlderSummaries: Int = 5) -> String {
+    func buildLLMContext(
+        recentFullTasks: Int = 1,
+        maxOlderSummaries: Int = 5,
+        maxRecentChars: Int = LogLimits.historyContextChars
+    ) -> String {
         guard let context else { return "" }
 
         let descriptor = FetchDescriptor<ChatTask>(
@@ -391,9 +395,9 @@ final class ChatHistoryStore {
                     body += "\n"
                 }
             }
-            if body.count > LogLimits.historyContextChars {
-                let dropped = body.count - LogLimits.historyContextChars
-                body = "[... \(dropped) chars of earlier log omitted]\n" + String(body.suffix(LogLimits.historyContextChars))
+            if body.count > maxRecentChars {
+                let dropped = body.count - maxRecentChars
+                body = "[... \(dropped) chars of earlier log omitted]\n" + String(body.suffix(maxRecentChars))
             }
             result += "--- Recent Task ---\n"
             result += "[\(formatter.string(from: task.startTime))] Task: \(task.prompt.prefix(LogLimits.historyLineChars))\n"

@@ -165,7 +165,9 @@ final class OpenAICompatibleService {
         overrideSystemPrompt == nil && (provider == .oMLX || provider == .vLLM)
     }
 
-    private var volatileContext: String { historyContext + stateBlocks }
+    // Memory (stable across tasks) first, chat history (changes every task) last,
+    // so the server's prefix cache extends through the memory block.
+    private var volatileContext: String { stateBlocks + historyContext }
 
     func tools(activeGroups: Set<String>? = nil, compact: Bool = false) -> [[String: Any]] {
         // No mode-based narrowing — every user-enabled tool flows through.
