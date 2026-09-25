@@ -4,11 +4,29 @@ import AgentAudit
 /// Shared output context for streaming command output via XPC.
 final class OutputContext: @unchecked Sendable {
     var output = ""
+    /// Bytes read from the pipe that end mid-UTF-8 character; completed by the next read.
+    var pendingBytes = Data()
     let outputLock = NSLock()
     let progressHandler: ((String) -> Void)?
 
     init(progressHandler: ((String) -> Void)?) {
         self.progressHandler = progressHandler
+    }
+
+    /// Decode the longest valid UTF-8 prefix of `buffer`, leaving up to 3 trailing bytes
+    /// of an incomplete character in `buffer`. Pipe reads can split a multi-byte
+    /// character; decoding each read on its own used to drop the whole chunk.
+    static func takeDecodablePrefix(_ buffer: inout Data) -> String {
+        for trim in 0...min(3, buffer.count) {
+            if let s = String(data: buffer.prefix(buffer.count - trim), encoding: .utf8) {
+                buffer = Data(buffer.suffix(trim))
+                return s
+            }
+        }
+        // Genuinely invalid bytes (not just a split character): keep the text, replace the bad bytes.
+        let s = String(decoding: buffer, as: UTF8.self)
+        buffer.removeAll()
+        return s
     }
 }
 
@@ -90,11 +108,13 @@ enum DaemonCore {
 
         pipe.fileHandleForReading.readabilityHandler = { [ctx] handle in
             let data = handle.availableData
-            guard !data.isEmpty, let chunk = String(data: data, encoding: .utf8) else { return }
+            guard !data.isEmpty else { return }
             ctx.outputLock.lock()
+            ctx.pendingBytes.append(data)
+            let chunk = OutputContext.takeDecodablePrefix(&ctx.pendingBytes)
             ctx.output += chunk
             ctx.outputLock.unlock()
-            ctx.progressHandler?(chunk)
+            if !chunk.isEmpty { ctx.progressHandler?(chunk) }
         }
 
         do {
@@ -102,6 +122,9 @@ enum DaemonCore {
             process.waitUntilExit()
         } catch {
             AuditLog.denied(auditCategory, "exec [\(instanceID)] failed to launch: \(error.localizedDescription)")
+            lock.lock()
+            if runningProcesses[instanceID] === process { runningProcesses.removeValue(forKey: instanceID) }
+            lock.unlock()
             reply(-1, error.localizedDescription)
             return
         }
@@ -109,12 +132,14 @@ enum DaemonCore {
         pipe.fileHandleForReading.readabilityHandler = nil
 
         let remainingData = pipe.fileHandleForReading.readDataToEndOfFile()
-        if !remainingData.isEmpty, let chunk = String(data: remainingData, encoding: .utf8) {
-            ctx.outputLock.lock()
-            ctx.output += chunk
-            ctx.outputLock.unlock()
-            ctx.progressHandler?(chunk)
-        }
+        ctx.outputLock.lock()
+        ctx.pendingBytes.append(remainingData)
+        // End of stream: decode whatever is left, replacing any truly invalid bytes.
+        let tail = String(decoding: ctx.pendingBytes, as: UTF8.self)
+        ctx.pendingBytes.removeAll()
+        ctx.output += tail
+        ctx.outputLock.unlock()
+        if !tail.isEmpty { ctx.progressHandler?(tail) }
 
         ctx.outputLock.lock()
         let output = ctx.output
@@ -123,8 +148,10 @@ enum DaemonCore {
         AuditLog.log(auditCategory, "exec [\(instanceID)] exited \(process.terminationStatus) (\(output.count) bytes)")
         reply(process.terminationStatus, output)
 
+        // Only drop our own entry — a newer execute() with the same instanceID may
+        // already have registered its process, and Cancel must still find it.
         lock.lock()
-        runningProcesses.removeValue(forKey: instanceID)
+        if runningProcesses[instanceID] === process { runningProcesses.removeValue(forKey: instanceID) }
         lock.unlock()
     }
 
