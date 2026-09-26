@@ -609,6 +609,8 @@ extension AgentViewModel {
     private static func toolResultLooksLikeError(_ toolResult: [String: Any]?) -> Bool {
         guard let content = toolResult?["content"] as? String else { return false }
         let lower = content.lowercased()
+        // Successful edits embed a diff preview whose removed lines start with ❌ — not an error.
+        if lower.contains("[verified: true]") { return false }
         // Non-zero exit codes — match "exit code: 1", "exit code: 127", etc.
         if let range = lower.range(of: "exit code: ") {
             let tail = lower[range.upperBound...]
