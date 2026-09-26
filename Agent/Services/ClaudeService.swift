@@ -340,7 +340,7 @@ final class ClaudeService {
             var toolDefs = tools(activeGroups: activeGroups, compact: compactTools)
             // Mark last tool with cache_control for prompt caching
             if !toolDefs.isEmpty {
-                toolDefs[toolDefs.count - 1]["cache_control"] = ["type": "ephemeral"]
+                toolDefs[toolDefs.count - 1]["cache_control"] = isLocalEndpoint ? ["type": "ephemeral"] : Self.longCacheControl
             }
             body["tools"] = toolDefs
         }
@@ -401,12 +401,19 @@ final class ClaudeService {
         if isOAuthToken(credential) {
             blocks.append(["type": "text", "text": claudeCodeIdentityPrompt])
         }
-        blocks.append(["type": "text", "text": stable, "cache_control": ["type": "ephemeral"]])
+        blocks.append(["type": "text", "text": stable, "cache_control": longCacheControl])
         if !dynamic.isEmpty {
             blocks.append(["type": "text", "text": dynamic, "cache_control": ["type": "ephemeral"]])
         }
         return blocks
     }
+
+    /// 1-hour cache breakpoint for the parts that are byte-identical across
+    /// tasks (tools + stable system prompt), so a pause longer than the default
+    /// 5-minute TTL doesn't re-write them. The per-task dynamic suffix and the
+    /// per-turn message breakpoint stay at 5 min; Anthropic requires longer-TTL
+    /// breakpoints to precede shorter ones, which tools → system → messages does.
+    nonisolated static var longCacheControl: [String: Any] { ["type": "ephemeral", "ttl": "1h"] }
 
     /// Apply the correct auth headers for either an API key or an OAuth token.
     /// OAuth tokens use `Authorization: Bearer` + the `oauth-2025-04-20` beta
@@ -426,7 +433,7 @@ final class ClaudeService {
             request.setValue("Bearer \(clean)", forHTTPHeaderField: "Authorization")
             // All beta flags in a single comma-separated header value.
             request.setValue(
-                "oauth-2025-04-20,prompt-caching-2024-07-31" + thinkingFlag,
+                "oauth-2025-04-20,prompt-caching-2024-07-31,extended-cache-ttl-2025-04-11" + thinkingFlag,
                 forHTTPHeaderField: "anthropic-beta"
             )
         } else if clean.hasPrefix("sk-or-") {
@@ -434,7 +441,7 @@ final class ClaudeService {
             request.setValue("Bearer \(clean)", forHTTPHeaderField: "Authorization")
         } else {
             request.setValue(clean, forHTTPHeaderField: "x-api-key")
-            request.setValue("prompt-caching-2024-07-31" + thinkingFlag, forHTTPHeaderField: "anthropic-beta")
+            request.setValue("prompt-caching-2024-07-31,extended-cache-ttl-2025-04-11" + thinkingFlag, forHTTPHeaderField: "anthropic-beta")
         }
     }
 
@@ -514,7 +521,7 @@ final class ClaudeService {
         if !isLocalhostEndpoint {
             var toolDefs = tools(activeGroups: activeGroups, compact: compactTools)
             if !toolDefs.isEmpty {
-                toolDefs[toolDefs.count - 1]["cache_control"] = ["type": "ephemeral"]
+                toolDefs[toolDefs.count - 1]["cache_control"] = isLocalEndpoint ? ["type": "ephemeral"] : Self.longCacheControl
             }
             body["tools"] = toolDefs
         }
