@@ -56,7 +56,7 @@ extension AgentViewModel {
         {
             return (config.provider, config.model)
         }
-        return (selectedProvider, globalModelForProvider(selectedProvider))
+        return (mainTabProvider, globalModelForProvider(mainTabProvider))
     }
 
     /// Return the current global model ID for the given provider.

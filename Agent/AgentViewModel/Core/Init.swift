@@ -100,17 +100,8 @@ extension AgentViewModel {
         fetchModelsIfNeeded(for: selectedProvider)
     }
 
-    /// Push global provider/model change into the active tab's LLMConfig.
-    /// Skipped while a restore-from-tab is in flight so the tab's user-picked model isn't clobbered.
-    func syncProviderToActiveTab() {
-        if isRestoringProviderFromTab { return }
-        guard let tabId = selectedTabId, let tab = tab(for: tabId), tab.isMainTab else { return }
-        let model = globalModelForProvider(selectedProvider)
-        tab.llmConfig = LLMConfig(provider: selectedProvider, model: model, displayName: tab.scriptName)
-        persistScriptTabs()
-    }
-
-    /// Restore global provider/model from the active tab's saved LLMConfig when switching tabs.
+    /// Show the active tab's provider in the toolbar when switching tabs.
+    /// A tab's LLMConfig is fixed at creation — the toolbar never writes back into it.
     func restoreProviderFromActiveTab() {
         // Back on Main: put Main's own provider back instead of keeping the last tab's.
         if selectedTabId == nil {
@@ -121,9 +112,7 @@ extension AgentViewModel {
               let tab = tab(for: tabId),
               let config = tab.llmConfig else { return }
         if selectedProvider != config.provider {
-            isRestoringProviderFromTab = true
             selectedProvider = config.provider
-            isRestoringProviderFromTab = false
         }
     }
 }

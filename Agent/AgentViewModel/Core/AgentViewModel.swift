@@ -230,8 +230,6 @@ final class AgentViewModel {
             UserDefaults.standard.set(selectedProvider.rawValue, forKey: "agentProvider")
             if selectedTabId == nil { mainTabProvider = selectedProvider }
             fetchModelsForSelectedProviderIfNeeded()
-            // Sync to the active tab's LLMConfig so each tab remembers its own provider
-            syncProviderToActiveTab()
         }
     }
 
@@ -598,10 +596,6 @@ final class AgentViewModel {
     }() {
         didSet { UserDefaults.standard.set(mainTabProvider.rawValue, forKey: "mainTabProvider") }
     }
-
-    /// Re-entrancy guard: true while restoreProviderFromActiveTab is mid-flight so the
-    /// chained selectedProvider.didSet doesn't overwrite the tab's user-picked model.
-    var isRestoringProviderFromTab: Bool = false
 
     /// O(1) tab lookup by UUID
     private var tabsByID: [UUID: ScriptTab] = [:]
