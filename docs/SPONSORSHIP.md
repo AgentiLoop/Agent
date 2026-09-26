@@ -10,7 +10,7 @@ Agent! is a free-for-noncommercial-use (PolyForm Noncommercial 1.0.0), 100% nati
 
 | Logo | Sponsor | &nbsp;&nbsp;&nbsp;Level&nbsp;&nbsp;&nbsp; | |
 |:---:|---|:---:|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="sponsors/fluxion-ai-logo.png" width="64" height="64" alt="Fluxion AI logo" /></a> | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | One unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing, and get $3 in API credits when you sign up through the link (promo code `AIAGENT`). |
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="sponsors/fluxion-ai-logo.png" width="128" height="128" alt="Fluxion AI logo" /></a> | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | One unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing, and get $3 in API credits when you sign up through the link (promo code `AIAGENT`). |
 
 ## Badges
 
