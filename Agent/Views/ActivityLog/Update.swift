@@ -164,9 +164,11 @@ extension ActivityLogView.Coordinator {
                 if tabSwitched, swapToCachedStorage(for: tabID, text: text, textView: textView, scrollView: scrollView) {
                     // Cache hit — layout preserved, scroll restored
                 } else if len > Self.asyncRenderThreshold {
-                    // Big log, no cache: parse off-main behind a progress overlay. lastLength /
-                    // lastRenderedText are committed when the result lands (see finishAsyncRender).
-                    startAsyncFullRender(text: text, len: len, tabID: tabID, textView: textView, scrollView: scrollView)
+                    // Big log, no cache: parse off-main. The progress overlay is only for loading a tab's
+                    // data (tab switch / first load); a same-tab re-render (e.g. new task start) keeps the
+                    // old content visible until the result lands. lastLength / lastRenderedText are
+                    // committed when the result lands (see finishAsyncRender).
+                    startAsyncFullRender(text: text, len: len, tabID: tabID, textView: textView, scrollView: scrollView, showOverlay: lastLength == 0)
                     return
                 } else {
                     textView.textStorage?.beginEditing()
@@ -225,14 +227,16 @@ extension ActivityLogView.Coordinator {
     /// The bar is determinate while the parse runs (chars consumed / total, reported by
     /// `buildAttributedString`), then flips to indeterminate for the final TextKit layout,
     /// which gives no progress and would otherwise look frozen at 100 %.
-    func startAsyncFullRender(text: String, len: Int, tabID: UUID?, textView: NSTextView, scrollView: NSScrollView) {
+    func startAsyncFullRender(text: String, len: Int, tabID: UUID?, textView: NSTextView, scrollView: NSScrollView, showOverlay: Bool) {
         asyncRenderGeneration += 1
         let generation = asyncRenderGeneration
         asyncRenderInFlight = true
-        textView.textStorage?.setAttributedString(NSAttributedString())
-        textView.alphaValue = 1
-        showLoadingOverlay(in: scrollView)
-        setLoadingBarDeterminate(true)
+        if showOverlay {
+            textView.textStorage?.setAttributedString(NSAttributedString())
+            textView.alphaValue = 1
+            showLoadingOverlay(in: scrollView)
+            setLoadingBarDeterminate(true)
+        }
 
         Task.detached(priority: .userInitiated) { [weak self] in
             guard let self else { return }
