@@ -165,13 +165,16 @@ struct LLMOutputTextView: NSViewRepresentable {
             .foregroundColor: cursorVisible ? textColor : NSColor.clear
         ]
 
-        if contentLen != coord.lastContentLength {
-            // Text shrank → new task / reset → re-arm auto-follow + drop table latch
-            if contentLen < coord.lastContentLength {
+        if contentText != coord.lastContentText {
+            // The coordinator/NSView is reused across tab switches, so a length check
+            // alone isn't enough: only a true continuation of the previously rendered
+            // text may take the append fast path. Anything else (new task, reset, or a
+            // different tab's text) re-arms auto-follow and does a full splice.
+            let isAppend = coord.lastContentLength > 0 && contentText.hasPrefix(coord.lastContentText)
+            if !isAppend {
                 coord.autoFollowDisabled = false
                 coord.needsTableRender = false
             }
-            let isAppend = contentLen > coord.lastContentLength && coord.lastContentLength > 0
             let hasTable = contentText.contains("|\n") && contentText.contains("---")
             if hasTable { coord.needsTableRender = true }
 
@@ -243,6 +246,7 @@ struct LLMOutputTextView: NSViewRepresentable {
 
             CATransaction.commit()
             coord.lastContentLength = contentLen
+            coord.lastContentText = contentText
             coord.renderedSourceLength = contentLen
 
             // Latch table-render mode while the tail looks like a table row
@@ -288,6 +292,8 @@ struct LLMOutputTextView: NSViewRepresentable {
         weak var textView: NSTextView?
         var onContentHeight: ((CGFloat) -> Void)?
         var lastContentLength: Int = 0
+        /// Source text last rendered into storage — the append fast path requires the new text to extend it.
+        var lastContentText: String = ""
         /// UTF-16 length of the raw source text already represented in storage. The fast path
         /// appends raw deltas from this offset — NOT from storage.length, which diverges from
         /// the source length after any markdown render (fences stripped, bullets widened, etc.).
