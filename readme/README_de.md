@@ -109,9 +109,9 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 
 <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_de.svg" width="900" alt="Fluxion AI, Silver-Sponsor: eine einheitliche API für GPT, Claude und andere führende KI-Modelle. Spare bis zu 70 % gegenüber den offiziellen API-Preisen und erhalte $3 API-Guthaben." /></a>
 
-| Sponsor | &nbsp;&nbsp;&nbsp;Stufe&nbsp;&nbsp;&nbsp; | |
-|---|:---:|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Zuverlässiger, kostengünstiger Zugang zu GPT, Claude und anderen führenden KI-Modellen über eine einheitliche API. Spare bis zu 70 % gegenüber den offiziellen API-Preisen und erhalte $3 API-Guthaben, wenn du dich über [diesen Link](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) registrierst (Promo-Code `AIAGENT`). |
+| Logo | Sponsor | &nbsp;&nbsp;&nbsp;Stufe&nbsp;&nbsp;&nbsp; | |
+|:---:|---|:---:|---|
+| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-logo.png" width="64" height="64" alt="Fluxion AI logo" /></a> | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Zuverlässiger, kostengünstiger Zugang zu GPT, Claude und anderen führenden KI-Modellen über eine einheitliche API. Spare bis zu 70 % gegenüber den offiziellen API-Preisen und erhalte $3 API-Guthaben, wenn du dich über [diesen Link](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) registrierst (Promo-Code `AIAGENT`). |
 
 ## Sponsoring
 
