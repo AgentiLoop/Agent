@@ -643,7 +643,10 @@ extension AgentViewModel {
             return "Error: clipboard write failed. Recovery: retry, or write to a file path instead of 'clipboard'."
         }
         var destPath = (destination as NSString).expandingTildeInPath
-        if !destPath.hasPrefix("/"), !projectFolder.isEmpty {
+        // "chat" / "chat:N" isn't a real path — keep it out of the project folder (and git).
+        if d == "chat" || d.hasPrefix("chat:") {
+            destPath = "/tmp/chat.png"
+        } else if !destPath.hasPrefix("/"), !projectFolder.isEmpty {
             destPath = (projectFolder as NSString).appendingPathComponent(destPath)
         }
         guard let tiff = image.tiffRepresentation,
