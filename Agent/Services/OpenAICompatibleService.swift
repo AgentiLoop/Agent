@@ -13,9 +13,26 @@ enum OpenAIToolCallParsing {
     }
 
     /// Sanitize an existing tool call ID to 9 alphanumeric chars.
+    /// Longer IDs are hashed (not prefix-truncated) so parallel calls sharing a
+    /// prefix (e.g. "call_01a0d…1" / "call_01a0d…2") don't collapse into one ID.
     nonisolated static func sanitizeToolId(_ id: String) -> String {
         let clean = String(id.unicodeScalars.filter { CharacterSet.alphanumerics.contains($0) })
-        if clean.count >= 9 { return String(clean.prefix(9)) }
+        if clean.count == 9, clean == id { return clean }
+        if clean.count >= 9 {
+            // FNV-1a 64-bit over the full original ID → 9 base62 chars (deterministic)
+            var hash: UInt64 = 0xcbf29ce484222325
+            for byte in id.utf8 {
+                hash ^= UInt64(byte)
+                hash = hash &* 0x100000001b3
+            }
+            let chars = Array("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+            var out = ""
+            for _ in 0..<9 {
+                out.append(chars[Int(hash % 62)])
+                hash /= 62
+            }
+            return out
+        }
         // Pad if too short
         return clean + shortToolId().prefix(9 - clean.count)
     }

@@ -278,10 +278,16 @@ struct OpenAIToolCallParsingTests {
         #expect(a != b)
     }
 
-    @Test("sanitizeToolId strips non-alphanumerics and truncates to 9")
+    @Test("sanitizeToolId hashes long ids to 9 alnum, deterministic and collision-free on shared prefixes")
     func sanitizeLong() {
-        #expect(OpenAIToolCallParsing.sanitizeToolId("call_abc123DEF456xyz") == "callabc12")
-        #expect(OpenAIToolCallParsing.sanitizeToolId("toolu_01ABCDEFGHIJ") == "toolu01AB")
+        let a = OpenAIToolCallParsing.sanitizeToolId("call_01a0d1234567")
+        let b = OpenAIToolCallParsing.sanitizeToolId("call_01a0d7654321")
+        #expect(isAlnum9(a))
+        #expect(isAlnum9(b))
+        #expect(a != b)
+        #expect(a == OpenAIToolCallParsing.sanitizeToolId("call_01a0d1234567"))
+        // Already-sanitized IDs round-trip unchanged (tool_use and tool_result must match)
+        #expect(OpenAIToolCallParsing.sanitizeToolId(a) == a)
         let padded = OpenAIToolCallParsing.sanitizeToolId("exactly-9!") // 8 clean chars -> 1 random pad
         #expect(padded.hasPrefix("exactly9"))
         #expect(isAlnum9(padded))
