@@ -223,6 +223,15 @@ struct LLMOutputTextView: NSViewRepresentable {
                 // fresh attributes. Also guarantees we never split a surrogate pair.
                 let lastNewline = newStr.range(of: "\n", options: .backwards, range: NSRange(location: 0, length: prefixLen))
                 prefixLen = (lastNewline.location == NSNotFound) ? 0 : lastNewline.location + 1
+                // Each render builds a NEW NSTextTable. If the kept prefix ends inside a table,
+                // old rows would reference a different table instance than the new rows, and
+                // the layout collapses (all text in column 1, no grid). Back up to the start
+                // of that table so the whole table is spliced from a single render.
+                if let table = Self.table(in: rendered, at: prefixLen - 1) {
+                    while prefixLen > 0, Self.table(in: rendered, at: prefixLen - 1) === table {
+                        prefixLen -= 1
+                    }
+                }
                 storage.beginEditing()
                 storage.replaceCharacters(
                     in: NSRange(location: prefixLen, length: oldStr.length - prefixLen),
@@ -265,6 +274,14 @@ struct LLMOutputTextView: NSViewRepresentable {
             let cb = coord.onContentHeight
             DispatchQueue.main.async { cb?(h) }
         }
+    }
+
+    /// NSTextTable owning the paragraph at `index`, or nil if not a table cell / out of range.
+    private static func table(in str: NSAttributedString, at index: Int) -> NSTextTable? {
+        guard index >= 0, index < str.length,
+              let style = str.attribute(.paragraphStyle, at: index, effectiveRange: nil) as? NSParagraphStyle
+        else { return nil }
+        return (style.textBlocks.first as? NSTextTableBlock)?.table
     }
 
     @MainActor final class Coordinator: @unchecked Sendable {
