@@ -19,7 +19,7 @@
 ## 🧠 Agentic AI for the  Mac Desktop 
 Agent! is the result of 27 years of Mac automation experience — from FaceSpan and AppleScript on macOS 9 through AppleScript Studio, AppleScript-ObjC, and now Swift. It connects LLMs to Apple Events, ScriptingBridge, Accessibility APIs, and XPC services for native macOS control.
 
-Now with Apple Intelligence supporting 10 LLM providers.
+Now with Apple Intelligence supporting 23 LLM providers.
 
 ### Apple Intelligence Mediator
 
@@ -88,7 +88,7 @@ The privileged daemon requires explicit approval because it runs with root privi
 
 ### 5. Configure Your Provider
 
-Click the **gear icon** (⚙️) to open Settings and configure one of the 10 supported providers:
+Click the **gear icon** (⚙️) to open Settings and configure one of the 23 supported providers:
 
 <details>
 <summary>Supported Providers (Click to expand)</summary>

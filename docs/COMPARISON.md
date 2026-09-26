@@ -12,7 +12,7 @@
 | **AppleScript/JXA** | Built-in | Via MCP* | No | No | No |
 | **Accessibility API** | Full control | No | No | No | No |
 | **MCP Protocol** | Stdio + SSE | Stdio + SSE | Stdio + SSE | Stdio | Sandbox* |
-| **Multi-LLM** | 10 providers | Claude only | Multiple | Multiple | Claude + Local |
+| **Multi-LLM** | 23 providers | Claude only | Multiple | Multiple | Claude + Local |
 | **Local Models** | Ollama, vLLM, LM Studio | No | Via OpenRouter* | Ollama, LM Studio | Ollama, LM Studio |
 | **Apple Intelligence** | Autocomplete, summaries | No | No | No | No |
 | **iMessage Remote** | Built-in | Via Channels* | No | No | Via MoltBot* |
@@ -38,7 +38,7 @@
 | **Xcode Integration** | Build, run, manage projects | File edits only |
 | **App Automation** | Full ScriptingBridge support | Via MCP servers (add-on) |
 | **System Access** | Accessibility API, root daemon | Sandboxed terminal |
-| **LLM Choice** | 10 providers | Claude only (Claude API) |
+| **LLM Choice** | 23 providers | Claude only (Claude API) |
 | **Local Models** | Ollama, LM Studio, vLLM | No |
 | **Scripting** | Swift, AppleScript, JXA | None native |
 | **MCP** | Stdio + HTTP/SSE transports | HTTP/SSE + Stdio |
@@ -57,7 +57,7 @@
 | **Performance** | Native speed, low memory | Chromium overhead (~150MB+ idle) |
 | **macOS Integration** | Deep system integration | Limited to file operations |
 | **Xcode Support** | Full project management | Basic file editing, simulator via Sweetpad |
-| **LLM Choice** | 10 providers | OpenAI, DeepSeek, Claude, Gemini |
+| **LLM Choice** | 23 providers | OpenAI, DeepSeek, Claude, Gemini |
 | **Scripting** | Swift, AppleScript, JXA | None |
 | **System Automation** | Accessibility, root operations | None |
 | **Privacy** | Local processing options | Cloud-only by default |
@@ -77,7 +77,7 @@
 | **Xcode Integration** | Build, run, manage projects | File edits only |
 | **App Automation** | Full ScriptingBridge support | None |
 | **System Access** | Accessibility API, root daemon | Terminal commands only |
-| **LLM Choice** | 10 providers | Multiple (Claude, OpenAI, DeepSeek, local) |
+| **LLM Choice** | 23 providers | Multiple (Claude, OpenAI, DeepSeek, local) |
 | **Local Models** | Ollama, LM Studio, vLLM | Ollama, LM Studio |
 | **Scripting** | Swift, AppleScript, JXA | None |
 | **MCP Support** | Stdio + HTTP/SSE | Stdio |
@@ -95,7 +95,7 @@
 | **Architecture** | Native macOS app | Electron with Docker sandbox |
 | **Xcode Integration** | Build, run, projects | File edits only |
 | **App Automation** | ScriptingBridge for 50+ apps | None (sandboxed) |
-| **LLM Choice** | 10 providers | Claude API + Local LLMs (Ollama, LM Studio) |
+| **LLM Choice** | 23 providers | Claude API + Local LLMs (Ollama, LM Studio) |
 | **Local Models** | Ollama, LM Studio, vLLM | Full support |
 | **Scripting** | Swift, AppleScript, JXA | None |
 | **MCP** | Full Stdio + HTTP/SSE | Basic support, sandboxed |
