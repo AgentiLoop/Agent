@@ -69,7 +69,7 @@ struct HUDOptionsView: View {
             }
         }
         .padding(16)
-        .frame(width: 360, alignment: .leading)
+        .frame(width: 460, alignment: .leading)
         .clipped()
     }
 }
