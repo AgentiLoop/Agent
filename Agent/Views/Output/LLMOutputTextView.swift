@@ -129,8 +129,10 @@ struct LLMOutputTextView: NSViewRepresentable {
             if hovering {
                 coord.autoFollowDisabled = true
             } else if coord.isStreaming {
-                // Re-arm follow, but don't scroll mid-stream — the snap happens once streaming ends.
                 coord.autoFollowDisabled = false
+                if let tv = coord.textView {
+                    coord.snapToEnd(tv, force: true)
+                }
             }
             // Operation done — leave autoFollowDisabled as-is, don't snap. User's scroll position preserved.
         }
@@ -141,13 +143,8 @@ struct LLMOutputTextView: NSViewRepresentable {
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
         let coord = context.coordinator
         coord.onContentHeight = onContentHeight
-        let streamingEnded = coord.isStreaming && !isStreaming
         coord.isStreaming = isStreaming
         guard let tv = coord.textView, let storage = tv.textStorage else { return }
-        // Auto-scroll only when streaming is off: catch up to the end once the stream finishes.
-        if streamingEnded && !coord.autoFollowDisabled {
-            coord.snapToEnd(tv)
-        }
 
         // Decompose input into "real content" + "cursor state". Upstream appends "█"/" " for blink on/off.
         let cursorVisible = text.hasSuffix("█")
@@ -259,8 +256,8 @@ struct LLMOutputTextView: NSViewRepresentable {
                 coord.needsTableRender = true
             }
 
-            // Follow-bottom: only when streaming is off and autoFollowDisabled is false. Content extends below naturally otherwise.
-            if !isStreaming && !coord.autoFollowDisabled {
+            // Follow-bottom: only scroll when autoFollowDisabled is false. Content extends below naturally when user scrolls away.
+            if !coord.autoFollowDisabled {
                 coord.snapToEnd(tv)
             }
         } else {
@@ -384,27 +381,10 @@ struct LLMOutputTextView: NSViewRepresentable {
             // Pixel-align the scroll origin — a fractional y makes the bottom line
             // render at sub-pixel offsets that shimmer on every streamed tick.
             let bottomY = max(0, (docHeight - visibleHeight).rounded(.up))
-            // Already there — nothing to animate
-            guard abs(scrollView.contentView.bounds.origin.y - bottomY) > 0.5 else { return }
             isProgrammaticScroll = true
-            smoothScrollGeneration += 1
-            let generation = smoothScrollGeneration
-            NSAnimationContext.runAnimationGroup { ctx in
-                ctx.duration = 0.2
-                // Ease-out so retargeting mid-animation (new streamed text) stays fluid
-                ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
-                scrollView.contentView.animator().setBoundsOrigin(NSPoint(x: 0, y: bottomY))
-            } completionHandler: {
-                MainActor.assumeIsolated { [weak self] in
-                    // A newer animation superseded this one — let it finish
-                    guard let self, generation == self.smoothScrollGeneration else { return }
-                    scrollView.reflectScrolledClipView(scrollView.contentView)
-                    self.isProgrammaticScroll = false
-                }
-            }
+            scrollView.contentView.scroll(to: NSPoint(x: 0, y: bottomY))
+            scrollView.reflectScrolledClipView(scrollView.contentView)
+            isProgrammaticScroll = false
         }
-
-        /// Bumped per smooth-scroll animation so only the latest completion clears isProgrammaticScroll
-        private var smoothScrollGeneration = 0
     }
 }

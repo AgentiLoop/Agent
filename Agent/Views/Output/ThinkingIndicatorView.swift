@@ -288,7 +288,6 @@ struct ThinkingIndicatorView: View {
                             rawText: rawStreamText,
                             height: $outputHeight,
                             isStreaming: isActive,
-                            smoothStreaming: viewModel.dripEnabled,
                             showDismiss: true,
                             dismissEnabled: !isActive,
                             showScanlines: viewModel.scanLinesEnabled,
@@ -386,8 +385,6 @@ private struct LLMOutputBox: View {
     var rawText: String = ""
     @Binding var height: CGFloat
     var isStreaming: Bool = false
-    /// HUD "Smooth Streaming" toggle — when on, the output view holds still until the stream ends.
-    var smoothStreaming: Bool = true
     var showDismiss: Bool = false
     var dismissEnabled: Bool = true
     var showScanlines: Bool = true
@@ -572,7 +569,7 @@ private struct LLMOutputBox: View {
         VStack(spacing: 0) {
             ZStack(alignment: .topTrailing) {
                 if !displayText.isEmpty {
-                    LLMOutputTextView(text: displayText, isStreaming: isStreaming && smoothStreaming) { h in
+                    LLMOutputTextView(text: displayText, isStreaming: isStreaming) { h in
                         guard dragStartHeight == 0 else { return }
                         // Pre-size from raw stream (ahead of drip) to prevent stutter
                         let lineCount = CGFloat(rawText.components(separatedBy: "\n").count)
@@ -720,8 +717,6 @@ struct ToolStepsView: View {
     /// Live height while a drag is in flight. Kept local so every mouse move doesn't
     /// round-trip through the ViewModel + UserDefaults and re-render the whole parent.
     @State private var dragHeight: Double?
-    /// Backing NSScrollView of the list — used for smooth animated auto-scroll.
-    @State private var scrollBox = ScrollViewBox()
 
     private static let minHeight: Double = 60
     private static let maxHeight: Double = 800
@@ -793,7 +788,6 @@ struct ToolStepsView: View {
                             }
                         }
                         .padding(.top, 2)
-                        .background(EnclosingScrollViewReader(box: scrollBox))
                     }
                     .frame(height: max(min(max(CGFloat(steps.count) * 18, Self.minHeight), effectiveHeight), Self.minHeight))
                     .animation(nil, value: effectiveHeight)
@@ -836,47 +830,9 @@ struct ToolStepsView: View {
 
     private func scrollToBottom(_ proxy: ScrollViewProxy) {
         guard autoScroll, !isHovering, !isDragging, let last = steps.last else { return }
-        // Next runloop so the backing document view has laid out the new row
-        DispatchQueue.main.async {
-            guard let scrollView = scrollBox.scrollView, let doc = scrollView.documentView else {
-                proxy.scrollTo(last.id, anchor: .bottom)
-                return
-            }
-            // withAnimation + proxy.scrollTo jumps on macOS — animate the clip view like the activity log
-            let clip = scrollView.contentView
-            let maxY = max(0, doc.frame.height - clip.bounds.height)
-            let targetY = doc.isFlipped ? maxY : 0
-            guard abs(clip.bounds.origin.y - targetY) > 0.5 else { return }
-            NSAnimationContext.runAnimationGroup { ctx in
-                ctx.duration = 0.2
-                ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
-                clip.animator().setBoundsOrigin(NSPoint(x: clip.bounds.origin.x, y: targetY))
-            } completionHandler: {
-                MainActor.assumeIsolated {
-                    scrollView.reflectScrolledClipView(clip)
-                }
-            }
+        withAnimation(.easeOut(duration: 0.15)) {
+            proxy.scrollTo(last.id, anchor: .bottom)
         }
-    }
-}
-
-/// Weak holder for the NSScrollView backing a SwiftUI ScrollView.
-private final class ScrollViewBox {
-    weak var scrollView: NSScrollView?
-}
-
-/// Resolves the NSScrollView enclosing its position in a SwiftUI ScrollView.
-private struct EnclosingScrollViewReader: NSViewRepresentable {
-    let box: ScrollViewBox
-
-    func makeNSView(context: Context) -> NSView {
-        let view = NSView()
-        DispatchQueue.main.async { box.scrollView = view.enclosingScrollView }
-        return view
-    }
-
-    func updateNSView(_ nsView: NSView, context: Context) {
-        if box.scrollView == nil { box.scrollView = nsView.enclosingScrollView }
     }
 }
 
