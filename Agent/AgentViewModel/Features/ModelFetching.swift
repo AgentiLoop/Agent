@@ -1010,6 +1010,10 @@ extension AgentViewModel {
             // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
             fetchProviderModels(.vibe, defaults: [],
                 filter: { $0.filter { $0.id.lowercased().contains("devstral") && $0.id.contains("latest") } })
+        case .meta:
+            // /v1/models also lists image, voice and SAM models — keep only the chat models.
+            fetchProviderModels(.meta, defaults: [],
+                filter: { $0.filter { $0.id.lowercased().hasPrefix("muse-spark") } })
         case .openAI, .deepSeek, .gemini, .grok, .mistral, .miniMax, .fmServe, .fluxion:
             fetchProviderModels(provider, defaults: [])
         case .bigModel, .foundationModel: break

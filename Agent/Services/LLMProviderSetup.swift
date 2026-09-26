@@ -128,6 +128,17 @@ enum LLMProviderSetup {
                 contextSize: 200_000,
                 supportedProtocols: [.openAI, .anthropic])
 
+        // Meta Model API — Muse Spark (the model behind Muse Code), OpenAI-compatible.
+        case .meta:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.meta.ai/v1/chat/completions",
+                    modelsURL: "https://api.meta.ai/v1/models"
+                ),
+                model: "muse-spark-1.3",
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 1_000_000)
+
         case .miniMax:
             return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
                 endpoint: LLMEndpoint(

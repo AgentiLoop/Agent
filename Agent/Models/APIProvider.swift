@@ -30,6 +30,7 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
     case a2Agent = "a2Agent"
     case orcaRouter = "orcaRouter"
     case fluxion = "fluxion"       // Fluxion AI (fluxionai.world) — OpenAI-compatible gateway, sk-fx-… keys
+    case meta = "meta"           // Meta Model API (api.meta.ai) — Muse Spark, OpenAI-compatible, LLM_… keys
     case foundationModel = "foundationModel"
 
     var displayName: String {
@@ -59,6 +60,7 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
         case .a2Agent: "A2Agent"
         case .orcaRouter: "OrcaRouter"
         case .fluxion: "Fluxion AI"
+        case .meta: "Meta Muse"
         case .foundationModel: "Apple Intelligence"
         }
     }
