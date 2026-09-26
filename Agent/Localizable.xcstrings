@@ -7313,6 +7313,9 @@
         }
       }
     },
+    "Fetch available models from the Meta Model API" : {
+
+    },
     "File Backups" : {
       "localizations" : {
         "de" : {
@@ -10330,6 +10333,9 @@
         }
       }
     },
+    "Model id (e.g. muse-spark-1.3)" : {
+
+    },
     "Model name" : {
       "localizations" : {
         "de" : {
@@ -10421,6 +10427,12 @@
           }
         }
       }
+    },
+    "Muse Code" : {
+
+    },
+    "Muse Code subscription" : {
+
     },
     "My MCP Server" : {
       "localizations" : {
@@ -14703,6 +14715,9 @@
         }
       }
     },
+    "Sign In via Muse CLI" : {
+
+    },
     "Signed in" : {
       "localizations" : {
         "de" : {
@@ -17008,6 +17023,9 @@
           }
         }
       }
+    },
+    "Uses the key `muse login` stores for your Meta Model API account (keychain item ai.meta.dev.credentials or ~/.config/muse/auth.json). Sign In launches `muse login` in Terminal — approve the device code in your browser, then return here. macOS may ask once to allow Agent! to read the keychain item." : {
+
     },
     "Uses the macOS 27 `fm` CLI, which serves the on-device Apple Foundation Model over a local Chat Completions API (127.0.0.1:1976). Requires `sudo fm license` to have been accepted once. Experimental — Apple may change or remove this tool." : {
       "localizations" : {

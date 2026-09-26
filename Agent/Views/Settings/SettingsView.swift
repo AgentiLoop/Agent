@@ -452,6 +452,77 @@ struct SettingsView: View {
                         }
                     }
                 }
+            } else if viewModel.selectedProvider == .museCode {
+                // Muse Code — subscription key provisioned by `muse login`
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 6) {
+                        Text("Muse Code")
+                            .font(.headline)
+                        Text("Muse Code subscription")
+                            .font(.caption2).bold()
+                            .padding(.horizontal, 6).padding(.vertical, 1)
+                            .background(Color.accentColor.opacity(0.15))
+                            .clipShape(Capsule())
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Authentication").font(.caption).foregroundStyle(.secondary)
+                        if MuseCodeAuth.isSignedIn {
+                            HStack(spacing: 6) {
+                                Image(systemName: "checkmark.seal.fill").foregroundStyle(.green)
+                                Text("Signed in")
+                                Spacer()
+                                Button("Sign In Again") {
+                                    MuseCodeAuth.launchLogin()
+                                }
+                                .controlSize(.small)
+                            }
+                        } else {
+                            HStack(spacing: 6) {
+                                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                                Text("Not signed in")
+                                Spacer()
+                                Button("Sign In via Muse CLI") {
+                                    MuseCodeAuth.launchLogin()
+                                }
+                                .controlSize(.small)
+                            }
+                        }
+                        Text("Uses the key `muse login` stores for your Meta Model API account (keychain item ai.meta.dev.credentials or ~/.config/muse/auth.json). Sign In launches `muse login` in Terminal — approve the device code in your browser, then return here. macOS may ask once to allow Agent! to read the keychain item.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Model").font(.caption).foregroundStyle(.secondary)
+                        HStack {
+                            if viewModel.modelLists[.museCode].isEmpty {
+                                TextField("Model id (e.g. muse-spark-1.3)", text: $viewModel.models[.museCode])
+                                    .textFieldStyle(.roundedBorder)
+                            } else {
+                                Picker("Model", selection: $viewModel.models[.museCode]) {
+                                    ForEach(viewModel.modelLists[.museCode]) { model in
+                                        Text(model.name).tag(model.id)
+                                    }
+                                }
+                                .labelsHidden()
+                            }
+                            Button {
+                                viewModel.fetchModelsIfNeeded(for: .museCode, force: true)
+                            } label: {
+                                if viewModel.fetchingModels.contains(.museCode) {
+                                    ProgressView().controlSize(.small)
+                                } else {
+                                    Image(systemName: "arrow.clockwise")
+                                }
+                            }
+                            .controlSize(.small)
+                            .disabled(viewModel.fetchingModels.contains(.museCode))
+                            .help("Fetch available models from the Meta Model API")
+                        }
+                    }
+                }
             } else if viewModel.selectedProvider == .codex {
                 // Codex — ChatGPT subscription OAuth via ~/.codex/auth.json
                 VStack(alignment: .leading, spacing: 10) {

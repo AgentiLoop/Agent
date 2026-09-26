@@ -74,6 +74,7 @@ extension AgentViewModel {
     func apiKeyForProvider(_ provider: APIProvider) -> String {
         switch provider {
         case .codex, .localOllama, .foundationModel: return ""
+        case .museCode: return MuseCodeAuth.apiKey()
         default: return apiKeys[provider].trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }

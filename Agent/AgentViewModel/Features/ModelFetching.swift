@@ -182,7 +182,7 @@ extension AgentViewModel {
         defaults: [OpenAIModelInfo],
         filter: (([OpenAIModelInfo]) -> [OpenAIModelInfo])? = nil
     ) {
-        let key = apiKeys[provider]
+        let key = apiKeyForProvider(provider)
         let endpoint = provider.config.endpoint.modelsURL
         let fallbackModel = provider.config.model
         fetchingModels.insert(provider)
@@ -1010,9 +1010,9 @@ extension AgentViewModel {
             // Vibe key only works with *-latest models, not dated versions like devstral-small-2507
             fetchProviderModels(.vibe, defaults: [],
                 filter: { $0.filter { $0.id.lowercased().contains("devstral") && $0.id.contains("latest") } })
-        case .meta:
+        case .meta, .museCode:
             // /v1/models also lists image, voice and SAM models — keep only the chat models.
-            fetchProviderModels(.meta, defaults: [],
+            fetchProviderModels(provider, defaults: [],
                 filter: { $0.filter { $0.id.lowercased().hasPrefix("muse-spark") } })
         case .openAI, .deepSeek, .gemini, .grok, .mistral, .miniMax, .fmServe, .fluxion:
             fetchProviderModels(provider, defaults: [])

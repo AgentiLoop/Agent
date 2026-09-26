@@ -276,7 +276,7 @@ struct LLMUsageView: View {
     private func isSubscriptionBilled(model: String) -> Bool {
         if store.subscriptionModels.contains(model) { return true }
         let provider = store.modelProvider[model] ?? ""
-        if provider == "Codex" { return true }
+        if provider == "Codex" || provider == "Muse Code" { return true }
         if provider == "Claude", ClaudeService.isOAuthToken(viewModel.apiKey) { return true }
         return false
     }

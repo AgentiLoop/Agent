@@ -10,7 +10,7 @@ extension AgentViewModel {
     /// rather than per-token. Codex always uses ChatGPT OAuth; Claude uses OAuth
     /// only when the credential is an `sk-ant-oat01-…` token.
     nonisolated static func isSubscriptionCredential(provider: APIProvider, apiKey: String) -> Bool {
-        if provider == .codex { return true }
+        if provider == .codex || provider == .museCode { return true }
         if provider == .claude, ClaudeService.isOAuthToken(apiKey) { return true }
         return false
     }

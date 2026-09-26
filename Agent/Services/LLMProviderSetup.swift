@@ -139,6 +139,18 @@ enum LLMProviderSetup {
                 capabilities: [.streaming, .tools, .vision, .systemPrompt],
                 contextSize: 1_000_000)
 
+        // Muse Code subscription — same Meta Model API, authenticated with the key
+        // `muse login` provisions for the account (MuseCodeAuth) instead of a pasted key.
+        case .museCode:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.meta.ai/v1/chat/completions",
+                    modelsURL: "https://api.meta.ai/v1/models"
+                ),
+                model: "muse-spark-1.3",
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 1_000_000)
+
         case .miniMax:
             return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
                 endpoint: LLMEndpoint(

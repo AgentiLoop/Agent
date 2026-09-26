@@ -245,6 +245,7 @@
 		WEB1000000000000000003 /* WebAutomationService+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000004 /* WebAutomationService+Navigation.swift */; };
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
+		EAD4DB45DF56D6B65D2F3638 /* MuseCodeAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C10699E27F443F76A01246 /* MuseCodeAuth.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -523,6 +524,7 @@
 		WEB1000000000000000004 /* WebAutomationService+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Navigation.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
+		34C10699E27F443F76A01246 /* MuseCodeAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MuseCodeAuth.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -997,7 +999,8 @@
 				BB5A29F2E735D900C78C575E /* PlanStateStore.swift */,
 				B73CC1C22C23AAC6CD8E7BD5 /* ToolErrorClassifier.swift */,
 				8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */,
-			);
+							34C10699E27F443F76A01246 /* MuseCodeAuth.swift */,
+);
 			path = Services;
 			sourceTree = "<group>";
 		};
@@ -1498,7 +1501,8 @@
 				AB7853CF1FF649C48C631F51 /* Shared/ProcessTree.swift in Sources */,
 				094F03A9F6093F2CD32452B2 /* FMServeService.swift in Sources */,
 				F36A58D7738933627DF110BF /* LLMCommonSettingsView.swift in Sources */,
-			);
+							EAD4DB45DF56D6B65D2F3638 /* MuseCodeAuth.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BB10000000000000000050 /* Sources */ = {
