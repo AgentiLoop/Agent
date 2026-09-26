@@ -174,6 +174,7 @@ final class SystemPromptService {
 
         // Write common system prompt
         writeIfNeeded(fileName: Self.commonFileName, defaultContent: Self.defaultPrompt())
+        Self.writeToolsListBackup()
 
         // Write compact prompt (Apple AI)
         writeIfNeeded(fileName: Self.compactFileName, defaultContent: Self.defaultCompactPrompt())
@@ -323,15 +324,50 @@ final class SystemPromptService {
         return firstLine.hasPrefix(Self.readOnlyPrefix)
     }
 
-    /// The built-in default system prompt.
-    private static func defaultPrompt() -> String {
-        let base = AgentTools.systemPrompt(
+    /// The built-in AgentTools base prompt with {placeholders} left in.
+    private static func basePrompt() -> String {
+        AgentTools.systemPrompt(
             userName: "{userName}",
             userHome: "{userHome}",
             projectFolder: "{projectFolder}",
             shell: "{shell}"
         )
-        return wrapWithRules(base)
+    }
+
+    /// The built-in default system prompt (TOOLS list removed — see splitToolsList).
+    private static func defaultPrompt() -> String {
+        wrapWithRules(splitToolsList(basePrompt()).prompt)
+    }
+
+    /// Backup file for the TOOLS list removed from the full prompt.
+    static let toolsListFileName = "tools_list.txt"
+
+    /// Split the "TOOLS: …" block out of the base prompt. The model already gets
+    /// every tool name and action from the tool definitions, so the list only
+    /// duplicated ~1K chars of cached prefix. The "MCP tools are prefixed" line
+    /// after it is kept. Returns the base unchanged if the markers aren't found.
+    nonisolated static func splitToolsList(_ base: String) -> (prompt: String, tools: String) {
+        guard let start = base.range(of: "\nTOOLS: "),
+              let end = base.range(of: "\nMCP tools are prefixed", range: start.upperBound..<base.endIndex)
+        else { return (base, "") }
+        let from = base.index(after: start.lowerBound)
+        let to = base.index(after: end.lowerBound)
+        var prompt = base
+        prompt.removeSubrange(from..<to)
+        return (prompt, String(base[from..<to]))
+    }
+
+    /// Write the removed TOOLS list to system/tools_list.txt so it's kept on disk.
+    private static func writeToolsListBackup() {
+        let tools = splitToolsList(basePrompt()).tools
+        guard !tools.isEmpty else { return }
+        let url = systemDir.appendingPathComponent(toolsListFileName)
+        if (try? String(contentsOf: url, encoding: .utf8)) == tools { return }
+        do {
+            try tools.write(to: url, atomically: true, encoding: .utf8)
+        } catch {
+            AuditLog.log(.api, "[SystemPrompt] Failed to write \(toolsListFileName): \(error)")
+        }
     }
 
     /// The built-in default compact prompt (Apple AI).
