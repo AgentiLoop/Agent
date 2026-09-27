@@ -35,22 +35,7 @@ extension AgentViewModel {
         // Store in SwiftData
         ChatHistoryStore.shared.appendMessage(formattedMessage)
 
-        // Also store in error history
-        let errorRecord = ErrorRecord(
-            timestamp: Date(),
-            message: fullMessage,
-            errorType: String(describing: type(of: error)),
-            context: context,
-            stackTrace: Thread.callStackSymbols.joined(separator: "\n")
-        )
-        ErrorHistory.shared.add(errorRecord)
-
-        // Also store per-tab error if a tab is active
-        if let selectedId = selectedTabId,
-           let tab = tab(for: selectedId)
-        {
-            tab.tabErrors.append("[\(timestamp)] \(String(describing: type(of: error))): \(fullMessage.truncate(to: 100))")
-        }
+        recordError(error, context: context)
 
         // Log to buffer
         if !logBuffer.isEmpty && !logBuffer.hasSuffix("\n") {
@@ -58,6 +43,25 @@ extension AgentViewModel {
         }
         logBuffer += formattedMessage + "\n"
         scheduleLogFlush()
+    }
+
+    /// Store an error in Error History without writing to the activity log.
+    /// A tab task records on its own tab (TabLogRouter.current); otherwise it goes to the global history.
+    func recordError(_ error: Error, context: String = "") {
+        let errorMessage = (error as? AgentError)?.errorDescription ?? error.localizedDescription
+        let fullMessage = context.isEmpty ? errorMessage : "\(context): \(errorMessage)"
+        let errorType = String(describing: type(of: error))
+        ErrorHistory.shared.add(ErrorRecord(
+            timestamp: Date(),
+            message: fullMessage,
+            errorType: errorType,
+            context: context,
+            stackTrace: Thread.callStackSymbols.joined(separator: "\n")
+        ))
+        if let tab = TabLogRouter.current {
+            let timestamp = Self.timestampFormatter.string(from: Date())
+            tab.tabErrors.append("[\(timestamp)] \(errorType): \(fullMessage.truncate(to: 100))")
+        }
     }
 
     /// Log a tool error with specific tool context

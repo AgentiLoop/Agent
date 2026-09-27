@@ -123,6 +123,7 @@ extension AgentViewModel {
                     """
                 )
                 flushLog()
+                recordError(error, context: "\(provider.displayName) context overflow")
                 return .breakLoop
             }
             appendLog("⚠️ Context overflow — pruned \(beforeCount) → \(messages.count) messages, retrying (\(timeoutRetryCount)/3)")
@@ -267,6 +268,7 @@ extension AgentViewModel {
                     """
                 appendLog(timeoutMessage)
                 flushLog()
+                recordError(error, context: "\(errorSource) timeout after \(maxTimeoutRetries) retries")
                 if agentReplyHandle != nil {
                     sendProgressUpdate(timeoutMessage)
                 }
@@ -298,6 +300,7 @@ extension AgentViewModel {
                     """
                 )
                 flushLog()
+                recordError(error, context: "\(errorSource) free-tier upstream exhausted")
                 return .breakLoop
             }
             // Tier 10.2: Retry-After (already recorded in LLMRateLimiter by the
@@ -361,6 +364,7 @@ extension AgentViewModel {
                 }
                 appendLog("🌐 Network connection lost after \(maxTimeoutRetries) retries.")
                 flushLog()
+                recordError(error, context: "\(errorSource) network lost after \(maxTimeoutRetries) retries")
                 return .breakLoop
             }
         } else {
@@ -373,6 +377,7 @@ extension AgentViewModel {
             // Non-recoverable error — no fallback available
             appendLog("\(errorSource) Error: \(errMsg)")
             flushLog()
+            recordError(error, context: errorSource)
 
             // Apple Intelligence error explanation
             let mediator = AppleIntelligenceMediator.shared
