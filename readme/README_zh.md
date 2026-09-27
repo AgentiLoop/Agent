@@ -346,7 +346,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 **需要会编程吗？** 不需要——用自然语言（或你的母语）即可。
 **费用多少？** 应用对非商业和个人用途免费（PolyForm Noncommercial 1.0.0）。你只需支付提供商费用；正经工作最便宜的是通过 Z.ai/BigModel 使用 GLM-5.3 或 DeepSeek。拥有硬件的话本地模型免费。
-**需要什么 Mac？** Apple Silicon，macOS 14.6+。云端提供商任何现代 Mac 都行；30B 本地模型需要 64GB+。
+**需要什么 Mac？** Apple Silicon 或 Intel，macOS 14.6+。云端提供商任何现代 Mac 都行；30B 本地模型需要 64GB+。
 **和 Siri 有什么不同？** Siri 回答问题。Agent! *执行操作*——应用、文件、代码、系统。
 
 更多：[docs/FAQ.md](../docs/FAQ.md) · [技术架构](../docs/TECHNICAL.md) · [对比](../docs/COMPARISON.md)（vs Claude Code、Cursor、Cline、OpenClaw）· [安全模型](../docs/SECURITY.md)

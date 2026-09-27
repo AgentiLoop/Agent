@@ -347,7 +347,7 @@ Los comandos slash se ejecutan en local: `/clear [log|all|llm|history|tasks|toke
 
 **¿Necesito saber programar?** No — español llano (o tu idioma nativo).
 **¿Cuánto cuesta?** La app es gratis para uso no comercial y personal (PolyForm Noncommercial 1.0.0). Pagas a tu proveedor; GLM-5.3 vía Z.ai/BigModel o DeepSeek son los más baratos para trabajo serio. Los modelos locales son gratis si tienes el hardware.
-**¿Qué Mac necesito?** Apple Silicon, macOS 14.6+. Cualquier Mac moderno para proveedores en la nube; 64 GB+ para modelos locales de 30B.
+**¿Qué Mac necesito?** Apple Silicon o Intel, macOS 14.6+. Cualquier Mac moderno para proveedores en la nube; 64 GB+ para modelos locales de 30B.
 **¿En qué se diferencia de Siri?** Siri responde. Agent! *actúa* — apps, archivos, código, sistema.
 
 Más: [docs/FAQ.md](../docs/FAQ.md) · [Arquitectura técnica](../docs/TECHNICAL.md) · [Comparativas](../docs/COMPARISON.md) (vs Claude Code, Cursor, Cline, OpenClaw) · [Modelo de seguridad](../docs/SECURITY.md)

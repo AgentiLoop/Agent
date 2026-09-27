@@ -347,7 +347,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 **코딩을 알아야 하나요?** 아니요 — 평범한 한국어(또는 모국어)면 됩니다.
 **비용은 얼마인가요?** 앱은 비상업적·개인 용도로 무료입니다(PolyForm Noncommercial 1.0.0). 제공자 비용만 지불하면 됩니다; 진지한 작업에는 Z.ai/BigModel의 GLM-5.3이나 DeepSeek이 가장 저렴합니다. 하드웨어가 있다면 로컬 모델은 무료입니다.
-**어떤 Mac이 필요한가요?** Apple Silicon, macOS 14.6+. 클라우드 제공자는 최신 Mac이면 충분; 30B 로컬 모델은 64GB+.
+**어떤 Mac이 필요한가요?** Apple Silicon 또는 Intel, macOS 14.6+. 클라우드 제공자는 최신 Mac이면 충분; 30B 로컬 모델은 64GB+.
 **Siri와 어떻게 다른가요?** Siri는 답합니다. Agent!는 *행동합니다* — 앱, 파일, 코드, 시스템.
 
 더 보기: [docs/FAQ.md](../docs/FAQ.md) · [기술 아키텍처](../docs/TECHNICAL.md) · [비교](../docs/COMPARISON.md) (Claude Code, Cursor, Cline, OpenClaw 대비) · [보안 모델](../docs/SECURITY.md)
