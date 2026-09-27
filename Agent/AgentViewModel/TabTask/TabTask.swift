@@ -377,7 +377,18 @@ extension AgentViewModel {
                 tab.tabInputTokens += inTok
                 tab.tabOutputTokens += outTok
                 // Show timing in activity log so user can see what's slow
-                tab.appendLog("🕐 LLM \(String(format: "%.1f", streamElapsed))s | stop: \(response.stopReason) | iter \(iterations)")
+                // Receipt: what this turn cost and what the model asked for next.
+                let calledTools = response.content.compactMap { $0["type"] as? String == "tool_use" ? $0["name"] as? String : nil }
+                let next: String = if !calledTools.isEmpty {
+                    "→ " + calledTools.joined(separator: ", ")
+                } else {
+                    switch response.stopReason {
+                    case "end_turn", "stop": "→ replied"
+                    case "max_tokens", "length": "→ hit max tokens"
+                    default: "→ \(response.stopReason)"
+                    }
+                }
+                tab.appendLog("🧾 LLM \(String(format: "%.1f", streamElapsed))s · iter \(iterations) · \(inTok.formatted()) in / \(outTok.formatted()) out · \(next)")
                 tab.flush()
                 tab.isLLMThinking = false
                 timeoutRetryCount = 0 // Reset on successful response
