@@ -11,7 +11,8 @@ final class FoundationModelService {
     let userName: String
     let projectFolder: String
 
-    private(set) var session: LanguageModelSession?
+    /// Type-erased `LanguageModelSession` so the stored property compiles below macOS 26.
+    private(set) var session: AnyObject?
 
     /// Timeout for Apple Intelligence calls (seconds). Short timeout to skip quickly if unavailable.
     private static let responseTimeout: TimeInterval = 5
@@ -20,8 +21,9 @@ final class FoundationModelService {
     func resetSession() { session = nil }
 
     /// The current session's transcript — the framework's built-in conversation history.
+    @available(macOS 26.0, *)
     var transcript: Transcript? {
-        session?.transcript
+        (session as? LanguageModelSession)?.transcript
     }
 
     // MARK: - Enabled Tools (none — Apple AI is text-only, main LLM handles tools)
@@ -32,6 +34,7 @@ final class FoundationModelService {
     // MARK: - Availability
 
     static var isAvailable: Bool {
+        guard #available(macOS 26.0, *) else { return false }
         if case .available = SystemLanguageModel.default.availability {
             return true
         }
@@ -39,6 +42,7 @@ final class FoundationModelService {
     }
 
     static var unavailabilityReason: String {
+        guard #available(macOS 26.0, *) else { return "Apple Intelligence requires macOS 26 or later." }
         switch SystemLanguageModel.default.availability {
         case .available:
             return ""
@@ -67,6 +71,7 @@ final class FoundationModelService {
 
     // MARK: - Session
 
+    @available(macOS 26.0, *)
     private func ensureSession() -> LanguageModelSession {
         let instructions = SystemPromptService.shared.prompt(
             for: .foundationModel,
@@ -84,6 +89,9 @@ final class FoundationModelService {
     // MARK: - Send (non-streaming)
 
     func send(messages: [[String: Any]]) async throws -> (content: [[String: Any]], stopReason: String) {
+        guard #available(macOS 26.0, *) else {
+            return ([["type": "text", "text": Self.unavailabilityReason]], "end_turn")
+        }
         let s = ensureSession()
         let prompt = extractLastUserPrompt(from: messages)
         guard !prompt.isEmpty else {
@@ -126,6 +134,10 @@ final class FoundationModelService {
         messages: [[String: Any]],
         onTextDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: [[String: Any]], stopReason: String) {
+        guard #available(macOS 26.0, *) else {
+            onTextDelta(Self.unavailabilityReason)
+            return ([["type": "text", "text": Self.unavailabilityReason]], "end_turn")
+        }
         let s = ensureSession()
         let prompt = extractLastUserPrompt(from: messages)
         guard !prompt.isEmpty else {
@@ -182,7 +194,7 @@ final class FoundationModelService {
     /// Clean up a user prompt (fix spelling/grammar) using Apple Intelligence.
     /// Returns the cleaned text, or the original if AI is unavailable or fails.
     static func cleanUpPrompt(_ text: String) async -> String {
-        guard isAvailable else { return text }
+        guard #available(macOS 26.0, *), isAvailable else { return text }
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return text }
         do {

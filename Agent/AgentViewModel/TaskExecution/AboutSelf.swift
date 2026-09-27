@@ -262,7 +262,7 @@ extension AgentViewModel {
 
     /// Ask Apple Intelligence for a brief insight about what Agent! could help with right now.
     private func generateAppleAIInsight() async -> String {
-        guard AppleIntelligenceMediator.isAvailable else { return "" }
+        guard #available(macOS 26.0, *), AppleIntelligenceMediator.isAvailable else { return "" }
         do {
             let session = LanguageModelSession()
             let prompt =

@@ -120,7 +120,7 @@ struct AgentApp: App {
                     ChatHistoryStore.shared.migrateFromUserDefaults()
 
                     // Pre-warm Apple Intelligence model for instant first response
-                    if case .available = SystemLanguageModel.default.availability {
+                    if #available(macOS 26.0, *), case .available = SystemLanguageModel.default.availability {
                         let warmupSession = LanguageModelSession()
                         warmupSession.prewarm()
                     }

@@ -165,7 +165,7 @@ extension AgentViewModel {
     /// Call this before compressMessages for best results.
     static func summarizeOldMessages(_ messages: inout [[String: Any]], keepRecent: Int = 4) async {
         guard AppleIntelligenceMediator.shared.tokenCompressionEnabled else { return }
-        guard messages.count > keepRecent + 1, FoundationModelService.isAvailable else {
+        guard #available(macOS 26.0, *), messages.count > keepRecent + 1, FoundationModelService.isAvailable else {
             return
         }
         // Bound the in-memory summary cache — long sessions previously grew it
@@ -621,7 +621,7 @@ extension AgentViewModel {
     /// falls back to ~4 chars per token estimate otherwise.
     @MainActor
     private static func countTokens(for text: String) async -> Int {
-        if FoundationModelService.isAvailable {
+        if #available(macOS 26.0, *), FoundationModelService.isAvailable {
             do {
                 return try await SystemLanguageModel.default.tokenCount(for: text)
             } catch {

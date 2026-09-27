@@ -18,7 +18,7 @@ final class AppleIntelligenceMediator: ObservableObject {
     /// Maximum context window size — reads dynamically from the on-device model (macOS 26.4+).
     /// Falls back to 4096 if the model isn't available yet.
     private static var maxContextTokens: Int {
-        if case .available = SystemLanguageModel.default.availability {
+        if #available(macOS 26.0, *), case .available = SystemLanguageModel.default.availability {
             return SystemLanguageModel.default.contextSize
         }
         return 4096
@@ -112,7 +112,8 @@ final class AppleIntelligenceMediator: ObservableObject {
     /// Running summary of conversation for context
     private var conversationSummary: String?
 
-    private var session: LanguageModelSession?
+    /// Type-erased `LanguageModelSession` so the stored property compiles below macOS 26.
+    private var session: AnyObject?
 
     /// Represents an Apple Intelligence annotation
     struct Annotation {
@@ -148,6 +149,7 @@ final class AppleIntelligenceMediator: ObservableObject {
 
     /// Check if Apple Intelligence is available
     static var isAvailable: Bool {
+        guard #available(macOS 26.0, *) else { return false }
         switch SystemLanguageModel.default.availability {
         case .available: return true
         case .unavailable: return false
@@ -155,6 +157,7 @@ final class AppleIntelligenceMediator: ObservableObject {
     }
 
     static var unavailabilityReason: String {
+        guard #available(macOS 26.0, *) else { return "Apple Intelligence requires macOS 26 or later." }
         switch SystemLanguageModel.default.availability {
         case .available: return ""
         case .unavailable(let reason):
@@ -224,14 +227,18 @@ final class AppleIntelligenceMediator: ObservableObject {
     /// Deterministic generation options for intent parsing — low temperature for consistent results.
     /// `sampling:` was renamed `samplingMode:` in the Xcode 27 SDK; CI still builds with Xcode 26.
     #if compiler(>=6.4)
-    private static let deterministicOptions = GenerationOptions(samplingMode: .greedy, temperature: 0.0)
+    @available(macOS 26.0, *)
+    private static var deterministicOptions: GenerationOptions { GenerationOptions(samplingMode: .greedy, temperature: 0.0) }
     #else
-    private static let deterministicOptions = GenerationOptions(sampling: .greedy, temperature: 0.0)
+    @available(macOS 26.0, *)
+    private static var deterministicOptions: GenerationOptions { GenerationOptions(sampling: .greedy, temperature: 0.0) }
     #endif
 
     /// Slightly creative generation options for annotations and summaries.
-    private static let annotationOptions = GenerationOptions(temperature: 0.3)
+    @available(macOS 26.0, *)
+    private static var annotationOptions: GenerationOptions { GenerationOptions(temperature: 0.3) }
 
+    @available(macOS 26.0, *)
     private func ensureSession() -> LanguageModelSession {
         // Always create a fresh session with current context to avoid stale/stuck state
         let s = LanguageModelSession(
@@ -244,6 +251,7 @@ final class AppleIntelligenceMediator: ObservableObject {
 
     /// Wraps a session.respond call with timeout.
     /// Returns nil on timeout so the request goes straight to the LLM.
+    @available(macOS 26.0, *)
     private func respondWithTimeout(_ session: LanguageModelSession, prompt: String, label: String, options: GenerationOptions? = nil) async -> String? {
 
         let startLimit = Self.startTimeout
@@ -286,7 +294,7 @@ final class AppleIntelligenceMediator: ObservableObject {
 
     /// Generate summary annotation after LLM task completion; updates context. Paraphrases when no tool calls.
     func summarizeCompletion(summary: String, commandsRun: [String]) async -> Annotation? {
-        guard isEnabled && showAnnotationsToUser && Self.isAvailable else { return nil }
+        guard #available(macOS 26.0, *), isEnabled && showAnnotationsToUser && Self.isAvailable else { return nil }
 
         // Store a truncated version for context (keep within token limits)
         let summaryForContext: String
@@ -330,7 +338,7 @@ final class AppleIntelligenceMediator: ObservableObject {
 
     /// Explain an error that occurred during tool execution
     func explainError(toolName: String, error: String) async -> Annotation? {
-        guard isEnabled && showAnnotationsToUser && Self.isAvailable else { return nil }
+        guard #available(macOS 26.0, *), isEnabled && showAnnotationsToUser && Self.isAvailable else { return nil }
 
         let session = ensureSession()
         let prompt = """
@@ -351,7 +359,7 @@ final class AppleIntelligenceMediator: ObservableObject {
 
     /// Provide suggestions for what the user might want to do next
     func suggestNextSteps(context: String) async -> Annotation? {
-        guard isEnabled && showAnnotationsToUser && Self.isAvailable else { return nil }
+        guard #available(macOS 26.0, *), isEnabled && showAnnotationsToUser && Self.isAvailable else { return nil }
 
         let session = ensureSession()
         let prompt = """
@@ -476,7 +484,7 @@ final class AppleIntelligenceMediator: ObservableObject {
         _ message: String,
         appendLog: @escaping @Sendable @MainActor (String) -> Void
     ) async -> TriageResult {
-        guard isEnabled && Self.isAvailable else {
+        guard #available(macOS 26.0, *), isEnabled && Self.isAvailable else {
             if !isEnabled { appendLog("🍎 ⏭ Mediator disabled") }
             else { appendLog("🍎 ⏭ Apple AI unavailable — \(Self.unavailabilityReason)") }
             return .passThrough
@@ -556,8 +564,9 @@ final class AppleIntelligenceMediator: ObservableObject {
 
     /// The current session's transcript — the framework's built-in conversation history.
     /// Useful for inspecting what the on-device model has seen in the current session.
+    @available(macOS 26.0, *)
     var transcript: Transcript? {
-        session?.transcript
+        (session as? LanguageModelSession)?.transcript
     }
 
     /// Get the current conversation context for debugging/inspection
@@ -567,7 +576,7 @@ final class AppleIntelligenceMediator: ObservableObject {
         if let aiMsg = lastAppleAIMessage { parts.append("Last Apple AI: \(aiMsg.prefix(100))...") }
         if let llm = lastLLMResponse { parts.append("Last LLM: \(String(llm.prefix(100)))...") }
         if let summary = conversationSummary { parts.append("Summary: \(summary)") }
-        if let t = session?.transcript {
+        if #available(macOS 26.0, *), let t = (session as? LanguageModelSession)?.transcript {
             parts.append("Transcript entries: \(t.count)")
         }
         return parts.isEmpty ? "No context stored" : parts.joined(separator: "\n")
