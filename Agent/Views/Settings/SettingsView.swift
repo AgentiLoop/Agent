@@ -839,6 +839,18 @@ struct LockedSecureField: View {
             .buttonStyle(.bordered)
             .controlSize(.small)
             .help(isLocked ? "Unlock to edit" : "Lock to protect")
+
+            Button {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(text, forType: .string)
+            } label: {
+                Image(systemName: "doc.on.doc")
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            .disabled(text.isEmpty)
+            .help("Copy key to clipboard")
         }
     }
 }
