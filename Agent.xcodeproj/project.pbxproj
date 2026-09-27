@@ -20,6 +20,7 @@
 		22439788DCAA5510D58ABEEC /* Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D96CB6C2479E8BCCBF6B487 /* Core.swift */; };
 		238B40E2A7DFCFB745101269 /* HeaderSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEA10A5913CDA508518F6EDA /* HeaderSectionView.swift */; };
 		23D4A25EAF30497598063A0D /* TokenUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3804F32B8914764A3690CB5 /* TokenUsageStore.swift */; };
+		25941BC9E0651A9D8638C93E /* CriticGateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562DDED208832F41127CBDFA /* CriticGateTests.swift */; };
 		294AAA2C5E0241FCC1290B01 /* TaskUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBEFF49533F8BC00811AE5C /* TaskUtilities.swift */; };
 		34558227A73FD129C9AF86AA /* Automation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224DF4E08C4D8857DC2B563B /* Automation.swift */; };
 		3A2D86472E205A0DA0CB5D69 /* AgenticCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBDF459529494A3928D101A /* AgenticCoreTests.swift */; };
@@ -192,6 +193,7 @@
 		EAA08AAC2F7D549300D5998A /* AgentLLM in Frameworks */ = {isa = PBXBuildFile; productRef = EAA08AAB2F7D549300D5998A /* AgentLLM */; };
 		EAAI000000000000000001 /* AppleIntelligenceMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAI000000000000000002 /* AppleIntelligenceMediator.swift */; };
 		EABA0FBD2F7B78DA005CCD6E /* ChatModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABA0FBC2F7B78DA005CCD6E /* ChatModels.swift */; };
+		EAD4DB45DF56D6B65D2F3638 /* MuseCodeAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C10699E27F443F76A01246 /* MuseCodeAuth.swift */; };
 		EAE1E7032F7BF5270079432C /* AgentTerminalNeo in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7022F7BF5270079432C /* AgentTerminalNeo */; };
 		EAE1E7062F7BF5470079432C /* AgentTools in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7052F7BF5470079432C /* AgentTools */; };
 		EAE1E7092F7BF5590079432C /* AgentColorSyntax in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7082F7BF5590079432C /* AgentColorSyntax */; };
@@ -245,8 +247,6 @@
 		WEB1000000000000000003 /* WebAutomationService+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000004 /* WebAutomationService+Navigation.swift */; };
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
-		EAD4DB45DF56D6B65D2F3638 /* MuseCodeAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C10699E27F443F76A01246 /* MuseCodeAuth.swift */; };
-		25941BC9E0651A9D8638C93E /* CriticGateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562DDED208832F41127CBDFA /* CriticGateTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -311,8 +311,10 @@
 		245995D0756C349D623788CC /* ProviderParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderParserTests.swift; sourceTree = "<group>"; };
 		2AFB0612717E44BF8818651B /* FileBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBackupService.swift; sourceTree = "<group>"; };
 		30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalStateStore.swift; sourceTree = "<group>"; };
+		34C10699E27F443F76A01246 /* MuseCodeAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseCodeAuth.swift; sourceTree = "<group>"; };
 		39A507049182BD42AD200EC6 /* ResponseCompletionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseCompletionTests.swift; sourceTree = "<group>"; };
 		4B0C57073F5C4305AF673454 /* RollbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollbackView.swift; sourceTree = "<group>"; };
+		562DDED208832F41127CBDFA /* CriticGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CriticGateTests.swift; sourceTree = "<group>"; };
 		5D8FE3C1065B23B9424ED23C /* TE-Selenium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TE-Selenium.swift"; sourceTree = "<group>"; };
 		6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMCommonSettingsView.swift; sourceTree = "<group>"; };
 		6CD920ED377E5386B020BC79 /* ModelFetching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelFetching.swift; sourceTree = "<group>"; };
@@ -525,8 +527,6 @@
 		WEB1000000000000000004 /* WebAutomationService+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Navigation.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
-		34C10699E27F443F76A01246 /* MuseCodeAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MuseCodeAuth.swift"; sourceTree = "<group>"; };
-		562DDED208832F41127CBDFA /* CriticGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CriticGateTests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -939,8 +939,8 @@
 				AB1122334455667788990C71 /* ToolErrorClassifierTests.swift */,
 				39A507049182BD42AD200EC6 /* ResponseCompletionTests.swift */,
 				245995D0756C349D623788CC /* ProviderParserTests.swift */,
-							562DDED208832F41127CBDFA /* CriticGateTests.swift */,
-);
+				562DDED208832F41127CBDFA /* CriticGateTests.swift */,
+			);
 			path = AgentTests;
 			sourceTree = "<group>";
 		};
@@ -1002,8 +1002,8 @@
 				BB5A29F2E735D900C78C575E /* PlanStateStore.swift */,
 				B73CC1C22C23AAC6CD8E7BD5 /* ToolErrorClassifier.swift */,
 				8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */,
-							34C10699E27F443F76A01246 /* MuseCodeAuth.swift */,
-);
+				34C10699E27F443F76A01246 /* MuseCodeAuth.swift */,
+			);
 			path = Services;
 			sourceTree = "<group>";
 		};
@@ -1504,8 +1504,8 @@
 				AB7853CF1FF649C48C631F51 /* Shared/ProcessTree.swift in Sources */,
 				094F03A9F6093F2CD32452B2 /* FMServeService.swift in Sources */,
 				F36A58D7738933627DF110BF /* LLMCommonSettingsView.swift in Sources */,
-							EAD4DB45DF56D6B65D2F3638 /* MuseCodeAuth.swift in Sources */,
-);
+				EAD4DB45DF56D6B65D2F3638 /* MuseCodeAuth.swift in Sources */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BB10000000000000000050 /* Sources */ = {
@@ -1618,6 +1618,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 469UCUB275;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1635,7 +1636,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1643,7 +1644,7 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 6.4;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -1685,6 +1686,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 469UCUB275;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1696,13 +1698,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_VERSION = 6.4;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -1744,7 +1746,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.1.74;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1798,7 +1800,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.1.74;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				PRODUCT_NAME = "$(TARGET_NAME)";

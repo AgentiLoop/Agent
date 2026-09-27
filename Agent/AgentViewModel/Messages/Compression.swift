@@ -621,7 +621,7 @@ extension AgentViewModel {
     /// falls back to ~4 chars per token estimate otherwise.
     @MainActor
     private static func countTokens(for text: String) async -> Int {
-        if #available(macOS 26.0, *), FoundationModelService.isAvailable {
+        if #available(macOS 26.4, *), FoundationModelService.isAvailable {
             do {
                 return try await SystemLanguageModel.default.tokenCount(for: text)
             } catch {
