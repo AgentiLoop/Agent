@@ -23,7 +23,7 @@ It won't delete important files or make system changes without your approval. Mo
 Agent! is free for noncommercial and personal use (PolyForm Noncommercial License 1.0.0; commercial versions are reserved to AgentiLoop). Cloud AI providers charge for API usage. Local models are completely free.
 
 ### What Mac do I need?
-Any Mac running macOS 26 or later. Apple Silicon (M1/M2/M3/M4) recommended. 32GB+ RAM needed for local AI models.
+Any Mac running macOS 14.6 or later. Apple Silicon (M1/M2/M3/M4) recommended. 32GB+ RAM needed for local AI models.
 
 ---
 

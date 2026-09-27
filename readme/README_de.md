@@ -9,7 +9,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
-[![macOS 26.4+](https://img.shields.io/badge/macOS-26.4.1-green?style=for-the-badge)](https://github.com/apple)
+[![macOS 14.6+](https://img.shields.io/badge/macOS-14.6+-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
@@ -79,7 +79,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **`xcode-select` zeigt auf die Command Line Tools** → `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
 - **Seltsames `BUILD FAILED` nach dem Pull** → veraltete DerivedData: `./build.sh clean && ./build.sh`
 - **Helper registrieren sich nie** → bei Option B erwartet; für die Helper Option A verwenden
-- **Fehler bei Deployment Target / SDK** → Agent! zielt auf macOS 26; macOS und Xcode aktualisieren
+- **Fehler bei Deployment Target / SDK** → Agent! zielt auf macOS 14.6; macOS und Xcode aktualisieren
 - **Konfigurationsargument ist case-sensitiv** → `./build.sh` (Debug) oder `./build.sh Release`
 
 ## Was kann es?
@@ -347,7 +347,7 @@ Slash-Befehle laufen lokal: `/clear [log|all|llm|history|tasks|tokens]`, `/memor
 
 **Muss ich programmieren können?** Nein — einfaches Deutsch (oder deine Muttersprache).
 **Was kostet es?** Die App ist für nichtkommerzielle und private Nutzung kostenlos (PolyForm Noncommercial 1.0.0). Du bezahlst deinen Anbieter; GLM-5.3 über Z.ai/BigModel oder DeepSeek sind für ernsthafte Arbeit am günstigsten. Lokale Modelle sind kostenlos, wenn du die Hardware besitzt.
-**Welchen Mac brauche ich?** Apple Silicon, macOS 26.4.1+. Jeder moderne Mac für Cloud-Anbieter; 64 GB+ für lokale 30B-Modelle.
+**Welchen Mac brauche ich?** Apple Silicon, macOS 14.6+. Jeder moderne Mac für Cloud-Anbieter; 64 GB+ für lokale 30B-Modelle.
 **Was unterscheidet das von Siri?** Siri antwortet. Agent! *handelt* — Apps, Dateien, Code, System.
 
 Mehr: [docs/FAQ.md](../docs/FAQ.md) · [Technische Architektur](../docs/TECHNICAL.md) · [Vergleiche](../docs/COMPARISON.md) (vs. Claude Code, Cursor, Cline, OpenClaw) · [Sicherheitsmodell](../docs/SECURITY.md)
@@ -392,7 +392,7 @@ Siehe [CONTRIBUTING.md](../CONTRIBUTING.md) — in ~5 Minuten mit `./build.sh` a
 >
 > ---
 >
-> Danke für dein Interesse an AgentiLoop Agent! — einer Anwendung, entwickelt für Mac-mini-, MacBook- und Mac-Studio-Computer, die macOS 26.4 oder neuer auf originaler Mac-Hardware und -Software ausführen.
+> Danke für dein Interesse an AgentiLoop Agent! — einer Anwendung, entwickelt für Mac-mini-, MacBook- und Mac-Studio-Computer, die macOS 14.6 oder neuer auf originaler Mac-Hardware und -Software ausführen.
 >
 > - Website: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent

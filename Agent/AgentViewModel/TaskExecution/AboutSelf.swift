@@ -197,7 +197,7 @@ extension AgentViewModel {
         default: // "all"
             let aiInsight = await generateAppleAIInsight()
             aboutText = """
-            \(detailPrefix) Agent! for macOS 26
+            \(detailPrefix) Agent! for macOS
 
             I'm Agent! — an open-source autonomous AI that lives on your Mac.
             I act autonomously under least privilege. I use my User Space Launch Agent

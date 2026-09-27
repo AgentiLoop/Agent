@@ -9,7 +9,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
-[![macOS 26.4+](https://img.shields.io/badge/macOS-26.4.1-green?style=for-the-badge)](https://github.com/apple)
+[![macOS 14.6+](https://img.shields.io/badge/macOS-14.6+-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
@@ -79,7 +79,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **`xcode-select` 指向 Command Line Tools** → `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
 - **拉取后出现奇怪的 `BUILD FAILED`** → DerivedData 过期：`./build.sh clean && ./build.sh`
 - **helper 始终无法注册** → 方案 B 的预期行为；需要 helper 请使用方案 A
-- **Deployment target / SDK 错误** → Agent! 面向 macOS 26；请更新 macOS 和 Xcode
+- **Deployment target / SDK 错误** → Agent! 面向 macOS 14.6；请更新 macOS 和 Xcode
 - **配置参数区分大小写** → `./build.sh`（Debug）或 `./build.sh Release`
 
 ## 它能做什么？
@@ -346,7 +346,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 **需要会编程吗？** 不需要——用自然语言（或你的母语）即可。
 **费用多少？** 应用对非商业和个人用途免费（PolyForm Noncommercial 1.0.0）。你只需支付提供商费用；正经工作最便宜的是通过 Z.ai/BigModel 使用 GLM-5.3 或 DeepSeek。拥有硬件的话本地模型免费。
-**需要什么 Mac？** Apple Silicon，macOS 26.4.1+。云端提供商任何现代 Mac 都行；30B 本地模型需要 64GB+。
+**需要什么 Mac？** Apple Silicon，macOS 14.6+。云端提供商任何现代 Mac 都行；30B 本地模型需要 64GB+。
 **和 Siri 有什么不同？** Siri 回答问题。Agent! *执行操作*——应用、文件、代码、系统。
 
 更多：[docs/FAQ.md](../docs/FAQ.md) · [技术架构](../docs/TECHNICAL.md) · [对比](../docs/COMPARISON.md)（vs Claude Code、Cursor、Cline、OpenClaw）· [安全模型](../docs/SECURITY.md)
@@ -391,7 +391,7 @@ Agent! 是三年智能体 AI 应用开发的结晶——ANIE、Game Changer、Ba
 >
 > ---
 >
-> 感谢你对 AgentiLoop Agent! 的关注——这是一款专为运行 macOS 26.4 及以上版本、使用正版 Mac 硬件和软件的 Mac mini、MacBook 以及 Mac Studio 电脑打造的应用程序。
+> 感谢你对 AgentiLoop Agent! 的关注——这是一款专为运行 macOS 14.6 及以上版本、使用正版 Mac 硬件和软件的 Mac mini、MacBook 以及 Mac Studio 电脑打造的应用程序。
 >
 > - Website: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent

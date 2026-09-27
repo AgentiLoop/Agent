@@ -9,7 +9,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/AgentiLoop/Agent?label=Download&color=blue&style=for-the-badge)](https://github.com/AgentiLoop/Agent/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
-[![macOS 26.4+](https://img.shields.io/badge/macOS-26.4.1-green?style=for-the-badge)](https://github.com/apple)
+[![macOS 14.6+](https://img.shields.io/badge/macOS-14.6+-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
@@ -79,7 +79,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **`xcode-select`가 Command Line Tools를 가리킴** → `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
 - **pull 후 이상한 `BUILD FAILED`** → 오래된 DerivedData: `./build.sh clean && ./build.sh`
 - **헬퍼가 등록되지 않음** → 옵션 B에서는 정상; 옵션 A를 사용하거나 [서명된 릴리스 바이너리](https://github.com/AgentiLoop/Agent/releases/latest)를 설치하세요 — 모든 릴리스와 프리릴리스에 포함됩니다
-- **Deployment target / SDK 오류** → Agent!는 macOS 26을 대상으로 합니다; macOS와 Xcode를 업데이트하세요
+- **Deployment target / SDK 오류** → Agent!는 macOS 14.6을 대상으로 합니다; macOS와 Xcode를 업데이트하세요
 - **구성 인수는 대소문자 구분** → `./build.sh`(Debug) 또는 `./build.sh Release`
 
 ## 무엇을 할 수 있나요?
@@ -347,7 +347,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 **코딩을 알아야 하나요?** 아니요 — 평범한 한국어(또는 모국어)면 됩니다.
 **비용은 얼마인가요?** 앱은 비상업적·개인 용도로 무료입니다(PolyForm Noncommercial 1.0.0). 제공자 비용만 지불하면 됩니다; 진지한 작업에는 Z.ai/BigModel의 GLM-5.3이나 DeepSeek이 가장 저렴합니다. 하드웨어가 있다면 로컬 모델은 무료입니다.
-**어떤 Mac이 필요한가요?** Apple Silicon, macOS 26.4.1+. 클라우드 제공자는 최신 Mac이면 충분; 30B 로컬 모델은 64GB+.
+**어떤 Mac이 필요한가요?** Apple Silicon, macOS 14.6+. 클라우드 제공자는 최신 Mac이면 충분; 30B 로컬 모델은 64GB+.
 **Siri와 어떻게 다른가요?** Siri는 답합니다. Agent!는 *행동합니다* — 앱, 파일, 코드, 시스템.
 
 더 보기: [docs/FAQ.md](../docs/FAQ.md) · [기술 아키텍처](../docs/TECHNICAL.md) · [비교](../docs/COMPARISON.md) (Claude Code, Cursor, Cline, OpenClaw 대비) · [보안 모델](../docs/SECURITY.md)
@@ -392,7 +392,7 @@ Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game C
 >
 > ---
 >
-> AgentiLoop Agent!에 관심을 가져 주셔서 감사합니다 — 정품 Mac 하드웨어와 소프트웨어에서 macOS 26.4 이상을 실행하는 Mac mini, MacBook, Mac Studio 컴퓨터를 위해 제작된 애플리케이션입니다.
+> AgentiLoop Agent!에 관심을 가져 주셔서 감사합니다 — 정품 Mac 하드웨어와 소프트웨어에서 macOS 14.6 이상을 실행하는 Mac mini, MacBook, Mac Studio 컴퓨터를 위해 제작된 애플리케이션입니다.
 >
 > - 웹사이트: https://AgentiLoop.ai
 > - Github : https://github.com/AgentiLoop/agent

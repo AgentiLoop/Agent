@@ -19,7 +19,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 2. Select the **Agent!** scheme, set your own Development Team
 3. Build & Run — approve the helper daemon when prompted
 
-**Requirements:** macOS 26.4+, Xcode 27 (Swift 6.4).
+**Requirements:** Xcode 27 (Swift 6.4) to build; the app runs on macOS 14.6+.
 
 ## Project Layout
 

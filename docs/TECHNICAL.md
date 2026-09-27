@@ -2,7 +2,7 @@
 
 <img width="107" height="107" alt="Agent! Agentic AI for the rest of us only on  macOS Desktop" src="https://github.com/user-attachments/assets/245b3612-c354-4177-a500-3ee4f22a5111" />
 
-# Agent! for macOS26
+# Agent! for macOS
 
 [![Swift 6.2](https://img.shields.io/badge/Swift-6.2-blue.svg)](https://swift.org)
 [![Website](https://img.shields.io/badge/website-agentiloop.ai-blue.svg)](https://agentiloop.ai)
@@ -57,7 +57,7 @@ Enable Apple Intelligence Mediator in Settings to enhance communication clarity.
 
 ### 1. Prerequisites
 
-- **macOS 26+** (Tahoe)
+- **macOS 14.6+**
 - **Xcode Command Line Tools** (Agent will prompt to install if missing)
 - **Apple Silicon recommended** for local LLMs (minimum 32GB RAM, recommended 64-128GB)
 - An API key for your preferred provider
