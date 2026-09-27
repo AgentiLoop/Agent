@@ -49,7 +49,30 @@ struct RenderProgress: Sendable {
 }
 
 extension ActivityLogView.Coordinator {
+    /// The monospaced system font has no ✔ (U+2714) glyph, so macOS falls back to
+    /// Apple Color Emoji: grey, ignores foregroundColor. ✘ falls back to Menlo and
+    /// takes color. Pin ✔ to Menlo so the pair renders alike.
+    nonisolated static let emojiFallbackMarks = CharacterSet(charactersIn: "\u{2714}")
+
     nonisolated func renderMarkdown(_ text: String, progress: RenderProgress? = nil) -> NSAttributedString {
+        let rendered = renderMarkdownBody(text, progress: progress)
+        guard text.unicodeScalars.contains(where: { Self.emojiFallbackMarks.contains($0) }) else { return rendered }
+        let out = NSMutableAttributedString(attributedString: rendered)
+        let ns = out.string as NSString
+        var loc = 0
+        while loc < ns.length {
+            let r = ns.rangeOfCharacter(from: Self.emojiFallbackMarks, options: [], range: NSRange(location: loc, length: ns.length - loc))
+            guard r.location != NSNotFound else { break }
+            let size = (out.attribute(.font, at: r.location, effectiveRange: nil) as? NSFont)?.pointSize ?? font.pointSize
+            if let menlo = NSFont(name: "Menlo-Regular", size: size) {
+                out.addAttribute(.font, value: menlo, range: r)
+            }
+            loc = NSMaxRange(r)
+        }
+        return out
+    }
+
+    nonisolated func renderMarkdownBody(_ text: String, progress: RenderProgress? = nil) -> NSAttributedString {
         let baseAttrs: [NSAttributedString.Key: Any] = [
             .font: font,
             .foregroundColor: NSColor.labelColor
