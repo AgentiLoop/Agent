@@ -181,7 +181,12 @@ struct LLMOutputTextView: NSViewRepresentable {
             CATransaction.begin()
             CATransaction.setDisableActions(true)
 
-            if isAppend && !coord.needsTableRender {
+            // The fast path appends RAW text. A delta carrying markdown syntax (or finishing a
+            // line) must go through the renderer, or **bold**/`code`/"- " bullets stay literal.
+            let deltaNS = contentNS.substring(from: min(coord.renderedSourceLength, contentLen))
+            let deltaHasMarkdown = deltaNS.rangeOfCharacter(from: Self.markdownChars) != nil
+
+            if isAppend && !coord.needsTableRender && !deltaHasMarkdown {
                 // FAST PATH: strip previous cursor glyph, append new content delta (UTF-16 offsets), then append fresh "█" cursor. Color switches via setAttributes, not replaceCharacters.
                 // The cursor delete MUST be inside the beginEditing/endEditing batch —
                 // deleting it outside forced an immediate relayout with the cursor
@@ -279,6 +284,9 @@ struct LLMOutputTextView: NSViewRepresentable {
             DispatchQueue.main.async { cb?(h) }
         }
     }
+
+    /// Characters that can start/close markdown styling, plus newline (line-level syntax like "- " / "#").
+    private static let markdownChars = CharacterSet(charactersIn: "*`_#-[]|>~\n")
 
     /// NSTextTable owning the paragraph at `index`, or nil if not a table cell / out of range.
     private static func table(in str: NSAttributedString, at index: Int) -> NSTextTable? {
