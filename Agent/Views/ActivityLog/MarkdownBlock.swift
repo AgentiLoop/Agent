@@ -452,6 +452,13 @@ extension ActivityLogView.Coordinator {
             return result
         }
 
+        // `git status -sb` "## main...origin/main" — not a markdown heading
+        if line.hasPrefix("## "), CodeBlockHighlighter.looksLikeGitBranchLine(line),
+           let highlighted = CodeBlockHighlighter.highlightActivityLogLine(line: line, font: font)
+        {
+            return highlighted
+        }
+
         // Header
         if let match = MarkdownPatterns.headerPattern?.firstMatch(in: line, range: fullRange) {
             let level = nsLine.substring(with: match.range(at: 1)).count
