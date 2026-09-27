@@ -246,6 +246,7 @@
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
 		EAD4DB45DF56D6B65D2F3638 /* MuseCodeAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C10699E27F443F76A01246 /* MuseCodeAuth.swift */; };
+		25941BC9E0651A9D8638C93E /* CriticGateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562DDED208832F41127CBDFA /* CriticGateTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -525,6 +526,7 @@
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
 		34C10699E27F443F76A01246 /* MuseCodeAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MuseCodeAuth.swift"; sourceTree = "<group>"; };
+		562DDED208832F41127CBDFA /* CriticGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CriticGateTests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -937,7 +939,8 @@
 				AB1122334455667788990C71 /* ToolErrorClassifierTests.swift */,
 				39A507049182BD42AD200EC6 /* ResponseCompletionTests.swift */,
 				245995D0756C349D623788CC /* ProviderParserTests.swift */,
-			);
+							562DDED208832F41127CBDFA /* CriticGateTests.swift */,
+);
 			path = AgentTests;
 			sourceTree = "<group>";
 		};
@@ -1540,6 +1543,7 @@
 				FA10000000000000000103 /* PrefixStabilityTests.swift in Sources */,
 				FA10000000000000000203 /* LLMCompactionTests.swift in Sources */,
 				FA10000000000000000205 /* EditGateTests.swift in Sources */,
+				25941BC9E0651A9D8638C93E /* CriticGateTests.swift in Sources */,
 				FA10000000000000000105 /* LoopReplayTests.swift in Sources */,
 				FF20000000000000000004 /* DiffToolsTests.swift in Sources */,
 				FF20000000000000000006 /* ExaSearchTests.swift in Sources */,

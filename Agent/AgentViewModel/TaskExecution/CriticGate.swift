@@ -40,14 +40,22 @@ extension AgentViewModel {
             flushLog()
             return nil
         }
-        let trimmed = verdict.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.uppercased().hasPrefix("PASS") {
+        guard let blocker = Self.criticVerdictBlocker(verdict) else {
             appendLog("✅ Critic review: PASS")
             flushLog()
             return nil
         }
         appendLog("🧐 Critic review found issues — blocking completion once")
         flushLog()
+        return blocker
+    }
+
+    /// Maps the reviewer's reply to a completion blocker. A reply starting with
+    /// "PASS" (any case, surrounding whitespace ignored) returns nil; anything
+    /// else is quoted (capped at 2000 chars) inside a `CANNOT COMPLETE` block.
+    nonisolated static func criticVerdictBlocker(_ verdict: String) -> String? {
+        let trimmed = verdict.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.uppercased().hasPrefix("PASS") { return nil }
         return """
             CANNOT COMPLETE — a critic review of your diff found issues:
 
