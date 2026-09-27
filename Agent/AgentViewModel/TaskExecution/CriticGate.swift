@@ -27,8 +27,16 @@ extension AgentViewModel {
         appendLog("🧐 Critic review: analyzing task diff (\(diff.count) chars)...")
         flushLog()
 
-        guard let verdict = await runCriticLLM(diff: diff) else {
-            appendLog("🧐 Critic review skipped (no reviewer response)")
+        let verdict: String
+        do {
+            guard let text = try await runCriticLLM(diff: diff) else {
+                appendLog("🧐 Critic review skipped (reviewer replied with no text — tool call or empty reply)")
+                flushLog()
+                return nil
+            }
+            verdict = text
+        } catch {
+            appendLog("🧐 Critic review skipped (reviewer request failed: \(error.localizedDescription))")
             flushLog()
             return nil
         }
@@ -71,9 +79,10 @@ extension AgentViewModel {
     }
 
     /// One-shot review call on the currently selected provider. Text-only —
-    /// tool calls in the reply are ignored. Returns nil on any failure so the
-    /// gate degrades to a no-op instead of blocking completion.
-    private func runCriticLLM(diff: String) async -> String? {
+    /// tool calls in the reply are ignored. Returns nil when the reply has no
+    /// text; throws on request failure. The caller logs either and degrades to
+    /// a no-op instead of blocking completion.
+    private func runCriticLLM(diff: String) async throws -> String? {
         let criticSystemPrompt = """
             You are a strict code reviewer. You will receive a git diff of changes \
             an autonomous coding agent just made. Review ONLY the diff. Reply with \
@@ -98,21 +107,17 @@ extension AgentViewModel {
         services.openAICompatible?.overrideSystemPrompt = criticSystemPrompt
         services.ollama?.overrideSystemPrompt = criticSystemPrompt
 
-        do {
-            let content: [[String: Any]]
-            if let claude = services.claude {
-                content = try await claude.send(messages: messages).content
-            } else if let openAI = services.openAICompatible {
-                content = try await openAI.send(messages: messages).content
-            } else if let ollama = services.ollama {
-                content = try await ollama.send(messages: messages).content
-            } else {
-                return nil
-            }
-            let text = content.compactMap { $0["text"] as? String }.joined(separator: "\n")
-            return text.isEmpty ? nil : text
-        } catch {
-            return nil
+        let content: [[String: Any]]
+        if let claude = services.claude {
+            content = try await claude.send(messages: messages).content
+        } else if let openAI = services.openAICompatible {
+            content = try await openAI.send(messages: messages).content
+        } else if let ollama = services.ollama {
+            content = try await ollama.send(messages: messages).content
+        } else {
+            throw AgentError.invalidResponse
         }
+        let text = content.compactMap { $0["text"] as? String }.joined(separator: "\n")
+        return text.isEmpty ? nil : text
     }
 }
