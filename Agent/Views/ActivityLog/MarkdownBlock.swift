@@ -55,7 +55,7 @@ extension ActivityLogView.Coordinator {
     nonisolated static let emojiFallbackMarks = CharacterSet(charactersIn: "\u{2714}")
 
     nonisolated func renderMarkdown(_ text: String, progress: RenderProgress? = nil) -> NSAttributedString {
-        let rendered = renderMarkdownBody(text, progress: progress)
+        let rendered = renderWithRawDiffs(text, progress: progress)
         guard text.unicodeScalars.contains(where: { Self.emojiFallbackMarks.contains($0) }) else { return rendered }
         let out = NSMutableAttributedString(attributedString: rendered)
         let ns = out.string as NSString
@@ -70,6 +70,57 @@ extension ActivityLogView.Coordinator {
             loc = NSMaxRange(r)
         }
         return out
+    }
+
+    /// Raw `git diff` output (unfenced tool output) would otherwise hit the markdown
+    /// renderer, which turns "- "/"+ " lines into bullets and drops the markers.
+    /// Cut each run that starts at a `diff --git` line (outside ``` fences) and render
+    /// it with the unified-diff highlighter; everything else goes through markdown.
+    nonisolated func renderWithRawDiffs(_ text: String, progress: RenderProgress?) -> NSAttributedString {
+        guard text.contains("diff --git ") else { return renderMarkdownBody(text, progress: progress) }
+        let ns = text as NSString
+        var regions: [NSRange] = []
+        var inFence = false
+        var loc = 0
+        while loc < ns.length {
+            let lr = ns.lineRange(for: NSRange(location: loc, length: 0))
+            let line = ns.substring(with: lr)
+            if line.hasPrefix("```") { inFence.toggle() }
+            guard !inFence, line.hasPrefix("diff --git ") else { loc = NSMaxRange(lr); continue }
+            // Extend over diff lines; a blank line continues only if a diff line follows it.
+            var end = NSMaxRange(lr)
+            while end < ns.length {
+                let next = ns.lineRange(for: NSRange(location: end, length: 0))
+                let body = ns.substring(with: next).trimmingCharacters(in: .newlines)
+                if body.isEmpty {
+                    guard NSMaxRange(next) < ns.length else { break }
+                    let after = ns.substring(with: ns.lineRange(for: NSRange(location: NSMaxRange(next), length: 0)))
+                    guard CodeBlockHighlighter.isUnifiedDiffLine(Substring(after.trimmingCharacters(in: .newlines))) else { break }
+                } else if !CodeBlockHighlighter.isUnifiedDiffLine(Substring(body)) {
+                    break
+                }
+                end = NSMaxRange(next)
+            }
+            regions.append(NSRange(location: lr.location, length: end - lr.location))
+            loc = end
+        }
+        guard !regions.isEmpty else { return renderMarkdownBody(text, progress: progress) }
+
+        let result = NSMutableAttributedString()
+        var last = 0
+        for r in regions {
+            if r.location > last {
+                let before = NSRange(location: last, length: r.location - last)
+                result.append(renderMarkdownBody(ns.substring(with: before), progress: progress?.offset(by: last)))
+            }
+            result.append(CodeBlockHighlighter.highlightUnifiedDiff(code: ns.substring(with: r), font: font))
+            progress?.offset(by: r.location).consumed(r.length)
+            last = NSMaxRange(r)
+        }
+        if last < ns.length {
+            result.append(renderMarkdownBody(ns.substring(from: last), progress: progress?.offset(by: last)))
+        }
+        return result
     }
 
     nonisolated func renderMarkdownBody(_ text: String, progress: RenderProgress? = nil) -> NSAttributedString {

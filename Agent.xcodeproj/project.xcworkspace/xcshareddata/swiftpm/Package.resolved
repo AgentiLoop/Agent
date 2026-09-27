@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentColorSyntax.git",
       "state" : {
-        "revision" : "bf2ad909ca6032adec835f6cfb1ecfc5b66d36a3",
-        "version" : "1.2.9"
+        "revision" : "130198183b367ef2517ebfdff1b1bedec56cd5d6",
+        "version" : "1.2.10"
       }
     },
     {
