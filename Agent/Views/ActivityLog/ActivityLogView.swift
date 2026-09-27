@@ -117,14 +117,16 @@ struct ActivityLogView: NSViewRepresentable {
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
         let coord = context.coordinator
         coord.textProvider = textProvider
-        let len = (text as NSString).length
+        // Notifications can render newer model text before SwiftUI delivers its snapshot.
+        let currentText = textProvider?() ?? text
+        let len = (currentText as NSString).length
         let tabChanged = tabID != coord.latestTabID
-        let textChanged = len != coord.updateNSViewLastLength
+        let textChanged = len != coord.updateNSViewLastLength || currentText != coord.latestText
         let searchChanged = searchText != coord.latestSearchText || currentMatchIndex != coord.latestMatchIndex || caseSensitive != coord
             .latestCaseSensitive
         guard tabChanged || textChanged || searchChanged else { return }
 
-        coord.latestText = text
+        coord.latestText = currentText
         coord.updateNSViewLastLength = len
         coord.latestTabID = tabID
         if tabChanged {
