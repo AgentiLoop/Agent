@@ -21,7 +21,7 @@
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-cli-ad-v2_ru.svg" width="900" alt="AgentiLoop CLI: две версии, Rust и Go, с абсолютно одинаковыми возможностями. macOS, Windows, Linux." /></a>
 
-*Создано с помощью AgentiLoop Agent! для Mac. Да, агент сам написал своих младших братьев.* 🤖✨ Попробуйте ранний релиз уже сегодня!
+*Создано с помощью AgentiLoop Agent! для Mac. Да, агент сам написал своих младших братьев.* 🤖✨ **Вышла v0.0.3:** мастер настройки, Codex, подписанные и нотаризованные бинарники для Mac. Скачайте сегодня!
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-rust-cli-button_ru.svg" width="211" height="44" alt="Rust CLI на GitHub" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="../docs/agentiloop-go-cli-button_ru.svg" width="194" height="44" alt="Go CLI на GitHub" /></a>

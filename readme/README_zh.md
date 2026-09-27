@@ -21,7 +21,7 @@
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-cli-ad-v2_zh.svg" width="900" alt="AgentiLoop CLI：Rust 与 Go 两个版本，功能完全相同。macOS、Windows、Linux。" /></a>
 
-*由 AgentiLoop Agent! for Mac 打造。没错，这个智能体亲手写出了自己的小弟弟。* 🤖✨ 立即试用早期版本！
+*由 AgentiLoop Agent! for Mac 打造。没错，这个智能体亲手写出了自己的小弟弟。* 🤖✨ **v0.0.3 已发布：**安装向导、Codex、已签名并公证的 Mac 二进制文件。立即下载！
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-rust-cli-button_zh.svg" width="246" height="44" alt="在 GitHub 查看 Rust CLI" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="../docs/agentiloop-go-cli-button_zh.svg" width="229" height="44" alt="在 GitHub 查看 Go CLI" /></a>
