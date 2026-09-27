@@ -835,6 +835,7 @@ struct LockedSecureField: View {
             } label: {
                 Image(systemName: isLocked ? "lock.fill" : "lock.open")
                     .foregroundStyle(isLocked ? .orange : .secondary)
+                    .frame(width: 16, height: 16)
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
@@ -846,6 +847,7 @@ struct LockedSecureField: View {
             } label: {
                 Image(systemName: "doc.on.doc")
                     .foregroundStyle(.secondary)
+                    .frame(width: 16, height: 16)
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
