@@ -511,11 +511,15 @@ extension AgentViewModel {
     }
 
     func clearLog() {
-        logBuffer = ""
         logFlushTask?.cancel()
         logFlushTask = nil
         logPersistTask?.cancel()
         logPersistTask = nil
+        streamFlushTask?.cancel()
+        streamFlushTask = nil
+        logBuffer = ""
+        streamBuffer = ""
+        streamingTextStarted = false
         activityLog = ""
         lastTaskMessages = []
         ChatHistoryStore.shared.clearAll()
@@ -524,6 +528,9 @@ extension AgentViewModel {
         // Clean up cached image snapshots
         try? FileManager.default.removeItem(at: Self.logImageCacheDir)
         try? FileManager.default.createDirectory(at: Self.logImageCacheDir, withIntermediateDirectories: true)
+        // Synchronous delivery clears the rendered log before clearAll appends its confirmation.
+        assert(activityLog.isEmpty && logBuffer.isEmpty && streamBuffer.isEmpty)
+        NotificationCenter.default.post(name: .activityLogDidChange, object: nil)
     }
 
     /// Clear the selected tab's log, or main log if no tab selected.
@@ -531,10 +538,14 @@ extension AgentViewModel {
         if let selectedId = selectedTabId,
            let tab = tab(for: selectedId)
         {
-            tab.activityLog = ""
-            tab.logBuffer = ""
             tab.logFlushTask?.cancel()
             tab.logFlushTask = nil
+            tab.llmStreamFlushTask?.cancel()
+            tab.llmStreamFlushTask = nil
+            tab.logBuffer = ""
+            tab.llmStreamBuffer = ""
+            tab.llmStreamingStarted = false
+            tab.activityLog = ""
             tab.streamLineCount = 0
             tab.rawLLMOutput = ""
             tab.lastElapsed = 0
@@ -544,6 +555,8 @@ extension AgentViewModel {
             tab.thinkingExpanded = false
             tab.thinkingOutputExpanded = false
             persistScriptTabs()
+            assert(tab.activityLog.isEmpty && tab.logBuffer.isEmpty && tab.llmStreamBuffer.isEmpty)
+            NotificationCenter.default.post(name: .activityLogDidChange, object: tab.id)
         } else {
             rawLLMOutput = ""
             thinkingDismissed = true
