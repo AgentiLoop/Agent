@@ -12,6 +12,8 @@ extension ActivityLogView.Coordinator {
 
             return
         }
+        // Queued renders must use the model, not an older SwiftUI snapshot.
+        if let textProvider { latestText = textProvider() }
         let text = latestText
         let searchText = latestSearchText
         let caseSensitive = latestCaseSensitive
@@ -20,6 +22,20 @@ extension ActivityLogView.Coordinator {
         let tabID = latestTabID
 
         if text.isEmpty {
+            // Invalidate old background results before acknowledging the clear.
+            cancelAsyncRender()
+            pendingRenderWork?.cancel()
+            pendingRenderWork = nil
+            pendingSearchWork?.cancel()
+            pendingSearchWork = nil
+            pendingScrollWork?.cancel()
+            pendingScrollWork = nil
+            lastRenderedText = ""
+            tableAnchorText = nil
+            tableAnchorStorage = nil
+            lastSearchRanges = []
+            savedForegroundColors = []
+            userIsAtBottom = true
             guard !showingPlaceholder else { return }
             textView.alphaValue = 0
             NSAnimationContext.runAnimationGroup { ctx in
