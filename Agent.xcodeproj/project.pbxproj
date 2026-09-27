@@ -2003,7 +2003,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 1.2.7;
+				minimumVersion = 1.2.11;
 			};
 		};
 		EAE1E70A2F7BF5780079432C /* XCRemoteSwiftPackageReference "AgentMCP" */ = {
