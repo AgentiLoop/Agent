@@ -27,9 +27,13 @@ extension AgentViewModel {
     @discardableResult
     func createMainTab(config: LLMConfig) -> ScriptTab {
         // Number duplicate model names: glm-5, glm-5 2, glm-5 3, etc.
+        // The primary Main tab isn't in `scriptTabs` — count it too when it shows the same name.
         var numberedConfig = config
         let baseName = config.displayName
+        let mainModel = globalModelForProvider(mainTabProvider)
+        let mainTitle = mainModel.isEmpty ? mainTabProvider.displayName : mainModel
         let existingCount = scriptTabs.filter { $0.scriptName.hasPrefix(baseName) && $0.isMainTab }.count
+            + (mainTitle == baseName ? 1 : 0)
         if existingCount > 0 {
             numberedConfig.displayName = "\(baseName) \(existingCount + 1)"
         }

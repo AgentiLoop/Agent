@@ -18,8 +18,13 @@ extension AgentViewModel {
     // MARK: - Tool Step Recording
 
     /// Record a tool step starting. Returns the step ID for later completion.
+    /// Tab task in flight (e.g. a sub-agent spawned from a tab dispatches through
+    /// `dispatchTool`) → the step belongs to that tab's Steps list, not the main tab's.
     @discardableResult
     func recordToolStep(name: String, detail: String) -> UUID {
+        if let tab = TabLogRouter.current {
+            return tab.recordToolStep(name: name, detail: detail)
+        }
         let step = ToolStep(name: name, detail: detail, startTime: Date())
         toolSteps.append(step)
         return step.id
@@ -27,6 +32,10 @@ extension AgentViewModel {
 
     /// Mark a tool step as completed.
     func completeToolStep(id: UUID, status: ToolStep.Status = .success) {
+        if let tab = TabLogRouter.current {
+            tab.completeToolStep(id: id, status: status)
+            return
+        }
         if let idx = toolSteps.firstIndex(where: { $0.id == id }) {
             toolSteps[idx].duration = Date().timeIntervalSince(toolSteps[idx].startTime)
             toolSteps[idx].status = status
