@@ -356,6 +356,16 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game Changer, BattleScript, XCF MCP Server와 Client, D1F, 그리고 약 8개의 독창적인 Swift 패키지. 빠진 조각은 지능적인 자율 루프였고, 이를 달성하자 그 프로젝트들의 정수가 Agent!로 모였습니다. 비디오 게임([Boss-Man](https://github.com/AgentiLoop/bossman))을 작성하고, 앱을 만들고, AppleScript로 Pages에 시를 쓰고, 디스크 이미지를 생성해 GitHub 릴리스에 첨부했습니다. Claude Code가 ~65개의 서드파티 NPM 패키지에 의존하는 반면, Agent!는 100% 네이티브이고, RAM을 거의 사용하지 않으며, Xcode 자동화, Swift Syntax 6.2 분석, 손쉬운 사용, AppleScript, AgentScript/ScriptingBridge, Safari 자동화, MCP 지원을 기본으로 제공합니다.
 
+## Star History
+
+<a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+ </picture>
+</a>
+
 ## 기여하기
 
 [CONTRIBUTING.md](../CONTRIBUTING.md)를 참고하세요 — `./build.sh`로 ~5분 만에 소스에서 빌드, 개발자 계정 불필요. Pull request는 CI Build & Test 워크플로를 실행합니다. [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)를 확인하세요.
