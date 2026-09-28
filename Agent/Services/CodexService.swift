@@ -469,6 +469,9 @@ final class CodexService {
         // Reasoning / thinking summary (when model runs reasoning). Emitted first
         // so the UI can display it above the final text, matching Claude's block order.
         var thinking = ""
+        // Last reasoning part streamed, and whether it still needs a trailing break.
+        var reasoningKey = ""
+        var reasoningOpen = false
         var stopReason = "end_turn"
         var inputTokens = 0
         var outputTokens = 0
@@ -500,7 +503,9 @@ final class CodexService {
                     // Announce the tool — its argument JSON streams as
                     // function_call_arguments deltas that are otherwise invisible.
                     if !name.isEmpty {
-                        await MainActor.run { onDelta("\n⚙️ \(name)\n") }
+                        let lead = reasoningOpen ? "\n" : ""
+                        reasoningOpen = false
+                        await MainActor.run { onDelta(lead + "\n⚙️ \(name)\n") }
                     }
                 }
 
@@ -509,7 +514,10 @@ final class CodexService {
                       let delta = obj["delta"] as? String else { continue }
                 textByItem[itemId, default: ""] += delta
                 if itemKind[itemId] == nil { itemOrder.append(itemId); itemKind[itemId] = "text" }
-                await MainActor.run { onDelta(delta) }
+                // Reply right after reasoning with no .done in between — break first.
+                let lead = reasoningOpen ? "\n\n" : ""
+                reasoningOpen = false
+                await MainActor.run { onDelta(lead + delta) }
 
             case "response.function_call_arguments.delta":
                 guard let itemId = obj["item_id"] as? String,
@@ -523,13 +531,22 @@ final class CodexService {
                 // accumulate into a final `thinking` content block so task
                 // history retains it separately from the visible reply.
                 if let delta = obj["delta"] as? String {
-                    thinking += delta
-                    await MainActor.run { onDelta(delta) }
+                    // `.done` isn't always sent between summary parts, so also
+                    // break whenever the part (item + index) changes.
+                    let index = (obj["summary_index"] as? Int) ?? (obj["content_index"] as? Int) ?? 0
+                    let key = "\(obj["item_id"] as? String ?? "")#\(index)"
+                    let lead = (reasoningOpen && key != reasoningKey) ? "\n\n" : ""
+                    reasoningKey = key
+                    reasoningOpen = true
+                    thinking += lead + delta
+                    await MainActor.run { onDelta(lead + delta) }
                 }
 
             case "response.reasoning_summary_text.done", "response.reasoning_text.done":
                 // Each summary part ("**Reviewing X**…") streams with no trailing
                 // break, so consecutive parts and the reply ran together.
+                guard reasoningOpen else { continue }
+                reasoningOpen = false
                 thinking += "\n\n"
                 await MainActor.run { onDelta("\n\n") }
 
