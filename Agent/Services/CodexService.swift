@@ -527,6 +527,12 @@ final class CodexService {
                     await MainActor.run { onDelta(delta) }
                 }
 
+            case "response.reasoning_summary_text.done", "response.reasoning_text.done":
+                // Each summary part ("**Reviewing X**…") streams with no trailing
+                // break, so consecutive parts and the reply ran together.
+                thinking += "\n\n"
+                await MainActor.run { onDelta("\n\n") }
+
             case "response.web_search_call.in_progress":
                 await MainActor.run { onDelta("\n🔍 web_search…") }
 
