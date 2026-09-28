@@ -356,6 +356,18 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 Agent! は 3 年間にわたるエージェント型 AI アプリ開発の成果です — ANIE、Game Changer、BattleScript、XCF MCP Server と Client、D1F、そして約 8 つのオリジナル Swift パッケージ。欠けていたピースはインテリジェントな自律ループでした。それが実現すると、これらのプロジェクトの最良の部分が Agent! に結集しました。ビデオゲーム（[Boss-Man](https://github.com/AgentiLoop/bossman)）を書き、アプリを作り、AppleScript で Pages に詩を書き、ディスクイメージを生成して GitHub リリースに添付してきました。Claude Code が約 65 のサードパーティ NPM パッケージに依存するのに対し、Agent! は 100% ネイティブで、RAM をほとんど使わず、Xcode 自動化、Swift Syntax 6.2 解析、アクセシビリティ、AppleScript、AgentScript/ScriptingBridge、Safari 自動化、MCP サポートを標準で備えています。
 
+Star History
+
+<a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+ </picture>
+</a>
+
+## 
+
 ## コントリビューション
 
 [CONTRIBUTING.md](../CONTRIBUTING.md) をご覧ください — `./build.sh` で約 5 分でソースからビルド、開発者アカウント不要。Pull request は CI Build & Test ワークフローを実行します。[good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) をチェックしてください。
