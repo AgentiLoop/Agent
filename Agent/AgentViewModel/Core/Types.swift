@@ -140,6 +140,10 @@ extension AgentViewModel {
             // Cloud API vision models
             "gpt-4o", "gpt-4-turbo", "gpt-4-vision", "claude",
             "glm-4v", "glm-4.5v", "glm-4.6v", "glm-5v", "deepseek-vl",
+            // Alibaba DashScope (its /models catalog carries no modality metadata).
+            // qwen3.7-max and qwen3.8-2.4t-a95b (open weights) are text-only.
+            "qwen3.6", "qwen3.7-plus", "qwen3.7-flash", "qwen3.8-max", "qwen3.8-flash",
+            "omni", "qvq",
         ]
         return visionKeywords.contains { lower.contains($0) }
     }
