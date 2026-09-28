@@ -59,7 +59,9 @@ struct CompactionState {
         // Output-fit still uses the TRUE window: with the cap, Claude's 500K
         // default budget on 1M would turn `window - maxTokens` negative and
         // floor the threshold at 2K. Only the percentage is capped.
-        let reservedOutput = maxTokens > 0 ? maxTokens : 8_192
+        // A user Max Output Tokens near the window size (256K on Codex's 272K)
+        // must not collapse the threshold to 16K — reserve at most half.
+        let reservedOutput = maxTokens > 0 ? min(maxTokens, contextWindow / 2) : 8_192
         return max(2_000, min(byFraction, contextWindow - reservedOutput))
     }
 
