@@ -232,6 +232,7 @@ extension AgentViewModel {
         var textOnlyCount = 0
         var timeoutRetryCount = 0
         var stopRouteRetries = 0
+        ensureContextWindowKnown(for: provider, model: modelId)
         var compactionState = CompactionState(contextWindow: contextWindow(for: provider, model: modelId), maxTokens: mt)
         var stuckFiles: [String: Int] = [:] // Edit failure count per file (for nudge)
         var repeatedCalls: [String: Int] = [:] // Identical tool-call fingerprint counts (broken-record guard)
@@ -550,6 +551,7 @@ extension AgentViewModel {
                     modelId = fbModel
                     // Rescale the compaction threshold to the fallback provider's
                     // real context window (see the main loop's fallback path).
+                    ensureContextWindowKnown(for: fbProvider, model: fbModel)
                     compactionState = CompactionState(contextWindow: contextWindow(for: fbProvider, model: fbModel), maxTokens: mt)
                     services = buildLLMServiceBundle(
                         provider: provider,

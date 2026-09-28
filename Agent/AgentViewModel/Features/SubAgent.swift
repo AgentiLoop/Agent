@@ -164,6 +164,7 @@ extension AgentViewModel {
         // Sub-agents previously never compacted — a long research loop grew
         // until the provider rejected the transcript. Same tiered compaction
         // as the main/tab loops, threshold from the provider's real context.
+        ensureContextWindowKnown(for: provider, model: modelName)
         var compactionState = CompactionState(contextWindow: contextWindow(for: provider, model: modelName), maxTokens: mt)
 
         agentLoop: while !Task.isCancelled && iterations < maxIterations {

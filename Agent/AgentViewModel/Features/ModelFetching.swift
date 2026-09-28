@@ -609,20 +609,7 @@ extension AgentViewModel {
                     {
                         return nil
                     }
-                    var ctx = 0
-                    // Modelfile parameters — one "num_ctx <value>" line when set.
-                    if let params = json["parameters"] as? String {
-                        for line in params.split(separator: "\n") {
-                            let parts = line.split(separator: " ", omittingEmptySubsequences: true)
-                            if parts.count >= 2, parts[0] == "num_ctx", let n = Int(parts[1]) { ctx = n }
-                        }
-                    }
-                    // Architecture max, e.g. "qwen3.context_length": 131072.
-                    if ctx == 0, let info = json["model_info"] as? [String: Any] {
-                        for (key, value) in info where key.hasSuffix(".context_length") {
-                            if let n = value as? Int, n > 0 { ctx = n }
-                        }
-                    }
+                    let ctx = Self.ollamaContextLength(fromShow: json)
                     return ctx > 0 ? (model, ctx) : nil
                 }
             }
@@ -632,6 +619,25 @@ extension AgentViewModel {
             }
             return windows
         }
+    }
+
+    /// Context length from an Ollama `/api/show` body: the Modelfile's
+    /// `num_ctx` parameter when set, else the architecture max
+    /// (`<arch>.context_length` in model_info, e.g. "kimi-k3.context_length": 1048576).
+    /// 0 when neither is present.
+    nonisolated static func ollamaContextLength(fromShow json: [String: Any]) -> Int {
+        if let params = json["parameters"] as? String {
+            for line in params.split(separator: "\n") {
+                let parts = line.split(separator: " ", omittingEmptySubsequences: true)
+                if parts.count >= 2, parts[0] == "num_ctx", let n = Int(parts[1]), n > 0 { return n }
+            }
+        }
+        if let info = json["model_info"] as? [String: Any] {
+            for (key, value) in info where key.hasSuffix(".context_length") {
+                if let n = (value as? NSNumber)?.intValue, n > 0 { return n }
+            }
+        }
+        return 0
     }
 
     // MARK: - Z.ai Models

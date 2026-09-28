@@ -386,7 +386,20 @@ final class AgentViewModel {
     /// (Codex /models, Ollama /api/show num_ctx/context_length, vLLM max_model_len, LM Studio
     /// /api/v0/models loaded/max context). `contextWindow(for:)` prefers these over the
     /// registry's static size so compaction doesn't fire far too early on local models.
-    var modelContextWindows = ProviderKeyed<[String: Int]>(load: { _ in [:] })
+    /// Persisted: the fetch is async and only runs for the global provider at launch, so an
+    /// in-memory-only map left tabs/fallbacks on other providers at the 32K static size (16K compaction).
+    var modelContextWindows = ProviderKeyed<[String: Int]>(
+        load: { UserDefaults.standard.dictionary(forKey: "modelContextWindows.\($0.rawValue)") as? [String: Int] ?? [:] },
+        persist: { UserDefaults.standard.set($1, forKey: "modelContextWindows.\($0.rawValue)") }
+    )
+
+    /// Kick off a model/context fetch when no real window is known for `model`,
+    /// so the loop's per-iteration `refreshThreshold` can pick it up mid-task.
+    func ensureContextWindowKnown(for provider: APIProvider, model: String?) {
+        let id = model ?? models[provider]
+        guard (modelContextWindows[provider][id] ?? 0) == 0, !fetchingModels.contains(provider) else { return }
+        fetchModels(for: provider)
+    }
 
     /// Real per-model output ceilings learned from Anthropic's rejection
     /// ("max_tokens: X > Y, which is the maximum allowed number of output tokens

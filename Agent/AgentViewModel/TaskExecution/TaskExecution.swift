@@ -187,6 +187,7 @@ extension AgentViewModel {
         // Token budget tracker — detects diminishing returns and prevents runaway costs
         var budgetTracker = TokenBudgetTracker(ceiling: tokenBudgetCeiling)
         // Context compaction state — token-aware triggers with circuit breaker
+        ensureContextWindowKnown(for: provider, model: modelName)
         var compactionState = CompactionState(contextWindow: contextWindow(for: provider, model: modelName), maxTokens: mt)
         // Overnight coding guards
         var unbuiltEditCount = 0 // build enforcement — nudge after edit without build
@@ -640,6 +641,7 @@ extension AgentViewModel {
                     // (Claude 1M → local 32K); keep the old threshold and the
                     // new provider rejects the transcript before compaction
                     // ever fires.
+                    ensureContextWindowKnown(for: newProvider, model: newModel)
                     compactionState = CompactionState(contextWindow: contextWindow(for: newProvider, model: newModel), maxTokens: mt)
                     services = buildLLMServiceBundle(
                         provider: provider,
