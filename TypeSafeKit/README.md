@@ -136,3 +136,13 @@ swift test    # 14 tests, no network — stubbed transport
 ```
 
 Every request/response shape asserted in the tests is taken from the published API reference. **Nothing here has been exercised against the live service yet** — Jev is in early access behind a waitlist, so a real `TYPESAFE_API_KEY` is needed to confirm end-to-end.
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+ </picture>
+</a>
