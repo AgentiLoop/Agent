@@ -140,12 +140,18 @@ final class ClaudeService {
     nonisolated static func removingUnsignedThinking(_ messages: [[String: Any]]) -> [[String: Any]] {
         messages.compactMap { message in
             guard let blocks = message["content"] as? [[String: Any]] else { return message }
+            let hasForeignKeys = blocks.contains { $0["reasoning_content"] != nil }
             let filtered = blocks.filter { block in
                 guard block["type"] as? String == "thinking" else { return true }
                 guard let signature = block["signature"] as? String else { return false }
                 return !signature.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            }.map { block in
+                // DeepSeek stashes reasoning_content on blocks; Anthropic rejects extra keys.
+                var b = block
+                b.removeValue(forKey: "reasoning_content")
+                return b
             }
-            guard filtered.count != blocks.count else { return message }
+            guard filtered.count != blocks.count || hasForeignKeys else { return message }
             guard !filtered.isEmpty else { return nil }
             var cleaned = message
             cleaned["content"] = filtered
