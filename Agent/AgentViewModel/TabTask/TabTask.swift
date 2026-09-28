@@ -11,6 +11,25 @@ import AgentD1F
 // MARK: - Tab Task Execution
 
 extension AgentViewModel {
+    /// Receipt line: what this turn cost, the raw stop reason (surfaces provider
+    /// failure text), and what the model asked for next. Shared by main + script tabs.
+    static func llmReceipt(elapsed: Double, iteration: Int, inTok: Int, outTok: Int,
+                           stopReason: String, content: [[String: Any]]) -> String
+    {
+        let calledTools = content.compactMap { $0["type"] as? String == "tool_use" ? $0["name"] as? String : nil }
+        let next: String = if !calledTools.isEmpty {
+            "→ " + calledTools.joined(separator: ", ")
+        } else {
+            switch stopReason {
+            case "end_turn", "stop": "→ replied"
+            case "max_tokens", "length": "→ hit max tokens"
+            default: "→ no tool call"
+            }
+        }
+        let stop = stopReason.isEmpty ? "none" : stopReason
+        return "🧾 LLM \(String(format: "%.1f", elapsed))s · iter \(iteration) · \(inTok.formatted()) in / \(outTok.formatted()) out · stop: \(stop) · \(next)"
+    }
+
 
     /// Start an LLM task on a specific script tab.
     func runTabTask(tab: ScriptTab) {
@@ -377,18 +396,10 @@ extension AgentViewModel {
                 tab.tabInputTokens += inTok
                 tab.tabOutputTokens += outTok
                 // Show timing in activity log so user can see what's slow
-                // Receipt: what this turn cost and what the model asked for next.
-                let calledTools = response.content.compactMap { $0["type"] as? String == "tool_use" ? $0["name"] as? String : nil }
-                let next: String = if !calledTools.isEmpty {
-                    "→ " + calledTools.joined(separator: ", ")
-                } else {
-                    switch response.stopReason {
-                    case "end_turn", "stop": "→ replied"
-                    case "max_tokens", "length": "→ hit max tokens"
-                    default: "→ \(response.stopReason)"
-                    }
-                }
-                tab.appendLog("🧾 LLM \(String(format: "%.1f", streamElapsed))s · iter \(iterations) · \(inTok.formatted()) in / \(outTok.formatted()) out · \(next)")
+                tab.appendLog(Self.llmReceipt(
+                    elapsed: streamElapsed, iteration: iterations, inTok: inTok, outTok: outTok,
+                    stopReason: response.stopReason, content: response.content
+                ))
                 tab.flush()
                 tab.isLLMThinking = false
                 timeoutRetryCount = 0 // Reset on successful response

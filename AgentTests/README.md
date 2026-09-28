@@ -187,3 +187,13 @@ Drives real Safari against Google, LinkedIn, and GitHub: Google search (open, ty
 - Use `// MARK: -` sections to group related cases; give each `@Test` a sentence-style name that states the expected behaviour.
 - Keep tests offline and deterministic. If a test genuinely needs the network or an external checkout, gate it with `.enabled(if:)` and document the env var in this file.
 - Tests that touch `AgentViewModel` or `UserDefaults` should be `@MainActor` and, where they share state, `.serialized`.
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+ </picture>
+</a>

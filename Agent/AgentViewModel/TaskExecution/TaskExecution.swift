@@ -289,6 +289,7 @@ extension AgentViewModel {
                 // moment they finish streaming; results are consumed below.
                 let streamPrefetch = Self.StreamPrefetch()
                 flushLog()
+                let streamStart = CFAbsoluteTimeGetCurrent()
                 if let claude = services.claude {
                     let prefetchPF = projectFolder
                     let prefetchTab = selectedTabId ?? Self.mainTabID
@@ -366,6 +367,11 @@ extension AgentViewModel {
                 )
                 FallbackChainService.shared.recordSuccess()
                 flushStreamBuffer()
+                appendLog(Self.llmReceipt(
+                    elapsed: CFAbsoluteTimeGetCurrent() - streamStart, iteration: iterations,
+                    inTok: inTok, outTok: outTok, stopReason: response.stopReason, content: response.content
+                ))
+                flushLog()
                 isThinking = false
                 timeoutRetryCount = 0 // Reset on successful response
                 // Strip done/task_complete from LLM Output
