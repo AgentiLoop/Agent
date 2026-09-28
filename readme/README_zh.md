@@ -355,6 +355,18 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 Agent! 是三年智能体 AI 应用开发的结晶——ANIE、Game Changer、BattleScript、XCF MCP Server and Client、D1F 以及约八个原创 Swift 包。缺失的一环是智能的自主循环；一旦实现，这些项目的精华便汇聚成了 Agent!。它写过电子游戏（[Boss-Man](https://github.com/AgentiLoop/bossman)）、创建过应用、通过 AppleScript 在 Pages 中写诗、生成磁盘映像并附加到 GitHub Release。Claude Code 依赖约 65 个第三方 NPM 包，而 Agent! 100% 原生、内存占用极低，开箱即带 Xcode 自动化、Swift Syntax 6.2 分析、辅助功能、AppleScript、AgentScript/ScriptingBridge、Safari 自动化和 MCP 支持。
 
+Star History
+
+<a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+ </picture>
+</a>
+
+## 
+
 ## 参与贡献
 
 见 [CONTRIBUTING.md](../CONTRIBUTING.md)——用 `./build.sh` 约 5 分钟即可从源码构建，无需开发者账户。Pull request 会运行 CI Build & Test 工作流。可查看 [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)。
