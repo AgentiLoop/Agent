@@ -356,6 +356,24 @@ More: [docs/FAQ.md](docs/FAQ.md) · [Technical Architecture](docs/TECHNICAL.md) 
 
 Agent! is the result of three years of building agentic AI apps — ANIE, Game Changer, BattleScript, XCF MCP Server and Client, D1F, and about eight original Swift packages. The missing piece was an intelligent autonomous loop; once achieved, the best of those projects came together into Agent!. It has written video games ([Boss-Man](https://github.com/AgentiLoop/bossman)), created apps, written poetry into Pages via AppleScript, generated disk images and attached them to GitHub releases. Where Claude Code relies on ~65 third-party NPM packages, Agent! is 100% native, uses very little RAM, and ships Xcode automation, Swift Syntax 6.2 analysis, Accessibility, AppleScript, AgentScript/ScriptingBridge, Safari automation and MCP support out of the box.
 
+## The Agent! family
+
+Agent! is built from a set of companion repos under the [AgentiLoop](https://github.com/AgentiLoop) org. News, downloads and the press kit are at 🌐 **[agentiloop.ai](https://agentiloop.ai/)** ([site source](https://github.com/AgentiLoop/agent.xcf.ai)).
+
+| Repo | What it is |
+|---|---|
+| [AgentiLoopCLI](https://github.com/AgentiLoop/AgentiLoopCLI) · [AgentiLoopGo](https://github.com/AgentiLoop/AgentiLoopGo) | The agent loop as cross-platform CLIs for macOS, Windows and Linux (Rust · Go) |
+| [AgentScripts](https://github.com/AgentiLoop/AgentScripts) | The Swift scripts Agent! compiles and runs in-process |
+| [AgentTools](https://github.com/AgentiLoop/AgentTools) | Tool schemas, system prompts and provider management |
+| [AgentLLM](https://github.com/AgentiLoop/AgentLLM) | LLM provider protocols, types and registry |
+| [AgentMCP](https://github.com/AgentiLoop/AgentMCP) | MCP client (stdio + HTTP) |
+| [AgentAccess](https://github.com/AgentiLoop/AgentAccess) | Accessibility automation |
+| [AgentEventBridges](https://github.com/AgentiLoop/AgentEventBridges) | ScriptingBridge protocols for 50+ Mac apps |
+| [AgentD1F](https://github.com/AgentiLoop/AgentD1F) | Multi-line diff engine |
+| [AgentSwift](https://github.com/AgentiLoop/AgentSwift) | SwiftSyntax code analysis |
+| [AgentColorSyntax](https://github.com/AgentiLoop/AgentColorSyntax) · [AgentTerminalNeo](https://github.com/AgentiLoop/AgentTerminalNeo) | Syntax highlighting · retro terminal markdown |
+| [AgentAudit](https://github.com/AgentiLoop/AgentAudit) | `os.log` audit logging |
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) — build from source in ~5 minutes with `./build.sh`, no developer account needed. Pull requests run the CI Build & Test workflow and require a one-time [CLA signature](./CLA.md). Check the [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
