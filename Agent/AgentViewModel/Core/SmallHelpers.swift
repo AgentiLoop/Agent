@@ -109,6 +109,7 @@ extension AgentViewModel {
             return localOllamaModels.first(where: { $0.id == modelId })?.supportsVision ?? Self.isVisionModel(modelId)
         default:
             if let known = modelVisionSupport[provider][modelId] { return known }
+            if let probed = probedVision(provider: provider, modelId: modelId) { return probed }
             return Self.isVisionModel(modelId)
         }
     }

@@ -254,12 +254,30 @@ final class AgentViewModel {
                 appendLog("🔄\(models[p])\(supportsVision ? " (vision)" : "")")
                 flushLog()
             }
+            for p in APIProvider.allCases where oldValue[p] != models[p] {
+                probeVisionIfNeeded(provider: p)
+            }
         }
     }
 
     /// Fetched model catalog per OpenAI-compatible provider. Claude and Ollama keep their own
     /// typed lists (`availableClaudeModels`, `ollamaModels`, `localOllamaModels`).
-    var modelLists = ProviderKeyed<[OpenAIModelInfo]>(load: { _ in [] })
+    var modelLists = ProviderKeyed<[OpenAIModelInfo]>(load: { _ in [] }) {
+        // A fresh catalog (launch or refresh) — probe the already-selected model too.
+        didSet {
+            for p in APIProvider.allCases where !modelLists[p].isEmpty && oldValue[p].isEmpty {
+                probeVisionIfNeeded(provider: p)
+            }
+        }
+    }
+
+    /// "provider|model" vision probes currently running (see `probeVisionIfNeeded`).
+    var visionProbesInFlight: Set<String> = []
+
+    /// Live vision-probe answers keyed "provider|model", persisted so each model is probed once.
+    var visionProbeResults: [String: Bool] = UserDefaults.standard.dictionary(forKey: "visionProbeResults") as? [String: Bool] ?? [:] {
+        didSet { UserDefaults.standard.set(visionProbeResults, forKey: "visionProbeResults") }
+    }
 
     /// Providers whose model list is currently being fetched.
     var fetchingModels: Set<APIProvider> = []

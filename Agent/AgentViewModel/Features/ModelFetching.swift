@@ -841,6 +841,78 @@ extension AgentViewModel {
         return (models, vision)
     }
 
+    // MARK: - Vision Probe
+
+    /// Result of a live vision probe for this provider/model, nil if never probed.
+    func probedVision(provider: APIProvider, modelId: String) -> Bool? {
+        visionProbeResults["\(provider.rawValue)|\(modelId)"]
+    }
+
+    /// Ask the provider itself whether the selected model accepts images, for
+    /// OpenAI-compatible providers whose catalog carries no modality metadata.
+    /// Sends one tiny image request; the answer is cached so it runs once per model.
+    func probeVisionIfNeeded(provider: APIProvider) {
+        switch provider { // these have fixed rules or their own capability APIs in resolveVision
+        case .claude, .codex, .openAI, .gemini, .mistral, .miniMax, .vibe, .foundationModel,
+             .zAI, .bigModel, .ollama, .localOllama: return
+        default: break
+        }
+        let modelId = models[provider]
+        guard !modelId.isEmpty,
+              modelVisionSupport[provider][modelId] == nil,
+              probedVision(provider: provider, modelId: modelId) == nil else { return }
+        let chatURL = provider == .vLLM ? vLLMEndpoint : chatURLForProvider(provider)
+        guard chatURL.hasSuffix("/chat/completions") else { return }
+        let cacheKey = "\(provider.rawValue)|\(modelId)"
+        guard !visionProbesInFlight.contains(cacheKey) else { return }
+        visionProbesInFlight.insert(cacheKey)
+        let key = apiKeyForProvider(provider)
+        Task {
+            defer { visionProbesInFlight.remove(cacheKey) }
+            guard let result = await Self.probeVision(chatURL: chatURL, apiKey: key, model: modelId) else { return }
+            visionProbeResults[cacheKey] = result
+            appendLog("👁 \(modelId): vision \(result ? "supported" : "not supported") (probed)")
+        }
+    }
+
+    /// true = model answered an image request, false = it rejected the image but
+    /// answers text, nil = inconclusive (auth, rate limit, network) — not cached.
+    private nonisolated static func probeVision(chatURL: String, apiKey: String, model: String) async -> Bool? {
+        guard let url = URL(string: chatURL) else { return nil }
+        func send(_ content: Any) async -> Int? {
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            if !apiKey.isEmpty { request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization") }
+            request.timeoutInterval = 30
+            let body: [String: Any] = [
+                "model": model,
+                "messages": [["role": "user", "content": content]],
+                "max_tokens": 16,
+                "stream": false,
+            ]
+            request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+            guard let (_, response) = try? await URLSession.shared.data(for: request) else { return nil }
+            return (response as? HTTPURLResponse)?.statusCode
+        }
+        // 32×32 white PNG — some providers (DashScope) reject images under 10px.
+        let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 32, pixelsHigh: 32, bitsPerSample: 8,
+                                   samplesPerPixel: 3, hasAlpha: false, isPlanar: false,
+                                   colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)
+        if let pixels = rep?.bitmapData { memset(pixels, 0xFF, rep!.bytesPerRow * 32) }
+        guard let png = rep?.representation(using: .png, properties: [:]) else { return nil }
+        let imageContent: [[String: Any]] = [
+            ["type": "text", "text": "Reply OK"],
+            ["type": "image_url", "image_url": ["url": "data:image/png;base64,\(png.base64EncodedString())"]],
+        ]
+        guard let status = await send(imageContent) else { return nil }
+        if (200..<300).contains(status) { return true }
+        guard status == 400 || status == 422 else { return nil }
+        // Image rejected — only call it "no vision" if the same model accepts plain text.
+        guard let textStatus = await send("Reply OK") else { return nil }
+        return (200..<300).contains(textStatus) ? false : nil
+    }
+
     // MARK: - vLLM Models
 
     func fetchVLLMModels() {
