@@ -374,6 +374,18 @@ Agent! is built from a set of companion repos under the [AgentiLoop](https://git
 | [AgentColorSyntax](https://github.com/AgentiLoop/AgentColorSyntax) · [AgentTerminalNeo](https://github.com/AgentiLoop/AgentTerminalNeo) | Syntax highlighting · retro terminal markdown |
 | [AgentAudit](https://github.com/AgentiLoop/AgentAudit) | `os.log` audit logging |
 
+Star History
+
+<a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+ </picture>
+</a>
+
+## 
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) — build from source in ~5 minutes with `./build.sh`, no developer account needed. Pull requests run the CI Build & Test workflow and require a one-time [CLA signature](./CLA.md). Check the [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
