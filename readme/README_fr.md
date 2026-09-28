@@ -356,6 +356,18 @@ Plus : [docs/FAQ.md](../docs/FAQ.md) · [Architecture technique](../docs/TECHNIC
 
 Agent! est le fruit de trois années de développement d'apps d'IA agentique — ANIE, Game Changer, BattleScript, XCF MCP Server and Client, D1F et environ huit packages Swift originaux. La pièce manquante était une boucle autonome intelligente ; une fois obtenue, le meilleur de ces projets s'est réuni dans Agent!. Il a écrit des jeux vidéo ([Boss-Man](https://github.com/AgentiLoop/bossman)), créé des apps, écrit de la poésie dans Pages via AppleScript, généré des images disque et les a jointes à des releases GitHub. Là où Claude Code repose sur ~65 packages NPM tiers, Agent! est 100 % natif, consomme très peu de RAM et embarque d'origine l'automatisation Xcode, l'analyse Swift Syntax 6.2, l'Accessibilité, AppleScript, AgentScript/ScriptingBridge, l'automatisation Safari et le support MCP.
 
+Star History
+
+<a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
+ </picture>
+</a>
+
+## 
+
 ## Contribuer
 
 Voir [CONTRIBUTING.md](../CONTRIBUTING.md) — compilez depuis les sources en ~5 minutes avec `./build.sh`, sans compte développeur. Les pull requests passent par le workflow CI Build & Test. Consultez les [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
