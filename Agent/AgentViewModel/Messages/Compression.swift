@@ -130,13 +130,16 @@ extension AgentViewModel {
     /// in CompactionState. The static per-provider size lives in the registry
     /// (`LLMProviderSetup.config(for:)`); providers that report a real per-model
     /// window at fetch time override it here.
-    func contextWindow(for provider: APIProvider) -> Int {
+    /// `model` is the model actually in use (tab override, fallback-chain model);
+    /// nil = the provider's global selection. Looking up the global model for a
+    /// fallback/tab model missed its real window and dropped to the 32K static size.
+    func contextWindow(for provider: APIProvider, model: String? = nil) -> Int {
         // Explicit Ollama user setting wins — it's also what gets sent as num_ctx.
         if (provider == .ollama || provider == .localOllama) && localOllamaContextSize > 0 {
             return localOllamaContextSize
         }
         // Real per-model window reported at fetch time, else the registry's static size.
-        if let ctx = modelContextWindows[provider][models[provider]], ctx > 0 { return ctx }
+        if let ctx = modelContextWindows[provider][model ?? models[provider]], ctx > 0 { return ctx }
         return provider.config.contextSize
     }
 

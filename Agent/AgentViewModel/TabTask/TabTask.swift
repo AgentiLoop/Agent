@@ -207,7 +207,7 @@ extension AgentViewModel {
                 await fetchClaudeModels()
             }
             mt = Self.defaultClaudeMaxTokens(
-                contextWindow: contextWindow(for: provider), modelCap: modelMaxOutputTokens[modelId])
+                contextWindow: contextWindow(for: provider, model: modelId), modelCap: modelMaxOutputTokens[modelId])
         }
         var services = buildLLMServiceBundle(
             provider: provider,
@@ -232,7 +232,7 @@ extension AgentViewModel {
         var textOnlyCount = 0
         var timeoutRetryCount = 0
         var stopRouteRetries = 0
-        var compactionState = CompactionState(contextWindow: contextWindow(for: provider), maxTokens: mt)
+        var compactionState = CompactionState(contextWindow: contextWindow(for: provider, model: modelId), maxTokens: mt)
         var stuckFiles: [String: Int] = [:] // Edit failure count per file (for nudge)
         var repeatedCalls: [String: Int] = [:] // Identical tool-call fingerprint counts (broken-record guard)
         // Plan-mode enforcement state
@@ -281,7 +281,7 @@ extension AgentViewModel {
             if iterations > 1 {
                 // Async context-window fetches can land after task start — pick
                 // up the real threshold instead of a possibly-stale 32K fallback.
-                compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
+                compactionState.refreshThreshold(contextWindow: contextWindow(for: provider, model: modelId))
                 let compactLog: (String) -> Void = { [weak tab] msg in
                     tab?.appendLog(msg)
                     tab?.flush()
@@ -536,7 +536,7 @@ extension AgentViewModel {
                     // Tier 10.3: same transcript, smaller output budget.
                     mt = newMT
                     compactionState.maxTokens = mt
-                    compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
+                    compactionState.refreshThreshold(contextWindow: contextWindow(for: provider, model: modelId))
                     services = buildLLMServiceBundle(
                         provider: provider,
                         modelName: modelId,
@@ -550,7 +550,7 @@ extension AgentViewModel {
                     modelId = fbModel
                     // Rescale the compaction threshold to the fallback provider's
                     // real context window (see the main loop's fallback path).
-                    compactionState = CompactionState(contextWindow: contextWindow(for: fbProvider), maxTokens: mt)
+                    compactionState = CompactionState(contextWindow: contextWindow(for: fbProvider, model: fbModel), maxTokens: mt)
                     services = buildLLMServiceBundle(
                         provider: provider,
                         modelName: modelId,

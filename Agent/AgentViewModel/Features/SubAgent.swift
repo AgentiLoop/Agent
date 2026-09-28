@@ -164,13 +164,13 @@ extension AgentViewModel {
         // Sub-agents previously never compacted — a long research loop grew
         // until the provider rejected the transcript. Same tiered compaction
         // as the main/tab loops, threshold from the provider's real context.
-        var compactionState = CompactionState(contextWindow: contextWindow(for: provider), maxTokens: mt)
+        var compactionState = CompactionState(contextWindow: contextWindow(for: provider, model: modelName), maxTokens: mt)
 
         agentLoop: while !Task.isCancelled && iterations < maxIterations {
             iterations += 1
 
             if iterations > 1 {
-                compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
+                compactionState.refreshThreshold(contextWindow: contextWindow(for: provider, model: modelName))
                 _ = await Self.tieredCompact(&messages, state: &compactionState)
             }
 

@@ -95,7 +95,7 @@ extension AgentViewModel {
                 await fetchClaudeModels()
             }
             mt = Self.defaultClaudeMaxTokens(
-                contextWindow: contextWindow(for: provider), modelCap: modelMaxOutputTokens[modelName])
+                contextWindow: contextWindow(for: provider, model: modelName), modelCap: modelMaxOutputTokens[modelName])
         }
         var services = buildLLMServiceBundle(
             provider: provider,
@@ -187,7 +187,7 @@ extension AgentViewModel {
         // Token budget tracker — detects diminishing returns and prevents runaway costs
         var budgetTracker = TokenBudgetTracker(ceiling: tokenBudgetCeiling)
         // Context compaction state — token-aware triggers with circuit breaker
-        var compactionState = CompactionState(contextWindow: contextWindow(for: provider), maxTokens: mt)
+        var compactionState = CompactionState(contextWindow: contextWindow(for: provider, model: modelName), maxTokens: mt)
         // Overnight coding guards
         var unbuiltEditCount = 0 // build enforcement — nudge after edit without build
         var consecutiveBuildFailures = 0 // error budget — stop after 5
@@ -244,7 +244,7 @@ extension AgentViewModel {
             if iterations > 1 {
                 // Async context-window fetches can land after task start — pick
                 // up the real threshold instead of a possibly-stale 32K fallback.
-                compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
+                compactionState.refreshThreshold(contextWindow: contextWindow(for: provider, model: modelName))
                 let compactLog: (String) -> Void = { [weak self] msg in
                     self?.appendLog(msg)
                     self?.flushLog()
@@ -419,11 +419,11 @@ extension AgentViewModel {
                     maxTokensEscalated = true
                     let effective = mt > 0 ? mt
                         : (services.claude != nil
-                            ? Self.defaultClaudeMaxTokens(contextWindow: contextWindow(for: provider), modelCap: modelMaxOutputTokens[modelName])
+                            ? Self.defaultClaudeMaxTokens(contextWindow: contextWindow(for: provider, model: modelName), modelCap: modelMaxOutputTokens[modelName])
                             : 8_192)
                     if let bigger = Self.escalatedMaxTokens(
                         current: effective,
-                        contextWindow: contextWindow(for: provider),
+                        contextWindow: contextWindow(for: provider, model: modelName),
                         lastInputTokens: response.inputTokens,
                         modelCap: modelMaxOutputTokens[modelName])
                     {
@@ -432,7 +432,7 @@ extension AgentViewModel {
                             provider: provider, modelName: modelName, isVision: isVision,
                             historyContext: historyContext, maxTokens: mt)
                         compactionState.maxTokens = mt
-                        compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
+                        compactionState.refreshThreshold(contextWindow: contextWindow(for: provider, model: modelName))
                         appendLog("⚠️ Response truncated at max_tokens — retrying the same request with max_tokens \(effective) → \(bigger)")
                         flushLog()
                         rawLLMOutput = ""
@@ -522,7 +522,7 @@ extension AgentViewModel {
                 // model once that the cached prefix is large — no re-reads,
                 // narrow outputs, wrap up.
                 if !toolResults.isEmpty, let note = Self.cacheWarmthReminderBlock(
-                    contextWindow: contextWindow(for: provider),
+                    contextWindow: contextWindow(for: provider, model: modelName),
                     inputTokens: response.inputTokens,
                     alreadySent: cacheWarmthSent)
                 {
@@ -627,7 +627,7 @@ extension AgentViewModel {
                     // Tier 10.3: same transcript, smaller output budget.
                     mt = newMT
                     compactionState.maxTokens = mt
-                    compactionState.refreshThreshold(contextWindow: contextWindow(for: provider))
+                    compactionState.refreshThreshold(contextWindow: contextWindow(for: provider, model: modelName))
                     services = buildLLMServiceBundle(
                         provider: provider, modelName: modelName, isVision: isVision,
                         historyContext: historyContext, maxTokens: mt)
@@ -640,7 +640,7 @@ extension AgentViewModel {
                     // (Claude 1M → local 32K); keep the old threshold and the
                     // new provider rejects the transcript before compaction
                     // ever fires.
-                    compactionState = CompactionState(contextWindow: contextWindow(for: newProvider), maxTokens: mt)
+                    compactionState = CompactionState(contextWindow: contextWindow(for: newProvider, model: newModel), maxTokens: mt)
                     services = buildLLMServiceBundle(
                         provider: provider,
                         modelName: modelName,
