@@ -335,7 +335,8 @@ final class ClaudeService {
         var body: [String: Any] = [
             "model": model,
             "max_tokens": maxTokens > 0 ? maxTokens : 16384,
-            "temperature": temperature,
+            // No "temperature" — newer Claude models reject it (400 "deprecated"),
+            // and sendStreaming() already omits it.
             "system": systemBlock,
             "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(Self.removingUnsignedThinking(messages))))
         ]
