@@ -248,6 +248,8 @@
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
 		C8F4CD1C340ECFC4F78830FF /* OllamaContextWindowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 238A13CE2A7A19A7A88BD2C8 /* OllamaContextWindowTests.swift */; };
+		1EBCF4BDAECFE598FEC3B400 /* ActivityLogTabCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186E2C0AE9CAF82B1B1F92A /* ActivityLogTabCacheTests.swift */; };
+		4EE92655F0CAFCE498E61EBF /* ContextOverflowDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06FF7974D444A53866B44F9 /* ContextOverflowDetectionTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -529,6 +531,8 @@
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
 		238A13CE2A7A19A7A88BD2C8 /* OllamaContextWindowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OllamaContextWindowTests.swift"; sourceTree = "<group>"; };
+		4186E2C0AE9CAF82B1B1F92A /* ActivityLogTabCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityLogTabCacheTests.swift"; sourceTree = "<group>"; };
+		D06FF7974D444A53866B44F9 /* ContextOverflowDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextOverflowDetectionTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -943,6 +947,8 @@
 				245995D0756C349D623788CC /* ProviderParserTests.swift */,
 				562DDED208832F41127CBDFA /* CriticGateTests.swift */,
 				238A13CE2A7A19A7A88BD2C8 /* OllamaContextWindowTests.swift */,
+							4186E2C0AE9CAF82B1B1F92A /* ActivityLogTabCacheTests.swift */,
+				D06FF7974D444A53866B44F9 /* ContextOverflowDetectionTests.swift */,
 			);
 			path = AgentTests;
 			sourceTree = "<group>";
@@ -1545,6 +1551,7 @@
 				3A2D86472E205A0DA0CB5D69 /* AgenticCoreTests.swift in Sources */,
 				FA10000000000000000103 /* PrefixStabilityTests.swift in Sources */,
 				FA10000000000000000203 /* LLMCompactionTests.swift in Sources */,
+				4EE92655F0CAFCE498E61EBF /* ContextOverflowDetectionTests.swift in Sources */,
 				FA10000000000000000205 /* EditGateTests.swift in Sources */,
 				25941BC9E0651A9D8638C93E /* CriticGateTests.swift in Sources */,
 				C8F4CD1C340ECFC4F78830FF /* OllamaContextWindowTests.swift in Sources */,
@@ -1554,6 +1561,7 @@
 				D3A4F795003DE4CF29105DB6 /* HarnessGuardTests.swift in Sources */,
 				AB11223344556677889900AA /* ShellSafetyServiceTests.swift in Sources */,
 				AB112233445566778899030A /* CodeBlockHighlighterTests.swift in Sources */,
+				1EBCF4BDAECFE598FEC3B400 /* ActivityLogTabCacheTests.swift in Sources */,
 				AB112233445566778899050A /* PackageAutoDiscoveryTests.swift in Sources */,
 				AB112233445566778899060A /* PackageGenerationTests.swift in Sources */,
 				AB112233445566778899070A /* ScriptServiceTests.swift in Sources */,
