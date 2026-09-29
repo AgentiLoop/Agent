@@ -14,13 +14,24 @@ extension AgentViewModel {
     /// or nil when completion may proceed (disabled, no edits, already ran,
     /// clean diff, or critic passed / failed to answer).
     func criticReviewBlocker(projectFolder overrideFolder: String? = nil) async -> String? {
+        let base = overrideFolder ?? projectFolder
+        let folder = base.isEmpty ? NSHomeDirectory() : base
+        // Follow-up on the next task_complete: tell the user whether the AI
+        // changed the code after the critic blocked it.
+        if criticReviewDone, let blockedDiff = criticBlockedDiff {
+            criticBlockedDiff = nil
+            let current = await Self.offMain { Self.uncommittedDiff(folder: folder) }
+            appendLog(current == blockedDiff
+                ? "🧐 Critic follow-up: no code changes after review — AI completed without addressing the issues"
+                : "🧐 Critic follow-up: AI changed the code after review (fixes not re-checked — critic runs once per task)")
+            flushLog()
+            return nil
+        }
         guard criticReviewEnabled, !criticReviewDone else { return nil }
         guard !FileBackupService.shared.snapshottedFiles().isEmpty else { return nil }
         // One shot only — the next task_complete passes this gate regardless.
         criticReviewDone = true
 
-        let base = overrideFolder ?? projectFolder
-        let folder = base.isEmpty ? NSHomeDirectory() : base
         let diff = await Self.offMain { Self.uncommittedDiff(folder: folder) }
         guard !diff.isEmpty else { return nil }
 
@@ -45,7 +56,9 @@ extension AgentViewModel {
             flushLog()
             return nil
         }
-        appendLog("🧐 Critic review found issues — blocking completion once")
+        criticBlockedDiff = diff
+        let issues = verdict.trimmingCharacters(in: .whitespacesAndNewlines)
+        appendLog("🧐 Critic review found issues — blocking completion once:\n\(String(issues.prefix(2000)))")
         flushLog()
         return blocker
     }

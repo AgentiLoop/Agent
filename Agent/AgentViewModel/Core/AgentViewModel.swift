@@ -71,6 +71,10 @@ final class AgentViewModel {
     /// Per-task flag — the critic runs at most once per task so a stubborn
     /// review can't loop task_complete forever. Reset at task start.
     var criticReviewDone: Bool = false
+    /// Diff the critic blocked on this task (nil when it passed / didn't run).
+    /// Compared on the next task_complete to report whether the AI changed the
+    /// code in response. Reset at task start.
+    var criticBlockedDiff: String?
     /// Per-task count of task_complete refusals by the completion gates. Once
     /// it reaches `maxCompletionGateRefusals` the gates step aside so an
     /// unsatisfiable criterion can't loop the task to the iteration cap.

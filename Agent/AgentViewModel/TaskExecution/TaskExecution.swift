@@ -142,6 +142,7 @@ extension AgentViewModel {
 
         commandsRun = []
         criticReviewDone = false
+        criticBlockedDiff = nil
         completionGateRefusals = 0
         var completionSummary = ""
         var stopRouteRetries = 0
