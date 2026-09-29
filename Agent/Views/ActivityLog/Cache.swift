@@ -21,6 +21,9 @@ extension ActivityLogView.Coordinator {
         guard let cache = tabCaches[tabID] else { return false }
         let len = (text as NSString).length
         guard cache.textLength <= len, Self.utf8HasPrefix(text, cache.text) else { return false }
+        // The swapped-in storage becomes the LIVE storage. Drop it from the cache so later
+        // renders (another tab, the empty placeholder) can't write into this tab's cached copy.
+        tabCaches.removeValue(forKey: tabID)
         // Swap the textStorage on the layout manager — instant, no re-layout
         textView.layoutManager?.replaceTextStorage(cache.textStorage)
         if cache.textLength < len {
