@@ -492,7 +492,10 @@ final class OllamaService {
 
         // Determine stop reason from tool calls presence
         let hasToolCalls = message["tool_calls"] != nil || parsedToolFromText
-        let stopReason = hasToolCalls ? "tool_use" : (done ? "end_turn" : "end_turn")
+        // done_reason "length" = num_predict hit — report it so the loop's
+        // max_tokens recovery (escalate/continue) runs instead of ending the turn.
+        let truncated = done && (json["done_reason"] as? String) == "length"
+        let stopReason = hasToolCalls ? "tool_use" : (truncated ? "max_tokens" : "end_turn")
 
         return (contentBlocks, stopReason, promptEval, evalCount)
     }
@@ -529,7 +532,7 @@ final class OllamaService {
 
         var fullText = ""
         var contentBlocks: [[String: Any]] = []
-        let stopReason = "end_turn"
+        var stopReason = "end_turn"
         var insideToolCall = false
         var pendingBuffer = "" // Buffer text that might be the start of a tool call
         var repetitionCount = 0
@@ -697,6 +700,7 @@ final class OllamaService {
             if let done = json["done"] as? Bool, done {
                 streamInputTokens = json["prompt_eval_count"] as? Int ?? 0
                 streamOutputTokens = json["eval_count"] as? Int ?? 0
+                if (json["done_reason"] as? String) == "length" { stopReason = "max_tokens" }
                 break
             }
         }

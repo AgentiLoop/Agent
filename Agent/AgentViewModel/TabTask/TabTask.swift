@@ -522,6 +522,7 @@ extension AgentViewModel {
                 let outcome = await handleTaskLoopError(
                     error,
                     provider: provider,
+                    model: modelId,
                     messages: &messages,
                     timeoutRetryCount: &timeoutRetryCount,
                     maxTimeoutRetries: maxRetries,
@@ -530,6 +531,8 @@ extension AgentViewModel {
                 )
                 switch outcome {
                 case .continueLoop:
+                    // An overflow error may have taught us a smaller real window.
+                    compactionState.refreshThreshold(contextWindow: contextWindow(for: provider, model: modelId))
                     continue
                 case .breakLoop:
                     break mainLoop

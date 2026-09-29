@@ -36,6 +36,7 @@ extension AgentViewModel {
     func handleTaskLoopError(
         _ error: Error,
         provider: APIProvider,
+        model: String? = nil,
         messages: inout [[String: Any]],
         timeoutRetryCount: inout Int,
         maxTimeoutRetries: Int,
@@ -56,33 +57,40 @@ extension AgentViewModel {
         let limiterKey = usesClaudeService ? APIProvider.claude.rawValue : provider.rawValue
 
         // Output budget above the model's real ceiling ("max_tokens: X > Y,
-        // which is the maximum allowed number of output tokens for MODEL").
-        // The default is window × outputBudgetFraction with no hard-coded cap;
-        // learn Y for this model and retry the same transcript at Y.
+        // which is the maximum allowed number of output tokens for MODEL" on
+        // Anthropic; "This model supports at most Y completion tokens" on
+        // OpenAI). Learn Y for this model and retry the same transcript at Y.
         if let cap = Self.parseMaxOutputCap(errMsg) {
-            if !cap.model.isEmpty { modelMaxOutputTokens[cap.model] = cap.limit }
-            appendLog("⚠️ \(cap.model.isEmpty ? "model" : cap.model) caps output at \(cap.limit) tokens (asked \(cap.requested)) — remembering it and retrying")
+            let capModel = cap.model.isEmpty ? (model ?? "") : cap.model
+            if !capModel.isEmpty { modelMaxOutputTokens[capModel] = cap.limit }
+            appendLog("⚠️ \(capModel.isEmpty ? "model" : capModel) caps output at \(cap.limit) tokens (asked \(cap.requested)) — remembering it and retrying")
             flushLog()
             return .lowerMaxTokens(cap.limit)
         }
 
         // Context overflow — prune messages aggressively and retry.
-        // Detection narrowed: require an "exceed/too long/too many" phrase alongside
-        // the keyword. Plain "max_tokens" appears in unrelated parameter errors
-        // (e.g. "max_tokens must be a positive integer"), and treating those as
-        // overflow caused infinite same-second prune loops on bogus model ids.
-        let isOverflow = errMsg.contains("context_length_exceeded")
-            || errMsg.contains("prompt is too long")
-            || errMsg.contains("too many tokens")
-            || (errMsg.contains("max_tokens") && (errMsg.contains("exceed") || errMsg.contains("greater than")))
-            || (errMsg.contains("context_length") && (errMsg.contains("exceed") || errMsg.contains("greater than")))
-        if isOverflow {
-            // Tier 10.3: "input length and max_tokens exceed context limit: A + B > C"
+        // Detection requires an overflow phrase, not just a keyword: plain
+        // "max_tokens" appears in unrelated parameter errors (e.g. "max_tokens
+        // must be a positive integer"), and treating those as overflow caused
+        // infinite same-second prune loops on bogus model ids.
+        if Self.isContextOverflowMessage(errMsg) {
+            // The provider told us its real window (vLLM / LM Studio / OpenAI
+            // "maximum context length is N", Anthropic "X tokens > N maximum").
+            // Remember it when smaller than what we assumed so the proactive
+            // compaction threshold stops overshooting on every later request.
+            if let model, !model.isEmpty, let window = Self.parseReportedContextWindow(errMsg),
+               window < contextWindow(for: provider, model: model)
+            {
+                modelContextWindows[provider][model] = window
+                appendLog("📏 \(provider.displayName) reports a \(window)-token context window for \(model) — compaction threshold adjusted")
+            }
+            // Tier 10.3: input + output budget exceeds the window ("A + B > C",
+            // vLLM "(B > C - A)", OpenAI "I in the messages, O in the completion")
             // — only the output budget is too big. Lower it and retry the same
             // transcript instead of throwing context away.
             if let parsed = Self.parseInputPlusMaxTokensOverflow(errMsg) {
                 let lowered = Self.loweredMaxTokens(limit: parsed.limit, input: parsed.input)
-                if lowered < parsed.maxTokens {
+                if lowered < parsed.maxTokens, parsed.input + 3_000 < parsed.limit {
                     appendLog("⚠️ input (\(parsed.input)) + max_tokens (\(parsed.maxTokens)) exceeds the \(parsed.limit) window — lowering max_tokens to \(lowered) and retrying")
                     flushLog()
                     return .lowerMaxTokens(lowered)
@@ -406,22 +414,98 @@ extension AgentViewModel {
         return .fallbackRequested(provider: fbProvider, modelName: fallback.model, isVision: newIsVision)
     }
 
-    // MARK: - Tier 10.3: input + max_tokens overflow
+    // MARK: - Tier 10.3: context-overflow classification
 
-    /// Parse Anthropic's "input length and `max_tokens` exceed context limit:
-    /// A + B > C" (A = input tokens, B = max_tokens, C = window). Returns nil for
-    /// any other overflow message so those still go through compaction.
-    nonisolated static func parseInputPlusMaxTokensOverflow(_ message: String) -> (input: Int, maxTokens: Int, limit: Int)? {
-        guard message.contains("max_tokens"), message.contains("exceed") else { return nil }
-        let pattern = #"(\d+)\s*\+\s*(\d+)\s*>\s*(\d+)"#
-        guard let re = try? NSRegularExpression(pattern: pattern),
+    /// First regex capture group `group` of `pattern` in `message` (case-insensitive).
+    nonisolated private static func firstCapture(_ pattern: String, in message: String, group: Int = 1) -> String? {
+        guard let re = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]),
               let m = re.firstMatch(in: message, range: NSRange(message.startIndex..., in: message)),
-              m.numberOfRanges == 4,
-              let a = Range(m.range(at: 1), in: message).flatMap({ Int(message[$0]) }),
-              let b = Range(m.range(at: 2), in: message).flatMap({ Int(message[$0]) }),
-              let c = Range(m.range(at: 3), in: message).flatMap({ Int(message[$0]) })
-        else { return nil }
-        return (a, b, c)
+              group < m.numberOfRanges,
+              let r = Range(m.range(at: group), in: message) else { return nil }
+        return String(message[r])
+    }
+
+    /// True when a provider error means "request doesn't fit the context
+    /// window". Covers the phrasing of every supported backend:
+    /// - Anthropic: "prompt is too long: X tokens > Y maximum",
+    ///   "input length and `max_tokens` exceed context limit: A + B > C"
+    /// - OpenAI / Codex: code `context_length_exceeded`, "This model's maximum
+    ///   context length is N tokens", "Your input exceeds the context window"
+    /// - vLLM: "maximum context length is N tokens … (B > C - A)"
+    /// - LM Studio: "Trying to keep the first N tokens when context the
+    ///   overflows … context length of only M tokens", "Context length exceeded"
+    /// - Ollama / llama.cpp: "input length exceeds the context length",
+    ///   "the request exceeds the available context size"
+    /// Case-insensitive; requires an overflow phrase, never a bare keyword.
+    nonisolated static func isContextOverflowMessage(_ message: String) -> Bool {
+        let m = message.lowercased()
+        let exceeds = m.contains("exceed") || m.contains("greater than") || m.contains("too long")
+            || m.contains("too large") || m.contains("overflow")
+        return m.contains("context_length_exceeded")
+            || m.contains("prompt is too long")
+            || m.contains("prompt too long")
+            || m.contains("input is too long")
+            || m.contains("too many tokens")
+            || m.contains("maximum context length")
+            || m.contains("tokens to keep")
+            || m.contains("context overflow")
+            || m.contains("available context size")
+            || m.contains("reduce the length of the messages")
+            || (m.contains("context window") && exceeds)
+            || (m.contains("context length") && (exceeds || m.contains("only")))
+            || (m.contains("context_length") && exceeds)
+            || (m.contains("context limit") && exceeds)
+            || (m.contains("input length") && m.contains("exceed"))
+            || (m.contains("max_tokens") && (m.contains("exceed") || m.contains("greater than")))
+    }
+
+    /// Real context window stated inside an overflow error, or nil.
+    nonisolated static func parseReportedContextWindow(_ message: String) -> Int? {
+        let patterns = [
+            #"maximum context length is\s*(\d+)"#,          // OpenAI / vLLM
+            #"context length of (?:only\s+)?(\d+)"#,        // LM Studio
+            #"context window of (?:only\s+)?(\d+)"#,
+            #"tokens\s*>\s*(\d+)\s*maximum"#,                // Anthropic prompt too long
+            #"context limit:\s*\d+\s*\+\s*\d+\s*>\s*(\d+)"#, // Anthropic input + max_tokens
+            #"n_ctx"?\s*[:=]\s*(\d+)"#                       // llama.cpp / Ollama
+        ]
+        for p in patterns {
+            if let n = firstCapture(p, in: message).flatMap(Int.init), n >= 1_000 { return n }
+        }
+        return nil
+    }
+
+    /// Parse an "input + output budget > window" overflow into its parts.
+    /// Returns nil for any other overflow so those still go through compaction.
+    /// - Anthropic: "input length and `max_tokens` exceed context limit: A + B > C"
+    /// - vLLM: "… maximum context length is C tokens and your request has A
+    ///   input tokens (B > C - A)"
+    /// - OpenAI / older vLLM: "maximum context length is C tokens. However, you
+    ///   requested T tokens (… B in the completion)" → A = T - B
+    nonisolated static func parseInputPlusMaxTokensOverflow(_ message: String) -> (input: Int, maxTokens: Int, limit: Int)? {
+        let lower = message.lowercased()
+        if lower.contains("max_tokens"), lower.contains("exceed"),
+           let a = firstCapture(#"(\d+)\s*\+\s*(\d+)\s*>\s*(\d+)"#, in: message, group: 1).flatMap(Int.init),
+           let b = firstCapture(#"(\d+)\s*\+\s*(\d+)\s*>\s*(\d+)"#, in: message, group: 2).flatMap(Int.init),
+           let c = firstCapture(#"(\d+)\s*\+\s*(\d+)\s*>\s*(\d+)"#, in: message, group: 3).flatMap(Int.init)
+        {
+            return (a, b, c)
+        }
+        let vllm = #"\((\d+)\s*>\s*(\d+)\s*-\s*(\d+)\)"#
+        if let b = firstCapture(vllm, in: message, group: 1).flatMap(Int.init),
+           let c = firstCapture(vllm, in: message, group: 2).flatMap(Int.init),
+           let a = firstCapture(vllm, in: message, group: 3).flatMap(Int.init)
+        {
+            return (a, b, c)
+        }
+        if let c = firstCapture(#"maximum context length is\s*(\d+)"#, in: message).flatMap(Int.init),
+           let t = firstCapture(#"you requested\s*(\d+)\s*tokens"#, in: message).flatMap(Int.init),
+           let b = firstCapture(#"(\d+)\s*in the completion"#, in: message).flatMap(Int.init),
+           t > b
+        {
+            return (t - b, b, c)
+        }
+        return nil
     }
 
     /// Output budget that fits next to `input` inside `limit`, with a 1K
@@ -430,21 +514,27 @@ extension AgentViewModel {
         max(3_000, limit - input - 1_000)
     }
 
-    /// Parse Anthropic's "max_tokens: X > Y, which is the maximum allowed number
-    /// of output tokens for MODEL". Returns the requested budget, the model's
-    /// real ceiling, and the model id (empty when the message omits it).
+    /// Parse an output-budget-above-model-ceiling error. Returns the requested
+    /// budget, the model's real ceiling, and the model id (empty when the
+    /// message omits it).
+    /// - Anthropic: "max_tokens: X > Y, which is the maximum allowed number of
+    ///   output tokens for MODEL"
+    /// - OpenAI / OpenAI-compatible: "max_tokens is too large: X. This model
+    ///   supports at most Y completion tokens, whereas you provided X."
     nonisolated static func parseMaxOutputCap(_ message: String) -> (requested: Int, limit: Int, model: String)? {
-        guard message.contains("max_tokens"), message.contains("maximum allowed") else { return nil }
-        func capture(_ pattern: String, _ group: Int) -> String? {
-            guard let re = try? NSRegularExpression(pattern: pattern),
-                  let m = re.firstMatch(in: message, range: NSRange(message.startIndex..., in: message)),
-                  let r = Range(m.range(at: group), in: message) else { return nil }
-            return String(message[r])
+        if message.contains("max_tokens"), message.contains("maximum allowed"),
+           let a = firstCapture(#"max_tokens:\s*(\d+)\s*>\s*(\d+)"#, in: message, group: 1).flatMap(Int.init),
+           let b = firstCapture(#"max_tokens:\s*(\d+)\s*>\s*(\d+)"#, in: message, group: 2).flatMap(Int.init)
+        {
+            let model = firstCapture(#"output tokens for\s+([A-Za-z0-9._:\-]+)"#, in: message) ?? ""
+            return (a, b, model)
         }
-        let numbers = #"max_tokens:\s*(\d+)\s*>\s*(\d+)"#
-        guard let a = capture(numbers, 1).flatMap(Int.init),
-              let b = capture(numbers, 2).flatMap(Int.init) else { return nil }
-        let model = capture(#"output tokens for\s+([A-Za-z0-9._:\-]+)"#, 1) ?? ""
-        return (a, b, model)
+        if let b = firstCapture(#"supports at most\s*(\d+)\s*(?:completion|output)\s*tokens"#, in: message).flatMap(Int.init) {
+            let a = firstCapture(#"too large:\s*(\d+)"#, in: message).flatMap(Int.init)
+                ?? firstCapture(#"you provided\s*(\d+)"#, in: message).flatMap(Int.init)
+                ?? 0
+            return (a, b, "")
+        }
+        return nil
     }
 }

@@ -397,6 +397,8 @@ final class CodexService {
         }
         if status == 401 { return "Unauthorized — sign in again (click Sign In in the Codex settings panel)." }
         if status == 429 { return "Rate limited by Codex. \(raw)" }
+        // Keep the error code (e.g. context_length_exceeded) for the overflow classifier.
+        if let code = err["code"] as? String, !code.isEmpty, !raw.contains(code) { return "\(raw) (\(code))" }
         return raw
     }
 
@@ -570,8 +572,11 @@ final class CodexService {
                 // Returning empty content here let the task loop treat it as a
                 // tool-less turn ("No tool call" nudge → "Completed:") and the
                 // real error never reached the user. Throw so it surfaces.
-                let msg = ((obj["response"] as? [String: Any])?["error"] as? [String: Any])?["message"] as? String
-                    ?? "response.failed"
+                let errObj = (obj["response"] as? [String: Any])?["error"] as? [String: Any]
+                var msg = errObj?["message"] as? String ?? "response.failed"
+                // Keep the error code (e.g. context_length_exceeded) so the
+                // overflow classifier recognizes it and compacts instead of failing.
+                if let code = errObj?["code"] as? String, !msg.contains(code) { msg += " (\(code))" }
                 AuditLog.log(.api, "Codex stream response.failed: \(msg)")
                 throw AgentError.apiError(statusCode: 200, message: msg)
 

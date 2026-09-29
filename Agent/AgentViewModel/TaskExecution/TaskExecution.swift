@@ -601,15 +601,19 @@ extension AgentViewModel {
                 let outcome = await handleTaskLoopError(
                     error,
                     provider: provider,
+                    model: modelName,
                     messages: &messages,
                     timeoutRetryCount: &timeoutRetryCount,
                     maxTimeoutRetries: maxTimeoutRetries,
-                    overflowCompactor: { [services] msgs in
+                    overflowCompactor: { [services, provider, modelName] msgs in
                         // 413 / context overflow → same compactor as the
                         // threshold path, threshold check bypassed (Tier 7.7).
                         let overflowLog: (String) -> Void = { m in
                             self.appendLog(m); self.flushLog()
                         }
+                        // The error may have revealed a smaller real window —
+                        // re-derive the threshold so compaction targets it.
+                        compactionState.refreshThreshold(contextWindow: self.contextWindow(for: provider, model: modelName))
                         return await Self.tieredCompact(
                             &msgs,
                             state: &compactionState,
