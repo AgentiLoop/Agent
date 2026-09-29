@@ -147,6 +147,8 @@ final class AgentViewModel {
     // Token tracking
     var taskInputTokens: Int = 0
     var taskOutputTokens: Int = 0
+    /// Input tokens of the most recent request — what the model actually saw. Drives the context bar.
+    var lastInputTokens: Int = 0
     var sessionInputTokens: Int = 0
     var sessionOutputTokens: Int = 0
 

@@ -165,6 +165,8 @@ final class ScriptTab: Identifiable {
     var _taskElapsedFrozen: Double = 0 // Stored value when task stops
     var tabInputTokens: Int = 0
     var tabOutputTokens: Int = 0
+    /// Input tokens of the most recent request — what the model actually saw. Drives the context bar.
+    var tabLastInputTokens: Int = 0
     var llmStreamFlushTask: Task<Void, Never>?
     var llmStreamingStarted: Bool = false
 

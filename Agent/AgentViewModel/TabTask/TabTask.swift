@@ -129,6 +129,9 @@ extension AgentViewModel {
     func executeTabTask(tab: ScriptTab, prompt: String) async {
         tab.isLLMRunning = true
         tab.llmMessages = [] // Fresh conversation for each task
+        tab.tabInputTokens = 0
+        tab.tabOutputTokens = 0
+        tab.tabLastInputTokens = 0
         // Reset elapsed timer at the task-start callsite (see executeTask
         // for the ThinkingIndicatorView .onChange race that this guards against).
         tab.taskStartDate = Date()
@@ -382,8 +385,6 @@ extension AgentViewModel {
                 // Track token usage — use reported counts or estimate from text (~4 chars/token)
                 let inTok = response.inputTokens > 0 ? response.inputTokens : Self.estimateTokens(messages: messages)
                 let outTok = response.outputTokens > 0 ? response.outputTokens : Self.estimateTokens(content: response.content)
-                taskInputTokens += inTok
-                taskOutputTokens += outTok
                 sessionInputTokens += inTok
                 sessionOutputTokens += outTok
                 TokenUsageStore.shared.record(inputTokens: inTok, outputTokens: outTok)
@@ -397,6 +398,7 @@ extension AgentViewModel {
                 tab.lastElapsed = streamElapsed
                 tab.tabInputTokens += inTok
                 tab.tabOutputTokens += outTok
+                tab.tabLastInputTokens = inTok
                 // Show timing in activity log so user can see what's slow
                 tab.appendLog(Self.llmReceipt(
                     elapsed: streamElapsed, iteration: iterations, inTok: inTok, outTok: outTok,

@@ -51,6 +51,7 @@ extension AgentViewModel {
         activityLog = ScriptTab.capActivityLog(activityLog, keepRecentTasks: visibleTaskCount)
         taskInputTokens = 0
         taskOutputTokens = 0
+        lastInputTokens = 0
         budgetUsedFraction = 0
         subAgents.removeAll()
         FileBackupService.shared.clearTaskSnapshots()
@@ -357,6 +358,7 @@ extension AgentViewModel {
                 let outTok = response.outputTokens > 0 ? response.outputTokens : Self.estimateTokens(content: response.content)
                 taskInputTokens += inTok
                 taskOutputTokens += outTok
+                lastInputTokens = inTok
                 sessionInputTokens += inTok
                 sessionOutputTokens += outTok
                 TokenUsageStore.shared.record(inputTokens: inTok, outputTokens: outTok)

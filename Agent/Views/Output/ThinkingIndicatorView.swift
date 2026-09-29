@@ -108,6 +108,7 @@ struct ThinkingIndicatorView: View {
     }
 
     private var inputTokens: Int { tab?.tabInputTokens ?? viewModel.taskInputTokens }
+    private var lastInputTokens: Int { tab?.tabLastInputTokens ?? viewModel.lastInputTokens }
     private var outputTokens: Int {
         let real = tab?.tabOutputTokens ?? viewModel.taskOutputTokens
         // Live estimate from raw stream during streaming (~4 chars per token)
@@ -243,8 +244,9 @@ struct ThinkingIndicatorView: View {
                         }
 
                         // Context budget bar
-                        if inputTokens > 0 {
-                            let used = inputTokens + outputTokens
+                        if lastInputTokens > 0 {
+                            // Last request's input = what the model actually saw; cumulative totals overcount by ~N turns.
+                            let used = lastInputTokens
                             let rawFraction = min(Double(used) / Double(contextWindow), 1.0)
                             let isRunning = viewModel.isRunning || (tab?.isLLMRunning ?? false)
                             // Show 100% when task is done, actual usage while running
