@@ -38,7 +38,7 @@ extension AgentViewModel {
                         spawnedTab.appendOutput(result)
                         spawnedTab.isRunning = false
                         spawnedTab.exitCode = result.contains("BUILD SUCCEEDED") ? 0 : 1
-                        spawnedTab.appendLog(result.contains("BUILD SUCCEEDED") ? "BUILD SUCCEEDED" : "BUILD FAILED")
+                        spawnedTab.appendLog(result.contains("BUILD SUCCEEDED") ? "✅ BUILD SUCCEEDED" : "❌ BUILD FAILED")
                         spawnedTab.flush()
                     }
                     // Auto-checkpoint logic (same as foreground path)
@@ -68,7 +68,7 @@ extension AgentViewModel {
                 let ax = AccessibilityService.shared
                 let windows = ax.listWindows(limit: 5)
                 let verifyReport = """
-                    BUILD SUCCEEDED
+                    ✅ BUILD SUCCEEDED
 
                     Auto-verify:
                     - App launched: \(runResult.prefix(200))
