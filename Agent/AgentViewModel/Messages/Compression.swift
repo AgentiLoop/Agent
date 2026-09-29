@@ -394,6 +394,11 @@ extension AgentViewModel {
         // intact than a 4K one, so big models stop losing files they just read.
         let keepRecent = max(6, min(24, state.compactThreshold / 6_000))
 
+        // A single block bigger than the whole budget (a multi-MB tool result)
+        // survives every tier below — they all keep recent messages verbatim —
+        // and makes even the summary request overflow. Cap those first.
+        capOversizedBlocks(&messages, maxChars: state.compactThreshold)
+
         // Tier 0: structured summary from the active model over the FULL
         // transcript. Runs before microcompact so the summarizer still sees
         // the tool output it is summarizing.
@@ -489,6 +494,52 @@ extension AgentViewModel {
             messages[messages.count - 1]["content"] = blocks
         } else {
             messages.append(["role": "user", "content": text])
+        }
+    }
+
+    // MARK: - Oversized block cap
+
+    /// Truncate any single message text / tool_result longer than `maxChars`
+    /// to a head + tail excerpt. Tool results are spilled first so
+    /// restore_tool_result can still recover the full text.
+    static func capOversizedBlocks(_ messages: inout [[String: Any]], maxChars: Int) {
+        let limit = max(8_000, maxChars)
+        let toolUses = toolUseIndex(messages)
+        func cap(_ text: String, id: String?) -> String {
+            let half = limit / 2
+            var note = "\n\n[… \(text.count - limit) chars truncated to fit the context window"
+            if let id, !id.isEmpty {
+                ToolResultCache.spill(toolUseID: id, content: text, toolUse: toolUses[id])
+                note += " — full content via restore_tool_result(tool_use_id:\"\(id)\")"
+            }
+            return String(text.prefix(half)) + note + " …]\n\n" + String(text.suffix(half))
+        }
+        for i in messages.indices {
+            if let text = messages[i]["content"] as? String {
+                if text.count > limit { messages[i]["content"] = cap(text, id: nil) }
+                continue
+            }
+            guard var blocks = messages[i]["content"] as? [[String: Any]] else { continue }
+            var changed = false
+            for j in blocks.indices {
+                let id = blocks[j]["tool_use_id"] as? String
+                if let text = blocks[j]["text"] as? String, text.count > limit {
+                    blocks[j]["text"] = cap(text, id: nil)
+                    changed = true
+                } else if let text = blocks[j]["content"] as? String, text.count > limit {
+                    blocks[j]["content"] = cap(text, id: id)
+                    changed = true
+                } else if var nested = blocks[j]["content"] as? [[String: Any]] {
+                    for k in nested.indices {
+                        if let text = nested[k]["text"] as? String, text.count > limit {
+                            nested[k]["text"] = cap(text, id: id)
+                            changed = true
+                        }
+                    }
+                    blocks[j]["content"] = nested
+                }
+            }
+            if changed { messages[i]["content"] = blocks }
         }
     }
 
