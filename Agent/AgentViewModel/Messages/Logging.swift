@@ -416,8 +416,7 @@ extension AgentViewModel {
         let combined = existingLog + buffer
         // Group each LLM iteration into its own block: a blank line before the
         // iteration header keeps its tool calls, Jev checks and timings visually together.
-        let startsGroup = message.hasPrefix("🕐 LLM ") || message.hasPrefix("🧾 LLM ")
-            || message.hasPrefix("📎 Attached")
+        let startsGroup = message.hasPrefix("🧾 LLM ") || message.hasPrefix("📎 Attached")
         if startsGroup && !combined.isEmpty && !combined.hasSuffix("\n\n") {
             if !combined.hasSuffix("\n") { buffer += "\n" }
             buffer += "\n"
