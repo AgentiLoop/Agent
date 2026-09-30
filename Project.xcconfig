@@ -1,7 +1,7 @@
 // Project identity: single source of truth for the bundle identifier and the
 // Apple Developer Team used to sign every target.
 //
-// Change APP_BUNDLE_ID here and everything derives from it:
+// Change APP_BUNDLE_ID_BASE here and everything derives from it (Debug appends .debug):
 //   - PRODUCT_BUNDLE_IDENTIFIER for Agent!, AgentHelper (.helper), AgentUser (.user), AgentTests (.tests)
 //   - Agent.entitlements keychain-access-groups
 //   - Info.plist CFBundleHelpBookName (.help) and the embedded Agent.help bundle ID
