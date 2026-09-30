@@ -248,13 +248,72 @@ extension ActivityLogView.Coordinator {
 
     // MARK: - Front Trim
 
-    /// `text` is `lastRenderedText` with whole task sections dropped from the front (and possibly
-    /// new lines appended). Delete the same sections from `storage` so the remainder can take the
-    /// append fast-path. Cuts land on `newTaskMarker`, which renders as literal text, so the k-th
-    /// marker from the end lines up in both the source string and the rendered storage.
+    /// `text` is `lastRenderedText` with its front dropped by `capActivityLog` (and possibly new
+    /// lines appended). Delete the same front from `storage` so the remainder can take the append
+    /// fast-path instead of a full re-render (which shows the "Processing tab data…" overlay).
+    /// Two shapes:
+    /// - task-count cap: `text` starts with `newTaskMarker`; whole task sections were dropped.
+    ///   The marker renders literally, so the k-th marker from the end lines up in source and storage.
+    /// - byte cap: `text` starts with `trimBanner`; the kept remainder begins on a line boundary.
+    ///   Its first line (a timestamped log line, rendered literally) locates the cut in storage.
     /// Returns false (storage untouched) when `text` isn't a front-trimmed continuation.
     private func trimRenderedFront(to text: String, storage: NSTextStorage) -> Bool {
         guard lastLength > 0, !lastRenderedText.isEmpty else { return false }
+        let banner = ScriptTab.trimBanner
+        if text.hasPrefix(banner) {
+            return trimRenderedFrontToBanner(text: text, banner: banner, storage: storage)
+        }
+        return trimRenderedFrontToMarker(text: text, storage: storage)
+    }
+
+    private func trimRenderedFrontToBanner(text: String, banner: String, storage: NSTextStorage) -> Bool {
+        let body = (text as NSString).substring(from: (banner as NSString).length) as NSString
+        let old = lastRenderedText as NSString
+        let rendered = storage.string as NSString
+        let oldStart = lastRenderedText.hasPrefix(banner) ? (banner as NSString).length : 0
+        let nl = body.range(of: "\n").location
+        guard nl != NSNotFound, nl > 0 else { return false }
+        let firstLine = body.substring(to: nl + 1)
+        // Cut in the old text: first line-start occurrence of the kept remainder's first line
+        // whose suffix is a prefix of `body`.
+        var search = NSRange(location: oldStart, length: old.length - oldStart)
+        var cut: Int?
+        while search.length > 0 {
+            let r = old.range(of: firstLine, options: [], range: search)
+            guard r.location != NSNotFound else { break }
+            let lineStart = r.location == 0 || old.character(at: r.location - 1) == 10
+            if lineStart, Self.utf8HasPrefix(body as String, old.substring(from: r.location)) {
+                cut = r.location
+                break
+            }
+            search = NSRange(location: r.location + 1, length: old.length - r.location - 1)
+        }
+        guard let cut else { return false }
+        // Same line in the rendered storage (log lines are timestamped, so effectively unique).
+        var back = NSRange(location: 0, length: rendered.length)
+        var storageCut: Int?
+        while back.length > 0 {
+            let r = rendered.range(of: firstLine, options: [], range: back)
+            guard r.location != NSNotFound else { break }
+            if r.location == 0 || rendered.character(at: r.location - 1) == 10 {
+                storageCut = r.location
+                break
+            }
+            back = NSRange(location: r.location + 1, length: rendered.length - r.location - 1)
+        }
+        guard let storageCut else { return false }
+        storage.beginEditing()
+        storage.deleteCharacters(in: NSRange(location: 0, length: storageCut))
+        storage.insert(renderMarkdownOnly(banner), at: 0)
+        storage.endEditing()
+        tableAnchorText = nil
+        tableAnchorStorage = nil
+        lastRenderedText = banner + old.substring(from: cut)
+        lastLength = (lastRenderedText as NSString).length
+        return true
+    }
+
+    private func trimRenderedFrontToMarker(text: String, storage: NSTextStorage) -> Bool {
         let marker = AgentViewModel.newTaskMarker
         let old = lastRenderedText as NSString
         let rendered = storage.string as NSString
