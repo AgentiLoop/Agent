@@ -135,6 +135,11 @@ extension AgentViewModel {
             content = try await openAI.send(messages: messages).content
         } else if let ollama = services.ollama {
             content = try await ollama.send(messages: messages).content
+        } else if let codex = services.codex {
+            // Codex locks `instructions` to its fixed prefix — put the critic prompt in the message.
+            content = try await codex.send(messages: [["role": "user", "content": criticSystemPrompt + "\n\n" + userMessage]]).content
+        } else if let fm = services.foundationModel {
+            content = try await fm.send(messages: [["role": "user", "content": criticSystemPrompt + "\n\n" + userMessage]]).content
         } else {
             throw AgentError.invalidResponse
         }
