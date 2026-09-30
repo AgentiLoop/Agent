@@ -117,9 +117,13 @@ extension AgentViewModel {
             let answer = await awaitUserAnswer(question)
             appendLog("💬 \(answer)")
             flushLog()
-            // Auto-pilot discovery cycle: the first answer becomes the session goal.
-            if autoPilot?.goal.isEmpty == true, !answer.hasPrefix("(no answer") {
-                autoPilot?.goal = answer
+            // Auto-pilot discovery cycle: the first answer becomes the session goal
+            // (on whichever tab — main or LLM tab — is running this task).
+            let apTab = TabLogRouter.current
+            if var session = autoPilotSession(apTab), session.goal.isEmpty, !answer.hasPrefix("(no answer") {
+                session.goal = answer
+                setAutoPilotSession(session, apTab)
+                recordAutoPilotGoal(answer)
                 appendLog("🛩️ Auto-pilot goal set: \(answer)")
                 flushLog()
             }

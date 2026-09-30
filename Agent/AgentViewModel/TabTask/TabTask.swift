@@ -61,6 +61,9 @@ extension AgentViewModel {
             return
         }
 
+        // Handle /auto — auto-pilot session on this tab (Features/AutoPilot.swift)
+        if handleAutoCommand(task, tab: tab) { return }
+
         // Handle /clear in tab context
         if task.lowercased() == "/clear" {
             tab.taskInput = ""
@@ -88,7 +91,7 @@ extension AgentViewModel {
     }
 
     /// Start executing a task on a tab (not queued).
-    private func startTabTask(tab: ScriptTab, prompt: String) {
+    func startTabTask(tab: ScriptTab, prompt: String) {
         tab.currentTaskPrompt = prompt
         tab.runningLLMTask = Task {
             // Bind the owning tab for the ENTIRE task so any shared code that
@@ -102,6 +105,9 @@ extension AgentViewModel {
             if !tab.taskQueue.isEmpty && !tab.isCancelled {
                 let next = tab.taskQueue.removeFirst()
                 startTabTask(tab: tab, prompt: next)
+            } else if let next = await continueAutoPilot(tab: tab) {
+                // Auto-pilot: queued user tasks run first, then the next cycle.
+                startTabTask(tab: tab, prompt: next)
             }
         }
     }
@@ -110,6 +116,7 @@ extension AgentViewModel {
     func stopTabTask(tab: ScriptTab) {
         let queueCount = tab.taskQueue.count
         tab.taskQueue.removeAll()
+        endAutoPilot(reason: "stopped by user", tab: tab)
         tab.runningLLMTask?.cancel()
         tab.runningLLMTask = nil
         tab.isLLMRunning = false
@@ -128,6 +135,7 @@ extension AgentViewModel {
 
     func executeTabTask(tab: ScriptTab, prompt: String) async {
         tab.isLLMRunning = true
+        tab.lastTaskCompletionSummary = ""
         tab.llmMessages = [] // Fresh conversation for each task
         tab.tabInputTokens = 0
         tab.tabOutputTokens = 0
@@ -235,6 +243,8 @@ extension AgentViewModel {
         let activeGroups: Set<String>? = nil
 
         var iterations = 0
+        // Auto-pilot cycles have no iteration cap — the LLM works until it calls done.
+        let maxIterations = tab.autoPilot != nil ? Int.max / 2 : self.maxIterations
         var textOnlyCount = 0
         var timeoutRetryCount = 0
         var stopRouteRetries = 0
@@ -427,6 +437,7 @@ extension AgentViewModel {
                 switch outcome {
                 case .complete(let summary):
                     completionSummary = summary
+                    tab.lastTaskCompletionSummary = summary
                     tab.llmMessages = messages
                     // Save task history for tab
                     let formatter = DateFormatter()
@@ -601,6 +612,7 @@ extension AgentViewModel {
             sendMessagesTabReply(reply, handle: handle)
         }
 
+        tab.lastTaskCompletionSummary = Task.isCancelled ? "" : completionSummary
         tab.flush()
         tab.isLLMRunning = false
         tab.isLLMThinking = false

@@ -2,15 +2,20 @@ import Foundation
 
 // MARK: - Auto-Pilot
 //
-// `/auto [<N>h|<N>m] [goal…]` runs the main task loop in cycles until the goal
-// is reached, the time budget runs out, or the user presses Stop. Each cycle
-// is a normal main-tab task; between cycles the summary is appended to
-// `.agent/autopilot/progress.md` in the project folder and fed back into the
-// next cycle's prompt so work carries over even across context compaction.
+// `/auto [<N>h|<N>m] [goal…]` runs the task loop in cycles until the goal is
+// reached, the (optional) time budget runs out, or the user presses Stop.
+// There is NO cycle limit and NO per-cycle iteration cap while a session is
+// active: whenever a cycle's task ends (done, error, stall) and the goal is not
+// reached, the next cycle starts automatically — only after the previous task
+// has fully ended. Works on the main tab and on any LLM tab (session is per tab).
+// Between cycles the summary is appended to `.agent/autopilot/progress.md` in the
+// project folder and fed back into the next cycle's prompt.
 //
 //   /auto <goal>              run until the LLM reports the goal reached
 //   /auto 4h <goal>           same, but stop after 4 hours (30m, 1.5h also work)
 //   /auto                     review the project, then ask the user for the goal
+//   /auto history             list previous auto-pilot goals
+//   /auto last | /auto #N     restart the most recent / Nth goal from history
 //   /auto add <folder>        add a parity folder (changes get mirrored there)
 //   /auto remove <folder>     remove a parity folder
 //   /auto status              show the active session
@@ -22,7 +27,8 @@ struct AutoPilotSession {
     var deadline: Date?
     var cycle: Int = 0
     /// Consecutive cycles that ended without a completion summary (cancelled,
-    /// iteration-capped, provider failure). Three in a row ends the session.
+    /// provider failure). Never ends the session — only lengthens the pause
+    /// before the next cycle so a failing provider isn't hammered.
     var idleCycles: Int = 0
     /// Set by `/auto stop` — finishes the running cycle, then ends.
     var stopRequested = false
@@ -34,29 +40,98 @@ extension AgentViewModel {
     /// Marker the LLM puts at the start of its done/task_complete summary when
     /// it judges the goal fully reached. Case-insensitive.
     static let autoPilotGoalReachedMarker = "AUTOPILOT: GOAL REACHED"
+    private static let autoPilotGoalHistoryKey = "autoPilotGoalHistory"
+
+    // MARK: Per-tab session access (tab == nil → main tab)
+
+    func autoPilotSession(_ tab: ScriptTab?) -> AutoPilotSession? {
+        tab == nil ? autoPilot : tab?.autoPilot
+    }
+
+    func setAutoPilotSession(_ session: AutoPilotSession?, _ tab: ScriptTab?) {
+        if let tab { tab.autoPilot = session } else { autoPilot = session }
+    }
+
+    private func apLog(_ message: String, _ tab: ScriptTab?) {
+        if let tab {
+            tab.appendLog(message)
+            tab.flush()
+        } else {
+            appendLog(message)
+            flushLog()
+        }
+    }
+
+    private func autoPilotFolder(_ tab: ScriptTab?) -> String {
+        guard let tab, !tab.projectFolder.isEmpty else { return projectFolder }
+        return Self.resolvedWorkingDirectory(tab.projectFolder)
+    }
+
+    private func autoPilotTaskIsRunning(_ tab: ScriptTab?) -> Bool {
+        tab.map { $0.isLLMRunning } ?? isRunning
+    }
+
+    // MARK: Goal history
+
+    var autoPilotGoalHistory: [String] {
+        UserDefaults.standard.stringArray(forKey: Self.autoPilotGoalHistoryKey) ?? []
+    }
+
+    func recordAutoPilotGoal(_ goal: String) {
+        let g = goal.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !g.isEmpty else { return }
+        var list = autoPilotGoalHistory.filter { $0 != g }
+        list.append(g)
+        UserDefaults.standard.set(Array(list.suffix(50)), forKey: Self.autoPilotGoalHistoryKey)
+    }
 
     // MARK: Slash command
 
-    /// Handle `/auto …`. Returns true when the input was consumed.
-    func handleAutoCommand(_ task: String) -> Bool {
+    /// Handle `/auto …` typed on the main tab (tab == nil) or an LLM tab.
+    /// Returns true when the input was consumed.
+    func handleAutoCommand(_ task: String, tab: ScriptTab? = nil) -> Bool {
         guard task.lowercased() == "/auto" || task.lowercased().hasPrefix("/auto ") else { return false }
-        taskInput = ""
+        // Record the command as a prompt so arrow-up history can replay it.
+        if let tab {
+            tab.addToHistory(task)
+            tab.taskInput = ""
+        } else {
+            promptHistory.append(task)
+            UserDefaults.standard.set(promptHistory, forKey: "agentPromptHistory")
+            historyIndex = -1
+            savedInput = ""
+            taskInput = ""
+        }
         let arg = task.dropFirst(5).trimmingCharacters(in: .whitespaces)
         let lower = arg.lowercased()
 
         if lower == "stop" {
-            if autoPilot != nil {
-                autoPilot?.stopRequested = true
-                appendLog("🛩️ Auto-pilot will stop after the current cycle.")
+            if autoPilotSession(tab) == nil {
+                apLog("🛩️ Auto-pilot is not running.", tab)
+            } else if autoPilotTaskIsRunning(tab) {
+                var s = autoPilotSession(tab)
+                s?.stopRequested = true
+                setAutoPilotSession(s, tab)
+                apLog("🛩️ Auto-pilot will stop after the current cycle.", tab)
             } else {
-                appendLog("🛩️ Auto-pilot is not running.")
+                // Between cycles (pause/backoff) — end now and drop the pending cycle.
+                endAutoPilot(reason: "stopped by /auto stop", tab: tab)
+                if let tab { tab.runningLLMTask?.cancel() } else { runningTask?.cancel() }
             }
-            flushLog()
             return true
         }
         if lower == "status" {
-            appendLog(autoPilotStatusLine())
-            flushLog()
+            apLog(autoPilotStatusLine(tab), tab)
+            return true
+        }
+        if lower == "history" {
+            let goals = autoPilotGoalHistory
+            if goals.isEmpty {
+                apLog("🛩️ No auto-pilot goals yet.", tab)
+            } else {
+                let lines = goals.enumerated().reversed().map { "  #\($0.offset + 1)  \($0.element)" }
+                apLog("🛩️ Auto-pilot goal history (newest first) — rerun with /auto #N or /auto last:\n" + lines.joined(separator: "\n"), tab)
+            }
             return true
         }
         if lower.hasPrefix("add ") || lower.hasPrefix("remove ") {
@@ -66,38 +141,50 @@ extension AgentViewModel {
             if isAdd {
                 var isDir: ObjCBool = false
                 guard FileManager.default.fileExists(atPath: folder, isDirectory: &isDir), isDir.boolValue else {
-                    appendLog("🛩️ Not a folder: \(folder)")
-                    flushLog()
+                    apLog("🛩️ Not a folder: \(folder)", tab)
                     return true
                 }
                 if !autoPilotParityFolders.contains(folder) { autoPilotParityFolders.append(folder) }
-                appendLog("🛩️ Parity folder added: \(folder)")
+                apLog("🛩️ Parity folder added: \(folder)", tab)
             } else {
                 autoPilotParityFolders.removeAll { $0 == folder }
-                appendLog("🛩️ Parity folder removed: \(folder)")
+                apLog("🛩️ Parity folder removed: \(folder)", tab)
             }
-            appendLog("🛩️ Parity folders: \(autoPilotParityFolders.isEmpty ? "(none)" : autoPilotParityFolders.joined(separator: ", "))")
-            flushLog()
+            apLog("🛩️ Parity folders: \(autoPilotParityFolders.isEmpty ? "(none)" : autoPilotParityFolders.joined(separator: ", "))", tab)
             return true
         }
         if lower == "help" || lower == "?" {
-            appendLog("Usage: /auto [<N>h|<N>m] [goal] | /auto add <folder> | /auto remove <folder> | /auto status | /auto stop")
-            flushLog()
+            apLog("Usage: /auto [<N>h|<N>m] [goal] | /auto history | /auto last | /auto #N | /auto add <folder> | /auto remove <folder> | /auto status | /auto stop", tab)
             return true
         }
-        if autoPilot != nil {
-            appendLog("🛩️ Auto-pilot already running — \(autoPilotStatusLine()). Use /auto stop first.")
-            flushLog()
+        if autoPilotSession(tab) != nil {
+            apLog("🛩️ Auto-pilot already running — \(autoPilotStatusLine(tab)). Use /auto stop first.", tab)
             return true
         }
-        guard !projectFolder.isEmpty else {
-            appendLog("🛩️ Set a project folder before starting auto-pilot.")
-            flushLog()
+        guard !autoPilotFolder(tab).isEmpty else {
+            apLog("🛩️ Set a project folder before starting auto-pilot.", tab)
             return true
         }
 
-        let (hours, goal) = Self.parseAutoPilotArgs(arg)
-        startAutoPilot(goal: goal, hours: hours)
+        let (hours, parsedGoal) = Self.parseAutoPilotArgs(arg)
+        var goal = parsedGoal
+        // `/auto last` / `/auto #N` — rerun a goal from history.
+        let history = autoPilotGoalHistory
+        if goal.lowercased() == "last" {
+            guard let last = history.last else {
+                apLog("🛩️ No auto-pilot goals in history yet.", tab)
+                return true
+            }
+            goal = last
+        } else if goal.hasPrefix("#"), let n = Int(goal.dropFirst()) {
+            guard n >= 1, n <= history.count else {
+                apLog("🛩️ No goal #\(n) — /auto history lists \(history.count) goal(s).", tab)
+                return true
+            }
+            goal = history[n - 1]
+        }
+        recordAutoPilotGoal(goal)
+        startAutoPilot(goal: goal, hours: hours, tab: tab)
         return true
     }
 
@@ -122,68 +209,101 @@ extension AgentViewModel {
 
     // MARK: Session lifecycle
 
-    func startAutoPilot(goal: String, hours: Double?) {
+    func startAutoPilot(goal: String, hours: Double?, tab: ScriptTab? = nil) {
         var session = AutoPilotSession(goal: goal)
         if let hours { session.deadline = Date().addingTimeInterval(hours * 3600) }
-        autoPilot = session
-        let budget = hours.map { Self.autoPilotFormatHours($0) } ?? "until the goal is reached"
-        appendLog("🛩️ Auto-pilot started — \(budget). Goal: \(goal.isEmpty ? "(will ask you after reviewing the project)" : goal)")
+        setAutoPilotSession(session, tab)
+        let budget = hours.map { Self.autoPilotFormatHours($0) } ?? "no time limit, unlimited cycles"
+        apLog("🛩️ Auto-pilot started — \(budget). Goal: \(goal.isEmpty ? "(will ask you after reviewing the project)" : goal)", tab)
         if !autoPilotParityFolders.isEmpty {
-            appendLog("🛩️ Parity folders: \(autoPilotParityFolders.joined(separator: ", "))")
+            apLog("🛩️ Parity folders: \(autoPilotParityFolders.joined(separator: ", "))", tab)
         }
-        appendLog("🛩️ Progress log: \(autoPilotProgressURL().path). Press Stop or type /auto stop to end.")
-        flushLog()
-        appendAutoPilotProgress("# Auto-pilot session — \(Self.autoPilotTimestamp())\nGoal: \(goal.isEmpty ? "(pending — asked during cycle 1)" : goal)\nBudget: \(budget)\n")
-        if let next = nextAutoPilotPrompt() { startMainTask(next) }
+        apLog("🛩️ Progress log: \(autoPilotProgressURL(tab).path). Press Stop or type /auto stop to end.", tab)
+        appendAutoPilotProgress("# Auto-pilot session — \(Self.autoPilotTimestamp())\nGoal: \(goal.isEmpty ? "(pending — asked during cycle 1)" : goal)\nBudget: \(budget)\n", tab)
+        guard let next = nextAutoPilotPrompt(tab: tab) else { return }
+        if let tab {
+            if tab.isLLMRunning {
+                // A normal task is in flight — the cycle chains after it ends.
+                tab.taskQueue.append(next)
+            } else {
+                startTabTask(tab: tab, prompt: next)
+            }
+        } else {
+            startMainTask(next)
+        }
     }
 
-    /// Called from `startMainTask` after each main task finishes. Returns the
-    /// next cycle's prompt, or nil (and ends the session) when auto-pilot is
-    /// off, the goal was reported reached, the deadline passed, or the loop stalled.
-    func nextAutoPilotPrompt() -> String? {
-        guard var session = autoPilot, !isCancelled else { return nil }
+    /// Called after a cycle's task has returned. Waits until the task has truly
+    /// ended, pauses (longer after idle cycles), then returns the next cycle's
+    /// prompt — or nil when auto-pilot is off, was stopped, or finished.
+    func continueAutoPilot(tab: ScriptTab?) async -> String? {
+        guard let session = autoPilotSession(tab), !Task.isCancelled else { return nil }
+        // Make sure the previous task on this tab has fully ended.
+        var waited = 0
+        while autoPilotTaskIsRunning(tab), waited < 600 {
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            waited += 1
+            if Task.isCancelled { return nil }
+        }
+        let summary = (tab?.lastTaskCompletionSummary ?? lastTaskCompletionSummary)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let reached = summary.uppercased().hasPrefix(Self.autoPilotGoalReachedMarker)
+        if !reached, !session.stopRequested, session.cycle > 0 {
+            // Idle cycles back off 15s, 30s, 60s… capped at 5 min; otherwise a short settle.
+            let idle = summary.isEmpty ? session.idleCycles + 1 : 0
+            let seconds = idle == 0 ? 2 : min(300, 15 << min(idle - 1, 5))
+            if idle > 0 {
+                apLog("🛩️ Cycle \(session.cycle) ended without a summary — next cycle in \(seconds)s (/auto stop to end).", tab)
+            }
+            try? await Task.sleep(nanoseconds: UInt64(seconds) * 1_000_000_000)
+            if Task.isCancelled || autoPilotSession(tab) == nil { return nil }
+        }
+        return nextAutoPilotPrompt(tab: tab)
+    }
+
+    /// Records the outcome of the cycle that just ended and returns the next
+    /// cycle's prompt, or nil (and ends the session) when the goal was reported
+    /// reached, the deadline passed, or /auto stop was requested.
+    func nextAutoPilotPrompt(tab: ScriptTab? = nil) -> String? {
+        guard var session = autoPilotSession(tab) else { return nil }
+        if tab == nil, isCancelled { return nil }
 
         // Outcome of the cycle that just ended (cycle 0 = nothing ran yet).
         if session.cycle > 0 {
-            let summary = lastTaskCompletionSummary.trimmingCharacters(in: .whitespacesAndNewlines)
-            appendAutoPilotProgress("## Cycle \(session.cycle) — \(Self.autoPilotTimestamp())\n\(summary.isEmpty ? "(no summary — cycle ended without task_complete)" : summary)\n")
+            let summary = (tab?.lastTaskCompletionSummary ?? lastTaskCompletionSummary)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            appendAutoPilotProgress("## Cycle \(session.cycle) — \(Self.autoPilotTimestamp())\n\(summary.isEmpty ? "(no summary — cycle ended without task_complete)" : summary)\n", tab)
             if summary.uppercased().hasPrefix(Self.autoPilotGoalReachedMarker) {
-                endAutoPilot(reason: "goal reached after \(session.cycle) cycle(s)")
+                endAutoPilot(reason: "goal reached after \(session.cycle) cycle(s)", tab: tab)
                 return nil
             }
             session.idleCycles = summary.isEmpty ? session.idleCycles + 1 : 0
-            if session.idleCycles >= 3 {
-                endAutoPilot(reason: "3 consecutive cycles ended without a summary")
-                return nil
-            }
             if session.stopRequested {
-                endAutoPilot(reason: "stopped by /auto stop after \(session.cycle) cycle(s)")
+                endAutoPilot(reason: "stopped by /auto stop after \(session.cycle) cycle(s)", tab: tab)
                 return nil
             }
         }
         if let deadline = session.deadline, Date() >= deadline {
-            endAutoPilot(reason: "time budget used up after \(session.cycle) cycle(s)")
+            endAutoPilot(reason: "time budget used up after \(session.cycle) cycle(s)", tab: tab)
             return nil
         }
 
         session.cycle += 1
-        autoPilot = session
-        appendLog("🛩️ Auto-pilot cycle \(session.cycle) — \(autoPilotStatusLine())")
-        flushLog()
-        return buildAutoPilotPrompt(session)
+        setAutoPilotSession(session, tab)
+        apLog("🛩️ Auto-pilot cycle \(session.cycle) — \(autoPilotStatusLine(tab))", tab)
+        return buildAutoPilotPrompt(session, tab: tab)
     }
 
-    func endAutoPilot(reason: String) {
-        guard let session = autoPilot else { return }
-        autoPilot = nil
+    func endAutoPilot(reason: String, tab: ScriptTab? = nil) {
+        guard let session = autoPilotSession(tab) else { return }
+        setAutoPilotSession(nil, tab)
         let elapsed = Self.autoPilotFormatHours(Date().timeIntervalSince(session.startedAt) / 3600)
-        appendLog("🛩️ Auto-pilot ended — \(reason). Ran \(elapsed).")
-        flushLog()
-        appendAutoPilotProgress("Session ended — \(reason) (\(Self.autoPilotTimestamp()))\n")
+        apLog("🛩️ Auto-pilot ended — \(reason). Ran \(elapsed), \(session.cycle) cycle(s).", tab)
+        appendAutoPilotProgress("Session ended — \(reason) (\(Self.autoPilotTimestamp()))\n", tab)
     }
 
-    func autoPilotStatusLine() -> String {
-        guard let s = autoPilot else { return "🛩️ Auto-pilot is not running." }
+    func autoPilotStatusLine(_ tab: ScriptTab? = nil) -> String {
+        guard let s = autoPilotSession(tab) else { return "🛩️ Auto-pilot is not running." }
         let elapsed = Self.autoPilotFormatHours(Date().timeIntervalSince(s.startedAt) / 3600)
         let remaining = s.deadline.map { "\(Self.autoPilotFormatHours(max(0, $0.timeIntervalSinceNow) / 3600)) left" } ?? "no time limit"
         return "cycle \(s.cycle) · \(elapsed) elapsed · \(remaining) · goal: \(s.goal.isEmpty ? "(pending)" : s.goal)"
@@ -191,17 +311,19 @@ extension AgentViewModel {
 
     // MARK: Prompt
 
-    private func buildAutoPilotPrompt(_ session: AutoPilotSession) -> String {
+    private func buildAutoPilotPrompt(_ session: AutoPilotSession, tab: ScriptTab?) -> String {
         let remaining = session.deadline.map { "\(Self.autoPilotFormatHours(max(0, $0.timeIntervalSinceNow) / 3600)) remaining" } ?? "no time limit — run until the goal is reached"
         var p = "[AUTO-PILOT cycle \(session.cycle) · \(remaining) · unattended session, the user is not watching]\n"
-        p += "PRIMARY PROJECT FOLDER: \(projectFolder)\n"
+        p += "PRIMARY PROJECT FOLDER: \(autoPilotFolder(tab))\n"
         if !autoPilotParityFolders.isEmpty {
             p += "PARITY FOLDERS (must end every cycle matching the primary — port each change you make in the primary to every one of these, build each, commit each):\n"
             for f in autoPilotParityFolders { p += "  - \(f)\n" }
         }
         if session.isDiscovery {
+            let recent = autoPilotGoalHistory.suffix(5)
+            let past = recent.isEmpty ? "" : "\nPrevious auto-pilot goals (offer these as options):\n" + recent.map { "  - \($0)" }.joined(separator: "\n") + "\n"
             p += """
-
+            \(past)
             There is no goal yet. FIRST review the primary project folder (index, README, git log, open TODO/STATUS docs) so you understand it. \
             THEN call ask_user with ONE question: what the goal of this auto-pilot session should be. \
             Once you have the answer, record it with goal_state (goal + verifiable criteria) and start working on it. \
@@ -210,18 +332,18 @@ extension AgentViewModel {
             return p
         }
         p += "GOAL: \(session.goal)\n"
-        let progress = recentAutoPilotProgress()
+        let progress = recentAutoPilotProgress(tab)
         if !progress.isEmpty {
             p += "\nPROGRESS FROM PREVIOUS CYCLES (newest last):\n\(progress)\n"
         }
         p += """
 
         INSTRUCTIONS FOR THIS CYCLE:
-        1. Re-orient: read \(autoPilotProgressURL().path), git status/log, and the project index. Do not redo finished work.
-        2. Pick the single most valuable next step toward the GOAL. Implement it fully: edit → build → fix → commit.
+        1. Re-orient: read \(autoPilotProgressURL(tab).path), git status/log, and the project index. Do not redo finished work.
+        2. Pick the single most valuable next step toward the GOAL. Implement it fully: edit → build → fix → commit. There is no iteration limit — keep working until the step is done.
         3. Parity: every change made in the primary folder must be mirrored into each parity folder before this cycle ends.
         4. Do not ask the user questions — decide and proceed; note assumptions in your summary.
-        5. When this cycle's step is done and committed, call done with: what you did, what remains, and any blockers.
+        5. When this cycle's step is done and committed, call done with: what you did, what remains, and any blockers. A new cycle starts automatically.
         6. If the GOAL is fully reached and verified (build green, criteria checked with tool evidence), start your done summary with the exact text "\(Self.autoPilotGoalReachedMarker)". Never write that text otherwise.
         """
         return p
@@ -229,12 +351,12 @@ extension AgentViewModel {
 
     // MARK: Progress log
 
-    func autoPilotProgressURL() -> URL {
-        AgentProjectPaths.url(in: projectFolder, .autopilot).appendingPathComponent("progress.md")
+    func autoPilotProgressURL(_ tab: ScriptTab? = nil) -> URL {
+        AgentProjectPaths.url(in: autoPilotFolder(tab), .autopilot).appendingPathComponent("progress.md")
     }
 
-    private func appendAutoPilotProgress(_ text: String) {
-        let url = autoPilotProgressURL()
+    private func appendAutoPilotProgress(_ text: String, _ tab: ScriptTab?) {
+        let url = autoPilotProgressURL(tab)
         try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         let existing = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
         try? (existing + text + "\n").write(to: url, atomically: true, encoding: .utf8)
@@ -242,8 +364,8 @@ extension AgentViewModel {
 
     /// Last ~3K chars of the progress log — enough for the most recent cycles
     /// without bloating every prompt.
-    private func recentAutoPilotProgress() -> String {
-        guard let text = try? String(contentsOf: autoPilotProgressURL(), encoding: .utf8) else { return "" }
+    private func recentAutoPilotProgress(_ tab: ScriptTab?) -> String {
+        guard let text = try? String(contentsOf: autoPilotProgressURL(tab), encoding: .utf8) else { return "" }
         let cycles = text.components(separatedBy: "\n## Cycle ").dropFirst()
         guard !cycles.isEmpty else { return "" }
         let recent = cycles.suffix(6).map { "## Cycle " + $0 }.joined(separator: "\n")

@@ -345,18 +345,20 @@ Your files, screen contents and personal data never leave your Mac — cloud pro
 
 ### Auto-pilot (`/auto`)
 
-Runs the main task loop in unattended cycles until a goal is reached, a time budget runs out, or you press Stop.
+Runs the task loop in unattended cycles — on the main tab or any LLM tab — until a goal is reached, a time budget runs out, or you press Stop. There is no cycle limit and no per-cycle iteration cap: when a cycle's task ends (after it has fully finished) and the goal isn't reached, the next cycle starts automatically.
 
 | Command | What it does |
 |---|---|
 | `/auto <goal>` | Work toward the goal until the LLM reports it reached |
 | `/auto 4h <goal>` | Same, but stop after 4 hours (`30m`, `1.5h` also work) |
 | `/auto` | Review the project first, then ask you for the goal via `ask_user` |
+| `/auto history` | List previous auto-pilot goals |
+| `/auto last` / `/auto #N` | Restart the most recent / Nth goal from history |
 | `/auto add <folder>` | Add a parity folder — every change to the project is mirrored there |
 | `/auto remove <folder>` | Remove a parity folder |
-| `/auto status` / `/auto stop` | Show the session / end it after the current cycle |
+| `/auto status` / `/auto stop` | Show the session / end it after the current cycle (immediately if between cycles) |
 
-Each cycle is a normal task; its summary is appended to `.agent/autopilot/progress.md` and fed into the next cycle's prompt. The LLM ends the session by starting its final summary with `AUTOPILOT: GOAL REACHED`. Three cycles in a row with no summary also end it
+Each cycle is a normal task; its summary is appended to `.agent/autopilot/progress.md` and fed into the next cycle's prompt. The LLM ends the session by starting its final summary with `AUTOPILOT: GOAL REACHED`. Cycles that end with no summary (errors, cancellations) never end the session — the next cycle just waits longer (15s, 30s, 60s… up to 5 min). `/auto` commands are recorded in prompt history (arrow-up) and goals are saved to the `/auto history` list.
 
 Slash commands run locally: `/clear [log|all|llm|history|tasks|tokens]`, `/memory [show|clear|edit|<text>]`.
 

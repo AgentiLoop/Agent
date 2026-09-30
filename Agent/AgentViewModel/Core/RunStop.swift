@@ -182,7 +182,7 @@ extension AgentViewModel {
             if !mainTaskQueue.isEmpty && !isCancelled {
                 let next = mainTaskQueue.removeFirst()
                 startMainTask(next)
-            } else if let next = nextAutoPilotPrompt() {
+            } else if let next = await continueAutoPilot(tab: nil) {
                 // Auto-pilot: queued user tasks run first, then the next cycle.
                 startMainTask(next)
             }
@@ -263,7 +263,7 @@ extension AgentViewModel {
         stop()
         for tab in scriptTabs {
             // Stop LLM tasks and clear queues
-            if tab.isLLMRunning || !tab.taskQueue.isEmpty {
+            if tab.isLLMRunning || !tab.taskQueue.isEmpty || tab.autoPilot != nil {
                 stopTabTask(tab: tab)
             }
             // Cancel running scripts

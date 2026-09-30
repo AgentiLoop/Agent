@@ -206,6 +206,8 @@ extension AgentViewModel {
         _ = userName; _ = userHome // kept for any future per-task prompt customization
         // Track unique files edited (write_file/edit_file/diff_apply/create_diff/apply_diff) for plan-mode enforcement
         var filesEditedThisTask: Set<String> = []
+        // Auto-pilot cycles have no iteration cap — the LLM works until it calls done.
+        let maxIterations = autoPilot != nil ? Int.max / 2 : self.maxIterations
 
         taskLoop: while !Task.isCancelled {
             iterations += 1

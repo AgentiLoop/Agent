@@ -69,6 +69,10 @@ final class ScriptTab: Identifiable {
     // MARK: - LLM Conversation State
 
     var taskInput: String = ""
+    /// Active `/auto` session on this tab — nil when auto-pilot is off. See Features/AutoPilot.swift.
+    var autoPilot: AutoPilotSession?
+    /// Summary the last tab task ended with ("" when cancelled/incomplete). Read by auto-pilot between cycles.
+    var lastTaskCompletionSummary: String = ""
     var isLLMRunning: Bool = false
     var isLLMThinking: Bool = false
     var thinkingDismissed: Bool = true

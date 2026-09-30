@@ -139,6 +139,9 @@ extension AgentViewModel {
                         if !lastText.isEmpty { summary = String(lastText.prefix(300)) }
                     }
                     completionSummary = summary
+                    // Auto-pilot reads this between cycles — this early-return path
+                    // skips the end of executeTask where it is otherwise set.
+                    lastTaskCompletionSummary = summary
                     // The gates passed, so every criterion is verified — retire
                     // the goal so it can't leak into the next task and block an
                     // unrelated task_complete.
