@@ -624,7 +624,11 @@ extension AgentViewModel {
         // leaving only the tool name in the HUD. Ignore deltas once the task is over.
         guard isRunning else { return }
         if !streamingTextStarted {
-            rawLLMOutput = ""
+            // Archive the previous response as a page so the user can paginate back to it.
+            let previous = rawLLMOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !previous.isEmpty { llmOutputPages.append(rawLLMOutput) }
+            llmOutputPageIndex = nil
+            rawLLMOutput = "[\(Self.timestampFormatter.string(from: Date()))] "
             displayedLLMOutput = ""
             dripDisplayIndex = 0
         }

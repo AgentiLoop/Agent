@@ -171,6 +171,8 @@ extension AgentViewModel {
         // Clear LLM Output for new task — show blinking cursor
         tab.dripTask?.cancel(); tab.dripTask = nil
         tab.rawLLMOutput = ""
+        tab.llmOutputPages = []
+        tab.llmOutputPageIndex = nil
         tab.displayedLLMOutput = ""
         tab.dripDisplayIndex = 0
 

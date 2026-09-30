@@ -45,6 +45,8 @@ extension AgentViewModel {
         // Clear LLM Output for new task — show blinking cursor
         dripTask?.cancel(); dripTask = nil
         rawLLMOutput = ""
+        llmOutputPages = []
+        llmOutputPageIndex = nil
         displayedLLMOutput = ""
         dripDisplayIndex = 0
 

@@ -147,6 +147,10 @@ final class ScriptTab: Identifiable {
     // LLM streaming state
     var llmStreamBuffer: String = ""
     var rawLLMOutput: String = ""
+    /// Earlier LLM responses from the current task (each prefixed with a `[HH:mm:ss]` stamp). The live/latest response is `rawLLMOutput`.
+    var llmOutputPages: [String] = []
+    /// Index into `llmOutputPages` the user paged back to; nil = show the live/latest response.
+    var llmOutputPageIndex: Int? = nil
     /// Character-by-character dripped version of rawLLMOutput for terminal effect
     var displayedLLMOutput: String = ""
     var dripDisplayIndex: Int = 0
@@ -364,7 +368,11 @@ final class ScriptTab: Identifiable {
         if !llmStreamingStarted {
             llmStreamingStarted = true
             llmStreamBuffer = ""
-            rawLLMOutput = ""
+            // Archive the previous response as a page so the user can paginate back to it.
+            let previous = rawLLMOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !previous.isEmpty { llmOutputPages.append(rawLLMOutput) }
+            llmOutputPageIndex = nil
+            rawLLMOutput = "[\(AgentViewModel.timestampFormatter.string(from: Date()))] "
             displayedLLMOutput = ""
             dripDisplayIndex = 0
         }

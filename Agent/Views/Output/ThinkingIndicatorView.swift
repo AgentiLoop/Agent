@@ -74,6 +74,23 @@ struct ThinkingIndicatorView: View {
         return viewModel.rawLLMOutput
     }
 
+    /// Archived responses from the current task (live response is not included).
+    private var outputPages: [String] { tab?.llmOutputPages ?? viewModel.llmOutputPages }
+    /// Total pages = archived responses + the live/latest one.
+    private var pageCount: Int { outputPages.count + 1 }
+    /// 1-based page the user is viewing; the last page is the live response.
+    private var currentPage: Int {
+        if let idx = tab?.llmOutputPageIndex ?? viewModel.llmOutputPageIndex, idx < outputPages.count {
+            return idx + 1
+        }
+        return pageCount
+    }
+    /// Text of an archived page, or nil when viewing the live response.
+    private var pagedText: String? {
+        guard let idx = tab?.llmOutputPageIndex ?? viewModel.llmOutputPageIndex, idx < outputPages.count else { return nil }
+        return outputPages[idx]
+    }
+
     private var modelName: String {
         if let tab {
             let (provider, model) = viewModel.resolvedLLMConfig(for: tab)
@@ -286,13 +303,21 @@ struct ThinkingIndicatorView: View {
 
                     if showStreamText {
                         LLMOutputBox(
-                            text: streamText,
-                            rawText: rawStreamText,
+                            text: pagedText ?? streamText,
+                            rawText: pagedText ?? rawStreamText,
                             height: $outputHeight,
-                            isStreaming: isActive,
+                            isStreaming: isActive && pagedText == nil,
                             showDismiss: true,
                             dismissEnabled: !isActive,
                             showScanlines: viewModel.scanLinesEnabled,
+                            pageIndex: currentPage,
+                            pageCount: pageCount,
+                            onPage: { delta in
+                                let next = currentPage + delta
+                                guard next >= 1, next <= pageCount else { return }
+                                let idx: Int? = next == pageCount ? nil : next - 1
+                                if let tab { tab.llmOutputPageIndex = idx } else { viewModel.llmOutputPageIndex = idx }
+                            },
                             onDismiss: {
                                 withAnimation(.easeInOut(duration: 0.2)) {
                                     showStreamText = false
@@ -390,6 +415,11 @@ private struct LLMOutputBox: View {
     var showDismiss: Bool = false
     var dismissEnabled: Bool = true
     var showScanlines: Bool = true
+    /// 1-based page being shown and total page count; pager renders only when `pageCount > 1`.
+    var pageIndex: Int = 1
+    var pageCount: Int = 1
+    /// Called with -1 (previous) or +1 (next).
+    var onPage: ((Int) -> Void)?
     var onDismiss: (() -> Void)?
     @State private var cursorVisible = true
     @State private var dragStartHeight: CGFloat = 0
@@ -621,20 +651,51 @@ private struct LLMOutputBox: View {
                     .onAppear { height = minHeight }
                 }
 
-                // Dismiss button — overlaid top right
+                // Pager + dismiss button — overlaid top right
                 if showDismiss {
-                    Button {
-                        onDismiss?()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(dismissEnabled ? termText : termDim)
-                            .frame(width: 20, height: 20)
-                            .background(termBg.opacity(0.9))
-                            .clipShape(Circle())
+                    HStack(spacing: 4) {
+                        if pageCount > 1 {
+                            Button { onPage?(-1) } label: {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(pageIndex > 1 ? termText : termDim)
+                                    .frame(width: 20, height: 20)
+                                    .background(termBg.opacity(0.9))
+                                    .clipShape(Circle())
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(pageIndex <= 1)
+                            Text("\(pageIndex)/\(pageCount)")
+                                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                                .foregroundColor(termText)
+                                .padding(.horizontal, 4)
+                                .frame(height: 20)
+                                .background(termBg.opacity(0.9))
+                                .clipShape(Capsule())
+                            Button { onPage?(1) } label: {
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(pageIndex < pageCount ? termText : termDim)
+                                    .frame(width: 20, height: 20)
+                                    .background(termBg.opacity(0.9))
+                                    .clipShape(Circle())
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(pageIndex >= pageCount)
+                        }
+                        Button {
+                            onDismiss?()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(dismissEnabled ? termText : termDim)
+                                .frame(width: 20, height: 20)
+                                .background(termBg.opacity(0.9))
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!dismissEnabled)
                     }
-                    .buttonStyle(.plain)
-                    .disabled(!dismissEnabled)
                     .padding(8)
                 }
             }

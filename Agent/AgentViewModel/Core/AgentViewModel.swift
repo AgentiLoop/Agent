@@ -711,6 +711,10 @@ final class AgentViewModel {
     @ObservationIgnored var rawLLMOutput: String = UserDefaults.standard.string(forKey: "mainRawLLMOutput") ?? "" {
         didSet { UserDefaults.standard.set(rawLLMOutput, forKey: "mainRawLLMOutput") }
     }
+    /// Earlier LLM responses from the current main-tab task (each prefixed with a `[HH:mm:ss]` stamp). The live/latest response is `rawLLMOutput`.
+    var llmOutputPages: [String] = []
+    /// Index into `llmOutputPages` the user paged back to; nil = show the live/latest response.
+    var llmOutputPageIndex: Int? = nil
     /// Character-by-character dripped version of rawLLMOutput for terminal effect
     var displayedLLMOutput: String = UserDefaults.standard.string(forKey: "mainRawLLMOutput") ?? ""
     var dripDisplayIndex: Int = (UserDefaults.standard.string(forKey: "mainRawLLMOutput") ?? "").unicodeScalars.count
