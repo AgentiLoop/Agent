@@ -21,7 +21,7 @@ import Foundation
 //   /auto status              show the active session
 //   /auto stop                end the session after the current cycle
 
-struct AutoPilotSession {
+struct AutoPilotSession: Codable {
     var goal: String
     var startedAt: Date = Date()
     var deadline: Date?
@@ -41,6 +41,9 @@ extension AgentViewModel {
     /// it judges the goal fully reached. Case-insensitive.
     static let autoPilotGoalReachedMarker = "AUTOPILOT: GOAL REACHED"
     private static let autoPilotGoalHistoryKey = "autoPilotGoalHistory"
+    /// Active sessions persisted across app restarts: [tab UUID string or "main": JSON].
+    private static let autoPilotSessionsKey = "autoPilotSessions"
+    private static let autoPilotMainKey = "main"
 
     // MARK: Per-tab session access (tab == nil → main tab)
 
@@ -50,7 +53,40 @@ extension AgentViewModel {
 
     func setAutoPilotSession(_ session: AutoPilotSession?, _ tab: ScriptTab?) {
         if let tab { tab.autoPilot = session } else { autoPilot = session }
+        // Mirror to disk so the session survives an app restart.
+        let key = tab?.id.uuidString ?? Self.autoPilotMainKey
+        var stored = UserDefaults.standard.dictionary(forKey: Self.autoPilotSessionsKey) as? [String: Data] ?? [:]
+        stored[key] = session.flatMap { try? JSONEncoder().encode($0) }
+        UserDefaults.standard.set(stored, forKey: Self.autoPilotSessionsKey)
     }
+
+    /// Relaunch sessions that were active when the app last quit (or crashed).
+    /// Called once at startup after script tabs are restored.
+    func resumeAutoPilotSessions() {
+        let stored = UserDefaults.standard.dictionary(forKey: Self.autoPilotSessionsKey) as? [String: Data] ?? [:]
+        for (key, data) in stored {
+            var tab: ScriptTab?
+            if key != Self.autoPilotMainKey {
+                tab = scriptTabs.first { $0.id.uuidString == key }
+                guard tab != nil else {
+                    // Tab was closed — drop its orphaned session.
+                    var s = UserDefaults.standard.dictionary(forKey: Self.autoPilotSessionsKey) as? [String: Data] ?? [:]
+                    s[key] = nil
+                    UserDefaults.standard.set(s, forKey: Self.autoPilotSessionsKey)
+                    continue
+                }
+            }
+            guard autoPilotSession(tab) == nil,
+                  let session = try? JSONDecoder().decode(AutoPilotSession.self, from: data) else { continue }
+            setAutoPilotSession(session, tab)
+            apLog("🛩️ Auto-pilot resumed after app restart — \(autoPilotStatusLine(tab))", tab)
+            appendAutoPilotProgress("Resumed after app restart (\(Self.autoPilotTimestamp()))\n", tab)
+            // The interrupted cycle is recorded as ended without a summary.
+            guard let next = nextAutoPilotPrompt(tab: tab) else { continue }
+            if let tab { startTabTask(tab: tab, prompt: next) } else { startMainTask(next) }
+        }
+    }
+
 
     private func apLog(_ message: String, _ tab: ScriptTab?) {
         if let tab {
@@ -296,6 +332,12 @@ extension AgentViewModel {
 
     func endAutoPilot(reason: String, tab: ScriptTab? = nil) {
         guard let session = autoPilotSession(tab) else { return }
+        if autoPilotAppQuitting {
+            // App is quitting — keep the persisted session so it resumes on next launch.
+            apLog("🛩️ Auto-pilot paused for app quit — resumes on next launch.", tab)
+            appendAutoPilotProgress("Paused for app quit (\(Self.autoPilotTimestamp()))\n", tab)
+            return
+        }
         setAutoPilotSession(nil, tab)
         let elapsed = Self.autoPilotFormatHours(Date().timeIntervalSince(session.startedAt) / 3600)
         apLog("🛩️ Auto-pilot ended — \(reason). Ran \(elapsed), \(session.cycle) cycle(s).", tab)

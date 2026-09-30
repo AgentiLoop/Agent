@@ -563,6 +563,8 @@ final class AgentViewModel {
     var mainTaskQueue: [String] = []
     /// Active `/auto` session — nil when auto-pilot is off. See Features/AutoPilot.swift.
     var autoPilot: AutoPilotSession?
+    /// Set when the app is quitting so endAutoPilot keeps sessions persisted for the next launch.
+    var autoPilotAppQuitting = false
     /// Extra project folders auto-pilot keeps in parity with the primary project folder. Persisted.
     var autoPilotParityFolders: [String] = UserDefaults.standard.stringArray(forKey: "autoPilotParityFolders") ?? [] {
         didSet { UserDefaults.standard.set(autoPilotParityFolders, forKey: "autoPilotParityFolders") }
@@ -856,5 +858,12 @@ final class AgentViewModel {
 
         restoreMessagesMonitor()
         startupPingWarmup()
+
+        // Resume /auto sessions that were active when the app last quit or crashed.
+        // Short delay so the UI and services are up before the first cycle starts.
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(3))
+            self?.resumeAutoPilotSessions()
+        }
     }
 }

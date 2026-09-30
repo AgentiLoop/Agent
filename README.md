@@ -358,7 +358,7 @@ Runs the task loop in unattended cycles — on the main tab or any LLM tab — u
 | `/auto remove <folder>` | Remove a parity folder |
 | `/auto status` / `/auto stop` | Show the session / end it after the current cycle (immediately if between cycles) |
 
-Each cycle is a normal task; its summary is appended to `.agent/autopilot/progress.md` and fed into the next cycle's prompt. The LLM ends the session by starting its final summary with `AUTOPILOT: GOAL REACHED`. Cycles that end with no summary (errors, cancellations) never end the session — the next cycle just waits longer (15s, 30s, 60s… up to 5 min). `/auto` commands are recorded in prompt history (arrow-up) and goals are saved to the `/auto history` list.
+Each cycle is a normal task; its summary is appended to `.agent/autopilot/progress.md` and fed into the next cycle's prompt. The LLM ends the session by starting its final summary with `AUTOPILOT: GOAL REACHED`. Cycles that end with no summary (errors, cancellations) never end the session — the next cycle just waits longer (15s, 30s, 60s… up to 5 min). `/auto` commands are recorded in prompt history (arrow-up) and goals are saved to the `/auto history` list. Active sessions survive app restarts: quitting (or a crash) pauses them, and on the next launch each one resumes on its tab with the next cycle.
 
 Slash commands run locally: `/clear [log|all|llm|history|tasks|tokens]`, `/memory [show|clear|edit|<text>]`.
 

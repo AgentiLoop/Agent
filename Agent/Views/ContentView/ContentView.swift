@@ -202,6 +202,7 @@ struct ContentView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .appWillQuit)) { _ in
+            viewModel.autoPilotAppQuitting = true
             viewModel.stopAll()
             viewModel.stopMessagesMonitor()
             Task { await MCPService.shared.disconnectAll() }
