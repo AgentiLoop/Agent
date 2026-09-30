@@ -14,7 +14,13 @@
 // Note: changing the ID also requires new provisioning profiles (release.yml) and a
 // fresh SMAppService registration on machines that had the old daemon/agent installed.
 
-APP_BUNDLE_ID = Agent.app.toddbruss
+APP_BUNDLE_ID_BASE = Agent.app.toddbruss
+APP_BUNDLE_ID = $(APP_BUNDLE_ID_BASE)
+
+// Debug builds get their own identity (Agent.app.toddbruss.debug, .debug.helper,
+// .debug.user, ...) so they can be installed and registered side by side with Release
+// without sharing the daemon/agent registration, keychain group, defaults or TCC grants.
+APP_BUNDLE_ID[config=Debug] = $(APP_BUNDLE_ID_BASE).debug
 
 // Apple Developer Team ID used to sign every target (app, helper, user agent, tests).
 // Change this to your own Team ID when building from your own developer account.

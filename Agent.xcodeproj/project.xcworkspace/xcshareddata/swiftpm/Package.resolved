@@ -1,13 +1,13 @@
 {
-  "originHash" : "9c6813c435023293b78b24e8c6a1f817139f41d54c8f9c1417c29aff360cb9a3",
+  "originHash" : "082c792025e045b9c53f4ed2061c31821bfdb1d9438bf749b0e82105b8a2fd23",
   "pins" : [
     {
       "identity" : "agentaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentAccess.git",
       "state" : {
-        "revision" : "c6484f2f788121e144f8e43894607d1ce58f481c",
-        "version" : "2.10.25"
+        "revision" : "32405791c8bbac28841cf1506ac11e3ece743f6c",
+        "version" : "2.10.24"
       }
     },
     {
