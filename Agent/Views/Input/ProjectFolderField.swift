@@ -111,6 +111,7 @@ struct ProjectFolderField: View {
     @State private var showTree = false
     @State private var showRecentFolders = false
     @State private var isFieldFocused = false
+    @State private var canRestoreRecent = RecentFoldersService.shared.canRestore
 
     private var recentFolders: [String] {
         RecentFoldersService.shared.recentFolders
@@ -192,6 +193,33 @@ struct ProjectFolderField: View {
                 .clipShape(Capsule())
                 .controlSize(.small)
                 .help("Clear project folder")
+
+                Button {
+                    RecentFoldersService.shared.clearAll()
+                    showRecentFolders = false
+                    canRestoreRecent = RecentFoldersService.shared.canRestore
+                } label: {
+                    Image(systemName: "clock.badge.xmark")
+                        .frame(width: 18)
+                }
+                .buttonStyle(.bordered)
+                .clipShape(Capsule())
+                .controlSize(.small)
+                .disabled(recentFolders.isEmpty)
+                .help("Clear recent folders")
+
+                Button {
+                    RecentFoldersService.shared.restore()
+                    canRestoreRecent = RecentFoldersService.shared.canRestore
+                } label: {
+                    Image(systemName: "arrow.uturn.backward.circle")
+                        .frame(width: 18)
+                }
+                .buttonStyle(.bordered)
+                .clipShape(Capsule())
+                .controlSize(.small)
+                .disabled(!canRestoreRecent)
+                .help("Restore recent folders")
 
                 PathTextField(
                     text: $projectFolder,

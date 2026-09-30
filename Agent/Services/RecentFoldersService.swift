@@ -7,6 +7,7 @@ class RecentFoldersService {
 
     private let maxCount = 12
     private let key = "recentProjectFolders"
+    private let backupKey = "recentProjectFoldersBackup"
 
     private nonisolated(unsafe) var folders: [String] = []
 
@@ -43,9 +44,26 @@ class RecentFoldersService {
         save()
     }
 
-    /// Clear all recent folders
+    /// Clear all recent folders (previous list is kept so it can be restored)
     func clearAll() {
+        if !folders.isEmpty {
+            UserDefaults.standard.set(folders, forKey: backupKey)
+        }
         folders.removeAll()
+        save()
+    }
+
+    /// True when a cleared list is available to restore
+    var canRestore: Bool {
+        !(UserDefaults.standard.stringArray(forKey: backupKey) ?? []).isEmpty
+    }
+
+    /// Restore the list saved by the last clearAll()
+    func restore() {
+        let backup = UserDefaults.standard.stringArray(forKey: backupKey) ?? []
+        guard !backup.isEmpty else { return }
+        folders = Array((folders + backup.filter { !folders.contains($0) }).prefix(maxCount))
+        UserDefaults.standard.removeObject(forKey: backupKey)
         save()
     }
 
