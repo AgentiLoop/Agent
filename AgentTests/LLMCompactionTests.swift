@@ -360,8 +360,13 @@ struct LLMCompactionTests {
             var logs: [String] = []
             #expect(await AgentViewModel.tieredCompact(&pruned, state: &state, force: true, log: { logs.append($0) }))
             #expect(logs.contains { $0.hasPrefix("🗜️ Pruned context") })
-            // [first] + [summary] + [ack] + 6-message tail (~30K of the 32K tail budget)
-            #expect(pruned.count == 9)
+            // Microcompact keeps only the newest results that fit the 32K tail
+            // budget (3 × ~10K) and clears the older 3; the rest then fits.
+            #expect(pruned.count == 13)
+            let cleared = (0..<6).map { i in
+                ((pruned[2 + i * 2]["content"] as? [[String: Any]])?.first?["content"] as? String ?? "").hasPrefix("[cleared")
+            }
+            #expect(cleared == [true, true, true, false, false, false])
 
             var summarized = heavySample(rounds: 6)
             var state2 = CompactionState(contextWindow: 131_072)
@@ -370,6 +375,21 @@ struct LLMCompactionTests {
             #expect(summarized.count == 9)
             #expect((summarized[1]["content"] as? String ?? "").contains("continued from a previous conversation"))
         }
+    }
+
+    @Test("microcompact with a token budget clears kept results that don't fit, newest first, keeping at least one")
+    func microcompactTokenBudget() {
+        var messages = heavySample(rounds: 4) // 4 results × ~10K tokens
+        AgentViewModel.microcompact(&messages, keepRecent: 10, maxKeptTokens: 25_000)
+        let cleared = (0..<4).map { i in
+            ((messages[2 + i * 2]["content"] as? [[String: Any]])?.first?["content"] as? String ?? "").hasPrefix("[cleared")
+        }
+        #expect(cleared == [true, true, false, false])
+
+        var tiny = heavySample(rounds: 2)
+        AgentViewModel.microcompact(&tiny, keepRecent: 10, maxKeptTokens: 1)
+        let newest = (tiny[4]["content"] as? [[String: Any]])?.first?["content"] as? String ?? ""
+        #expect(!newest.hasPrefix("[cleared"))
     }
 
     @Test("Apple AI: summarizeOldMessages is a no-op when the toggle is off, even if the model is available")

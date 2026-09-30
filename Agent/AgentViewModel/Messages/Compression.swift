@@ -439,7 +439,7 @@ extension AgentViewModel {
         }
 
         // Microcompact: clear old tool results to recoverable stubs.
-        microcompact(&messages, keepRecent: max(3, keepRecent))
+        microcompact(&messages, keepRecent: max(3, keepRecent), maxKeptTokens: tailBudget)
 
         // Strip images — they're huge and won't summarize well
         stripOldImages(&messages)
@@ -617,7 +617,7 @@ extension AgentViewModel {
         return index
     }
 
-    static func microcompact(_ messages: inout [[String: Any]], keepRecent: Int = 3) {
+    static func microcompact(_ messages: inout [[String: Any]], keepRecent: Int = 3, maxKeptTokens: Int? = nil) {
         // No toggle gate — clearing stale tool results (spilled to ToolResultCache
         // first, so nothing is lost) is structural recovery, not an Apple
         // Intelligence feature.
@@ -649,8 +649,20 @@ extension AgentViewModel {
                 }
             }
         }
-        // Clear all but the last keepRecent
-        let clearCount = max(0, toolResultIndices.count - keepRecent)
+        // Clear all but the last keepRecent — and, with a budget, all but the
+        // newest ones that fit in `maxKeptTokens` (always at least one).
+        var clearCount = max(0, toolResultIndices.count - keepRecent)
+        if let maxKeptTokens {
+            var used = 0
+            for (n, idx) in toolResultIndices[clearCount...].reversed().enumerated() {
+                let block = (messages[idx.msgIdx]["content"] as? [[String: Any]])?[idx.blockIdx] ?? [:]
+                used += estimateTokens(messages: [["role": "user", "content": [block]]])
+                if n > 0, used > maxKeptTokens {
+                    clearCount = toolResultIndices.count - n
+                    break
+                }
+            }
+        }
         for k in 0..<clearCount {
             let (i, j) = toolResultIndices[k]
             if var blocks = messages[i]["content"] as? [[String: Any]] {
