@@ -333,6 +333,45 @@ struct LLMCompactionTests {
         }
     }
 
+    /// Few messages, each tool result ~10K tokens: over a 131K window's 65K
+    /// threshold while still inside `keepRecent` (10) — the transcript shape
+    /// every tier used to leave untouched.
+    private func heavySample(rounds: Int) -> [[String: Any]] {
+        var messages: [[String: Any]] = [["role": "user", "content": "do the task"]]
+        for i in 0..<rounds {
+            messages.append([
+                "role": "assistant",
+                "content": [["type": "tool_use", "id": "heavy_\(i)", "name": "read_file", "input": ["path": "/tmp/h\(i)"]]]
+            ])
+            messages.append([
+                "role": "user",
+                "content": [["type": "tool_result", "tool_use_id": "heavy_\(i)",
+                             "content": String(repeating: "x", count: 40_000)]]
+            ])
+        }
+        return messages
+    }
+
+    @Test("short but heavy transcript: tail is bounded by tokens, so prune and LLM summary still shrink it")
+    func shortHeavyTranscriptCompacts() async {
+        await withAppleCompression(false) {
+            var pruned = heavySample(rounds: 6)
+            var state = CompactionState(contextWindow: 131_072)
+            var logs: [String] = []
+            #expect(await AgentViewModel.tieredCompact(&pruned, state: &state, force: true, log: { logs.append($0) }))
+            #expect(logs.contains { $0.hasPrefix("🗜️ Pruned context") })
+            // [first] + [summary] + [ack] + 6-message tail (~30K of the 32K tail budget)
+            #expect(pruned.count == 9)
+
+            var summarized = heavySample(rounds: 6)
+            var state2 = CompactionState(contextWindow: 131_072)
+            #expect(await AgentViewModel.tieredCompact(
+                &summarized, state: &state2, summarizer: { _ in "1. Primary Request: do the task" }, force: true))
+            #expect(summarized.count == 9)
+            #expect((summarized[1]["content"] as? String ?? "").contains("continued from a previous conversation"))
+        }
+    }
+
     @Test("Apple AI: summarizeOldMessages is a no-op when the toggle is off, even if the model is available")
     func appleSummarizeRespectsToggle() async {
         await withAppleCompression(false) {

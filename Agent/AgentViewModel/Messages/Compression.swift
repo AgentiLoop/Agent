@@ -253,6 +253,20 @@ extension AgentViewModel {
         If the task was already finished, say so.
         """
 
+    /// Trailing messages every compaction tier keeps verbatim: `keepRecent`,
+    /// shrunk (never below 1) until they fit in `maxTokens`. Without the token
+    /// bound, a short transcript of a few huge tool results sits entirely
+    /// inside the kept tail and no tier can shrink it.
+    static func recentTailCount(_ messages: [[String: Any]], keepRecent: Int, maxTokens: Int?) -> Int {
+        guard let maxTokens else { return keepRecent }
+        var used = 0
+        for (n, msg) in messages.suffix(keepRecent).reversed().enumerated() {
+            used += estimateTokens(messages: [msg])
+            if n > 0, used > maxTokens { return n }
+        }
+        return keepRecent
+    }
+
     /// Compact by asking the active model for a structured summary and
     /// rebuilding the transcript as `[first user prompt] + summary + tail`.
     /// The summary sees the WHOLE transcript (up to the model's own window), so
@@ -263,10 +277,13 @@ extension AgentViewModel {
     static func compactWithLLM(
         _ messages: inout [[String: Any]],
         keepRecent: Int,
+        tailTokenBudget: Int? = nil,
         summarizer: CompactSummarizer,
         log: ((String) -> Void)? = nil
     ) async -> Bool {
-        guard messages.count > keepRecent + 4 else { return false }
+        let tailCount = recentTailCount(messages, keepRecent: keepRecent, maxTokens: tailTokenBudget)
+        // A tail shrunk to fit the budget means the middle is heavy even when short.
+        guard messages.count - 1 - tailCount >= (tailCount < keepRecent ? 1 : 4) else { return false }
 
         // Request = transcript minus images (huge, and they don't summarize)
         // + one summary-request user message. No transcript mutation yet.
@@ -276,12 +293,12 @@ extension AgentViewModel {
 
         log?("🗜️ Requesting LLM summary of \(request.count - 1) messages (large models may take a while)...")
         var summary = await summarizer(request)
-        if summary == nil, !Task.isCancelled, messages.count > keepRecent + 8 {
+        if summary == nil, !Task.isCancelled, messages.count > tailCount + 8 {
             // The summary request itself may be too long for the provider
             // (forced compaction after a 413). Retry once summarizing only the
             // newer half of the middle — the older half is spilled below and
             // stays recoverable via restore_tool_result.
-            let dropCount = (messages.count - 1 - keepRecent) / 2
+            let dropCount = (messages.count - 1 - tailCount) / 2
             var shorter = [messages[0]]
             shorter.append(["role": "user", "content": "[\(dropCount) earlier messages omitted from this summary request]"])
             shorter.append(["role": "assistant", "content": "Understood."])
@@ -303,8 +320,8 @@ extension AgentViewModel {
         }
 
         let firstMsg = messages[0]
-        var tail = Array(messages.suffix(keepRecent))
-        let middle = Array(messages.dropFirst(1).dropLast(keepRecent))
+        var tail = Array(messages.suffix(tailCount))
+        let middle = Array(messages.dropFirst(1).dropLast(tailCount))
 
         // The dropped middle may hold tool results the model will want back —
         // spill them so restore_tool_result still works after compaction.
@@ -393,6 +410,9 @@ extension AgentViewModel {
         // model's context budget — a 131K local model keeps far more reads
         // intact than a 4K one, so big models stop losing files they just read.
         let keepRecent = max(6, min(24, state.compactThreshold / 6_000))
+        // ...but never more than half the budget: a short transcript of a few
+        // huge tool results must still shrink.
+        let tailBudget = state.compactThreshold / 2
 
         // A single block bigger than the whole budget (a multi-MB tool result)
         // survives every tier below — they all keep recent messages verbatim —
@@ -403,7 +423,10 @@ extension AgentViewModel {
         // transcript. Runs before microcompact so the summarizer still sees
         // the tool output it is summarizing.
         if let summarizer {
-            if await compactWithLLM(&messages, keepRecent: keepRecent, summarizer: summarizer, log: log) {
+            if await compactWithLLM(
+                &messages, keepRecent: keepRecent, tailTokenBudget: tailBudget,
+                summarizer: summarizer, log: log
+            ) {
                 let tokensAfterT0 = await preciseTokenCount(messages: messages)
                 if state.recordAttempt(tokensBefore: tokensBefore, tokensAfter: tokensAfterT0) {
                     log?("🗜️ LLM compaction: \(tokensBefore) → \(tokensAfterT0) tokens")
@@ -432,7 +455,7 @@ extension AgentViewModel {
         }
 
         // Tier 2: Aggressive prune (drops middle messages into summary).
-        pruneMessages(&messages, keepRecent: keepRecent)
+        pruneMessages(&messages, keepRecent: keepRecent, maxTailTokens: tailBudget)
         let tokensAfterT2 = await preciseTokenCount(messages: messages)
         let reduced = state.recordAttempt(tokensBefore: tokensBefore, tokensAfter: tokensAfterT2)
         if reduced {

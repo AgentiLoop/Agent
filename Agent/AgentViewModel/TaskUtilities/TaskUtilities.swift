@@ -258,15 +258,17 @@ extension AgentViewModel {
 
     /// / Prune old messages to reduce token usage on long tasks. / Keeps the first user message and the most recent
     /// messages. / Middle messages are summarized into a compact text block.
-    static func pruneMessages(_ messages: inout [[String: Any]], keepRecent: Int = 6) {
+    static func pruneMessages(_ messages: inout [[String: Any]], keepRecent: Int = 6, maxTailTokens: Int? = nil) {
         // No toggle gate: pruning is the last line of defence against a
         // conversation that has outgrown the provider's context window. It runs
         // whether or not Apple Intelligence token compression is enabled.
-        guard messages.count > keepRecent + 4 else { return }
+        let tailCount = recentTailCount(messages, keepRecent: keepRecent, maxTokens: maxTailTokens)
+        // A tail shrunk to fit the budget means the middle is heavy even when short.
+        guard messages.count - 1 - tailCount >= (tailCount < keepRecent ? 1 : 4) else { return }
 
         let firstMsg = messages[0]
-        var recentMessages = Array(messages.suffix(keepRecent))
-        let middleMessages = Array(messages.dropFirst(1).dropLast(keepRecent))
+        var recentMessages = Array(messages.suffix(tailCount))
+        let middleMessages = Array(messages.dropFirst(1).dropLast(tailCount))
 
         demoteOrphanToolResults(&recentMessages)
 
