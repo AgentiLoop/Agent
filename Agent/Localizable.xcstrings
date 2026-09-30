@@ -4501,6 +4501,9 @@
         }
       }
     },
+    "Clear recent folders" : {
+
+    },
     "Clear task input" : {
       "localizations" : {
         "de" : {
@@ -13568,6 +13571,9 @@
           }
         }
       }
+    },
+    "Restore recent folders" : {
+
     },
     "Retries" : {
       "localizations" : {
