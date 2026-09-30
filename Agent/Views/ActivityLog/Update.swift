@@ -113,7 +113,22 @@ extension ActivityLogView.Coordinator {
                 guard len >= lastLength else { return false }
                 return Self.utf8HasPrefix(text, lastRenderedText)
             }()
-            let isAppending = len > lastLength && lastLength > 0 && !searchCleared && prefixIntact
+            // Task start cap-trims the FRONT of the log (keepRecentTasks). Drop the same task
+            // sections from the rendered storage instead of re-rendering the whole log — the
+            // full re-render path would show the "Processing tab data…" overlay mid-task.
+            if !prefixIntact, !tabSwitched, !appearanceChanged, !searchCleared,
+               let storage = textView.textStorage,
+               trimRenderedFront(to: text, storage: storage) {
+                userIsAtBottom = true
+                if len == lastLength {
+                    // Nothing appended after the trim — storage already matches `text`.
+                    lastSearch = searchText
+                    lastMatchIndex = currentMatchIndex
+                    snapToEnd(textView)
+                    return
+                }
+            }
+            let isAppending = len > lastLength && lastLength > 0 && !searchCleared && Self.utf8HasPrefix(text, lastRenderedText)
 
             if isAppending, let storage = textView.textStorage {
                 let prevLen = lastLength
@@ -229,6 +244,62 @@ extension ActivityLogView.Coordinator {
         if textGrew {
             throttledScrollToEnd(textView)
         }
+    }
+
+    // MARK: - Front Trim
+
+    /// `text` is `lastRenderedText` with whole task sections dropped from the front (and possibly
+    /// new lines appended). Delete the same sections from `storage` so the remainder can take the
+    /// append fast-path. Cuts land on `newTaskMarker`, which renders as literal text, so the k-th
+    /// marker from the end lines up in both the source string and the rendered storage.
+    /// Returns false (storage untouched) when `text` isn't a front-trimmed continuation.
+    private func trimRenderedFront(to text: String, storage: NSTextStorage) -> Bool {
+        guard lastLength > 0, !lastRenderedText.isEmpty else { return false }
+        let marker = AgentViewModel.newTaskMarker
+        let old = lastRenderedText as NSString
+        let rendered = storage.string as NSString
+        // Walk marker occurrences in the old text from the front; the first whose suffix is a
+        // prefix of `text` is the cut (largest possible kept remainder).
+        var search = NSRange(location: 0, length: old.length)
+        var cut: Int?
+        while search.length > 0 {
+            let r = old.range(of: marker, options: [], range: search)
+            guard r.location != NSNotFound else { break }
+            if r.location > 0, Self.utf8HasPrefix(text, old.substring(from: r.location)) {
+                cut = r.location
+                break
+            }
+            search = NSRange(location: r.location + r.length, length: old.length - r.location - r.length)
+        }
+        guard let cut else { return false }
+        // k = markers kept in the old text from the cut onward.
+        var k = 0
+        var scan = NSRange(location: cut, length: old.length - cut)
+        while scan.length > 0 {
+            let r = old.range(of: marker, options: [], range: scan)
+            guard r.location != NSNotFound else { break }
+            k += 1
+            scan = NSRange(location: r.location + r.length, length: old.length - r.location - r.length)
+        }
+        guard k > 0 else { return false }
+        // Find the k-th marker from the end of the rendered storage.
+        var storageCut: Int?
+        var back = NSRange(location: 0, length: rendered.length)
+        for _ in 0..<k {
+            let r = rendered.range(of: marker, options: .backwards, range: back)
+            guard r.location != NSNotFound else { return false }
+            storageCut = r.location
+            back = NSRange(location: 0, length: r.location)
+        }
+        guard let storageCut, storageCut > 0 else { return false }
+        storage.beginEditing()
+        storage.deleteCharacters(in: NSRange(location: 0, length: storageCut))
+        storage.endEditing()
+        tableAnchorText = nil
+        tableAnchorStorage = nil
+        lastRenderedText = old.substring(from: cut)
+        lastLength = (lastRenderedText as NSString).length
+        return true
     }
 
     // MARK: - Async Full Render
