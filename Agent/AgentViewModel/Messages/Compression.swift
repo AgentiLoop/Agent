@@ -278,37 +278,60 @@ extension AgentViewModel {
         _ messages: inout [[String: Any]],
         keepRecent: Int,
         tailTokenBudget: Int? = nil,
+        requestTokenBudget: Int? = nil,
         summarizer: CompactSummarizer,
         log: ((String) -> Void)? = nil
     ) async -> Bool {
         let tailCount = recentTailCount(messages, keepRecent: keepRecent, maxTokens: tailTokenBudget)
+        let middleCount = messages.count - 1 - tailCount
         // A tail shrunk to fit the budget means the middle is heavy even when short.
-        guard messages.count - 1 - tailCount >= (tailCount < keepRecent ? 1 : 4) else { return false }
+        guard middleCount >= (tailCount < keepRecent ? 1 : 4) else { return false }
 
         // Request = transcript minus images (huge, and they don't summarize)
-        // + one summary-request user message. No transcript mutation yet.
-        var request = messages
-        stripOldImages(&request, keepRecentCount: 0)
-        request.append(["role": "user", "content": compactSummaryPrompt])
+        // + one summary-request user message, with the oldest `dropCount`
+        // middle messages replaced by a note. Dropped messages are spilled
+        // below like the rest of the middle. No transcript mutation yet.
+        let source = messages
+        func summaryRequest(dropping dropCount: Int) -> [[String: Any]] {
+            var request = [source[0]]
+            var rest = Array(source.dropFirst(1 + dropCount))
+            if dropCount > 0 {
+                request.append(["role": "user", "content": "[\(dropCount) earlier messages omitted from this summary request]"])
+                request.append(["role": "assistant", "content": "Understood."])
+                demoteOrphanToolResults(&rest)
+            }
+            request.append(contentsOf: rest)
+            stripOldImages(&request, keepRecentCount: 0)
+            request.append(["role": "user", "content": compactSummaryPrompt])
+            return request
+        }
 
-        log?("🗜️ Requesting LLM summary of \(request.count - 1) messages (large models may take a while)...")
+        // The request carries the whole transcript plus the prompt, so uncapped
+        // it is always larger than what triggered compaction. With a budget,
+        // drop the oldest middle messages until the (inflated, like
+        // measuredTokens) estimate fits.
+        var request = summaryRequest(dropping: 0)
+        var dropCount = 0
+        if let requestTokenBudget {
+            var tokens = estimateTokens(messages: request)
+            while dropCount < middleCount - 1, tokens + tokens / 4 > requestTokenBudget {
+                tokens -= estimateTokens(messages: [request[1 + dropCount]])
+                dropCount += 1
+            }
+            if dropCount > 0 { request = summaryRequest(dropping: dropCount) }
+        }
+
+        let omitted = dropCount > 0 ? ", oldest \(dropCount) omitted to fit the window" : ""
+        log?("🗜️ Requesting LLM summary of \(messages.count - dropCount) messages\(omitted) (large models may take a while)...")
         var summary = await summarizer(request)
-        if summary == nil, !Task.isCancelled, messages.count > tailCount + 8 {
-            // The summary request itself may be too long for the provider
-            // (forced compaction after a 413). Retry once summarizing only the
-            // newer half of the middle — the older half is spilled below and
-            // stays recoverable via restore_tool_result.
-            let dropCount = (messages.count - 1 - tailCount) / 2
-            var shorter = [messages[0]]
-            shorter.append(["role": "user", "content": "[\(dropCount) earlier messages omitted from this summary request]"])
-            shorter.append(["role": "assistant", "content": "Understood."])
-            var rest = Array(messages.dropFirst(1 + dropCount))
-            demoteOrphanToolResults(&rest)
-            shorter.append(contentsOf: rest)
-            stripOldImages(&shorter, keepRecentCount: 0)
-            shorter.append(["role": "user", "content": compactSummaryPrompt])
+        let remaining = middleCount - dropCount
+        if summary == nil, !Task.isCancelled, remaining >= 2 {
+            // The summary request may still be too long for the provider (the
+            // estimate is chars/4, or no budget was given). Retry once without
+            // the older half of what's left of the middle.
+            dropCount += remaining / 2
             log?("🗜️ Summary request too long — retrying with the oldest \(dropCount) messages omitted")
-            summary = await summarizer(shorter)
+            summary = await summarizer(summaryRequest(dropping: dropCount))
         }
         guard let summary, !summary.isEmpty else {
             if Task.isCancelled {
@@ -425,7 +448,7 @@ extension AgentViewModel {
         if let summarizer {
             if await compactWithLLM(
                 &messages, keepRecent: keepRecent, tailTokenBudget: tailBudget,
-                summarizer: summarizer, log: log
+                requestTokenBudget: state.compactThreshold, summarizer: summarizer, log: log
             ) {
                 let tokensAfterT0 = await preciseTokenCount(messages: messages)
                 if state.recordAttempt(tokensBefore: tokensBefore, tokensAfter: tokensAfterT0) {

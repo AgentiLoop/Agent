@@ -377,6 +377,27 @@ struct LLMCompactionTests {
         }
     }
 
+    @Test("LLM summary request is capped to the threshold by omitting the oldest middle messages")
+    func summaryRequestIsCapped() async {
+        var messages = heavySample(rounds: 8) // ~80K tokens; 131K window → 65,536 threshold
+        var request: [[String: Any]] = []
+        let ok = await AgentViewModel.compactWithLLM(
+            &messages, keepRecent: 10, tailTokenBudget: 32_768, requestTokenBudget: 65_536,
+            summarizer: { request = $0; return "summary" })
+        #expect(ok)
+        let est = AgentViewModel.estimateTokens(messages: request)
+        #expect(est + est / 4 <= 65_536)
+        #expect((request[1]["content"] as? String ?? "").contains("earlier messages omitted from this summary request"))
+        #expect((request.last?["content"] as? String) == AgentViewModel.compactSummaryPrompt)
+
+        // Without a budget the request is the full transcript, as before.
+        var uncapped = heavySample(rounds: 8)
+        var seen = 0
+        _ = await AgentViewModel.compactWithLLM(
+            &uncapped, keepRecent: 10, tailTokenBudget: 32_768, summarizer: { seen = $0.count; return "summary" })
+        #expect(seen == 18)
+    }
+
     @Test("microcompact with a token budget clears kept results that don't fit, newest first, keeping at least one")
     func microcompactTokenBudget() {
         var messages = heavySample(rounds: 4) // 4 results × ~10K tokens
