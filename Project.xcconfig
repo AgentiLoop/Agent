@@ -22,6 +22,11 @@ APP_BUNDLE_ID = $(APP_BUNDLE_ID_BASE)
 // without sharing the daemon/agent registration, keychain group, defaults or TCC grants.
 APP_BUNDLE_ID[config=Debug] = $(APP_BUNDLE_ID_BASE).debug
 
+// App bundle / display name. Debug builds ship as "Agent!-debug.app" so both a Release
+// and a Debug copy can be installed and running at the same time without colliding.
+APP_PRODUCT_NAME = Agent!
+APP_PRODUCT_NAME[config=Debug] = Agent!-debug
+
 // Apple Developer Team ID used to sign every target (app, helper, user agent, tests).
 // Change this to your own Team ID when building from your own developer account.
 // The project file intentionally does not set DEVELOPMENT_TEAM anywhere, so this is
