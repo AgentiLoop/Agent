@@ -341,6 +341,23 @@ Your files, screen contents and personal data never leave your Mac — cloud pro
 | `⌘ ⇧ M` / `⌘ ⇧ P` | Messages Monitor / Settings |
 | `⌘ ⇧ K` `L` `H` `J` `U` | Clear all / LLM panel / prompt history / task history / token counters |
 
+, `/auto …`.
+
+### Auto-pilot (`/auto`)
+
+Runs the main task loop in unattended cycles until a goal is reached, a time budget runs out, or you press Stop.
+
+| Command | What it does |
+|---|---|
+| `/auto <goal>` | Work toward the goal until the LLM reports it reached |
+| `/auto 4h <goal>` | Same, but stop after 4 hours (`30m`, `1.5h` also work) |
+| `/auto` | Review the project first, then ask you for the goal via `ask_user` |
+| `/auto add <folder>` | Add a parity folder — every change to the project is mirrored there |
+| `/auto remove <folder>` | Remove a parity folder |
+| `/auto status` / `/auto stop` | Show the session / end it after the current cycle |
+
+Each cycle is a normal task; its summary is appended to `.agent/autopilot/progress.md` and fed into the next cycle's prompt. The LLM ends the session by starting its final summary with `AUTOPILOT: GOAL REACHED`. Three cycles in a row with no summary also end it
+
 Slash commands run locally: `/clear [log|all|llm|history|tasks|tokens]`, `/memory [show|clear|edit|<text>]`.
 
 ## FAQ

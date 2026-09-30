@@ -148,6 +148,7 @@ extension AgentViewModel {
         criticBlockedDiff = nil
         completionGateRefusals = 0
         var completionSummary = ""
+        lastTaskCompletionSummary = ""
         var stopRouteRetries = 0
         // Tier 10.1: output truncation has its own recovery ladder — one
         // same-request retry with a bigger budget, then ≤3 continuations.
@@ -694,6 +695,7 @@ extension AgentViewModel {
 
         // End the task in SwiftData chat history
         ChatHistoryStore.shared.endCurrentTask(summary: completionSummary.isEmpty ? nil : completionSummary, cancelled: Task.isCancelled)
+        lastTaskCompletionSummary = Task.isCancelled ? "" : completionSummary
 
         // Stop progress updates
         stopProgressUpdates()

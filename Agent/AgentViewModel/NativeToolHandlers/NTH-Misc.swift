@@ -117,6 +117,12 @@ extension AgentViewModel {
             let answer = await awaitUserAnswer(question)
             appendLog("💬 \(answer)")
             flushLog()
+            // Auto-pilot discovery cycle: the first answer becomes the session goal.
+            if autoPilot?.goal.isEmpty == true, !answer.hasPrefix("(no answer") {
+                autoPilot?.goal = answer
+                appendLog("🛩️ Auto-pilot goal set: \(answer)")
+                flushLog()
+            }
             return "User answered: \(answer)"
         // WebFetch — read content from any URL
         // Visual test assertion — click element, verify text appears (opt-in)

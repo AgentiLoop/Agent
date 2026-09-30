@@ -250,6 +250,7 @@
 		C8F4CD1C340ECFC4F78830FF /* OllamaContextWindowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 238A13CE2A7A19A7A88BD2C8 /* OllamaContextWindowTests.swift */; };
 		1EBCF4BDAECFE598FEC3B400 /* ActivityLogTabCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186E2C0AE9CAF82B1B1F92A /* ActivityLogTabCacheTests.swift */; };
 		4EE92655F0CAFCE498E61EBF /* ContextOverflowDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06FF7974D444A53866B44F9 /* ContextOverflowDetectionTests.swift */; };
+		5308F5C24BE347A2B172254E /* AutoPilot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64F73655D7541A3B5492904 /* AutoPilot.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -533,6 +534,7 @@
 		238A13CE2A7A19A7A88BD2C8 /* OllamaContextWindowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OllamaContextWindowTests.swift"; sourceTree = "<group>"; };
 		4186E2C0AE9CAF82B1B1F92A /* ActivityLogTabCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityLogTabCacheTests.swift"; sourceTree = "<group>"; };
 		D06FF7974D444A53866B44F9 /* ContextOverflowDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextOverflowDetectionTests.swift; sourceTree = "<group>"; };
+		A64F73655D7541A3B5492904 /* AutoPilot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoPilot.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -768,7 +770,8 @@
 				AB110000000000000000000C /* ToolDispatch.swift */,
 				6CD920ED377E5386B020BC79 /* ModelFetching.swift */,
 				AA10000000000000000237 /* DefaultModels.swift */,
-			);
+							A64F73655D7541A3B5492904 /* AutoPilot.swift */,
+);
 			path = Features;
 			sourceTree = "<group>";
 		};
@@ -1514,7 +1517,8 @@
 				094F03A9F6093F2CD32452B2 /* FMServeService.swift in Sources */,
 				F36A58D7738933627DF110BF /* LLMCommonSettingsView.swift in Sources */,
 				EAD4DB45DF56D6B65D2F3638 /* MuseCodeAuth.swift in Sources */,
-			);
+							5308F5C24BE347A2B172254E /* AutoPilot.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BB10000000000000000050 /* Sources */ = {

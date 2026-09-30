@@ -129,6 +129,9 @@ extension AgentViewModel {
             return
         }
 
+        // Handle /auto — auto-pilot session control (Features/AutoPilot.swift)
+        if handleAutoCommand(task) { return }
+
         // Switch to appropriate LLM tab: current LLM tab, parent LLM tab if on child, or main tab
         ensureLLMTabSelected()
 
@@ -161,7 +164,7 @@ extension AgentViewModel {
 
     /// Start executing a task on the main tab. If a previous task is still draining (retry loop or in-flight HTTP),
     /// waits for it to fully terminate first — otherwise both loops write to the same activityLog producing garbled output.
-    private func startMainTask(_ task: String) {
+    func startMainTask(_ task: String) {
         let previousTask = runningTask
         runningTask = Task {
             // Drain any previous main task before starting this one. cancel() is idempotent (stop() may have already called it). Await the previous task's value so we know it has fully exited, including any in-flight HTTP request and catch-block log lines.
@@ -178,6 +181,9 @@ extension AgentViewModel {
             // When done, run next queued task
             if !mainTaskQueue.isEmpty && !isCancelled {
                 let next = mainTaskQueue.removeFirst()
+                startMainTask(next)
+            } else if let next = nextAutoPilotPrompt() {
+                // Auto-pilot: queued user tasks run first, then the next cycle.
                 startMainTask(next)
             }
         }
@@ -219,6 +225,7 @@ extension AgentViewModel {
     func stop(silent: Bool = false) {
         let queueCount = mainTaskQueue.count
         mainTaskQueue.removeAll()
+        endAutoPilot(reason: "stopped by user")
         isCancelled = true
         runningTask?.cancel()
         runningTask = nil

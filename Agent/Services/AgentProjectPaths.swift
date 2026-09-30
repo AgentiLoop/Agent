@@ -19,6 +19,7 @@ enum AgentProjectPaths {
         case memory = "memory"
         case worktrees = "worktrees"
         case plans = "plans"
+        case autopilot = "autopilot"
     }
 
     /// Return `{projectFolder}/.agent/{subdir}/` as a URL.

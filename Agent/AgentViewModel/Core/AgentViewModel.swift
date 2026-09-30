@@ -561,6 +561,14 @@ final class AgentViewModel {
     var isCancelled = false
     var runningTask: Task<Void, Never>?
     var mainTaskQueue: [String] = []
+    /// Active `/auto` session — nil when auto-pilot is off. See Features/AutoPilot.swift.
+    var autoPilot: AutoPilotSession?
+    /// Extra project folders auto-pilot keeps in parity with the primary project folder. Persisted.
+    var autoPilotParityFolders: [String] = UserDefaults.standard.stringArray(forKey: "autoPilotParityFolders") ?? [] {
+        didSet { UserDefaults.standard.set(autoPilotParityFolders, forKey: "autoPilotParityFolders") }
+    }
+    /// Summary the last main task ended with ("" when it was cancelled/incomplete). Read by auto-pilot between cycles.
+    var lastTaskCompletionSummary: String = ""
     var currentTaskPrompt: String = ""
     var currentAppleAIPrompt: String = ""
     /// Commands run during current task — used by history, mediator, and tool handlers.
