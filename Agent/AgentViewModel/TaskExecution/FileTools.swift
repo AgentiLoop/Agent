@@ -192,7 +192,7 @@ extension AgentViewModel {
                     // keepInline regex keeps "📝 Edit: …" inline with the timestamp;
                     // the D1F body flows onto the following lines where AgentColorSyntax
                     // draws per-line ❌/✅/📎 stripes.
-                    appendLog("📝 Edit: \(filePath)\n\(d1f)")
+                    appendLog("📝 Edit: \(filePath)\n\n\(d1f)\n")
                 } else {
                     appendLog("📝 Edit: \(filePath)")
                 }
@@ -510,7 +510,7 @@ extension AgentViewModel {
                 let display = MultiLineDiff.displayDiff(diff: verifyDiff, source: source, format: .ai)
                 let newLineCount = finalContent.components(separatedBy: "\n").count
                 // Header first (on the timestamp line, like 📝 Edit:), diff below.
-                appendLog("📝 Diff+Apply: \(filePath)\(rangeNote) [verified: \(verified)] (\(newLineCount) lines)\n" + Self.spaceDiffMarkers(display))
+                appendLog("📝 Diff+Apply: \(filePath)\(rangeNote) [verified: \(verified)] (\(newLineCount) lines)\n\n" + Self.spaceDiffMarkers(display) + "\n")
                 // Invalidate all pending diffs for this file — line numbers have shifted
                 DiffStore.shared.invalidateDiffs(for: expanded)
                 commandsRun.append("diff_and_apply: \(filePath)")

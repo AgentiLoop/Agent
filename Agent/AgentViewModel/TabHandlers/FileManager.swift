@@ -131,7 +131,7 @@ extension AgentViewModel {
                 let d1f = MultiLineDiff.displayDiff(diff: diff, source: oldString, format: .ai)
                 if !d1f.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     // Header + raw D1F in ONE appendLog → single timestamp, like diff_and_apply.
-                    tab.appendLog("📝 Edit: \(filePath)\n\(d1f)")
+                    tab.appendLog("📝 Edit: \(filePath)\n\n\(d1f)\n")
                 } else {
                     tab.appendLog("📝 Edit: \(filePath)")
                 }
@@ -379,7 +379,7 @@ extension AgentViewModel {
                 let display = MultiLineDiff.displayDiff(diff: verifyDiff, source: source, format: .ai)
                 let newLineCount = finalContent.components(separatedBy: "\n").count
                 // Header first (on the timestamp line, like 📝 Edit:), diff below.
-                tab.appendLog("📝 Diff+Apply: \(filePath)\(rangeNote) [verified: \(verified)] (\(newLineCount) lines)\n" + Self.spaceDiffMarkers(display))
+                tab.appendLog("📝 Diff+Apply: \(filePath)\(rangeNote) [verified: \(verified)] (\(newLineCount) lines)\n\n" + Self.spaceDiffMarkers(display) + "\n")
                 DiffStore.shared.invalidateDiffs(for: expanded)
                 tab.flush()
                 return TabToolResult(
