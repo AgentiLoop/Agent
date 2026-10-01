@@ -123,15 +123,18 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         return out
     }
 
-    /// Keyword fallback for picking a face for a sentence.
+    /// Keyword fallback for picking a face for a sentence. Whole-word matches only
+    /// ("abandoned" isn't "done", "terror" isn't "error"); curly apostrophes count as straight.
     nonisolated static func expression(for sentence: String) -> String {
-        let t = sentence.lowercased()
-        func has(_ words: [String]) -> Bool { words.contains { t.contains($0) } }
-        if has(["error", "failed", "failure", "sorry", "unfortunately", "can't", "cannot", "unable", "blocker", "broke"]) { return "sad" }
+        let t = sentence.lowercased().replacingOccurrences(of: "\u{2019}", with: "'")
+        func has(_ words: [String]) -> Bool {
+            t.range(of: "\\b(?:" + words.joined(separator: "|") + ")\\b", options: .regularExpression) != nil
+        }
+        if has(["error", "errors", "failed", "failure", "sorry", "unfortunately", "can't", "cannot", "unable", "blocker", "blockers", "broke", "broken"]) { return "sad" }
         if has(["wow", "amazing", "surprising", "unexpected", "whoa", "incredible"]) { return "surprised" }
-        if has(["never ", "stop ", "forbidden", "denied", "refuse"]) && t.hasSuffix("!") { return "angry" }
-        if has(["done", "success", "complete", "fixed", "great", "glad", "hello", "welcome", "thanks", "goal reached", "works", "green"]) { return "happy" }
-        if t.hasSuffix("?") || has(["let me", "thinking", "consider", "maybe", "perhaps", "investigat", "remains", "next"]) { return "thinking" }
+        if has(["never", "stop", "forbidden", "denied", "refuse"]) && t.hasSuffix("!") { return "angry" }
+        if has(["done", "success", "successful", "complete", "completed", "fixed", "great", "glad", "hello", "welcome", "thanks", "goal reached", "works", "green"]) { return "happy" }
+        if t.hasSuffix("?") || has(["let me", "thinking", "consider", "maybe", "perhaps", "investigat\\w*", "remains", "next"]) { return "thinking" }
         return "neutral"
     }
 }

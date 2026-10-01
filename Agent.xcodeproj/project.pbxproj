@@ -255,6 +255,7 @@
 		5B493B361E9291FA27F8496B /* AvatarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B56C841E197D78556C4620 /* AvatarController.swift */; };
 		AAAB78FFAB5CB1D752D58DD6 /* AvatarPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E8E39436A1C0932057F0F9 /* AvatarPaneView.swift */; };
 		D1A7A7A7A7A7A7A7A7A7A701 /* avatar.html in Resources */ = {isa = PBXBuildFile; fileRef = BF80D97BF0588E5E478E70AE /* avatar.html */; };
+		33D52D2CE01A775259C27580 /* AvatarControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F1EA9AEA14A0CC1B69CD575 /* AvatarControllerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -543,6 +544,7 @@
 		08B56C841E197D78556C4620 /* AvatarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Avatar/AvatarController.swift; sourceTree = "<group>"; };
 		C6E8E39436A1C0932057F0F9 /* AvatarPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Avatar/AvatarPaneView.swift; sourceTree = "<group>"; };
 		BF80D97BF0588E5E478E70AE /* avatar.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = Resources/avatar.html; sourceTree = "<group>"; };
+		6F1EA9AEA14A0CC1B69CD575 /* AvatarControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AvatarControllerTests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -964,7 +966,8 @@
 				238A13CE2A7A19A7A88BD2C8 /* OllamaContextWindowTests.swift */,
 							4186E2C0AE9CAF82B1B1F92A /* ActivityLogTabCacheTests.swift */,
 				D06FF7974D444A53866B44F9 /* ContextOverflowDetectionTests.swift */,
-			);
+							6F1EA9AEA14A0CC1B69CD575 /* AvatarControllerTests.swift */,
+);
 			path = AgentTests;
 			sourceTree = "<group>";
 		};
@@ -1572,6 +1575,7 @@
 				FA10000000000000000103 /* PrefixStabilityTests.swift in Sources */,
 				FA10000000000000000203 /* LLMCompactionTests.swift in Sources */,
 				4EE92655F0CAFCE498E61EBF /* ContextOverflowDetectionTests.swift in Sources */,
+				33D52D2CE01A775259C27580 /* AvatarControllerTests.swift in Sources */,
 				FA10000000000000000205 /* EditGateTests.swift in Sources */,
 				25941BC9E0651A9D8638C93E /* CriticGateTests.swift in Sources */,
 				C8F4CD1C340ECFC4F78830FF /* OllamaContextWindowTests.swift in Sources */,
