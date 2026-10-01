@@ -34,7 +34,6 @@ struct AvatarPaneView: View {
 
                 Spacer()
                 Picker("Voice", selection: $avatar.voiceID) {
-                    Text("Default").tag("")
                     ForEach(AvatarController.voices, id: \.identifier) { v in
                         Text(v.quality == .default ? v.name : "\(v.name) (\(v.quality == .premium ? "Premium" : "Enhanced"))").tag(v.identifier)
                     }

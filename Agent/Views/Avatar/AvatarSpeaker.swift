@@ -30,16 +30,24 @@ final class AvatarSpeaker {
         engine.connect(player, to: engine.mainMixerNode, format: format)
     }
 
+    /// One voice per name+quality (the same voice ships for several regions, e.g. en-US and en-GB);
+    /// the current region's copy wins.
     static func voices() -> [AVSpeechSynthesisVoice] {
-        let lang = String(AVSpeechSynthesisVoice.currentLanguageCode().prefix(2))
+        let code = AVSpeechSynthesisVoice.currentLanguageCode()
+        let lang = String(code.prefix(2))
+        var seen = Set<String>()
         return AVSpeechSynthesisVoice.speechVoices()
             .filter { $0.language.hasPrefix(lang) }
+            .sorted { ($0.language == code ? 1 : 0) > ($1.language == code ? 1 : 0) }
+            .filter { seen.insert("\($0.name)|\($0.quality.rawValue)").inserted }
             .sorted { ($0.quality.rawValue, $0.name) > ($1.quality.rawValue, $1.name) }
     }
 
+    /// Daniel for now; otherwise the best voice for the current language.
     static func bestVoice() -> AVSpeechSynthesisVoice? {
         let code = AVSpeechSynthesisVoice.currentLanguageCode()
-        return voices().first { $0.language == code } ?? voices().first
+        return voices().first { $0.name == "Daniel" }
+            ?? voices().first { $0.language == code } ?? voices().first
     }
 
     func speak(_ text: String) {

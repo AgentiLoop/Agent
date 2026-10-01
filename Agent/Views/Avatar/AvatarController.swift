@@ -32,8 +32,10 @@ final class AvatarController: NSObject, WKNavigationDelegate {
             js("avatar.setMode('\(mode)')")
         }
     }
-    /// Selected TTS voice identifier; empty = AvatarSpeaker's best default.
-    var voiceID: String = UserDefaults.standard.string(forKey: AvatarController.voiceKey) ?? "" {
+    /// Selected TTS voice identifier; falls back to AvatarSpeaker.bestVoice() (Daniel) when unset or no longer listed.
+    var voiceID: String = UserDefaults.standard.string(forKey: AvatarController.voiceKey)
+        .flatMap { id in AvatarController.voices.contains { $0.identifier == id } ? id : nil }
+        ?? AvatarSpeaker.bestVoice()?.identifier ?? "" {
         didSet {
             UserDefaults.standard.set(voiceID, forKey: Self.voiceKey)
             speaker.voice = AVSpeechSynthesisVoice(identifier: voiceID) ?? AvatarSpeaker.bestVoice()

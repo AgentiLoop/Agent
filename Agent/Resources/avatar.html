@@ -295,7 +295,8 @@ window.avatar={
   setMode(m){if(['mouth','waves','both'].includes(m))mode=m},
   setLevel(rms,zcr){rawLvl=cl(Math.pow(rms*5,.75),0,1);rawZ=zcr},
   setSpeaking(b){if(!b){rawLvl=0;rawZ=0}},
-  setEmbedded(){document.getElementById('hint').style.display='none'},
+  // in-app pane: start zoomed in on the face (ZOOM0x, nudged down OY model units)
+  setEmbedded(){document.getElementById('hint').style.display='none';ZOOM0=2.5;OY=.14;zoom=ZOOM0},
   expressions:NAMES};
 
 onkeydown=e=>{
@@ -342,13 +343,13 @@ let rotY=0,rotX=0,drag=false,pan=false,lx=0,ly=0,panX=0,panY=0;
 cv.oncontextmenu=e=>e.preventDefault();
 cv.onmousedown=e=>{pan=e.button===2||e.shiftKey||e.altKey;drag=!pan;lx=e.clientX;ly=e.clientY};onmouseup=()=>{drag=false;pan=false};onmousemove=e=>{if(pan){panX+=e.clientX-lx;panY+=e.clientY-ly;lx=e.clientX;ly=e.clientY}if(drag){rotY+=(e.clientX-lx)*0.01;rotX=cl(rotX-(e.clientY-ly)*0.01,-1.4,1.4);lx=e.clientX;ly=e.clientY}};
 // pinch to zoom: WebKit gesture events (trackpad pinch) with ctrl+wheel fallback
-let zoom=1,gz=1,gest=false;const setZoom=z=>zoom=cl(z,.4,4);
+let ZOOM0=1,OY=0,zoom=1,gz=1,gest=false;const setZoom=z=>zoom=cl(z,.4,4);
 addEventListener('gesturestart',e=>{e.preventDefault();gest=true;gz=zoom});
 addEventListener('gesturechange',e=>{e.preventDefault();setZoom(gz*e.scale)});
 addEventListener('gestureend',e=>{e.preventDefault();gest=false});
 // pan: two-finger scroll (wheel without ctrl), or shift/option/right-drag
 addEventListener('wheel',e=>{e.preventDefault();if(!e.ctrlKey){panX-=e.deltaX;panY-=e.deltaY;return}if(!gest)setZoom(zoom*Math.exp(-e.deltaY*.01))},{passive:false});
-ondblclick=()=>{rotY=0;rotX=0;zoom=1;panX=0;panY=0};
+ondblclick=()=>{rotY=0;rotX=0;zoom=ZOOM0;panX=0;panY=0};
 
 gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);
 let last=performance.now();
@@ -359,7 +360,7 @@ function frame(now){
   gl.uniformMatrix3fv(U.uRot,false,[cY,sX*sY,-cX*sY, 0,cX,sX, sY,-sX*cY,cX*cY]);
   const S=Math.min(cv.height*1.33,cv.width*1.4)*zoom;
   gl.uniform2f(U.uScale,2*S/cv.width,2*S/cv.height);
-  gl.uniform2f(U.uPan,2*panX/innerWidth,-2*panY/innerHeight);
+  gl.uniform2f(U.uPan,2*panX/innerWidth,-2*panY/innerHeight-2*OY*S/cv.height);
   gl.uniform1f(U.uLW,devicePixelRatio);
   gl.uniform4f(U.uEye,EX,EY,cl(F.eye*(1-F.blink),0,1.5),Math.max(0,F.smile));
   gl.uniform2f(U.uGaze,gaze[0],gaze[1]);gl.uniform1f(U.uOpen,F.open);
