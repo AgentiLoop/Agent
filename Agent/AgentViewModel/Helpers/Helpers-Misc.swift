@@ -84,6 +84,17 @@ extension AgentViewModel {
         }.joined(separator: "\n")
     }
 
+    /// D1F `.ai` output glues the marker to unindented content (no space), but the
+    /// log colorizer only stripes lines where the marker is followed by a space.
+    static func spaceDiffMarkers(_ d1f: String) -> String {
+        d1f.components(separatedBy: "\n").map { line in
+            for m in ["\u{274C}", "\u{2705}", "\u{1F4CE}"] where line.hasPrefix(m) && !line.hasPrefix(m + " ") {
+                return m + " " + line.dropFirst(m.count)
+            }
+            return line
+        }.joined(separator: "\n")
+    }
+
     static func codeFence(_ text: String, language: String = "") -> String {
         "```\(language)\n\(text.trimmingCharacters(in: .newlines))\n```"
     }
