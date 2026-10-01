@@ -65,6 +65,31 @@ enum JevAdvisor {
         """
     }
 
+    /// Avatar tabs: pick a facial expression for each sentence in one request.
+    /// Only needs a key (not the tool-gating toggle) — a wrong face is harmless.
+    /// Returns one entry per sentence (`nil` = no opinion), or `nil` on any failure.
+    static func avatarExpressions(for sentences: [String], options: [String]) async -> [String?]? {
+        guard JevConfiguration.isConfigured, !sentences.isEmpty,
+              let provider = JevConfiguration.provider(onUsage: { _, _ in }) else { return nil }
+        let capped = Array(sentences.prefix(12))
+        var questions: [String: Question] = [:]
+        for (i, sentence) in capped.enumerated() {
+            questions["s\(i)"] = .choice(
+                instructions: "Which facial expression should a talking avatar show while saying sentence \(i + 1): \"\(sentence)\"",
+                options: options)
+        }
+        do {
+            let answers = try await provider.evaluate(State(capped), questions: questions)
+            return sentences.indices.map { i in
+                guard case .choice(let c)? = answers["s\(i)"], options.contains(c.choice) else { return nil }
+                return c.choice
+            }
+        } catch {
+            if !Task.isCancelled { JevConfiguration.report("⚠️ Jev avatar expressions failed: \(error.localizedDescription)") }
+            return nil
+        }
+    }
+
     /// One-line form of a command for the activity log.
     private static func summarize(_ command: String) -> String {
         let flat = command.split(whereSeparator: \.isNewline)

@@ -15,6 +15,7 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     @ObservationIgnored let webView: WKWebView
     @ObservationIgnored private let speaker = AvatarSpeaker()
     @ObservationIgnored private var queue: [(text: String, expression: String)] = []
+    @ObservationIgnored private var jevTask: Task<Void, Never>?
 
     var speaking = false
     var expression = "neutral" { didSet { js("avatar.setExpression('\(expression)')") } }
@@ -46,16 +47,28 @@ final class AvatarController: NSObject, WKNavigationDelegate {
 
     // MARK: - Speech
 
-    /// Speak `text`, choosing an expression for each sentence.
+    /// Speak `text`, choosing an expression for each sentence. Starts at once
+    /// with the keyword faces; if Jev is configured its picks replace them for
+    /// the sentences not yet finished when the answer arrives.
     func say(_ text: String) {
         stop()
-        queue = Self.sentences(in: Self.speakable(text)).map { ($0, Self.expression(for: $0)) }
+        let sentences = Self.sentences(in: Self.speakable(text))
+        queue = sentences.map { ($0, Self.expression(for: $0)) }
         guard !queue.isEmpty else { return }
         speaking = true
         speakNext()
+        jevTask = Task { [weak self] in
+            guard let picks = await JevAdvisor.avatarExpressions(for: sentences, options: Self.expressions),
+                  !Task.isCancelled, let self else { return }
+            let offset = sentences.count - self.queue.count
+            for i in self.queue.indices { if let pick = picks[offset + i] { self.queue[i].expression = pick } }
+            if self.speaking, offset > 0, let pick = picks[offset - 1] { self.expression = pick }
+        }
     }
 
     func stop() {
+        jevTask?.cancel()
+        jevTask = nil
         queue.removeAll()
         speaker.stop()
         speaking = false
