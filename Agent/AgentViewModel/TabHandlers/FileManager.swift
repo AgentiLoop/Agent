@@ -378,8 +378,8 @@ extension AgentViewModel {
                 let verified = MultiLineDiff.verifyDiff(verifyDiff)
                 let display = MultiLineDiff.displayDiff(diff: verifyDiff, source: source, format: .ai)
                 let newLineCount = finalContent.components(separatedBy: "\n").count
-                tab.appendLog("\n" + display + "\n")
-                tab.appendLog("📝 Diff+Apply:\n\(filePath)\(rangeNote) [verified: \(verified)] (\(newLineCount) lines)")
+                // Header first (on the timestamp line, like 📝 Edit:), diff below.
+                tab.appendLog("📝 Diff+Apply: \(filePath)\(rangeNote) [verified: \(verified)] (\(newLineCount) lines)\n" + display)
                 DiffStore.shared.invalidateDiffs(for: expanded)
                 tab.flush()
                 return TabToolResult(
