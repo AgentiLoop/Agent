@@ -152,6 +152,8 @@ extension AgentViewModel {
                            let tab = self.tab(for: tabId)
                         {
                             tab.taskInput = newText
+                            // Avatar tabs: auto-send after a pause in speech.
+                            if tab.isAvatarTab { self.resetSilenceTimer() }
                         } else {
                             self.taskInput = newText
                         }
@@ -162,6 +164,10 @@ extension AgentViewModel {
                     if self.isHotwordListening {
                         // Restart listening after a pause (recognition sessions time out)
                         self.restartHotwordSession()
+                    } else if isFinal, let tabId = self.preDictationTabId,
+                              self.tab(for: tabId)?.isAvatarTab == true
+                    {
+                        self.submitHotwordCommand()
                     } else {
                         self.stopDictation()
                     }

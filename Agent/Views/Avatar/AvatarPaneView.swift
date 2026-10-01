@@ -23,7 +23,10 @@ struct AvatarPaneView: View {
                 }
                 .help(avatar.speaking ? "Stop Speaking" : "Speak Last Reply")
 
-                Button { viewModel.toggleDictation() } label: {
+                Button {
+                    if avatar.speaking { avatar.stop() } // don't let the mic hear the avatar
+                    viewModel.toggleDictation()
+                } label: {
                     Image(systemName: viewModel.isListening ? "mic.fill" : "mic")
                         .foregroundStyle(viewModel.isListening ? .red : .primary)
                 }
