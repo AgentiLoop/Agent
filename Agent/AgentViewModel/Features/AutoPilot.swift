@@ -141,6 +141,11 @@ extension AgentViewModel {
         let arg = task.dropFirst(5).trimmingCharacters(in: .whitespaces)
         let lower = arg.lowercased()
 
+        // /auto stop all | stopall | stop-all — same as the Stop All button.
+        if ["stop all", "stopall", "stop-all"].contains(lower.split(separator: " ").joined(separator: " ")) {
+            stopAll()
+            return true
+        }
         if lower == "stop" {
             if autoPilotSession(tab) == nil {
                 apLog("🛩️ Auto-pilot is not running.", tab)
