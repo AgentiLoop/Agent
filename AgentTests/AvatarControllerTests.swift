@@ -1,10 +1,11 @@
 import Testing
 import Foundation
+import WebKit
 @testable import Agent_
 
 // Avatar tabs (AvatarController.swift): the offline text helpers that decide
-// what the avatar says and which face it shows per sentence. Speech, the
-// WKWebView face and the Jev expression request are not exercised here.
+// what the avatar says and which face it shows per sentence, plus the bundled
+// avatar.html JS API. Speech and the Jev expression request are not exercised here.
 
 @MainActor
 struct AvatarControllerTests {
@@ -44,4 +45,24 @@ struct AvatarControllerTests {
         #expect(AvatarController.expression(for: "A terror film.") == "neutral")
         #expect(AvatarController.expression(for: "Never mind.") == "neutral") // angry needs "!"
     }
+
+    /// The bundled avatar.html loads in a WKWebView and exposes the JS API
+    /// AvatarController calls, with the same expression names Swift offers Jev.
+    @Test func bundledAvatarPageExposesControllerAPI() async throws {
+        let url = try #require(Bundle.main.url(forResource: "avatar", withExtension: "html"))
+        let web = WKWebView(frame: NSRect(x: 0, y: 0, width: 300, height: 300))
+        web.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+        var ready = false
+        for _ in 0..<100 where !ready {
+            try await Task.sleep(for: .milliseconds(100))
+            ready = (try? await web.evaluateJavaScript("typeof avatar")) as? String == "object"
+        }
+        #expect(ready)
+        let names = try await web.evaluateJavaScript("avatar.expressions") as? [String]
+        #expect(names == AvatarController.expressions)
+        for m in AvatarController.modes {
+            _ = try await web.evaluateJavaScript("avatar.setMode('\(m.id)');avatar.setLevel(0.3,0.1);avatar.setSpeaking(false);avatar.setEmbedded();1")
+        }
+    }
 }
+
