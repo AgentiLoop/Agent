@@ -15,6 +15,8 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     private static let voiceKey = "avatarVoiceIdentifier"
     /// Voices offered in the pane's voice menu (current language, best quality first).
     static let voices = AvatarSpeaker.voices()
+    /// Spoken when an avatar tab opens, and by the pane's Speak button before any reply exists.
+    static let greeting = "Hello, I'm Agent! Type or speak a goal and I'll work on it."
 
     @ObservationIgnored let webView: WKWebView
     @ObservationIgnored private let speaker = AvatarSpeaker()

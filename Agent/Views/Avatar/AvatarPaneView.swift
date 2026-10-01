@@ -16,7 +16,7 @@ struct AvatarPaneView: View {
                         avatar.stop()
                     } else {
                         let last = tab.lastTaskCompletionSummary
-                        avatar.say(last.isEmpty ? "Hello, I'm Agent! Type or speak a goal and I'll work on it." : last)
+                        avatar.say(last.isEmpty ? AvatarController.greeting : last)
                     }
                 } label: {
                     Image(systemName: avatar.speaking ? "stop.fill" : "speaker.wave.2.fill")
