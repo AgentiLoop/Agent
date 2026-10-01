@@ -3,38 +3,51 @@
 
 // MARK: - Critic Review Gate (opt-in)
 //
-// One-shot LLM review of the task's uncommitted diff before task_complete is
-// accepted. Runs at most ONCE per task (criticReviewDone) so a stubborn
-// review can never loop completion forever. Opt-in via criticReviewEnabled
-// (Settings → Coding → Critic Review).
+// LLM review of the task's uncommitted diff before task_complete is accepted.
+// Once the critic blocks, it keeps blocking: an unchanged diff is refused
+// again and a changed diff is re-reviewed. The per-task completion-gate
+// refusal cap (maxCompletionGateRefusals) is what ends a stubborn loop.
+// Opt-in via criticReviewEnabled (Settings → Coding → Critic Review).
 
 extension AgentViewModel {
 
-    /// Returns a `CANNOT COMPLETE — ...` blocker when the critic finds issues,
-    /// or nil when completion may proceed (disabled, no edits, already ran,
-    /// clean diff, or critic passed / failed to answer).
+    /// Returns a `CANNOT COMPLETE — ...` blocker when the critic finds issues
+    /// (or the AI ignored them), or nil when completion may proceed (disabled,
+    /// no edits, clean diff, flagged changes reverted, or critic passed /
+    /// failed to answer).
     func criticReviewBlocker(projectFolder overrideFolder: String? = nil) async -> String? {
         let base = overrideFolder ?? projectFolder
         let folder = base.isEmpty ? NSHomeDirectory() : base
-        // Follow-up on the next task_complete: tell the user whether the AI
-        // changed the code after the critic blocked it.
+        // Follow-up after a block: the AI must have changed the flagged diff.
         if criticReviewDone, let blockedDiff = criticBlockedDiff {
-            criticBlockedDiff = nil
             let current = await Self.offMain { Self.uncommittedDiff(folder: folder) }
-            appendLog(current == blockedDiff
-                ? "🧐 Critic follow-up: no code changes after review — AI completed without addressing the issues"
-                : "🧐 Critic follow-up: AI changed the code after review (fixes not re-checked — critic runs once per task)")
+            if current == blockedDiff {
+                appendLog("🧐 Critic follow-up: no code changes after review — refusing completion again")
+                flushLog()
+                return Self.criticIgnoredBlocker
+            }
+            criticBlockedDiff = nil
+            guard !current.isEmpty else {
+                appendLog("\u{2705} Critic follow-up: flagged changes reverted")
+                flushLog()
+                return nil
+            }
+            appendLog("🧐 Critic follow-up: code changed after review — re-checking")
             flushLog()
-            return nil
+            return await criticReview(diff: current)
         }
         guard criticReviewEnabled, !criticReviewDone else { return nil }
         guard !FileBackupService.shared.snapshottedFiles().isEmpty else { return nil }
-        // One shot only — the next task_complete passes this gate regardless.
         criticReviewDone = true
 
         let diff = await Self.offMain { Self.uncommittedDiff(folder: folder) }
         guard !diff.isEmpty else { return nil }
+        return await criticReview(diff: diff)
+    }
 
+    /// Runs the reviewer on `diff`. On issues, records the diff in
+    /// `criticBlockedDiff` and returns the blocker.
+    private func criticReview(diff: String) async -> String? {
         appendLog("🧐 Critic review: analyzing task diff (\(diff.count) chars)...")
         flushLog()
 
@@ -52,16 +65,28 @@ extension AgentViewModel {
             return nil
         }
         guard let blocker = Self.criticVerdictBlocker(verdict) else {
-            appendLog("✅ Critic review: PASS")
+            appendLog("\u{2705} Critic review: PASS")
             flushLog()
             return nil
         }
         criticBlockedDiff = diff
         let issues = verdict.trimmingCharacters(in: .whitespacesAndNewlines)
-        appendLog("🧐 Critic review found issues — blocking completion once:\n\(String(issues.prefix(2000)))")
+        appendLog("🧐 Critic review found issues — blocking completion:\n\(String(issues.prefix(2000)))")
         flushLog()
         return blocker
     }
+
+    /// Refusal when task_complete is called again without touching the diff
+    /// the critic flagged.
+    nonisolated static let criticIgnoredBlocker = """
+        CANNOT COMPLETE — the critic flagged issues and the uncommitted diff has \
+        NOT changed since. You may not dismiss the critic's issues as "out of \
+        scope" or "from an earlier task": everything in `git diff HEAD` is \
+        reviewed. Fix each issue, or revert the flagged change (e.g. \
+        `git checkout -- <file>`), then call task_complete again. If a flagged \
+        change looks like the user's own work in progress, call ask_user before \
+        reverting it.
+        """
 
     /// Maps the reviewer's reply to a completion blocker. A reply starting with
     /// "PASS" (any case, surrounding whitespace ignored) returns nil; anything
@@ -74,8 +99,12 @@ extension AgentViewModel {
 
             \(String(trimmed.prefix(2000)))
 
-            Address the valid issues (ignore any that are out of scope), then \
-            call task_complete again. The critic will not run a second time.
+            You MUST address every issue before completing: fix it, or revert \
+            the flagged change. The diff is ALL uncommitted changes (`git diff \
+            HEAD`), including leftovers from earlier tasks, so "this task didn't \
+            touch that file" is not a reason to skip an issue. Calling \
+            task_complete with the diff unchanged will be refused; changed code \
+            is re-reviewed.
             """
     }
 

@@ -71,7 +71,7 @@ struct CriticGateTests {
         let blocker = AgentViewModel.criticVerdictBlocker("ISSUES:\n- foo() is never called")
         #expect(blocker?.hasPrefix("CANNOT COMPLETE") == true)
         #expect(blocker?.contains("- foo() is never called") == true)
-        #expect(blocker?.contains("will not run a second time") == true)
+        #expect(blocker?.contains("diff unchanged will be refused") == true)
     }
 
     @Test("a reply that only mentions PASS mid-text is not a pass")

@@ -68,12 +68,11 @@ final class AgentViewModel {
     var criticReviewEnabled: Bool = UserDefaults.standard.bool(forKey: "codingCriticReview") {
         didSet { UserDefaults.standard.set(criticReviewEnabled, forKey: "codingCriticReview") }
     }
-    /// Per-task flag — the critic runs at most once per task so a stubborn
-    /// review can't loop task_complete forever. Reset at task start.
+    /// Per-task flag — set once the first critic review has run. Reset at task start.
     var criticReviewDone: Bool = false
     /// Diff the critic blocked on this task (nil when it passed / didn't run).
-    /// Compared on the next task_complete to report whether the AI changed the
-    /// code in response. Reset at task start.
+    /// On the next task_complete an unchanged diff is refused again and a
+    /// changed one is re-reviewed. Reset at task start.
     var criticBlockedDiff: String?
     /// Per-task count of task_complete refusals by the completion gates. Once
     /// it reaches `maxCompletionGateRefusals` the gates step aside so an
