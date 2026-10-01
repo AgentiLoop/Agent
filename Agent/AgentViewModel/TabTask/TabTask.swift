@@ -39,6 +39,9 @@ extension AgentViewModel {
         tab.pastedTexts.removeAll()
         guard !task.isEmpty else { return }
 
+        // Avatar tabs: the user replying (typed or spoken) interrupts the avatar.
+        if tab.isAvatarTab, AvatarController.shared.speaking { AvatarController.shared.stop() }
+
         // Handle /memory in tab context
         if task.lowercased().hasPrefix("/memory") {
             tab.taskInput = ""
