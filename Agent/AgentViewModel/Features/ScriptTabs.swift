@@ -25,7 +25,7 @@ extension AgentViewModel {
 
     /// Create a new main tab with its own LLM provider/model.
     @discardableResult
-    func createMainTab(config: LLMConfig) -> ScriptTab {
+    func createMainTab(config: LLMConfig, avatar: Bool = false, autoPilot: Bool = false) -> ScriptTab {
         // Number duplicate model names: glm-5, glm-5 2, glm-5 3, etc.
         // The primary Main tab isn't in `scriptTabs` — count it too when it shows the same name.
         var numberedConfig = config
@@ -38,6 +38,8 @@ extension AgentViewModel {
             numberedConfig.displayName = "\(baseName) \(existingCount + 1)"
         }
         let tab = ScriptTab(llmConfig: numberedConfig)
+        tab.isAvatarTab = avatar
+        tab.defaultsToAutoPilot = autoPilot
         // Inherit project folder from the currently selected tab, falling back to global
         let parentFolder = selectedTabId.flatMap { self.tab(for: $0) }?.projectFolder ?? ""
         let sourceFolder = parentFolder.isEmpty ? self.projectFolder : parentFolder

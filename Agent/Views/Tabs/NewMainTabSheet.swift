@@ -8,6 +8,8 @@ struct NewMainTabSheet: View {
 
     @State private var provider: APIProvider
     @State private var selectedModelId: String = ""
+    @State private var avatar = false
+    @State private var autoPilot = false
 
     init(viewModel: AgentViewModel) {
         self.viewModel = viewModel
@@ -44,6 +46,13 @@ struct NewMainTabSheet: View {
                 modelPicker
             }
 
+            // Avatar tab: talking face in a right pane; tasks default to /auto
+            Toggle("Avatar", isOn: $avatar)
+                .help("Show a talking avatar in a right pane that speaks replies and listens")
+                .onChange(of: avatar) { _, on in if on { autoPilot = true } }
+            Toggle("Default to Auto-Pilot (/auto)", isOn: $autoPilot)
+                .help("Every task typed in this tab starts an /auto session")
+
             // Validation message
             if !canCreate {
                 Text(validationMessage)
@@ -59,7 +68,7 @@ struct NewMainTabSheet: View {
                     // Tab label uses the raw model ID so it matches whatever case the LLM provider
                     // publishes (e.g., "glm-5.1", "mistral-large-latest") — no formatting applied.
                     let config = LLMConfig(provider: provider, model: selectedModelId, displayName: selectedModelId)
-                    viewModel.createMainTab(config: config)
+                    viewModel.createMainTab(config: config, avatar: avatar, autoPilot: autoPilot)
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)

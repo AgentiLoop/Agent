@@ -64,6 +64,10 @@ extension AgentViewModel {
         // Handle /auto — auto-pilot session on this tab (Features/AutoPilot.swift)
         if handleAutoCommand(task, tab: tab) { return }
 
+        // Tabs that default to auto-pilot: a plain task starts an /auto session.
+        if tab.defaultsToAutoPilot, !task.hasPrefix("/"), autoPilotSession(tab) == nil,
+           handleAutoCommand("/auto " + task, tab: tab) { return }
+
         // Handle /clear in tab context
         if task.lowercased() == "/clear" {
             tab.taskInput = ""
@@ -100,6 +104,10 @@ extension AgentViewModel {
             // on this tab — never on the main log or the selected tab.
             await TabLogRouter.$current.withValue(tab) {
                 await executeTabTask(tab: tab, prompt: prompt)
+            }
+            // Avatar tabs read the reply aloud (both the done and fall-through paths set the summary).
+            if tab.isAvatarTab, !Task.isCancelled, !tab.lastTaskCompletionSummary.isEmpty {
+                AvatarController.shared.say(tab.lastTaskCompletionSummary)
             }
             // When done, run next queued task
             if !tab.taskQueue.isEmpty && !tab.isCancelled {

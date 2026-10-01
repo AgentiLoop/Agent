@@ -58,6 +58,14 @@ final class ScriptTab: Identifiable {
     var isMessagesTab: Bool = false
     /// The iMessage handle to reply to when a Messages tab task completes
     var replyHandle: String?
+    /// Avatar tab: shows the talking-face pane on the right and speaks task replies.
+    var isAvatarTab: Bool = false {
+        didSet { UserDefaults.standard.set(isAvatarTab, forKey: "tab.\(id.uuidString).isAvatar") }
+    }
+    /// Typed tasks on this tab start as `/auto <task>` (auto-pilot) by default.
+    var defaultsToAutoPilot: Bool = false {
+        didSet { UserDefaults.standard.set(defaultsToAutoPilot, forKey: "tab.\(id.uuidString).defaultsToAutoPilot") }
+    }
     /// Display name: scriptName (numbered for duplicate LLM tabs; "Messages" for iMessage tab)
     var displayTitle: String { isMessagesTab ? "Messages" : scriptName }
 
@@ -244,6 +252,8 @@ final class ScriptTab: Identifiable {
         if let h = defaults.object(forKey: "tab.\(id.uuidString).llmOutputHeight") as? Double {
             self.llmOutputHeight = h
         }
+        self.isAvatarTab = defaults.bool(forKey: "tab.\(id.uuidString).isAvatar")
+        self.defaultsToAutoPilot = defaults.bool(forKey: "tab.\(id.uuidString).defaultsToAutoPilot")
         if let e = defaults.object(forKey: "tab.\(id.uuidString).toolStepsExpanded") as? Bool {
             self.toolStepsExpanded = e
         } else if !self.toolSteps.isEmpty {
