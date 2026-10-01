@@ -112,7 +112,11 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     static func speakable(_ text: String) -> String {
         var t = text.replacingOccurrences(of: "```[\\s\\S]*?```", with: " ", options: .regularExpression)
         t = t.replacingOccurrences(of: AgentViewModel.autoPilotGoalReachedMarker, with: "Goal reached.", options: .caseInsensitive)
+        t = t.replacingOccurrences(of: "\\[([^\\]]+)\\]\\([^)]*\\)", with: "$1", options: .regularExpression)
         t = t.replacingOccurrences(of: "https?://\\S+", with: "link", options: .regularExpression)
+        // File paths are read as just the file name: "/Users/x/Agent/Foo.swift" or "Agent/Views/Foo.swift" → "Foo.swift".
+        t = t.replacingOccurrences(of: "(?<![\\w/])(?:~|\\.{1,2})?/(?:[\\w.\\-]+/)*([\\w.\\-]+)", with: "$1", options: .regularExpression)
+        t = t.replacingOccurrences(of: "(?<![\\w/])(?:[\\w.\\-]+/)+([\\w\\-]+\\.[A-Za-z]\\w*)", with: "$1", options: .regularExpression)
         t = t.replacingOccurrences(of: "[`*_#>|]", with: "", options: .regularExpression)
         return t.trimmingCharacters(in: .whitespacesAndNewlines)
     }

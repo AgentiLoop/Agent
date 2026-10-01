@@ -29,6 +29,11 @@ struct AvatarControllerTests {
         #expect(AvatarController.speakable("AUTOPILOT: GOAL REACHED all good").hasPrefix("Goal reached."))
     }
 
+    @Test func speakableShortensPathsToFileNames() {
+        let s = AvatarController.speakable("Edited `Agent/Views/Avatar/AvatarController.swift` and /Users/x/Agent/.agent/progress.md, see [docs](https://a.b/c). Pick red and/or blue.")
+        #expect(s == "Edited AvatarController.swift and progress.md, see docs. Pick red and/or blue.")
+    }
+
     @Test func expressionKeywords() {
         #expect(AvatarController.expression(for: "The build failed.") == "sad")
         #expect(AvatarController.expression(for: "I can\u{2019}t reach the server.") == "sad")
