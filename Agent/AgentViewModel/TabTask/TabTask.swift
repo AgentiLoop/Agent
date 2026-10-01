@@ -116,7 +116,6 @@ extension AgentViewModel {
     func stopTabTask(tab: ScriptTab) {
         let queueCount = tab.taskQueue.count
         tab.taskQueue.removeAll()
-        endAutoPilot(reason: "stopped by user", tab: tab)
         tab.runningLLMTask?.cancel()
         tab.runningLLMTask = nil
         tab.isLLMRunning = false
@@ -129,6 +128,8 @@ extension AgentViewModel {
             tab.appendLog("🚫 Cancelled.")
         }
         tab.flush()
+        // Single-task stop (Esc / stop button) keeps auto-pilot running — Stop All ends it.
+        continueAutoPilotAfterCancel(tab)
     }
 
     // MARK: - Tab Task Execution Loop

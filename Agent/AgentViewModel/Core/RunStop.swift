@@ -225,7 +225,6 @@ extension AgentViewModel {
     func stop(silent: Bool = false) {
         let queueCount = mainTaskQueue.count
         mainTaskQueue.removeAll()
-        endAutoPilot(reason: "stopped by user")
         isCancelled = true
         runningTask?.cancel()
         runningTask = nil
@@ -256,10 +255,14 @@ extension AgentViewModel {
         rootServiceActive = false
         userWasActive = false
         rootWasActive = false
+        // Single-task stop (Esc / stop button) keeps auto-pilot running — Stop All ends it.
+        continueAutoPilotAfterCancel(nil)
     }
 
-    /// Stop everything — main task AND all script tabs.
+    /// Stop everything — main task AND all script tabs — and end every auto-pilot session.
     func stopAll() {
+        endAutoPilot(reason: "Stop All")
+        for tab in scriptTabs { endAutoPilot(reason: "Stop All", tab: tab) }
         stop()
         for tab in scriptTabs {
             // Stop LLM tasks and clear queues

@@ -123,6 +123,7 @@ extension AgentViewModel {
 
     func closeScriptTab(id: UUID) {
         if let tab = tab(for: id) {
+            endAutoPilot(reason: "tab closed", tab: tab)
             // Stop LLM task and clear queue
             if tab.isLLMRunning || !tab.taskQueue.isEmpty {
                 stopTabTask(tab: tab)

@@ -330,6 +330,20 @@ extension AgentViewModel {
         return buildAutoPilotPrompt(session, tab: tab)
     }
 
+    /// Esc / Stop cancels only the running cycle. Keep the session alive and
+    /// schedule the next cycle; Stop All is what ends auto-pilot.
+    func continueAutoPilotAfterCancel(_ tab: ScriptTab?) {
+        guard autoPilotSession(tab) != nil, !autoPilotAppQuitting else { return }
+        apLog("🛩️ Cycle cancelled — Auto-Pilot continues. Use Stop All to end it.", tab)
+        Task {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            // stop() left isCancelled set; clear it so nextAutoPilotPrompt can run (a new user task would reset it too).
+            if tab == nil, !isRunning { isCancelled = false }
+            guard let next = await continueAutoPilot(tab: tab), !autoPilotTaskIsRunning(tab) else { return }
+            if let tab { startTabTask(tab: tab, prompt: next) } else { startMainTask(next) }
+        }
+    }
+
     func endAutoPilot(reason: String, tab: ScriptTab? = nil) {
         guard let session = autoPilotSession(tab) else { return }
         if autoPilotAppQuitting {
