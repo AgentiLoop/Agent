@@ -6676,6 +6676,9 @@
         }
       }
     },
+    "End Auto-Pilot and stop all tasks" : {
+
+    },
     "Endpoint" : {
       "localizations" : {
         "de" : {
@@ -15098,6 +15101,9 @@
           }
         }
       }
+    },
+    "Stop All" : {
+
     },
     "Stop dictation" : {
       "localizations" : {
