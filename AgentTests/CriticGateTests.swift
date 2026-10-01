@@ -84,7 +84,7 @@ struct CriticGateTests {
     func verdictCapped() {
         let long = "ISSUES:\n" + String(repeating: "x", count: 5000)
         let blocker = AgentViewModel.criticVerdictBlocker(long)!
-        #expect(blocker.count < 2300)
+        #expect(blocker.count < 2600) // 2000-char body + fixed instruction wrapper (~400)
         #expect(blocker.contains(String(repeating: "x", count: 1900)))
         #expect(!blocker.contains(String(repeating: "x", count: 2100)))
     }
