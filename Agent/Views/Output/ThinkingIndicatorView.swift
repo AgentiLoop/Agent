@@ -234,17 +234,6 @@ struct ThinkingIndicatorView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .overlay(alignment: .trailing) {
-                // Auto-Pilot: Esc stops only the current cycle — Stop All ends the session.
-                if viewModel.autoPilotSession(tab) != nil {
-                    Button("Stop All") { viewModel.stopAll() }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.red)
-                        .controlSize(.mini)
-                        .padding(.trailing, 12)
-                        .help("End Auto-Pilot and stop all tasks")
-                }
-            }
 
             if isExpanded {
                 VStack(alignment: .leading, spacing: 4) {

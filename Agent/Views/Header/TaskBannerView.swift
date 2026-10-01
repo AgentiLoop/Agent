@@ -8,6 +8,8 @@ struct TaskBannerView: View {
     let appleAIPrompt: String?
     @Binding var showAppleAIBanner: Bool
     let onCancel: () -> Void
+    /// Non-nil only while Auto-Pilot is active — ends the session and stops all tasks.
+    var onStopAll: (() -> Void)? = nil
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,6 +36,16 @@ struct TaskBannerView: View {
                     .foregroundStyle(.white)
 
                 Spacer()
+
+                if let onStopAll {
+                    Button(action: onStopAll) {
+                        Label("Stop All", systemImage: "stop.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.white)
+                    }
+                    .buttonStyle(.plain)
+                    .help("End Auto-Pilot and stop all tasks")
+                }
 
                 Button(action: onCancel) {
                     Label("Cancel", systemImage: "xmark.circle.fill")
