@@ -33,6 +33,16 @@ struct AvatarPaneView: View {
                 .help(viewModel.isListening ? "Stop Listening" : "Listen")
 
                 Spacer()
+                Picker("Voice", selection: $avatar.voiceID) {
+                    Text("Default").tag("")
+                    ForEach(AvatarController.voices, id: \.identifier) { v in
+                        Text(v.quality == .default ? v.name : "\(v.name) (\(v.quality == .premium ? "Premium" : "Enhanced"))").tag(v.identifier)
+                    }
+                }
+                .labelsHidden()
+                .frame(width: 120)
+                .help("Avatar Voice")
+
 
                 Picker("Face", selection: $avatar.expression) {
                     ForEach(AvatarController.expressions, id: \.self) { Text($0.capitalized).tag($0) }

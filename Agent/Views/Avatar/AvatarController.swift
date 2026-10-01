@@ -1,4 +1,5 @@
 import AppKit
+import AVFoundation
 import WebKit
 
 /// Shared avatar face for Avatar tabs: a WKWebView running avatar.html (from
@@ -11,6 +12,9 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     /// The three animation styles avatar.html supports.
     static let modes: [(id: String, label: String)] = [("mouth", "Mouth"), ("waves", "Waves"), ("both", "Both")]
     private static let modeKey = "avatarAnimationMode"
+    private static let voiceKey = "avatarVoiceIdentifier"
+    /// Voices offered in the pane's voice menu (current language, best quality first).
+    static let voices = AvatarSpeaker.voices()
 
     @ObservationIgnored let webView: WKWebView
     @ObservationIgnored private let speaker = AvatarSpeaker()
@@ -26,6 +30,13 @@ final class AvatarController: NSObject, WKNavigationDelegate {
             js("avatar.setMode('\(mode)')")
         }
     }
+    /// Selected TTS voice identifier; empty = AvatarSpeaker's best default.
+    var voiceID: String = UserDefaults.standard.string(forKey: AvatarController.voiceKey) ?? "" {
+        didSet {
+            UserDefaults.standard.set(voiceID, forKey: Self.voiceKey)
+            speaker.voice = AVSpeechSynthesisVoice(identifier: voiceID) ?? AvatarSpeaker.bestVoice()
+        }
+    }
 
     override private init() {
         webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
@@ -38,6 +49,7 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         speaker.onFrame = { [weak self] rms, zcr in self?.js("avatar.setLevel(\(rms),\(zcr))") }
         speaker.onSpeaking = { [weak self] on in self?.js("avatar.setSpeaking(\(on))") }
         speaker.onFinished = { [weak self] in self?.speakNext() }
+        if let saved = AVSpeechSynthesisVoice(identifier: voiceID) { speaker.voice = saved }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
