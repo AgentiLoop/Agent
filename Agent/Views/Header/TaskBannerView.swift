@@ -45,14 +45,14 @@ struct TaskBannerView: View {
                     }
                     .buttonStyle(.plain)
                     .help("End Auto-Pilot and stop all tasks")
+                } else {
+                    Button(action: onCancel) {
+                        Label("Cancel", systemImage: "xmark.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.white)
+                    }
+                    .buttonStyle(.plain)
                 }
-
-                Button(action: onCancel) {
-                    Label("Cancel", systemImage: "xmark.circle.fill")
-                        .font(.caption)
-                        .foregroundStyle(.white)
-                }
-                .buttonStyle(.plain)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 5)

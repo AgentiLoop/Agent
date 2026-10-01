@@ -256,6 +256,8 @@ extension AgentViewModel {
         }
         apLog("🛩️ Progress log: \(autoPilotProgressURL(tab).path). Press Stop or type /auto stop to end.", tab)
         appendAutoPilotProgress("# Auto-pilot session — \(Self.autoPilotTimestamp())\nGoal: \(goal.isEmpty ? "(pending — asked during cycle 1)" : goal)\nBudget: \(budget)\n", tab)
+        // A previous Stop / Stop All leaves isCancelled set, which makes nextAutoPilotPrompt bail.
+        if tab == nil, !isRunning { isCancelled = false }
         guard let next = nextAutoPilotPrompt(tab: tab) else { return }
         if let tab {
             if tab.isLLMRunning {
