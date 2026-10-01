@@ -1,0 +1,377 @@
+<!doctype html><meta charset="utf-8"><title>Agent! Avatar</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#13243a 0%,#0b0f14 62%)}canvas{display:block}
+#hint{position:fixed;left:10px;bottom:8px;color:#4a6a85;font:11px -apple-system,sans-serif}</style>
+<canvas id="c"></canvas>
+<div id="hint">1–6 expressions · M mouth/waves/both · hold SPACE to fake speech · drag to rotate · pinch to zoom · two-finger scroll or shift-drag to pan · double-click resets</div>
+<script>
+onerror=(m)=>{document.title='ERR: '+m;document.getElementById('hint').textContent='ERR: '+m};
+const cv=document.getElementById('c');
+const gl=cv.getContext('webgl2',{antialias:true,alpha:true,premultipliedAlpha:true});
+function size(){const d=devicePixelRatio;cv.width=innerWidth*d;cv.height=innerHeight*d;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';gl.viewport(0,0,cv.width,cv.height)}
+size();onresize=size;
+
+// Units: head (crown to chin) = 0.30. y grows downward, z toward viewer.
+// key: [y, cx, cz, halfWidth, halfDepth, superellipse power]
+const HEAD=[
+[0,0,.02,0,0,2],[.008,0,.018,.046,.060,2],[.025,0,.016,.076,.098,2],[.055,0,.016,.090,.118,2],
+[.100,0,.020,.092,.122,2],[.150,0,.022,.089,.120,2],[.200,0,.030,.082,.110,2.1],
+[.245,0,.042,.069,.091,2.2],[.280,0,.055,.050,.067,2.2],[.299,0,.061,.029,.041,2],[.308,0,.063,.010,.014,2]];
+const BODY=[ // neck (leans forward into the skull), trapezius, shoulders, chest
+[.190,0,.016,.060,.062,2],[.240,0,.010,.059,.063,2],[.280,0,.002,.058,.064,2],[.315,0,-.008,.062,.066,2],[.345,0,-.012,.074,.074,2],
+[.375,0,-.014,.120,.090,2.2],[.405,0,-.015,.200,.104,2.4],[.435,0,-.008,.275,.116,2.6],
+[.470,0,0,.305,.128,2.7],[.530,0,.004,.300,.136,2.6],[.610,0,.006,.270,.142,2.4],
+[.700,0,.008,.250,.144,2.3],[.770,0,.006,.240,.140,2.3],[.820,0,.004,.236,.136,2.3]];
+
+function interp(keys,t){
+  let i=0;while(i<keys.length-2&&t>keys[i+1][0])i++;
+  const a=keys[i],b=keys[i+1],p=keys[Math.max(0,i-1)],n=keys[Math.min(keys.length-1,i+2)];
+  const h=b[0]-a[0],u=Math.min(1,Math.max(0,(t-a[0])/h)),u2=u*u,u3=u2*u;
+  const h00=2*u3-3*u2+1,h10=u3-2*u2+u,h01=-2*u3+3*u2,h11=u3-u2;
+  const out=[];
+  for(let f=1;f<6;f++){
+    const m0=(b[f]-p[f])/(b[0]-p[0])*h,m1=(n[f]-a[f])/(n[0]-a[0])*h;
+    out.push(h00*a[f]+h10*m0+h01*b[f]+h11*m1);
+  }
+  return out;
+}
+const g=(x,c,w)=>Math.exp(-((x-c)/w)*((x-c)/w));
+const sm=(x,w)=>1/(1+Math.exp(-x/w));
+const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+const N=224,C=N+1,HSTEP=.0018,BSTEP=.005,YC=.33,MOUTH=.244,EX=.036,EY=.152,PV=.27;
+// angles packed denser at the face (front, a=π/2) than at the back of the head
+const ANG=[...Array(C)].map((_,k)=>{const th=k/N*Math.PI*2,a=th+.5*Math.cos(th);return[Math.cos(a),Math.sin(a)]});
+function ringParams(keys,step){const o=[],t0=keys[0][0],t1=keys[keys.length-1][0];for(let t=t0+0.001;t<=t1-0.0005;t+=step)o.push([t,...interp(keys,t)]);return o}
+function shape(rx,rz,p,c,s){const pw=2/Math.max(2,p);return[Math.max(0,rx)*Math.sign(c)*Math.pow(Math.abs(c),pw),Math.max(0,rz)*Math.sign(s)*Math.pow(Math.abs(s),pw)]}
+
+// ---------- static facial anatomy ----------
+function anat(t,c,s,x,z){
+  const F=Math.max(0,s),side=Math.sign(c)||1,ax=Math.abs(x),dxE=ax-EX,dtE=t-EY;let hl=0;
+  // brow ridge, glabella, nasion
+  z+=F*(.009*g(t,.134,.010)*g(ax,.034,.026)+.004*g(t,.136,.010)*g(x,0,.014)-.005*g(t,.146,.007)*g(x,0,.012));
+  // forehead slopes back from the glabella (adult soft-tissue inclination ~10–20°) instead of standing vertical;
+  // the setback eases out toward the crown pole so the dome stays closed
+  const fu=cl((.128-t)/.073,0,1),fp=cl(t/.04,0,1);z-=F*.0085*fu*fu*(3-2*fu)*fp*fp*(3-2*fp);
+  // eye socket, eyeball, upper-lid fold, under-eye
+  z+=F*(-.013*g(dtE,-.002,.015)*g(dxE,0,.022)+.0085*g(dtE,0,.0085)*g(dxE,0,.0135)+.0015*g(dtE,-.0075,.002)*g(dxE,0,.015)+.003*g(dtE,.012,.006)*g(dxE,.002,.02));
+  // eyebrows (brightened contour segments)
+  const qb=(ax-.038)/.021,tB=EY-.0185-.0035*Math.max(0,1-qb*qb);
+  hl+=F*.75*g(t,tB,.0028)*Math.exp(-qb*qb*qb*qb);
+  // cheekbones, cheek fat, buccal hollow, temples
+  z+=F*(.008*g(t,.178,.022)*g(ax,.050,.020)-.004*g(t,.218,.018)*g(ax,.058,.016));
+  x+=side*(.006*g(t,.165,.02)*g(s,.5,.3)-.005*g(t,.095,.03)*g(s,.55,.3));
+  // nose: bridge → tip, alae, nostrils
+  // narrow bridge that stays narrow, then a rounded tip lobule; underside slopes back to the lip (no wedge/triangle)
+  const nr=cl((t-.144)/.056,0,1),nw=.0065+.003*nr+.006*nr**4,np=.020*Math.pow(nr,1.15)*(t<.200?1:g(t,.200,.0085));
+  z+=F*(np*Math.exp(-(x/nw)*(x/nw))+.0065*g(t,.1995,.0075)*g(x,0,.0125));
+  const ala=F*g(t,.209,.0055)*g(ax,.0145,.0055);z+=.011*ala;x+=side*.002*ala;
+  hl+=.3*F*g(t,.209,.006)*g(ax,.019,.0025);
+  const nos=F*g(t,.2135,.0022)*g(ax,.0072,.0040);z-=.004*nos;hl-=.9*nos;
+  // nasolabial folds
+  if(t>.2){const nlx=.021+.30*(t-.210),fold=F*g(ax,nlx,.0035)*g(t,.232,.015)*sm(t-.208,.003);
+    z+=-.0025*fold+F*.003*sm(ax-nlx,.004)*g(t,.226,.014)*g(ax,.045,.02);hl+=.3*fold}
+  // philtrum
+  z+=F*g(t,.226,.0055)*(.0018*g(ax,.0048,.0022)-.0008*g(x,0,.0025));
+  // lips, mouth corners, labiomental fold, chin
+  // each lip is a crescent: its centre and thickness follow the drawn lip outlines (thin at the corners, full in the
+  // middle) and its projection tapers to zero at the corners, so the lips no longer read as two flat-ended sausages
+  const xu=Math.min(ax/.025,1),tUb=.2335+.0100*xu*xu*xu,tS=.244+.0008*xu*xu,tLb=Math.max(tS+.001,.2585-.0135*(ax/.024)**2),
+        tpU=Math.max(0,1-(ax/.027)**2)**.6,tpL=Math.max(0,1-(ax/.025)**2)**.6,
+        l4u=tpU*g(t,(tUb+tS)/2,Math.max(.0012,.8*(tS-tUb)/2)),l4l=tpL*g(t,(tS+tLb)/2,Math.max(.0012,.75*(tLb-tS)/2));
+  z+=F*(.009*l4u+.011*l4l-.006*g(t,MOUTH,.0018)*Math.exp(-((x/.026)**4))
+       -.003*g(ax,.026,.003)*g(t,MOUTH,.004)+.003*g(t,.268,.009)*Math.exp(-((x/.020)**4))+.017*g(t,.287,.011)*g(x,0,.020));
+  hl+=F*(.15*l4u+.2*l4l);
+  // jaw angle
+  x+=side*.010*g(t,.245,.025)*g(s,.40,.35)*sm(Math.abs(c)-.5,.05);
+  // below the occiput, the head behind the jaw's ramus tucks inside the neck, so the jawline ends at a jaw angle
+  // under the ear instead of running all the way to the back of the skull
+  x*=1-.3*sm(t-.228,.005)*sm(-.05-s,.03);
+  // ears: top on the brow line (t≈.134), lobe at the nose base (t≈.212), tilted back. A single smooth shell that
+  // flares out toward the back and blends softly into the head — no rims, ridges or highlights.
+  const ev=(t-.173)/.039;
+  if(Math.abs(ev)<1.1&&s<.4){
+    const eu=(s+.15)/.16,lob=sm(ev-.62,.06),W=1.7-.35*ev-.5*Math.max(0,ev)**2,uF=.55+.15*ev,acr=(uF-eu)/W,
+          a=2*acr-1,d=Math.pow(Math.abs(a)**2.4+Math.abs(ev)**2.4,1/2.4);
+    if(d<1.05){
+      // smooth shell only: wide smoothstep edge, one gentle bulge, no ridges and no highlight terms
+      const e0=cl((1.05-d)/.4,0,1),em=e0*e0*(3-2*e0),
+            H=(.003+.010*Math.pow(cl(acr,0,1),1.5))*(1-.5*lob)+.002*lob;
+      x+=side*em*H;
+    }
+  }
+  return [x,z,hl];
+}
+
+// ---------- head mesh ----------
+// crown: the Hermite keys leave the top as a cone tip; replace the cap above the widest ring (t<.1) with a
+// superellipse dome (vertical tangent at the apex, zero slope where it meets the skull) so the top reads round.
+// Profile kept close to an ellipse (p 2.2/.45, was a boxier 2.5/.4) so the cranium above the brows isn't over-full
+// and the forehead doesn't read too big next to the face
+const hRP=ringParams(HEAD,HSTEP).map(r=>{if(r[0]>=.1)return r;const d=(1-Math.pow((.1-r[0])/.1,2.2))**.45;return[r[0],r[1],r[2],.092*d,.122*d,r[5]]});hRP.unshift([0,0,.02,0,0,2]);  // pole ring closes the dome
+const HR=hRP.length,HV=HR*C;
+const X0=new Float32Array(HV),Z0=new Float32Array(HV),T0=new Float32Array(HV),CC=new Float32Array(HV),SS=new Float32Array(HV),
+      FRONT=new Float32Array(HV),FR=new Float32Array(HV),HL0=new Float32Array(HV),hUV=new Float32Array(HV*3);
+hRP.forEach(([t,cx,cz,rx,rz,p],i)=>ANG.forEach(([c,s],k)=>{
+  const j=i*C+k;let [x,z]=shape(rx,rz,p,c,s);
+  // parietal breadth: average head breadth ≈151 mm vs ≈190 mm length (cephalic index ≈.79); widen only the sides/back
+  // of the upper skull (fades to zero toward the front, s>.35) so the face and forehead don't get any wider
+  x*=1+.10*g(t,.105,.045)*cl((.35-s)/.7,0,1);x+=cx;z+=cz;
+  const [x1,z1,h]=anat(t,c,s,x,z);
+  X0[j]=x1;Z0[j]=z1;T0[j]=t;CC[j]=c;SS[j]=s;FRONT[j]=Math.max(0,s);FR[j]=sm(s+.1,.2);HL0[j]=h;
+  hUV[j*3]=x1;hUV[j*3+1]=t;hUV[j*3+2]=Math.max(0,s);
+}));
+
+// expression pose (used once per blendshape)
+function headPose(P,pos,hl){
+  for(let j=0;j<HV;j++){
+    let x=X0[j],z=Z0[j],dy=0,h=HL0[j];const t=T0[j],s=SS[j],F=FRONT[j],side=Math.sign(CC[j])||1,ax=Math.abs(x),dxE=ax-EX,dtE=t-EY;
+    // brows
+    const sSide=Math.tanh(x/.012);   // smooth sign: no seam between the brows on asymmetric (skew) poses
+    const brM=F*g(t,.134,.014)*g(ax,.037,.028);dy-=(P.browUp+P.skew*sSide)*.008*brM;
+    const inn=F*g(t,.136,.012)*g(ax,.014,.012);dy+=P.browIn*.006*inn;x-=sSide*P.browIn*.0025*inn;h+=.35*P.browIn*inn;
+    h+=.2*P.browUp*F*g(t,.105,.02)*g(x,0,.05);                                    // forehead creases
+    // jaw / mouth
+    // jaw swings about the hinge in front of the ear: sharp split only between the lips, the cheeks and
+    // jaw sides stretch over a wide soft band, so opening the mouth no longer slices the head in half
+    const lm=F*Math.exp(-((x/(.032*(1+.2*P.wide)))**4)),below=sm(t-MOUTH,.003),lz0=F*Math.exp(-((ax/.03)**4)),
+          jw=sm(t-MOUTH,.003+.025*(1-lz0))*sm(t-.185,.01)*sm(s+.1,.1),th=.17*P.open*jw,dy0=t-.172,dz0=z;
+    dy+=dy0*(Math.cos(th)-1)+dz0*Math.sin(th)+P.open*.006*below*g(t,MOUTH+.008,.01)*lm;
+    z+=-dy0*Math.sin(th)+dz0*(Math.cos(th)-1)+.008*P.open*jw;
+    dy-=P.open*.003*(1-below)*g(t,.236,.008)*lm;                                  // upper lip lift
+    const cav=P.open*F*g(t,MOUTH,.0045)*Math.exp(-((x/(.022*(1+.3*P.wide)))**4));z-=.02*cav;h-=1.5*cav;
+    const lz=F*g(t,MOUTH,.014);x*=1+.16*P.wide*lz*g(x,0,.04);z+=.008*Math.max(0,-P.wide)*lz*g(x,0,.025);
+    // smile: corners lift up/out/back as one block with the upper lip and cheek above them (falloff wide above,
+    // narrow below) so the lips curve instead of bunching into a squashed lump; the stretched lips flatten slightly
+    const sp=Math.max(0,P.smile),cor=F*g(t,MOUTH,t<MOUTH?.022:.011)*g(ax,.026,.014);dy-=P.smile*.008*cor;x+=side*P.smile*.004*cor;
+    z-=sp*(.004*cor*g(ax,.026,.008)+.0025*F*g(t,.248,.009)*Math.exp(-((ax/.026)**4)));ch=F*g(t,.185,.018)*g(ax,.045,.018);z+=sp*.006*ch;dy-=sp*.003*ch;h+=.25*sp*ch;
+    dy-=sp*.0015*F*g(dtE,.007,.004)*g(dxE,0,.016);                                // smile squint
+    pos[j*3]=x;pos[j*3+1]=t+dy-YC;pos[j*3+2]=z;hl[j]=h;
+  }
+}
+const P0={open:0,wide:0,smile:0,browUp:0,browIn:0,skew:0};
+const basePos=new Float32Array(HV*3),baseHl=new Float32Array(HV);headPose(P0,basePos,baseHl);
+const TARGETS=[
+  [{open:1},F=>F.open],[{wide:1},F=>Math.max(0,F.wide)],[{wide:-1},F=>Math.max(0,-F.wide)],
+  [{smile:1},F=>Math.max(0,F.smile)],[{smile:-1},F=>Math.max(0,-F.smile)],
+  [{browUp:1},F=>F.browUp],[{browIn:1},F=>F.browIn,F=>Math.abs(F.browIn)],[{skew:1},F=>F.skew]
+].map(([p,w,wh])=>{
+  const pos=new Float32Array(HV*3),hl=new Float32Array(HV);headPose({...P0,...p},pos,hl);
+  const idx=[],d=[],dh=[];
+  for(let j=0;j<HV;j++){const a=pos[j*3]-basePos[j*3],b=pos[j*3+1]-basePos[j*3+1],c=pos[j*3+2]-basePos[j*3+2],e=hl[j]-baseHl[j];
+    if(Math.abs(a)+Math.abs(b)+Math.abs(c)>1e-7||Math.abs(e)>1e-5){idx.push(j);d.push(a,b,c);dh.push(e)}}
+  return{idx:Uint32Array.from(idx),d:Float32Array.from(d),dh:Float32Array.from(dh),w,wh:wh||w};
+});
+
+// ---------- body mesh (static) ----------
+const bRP=ringParams(BODY,BSTEP),BR=bRP.length,BV=BR*C;
+const bPos=new Float32Array(BV*3),bUV=new Float32Array(BV*3),bHl=new Float32Array(BV),bN=new Float32Array(BV*3);
+bRP.forEach(([t,cx,cz,rx,rz,p],i)=>ANG.forEach(([c,s],k)=>{
+  const j=i*C+k;let [x,z]=shape(rx,rz,p,c,s);x+=cx;z+=cz;
+  const front=Math.max(0,s),ax=Math.abs(x);
+  z+=0.012*g(t,.320,.016)*g(c,0,.18)*front;            // adam's apple
+  z+=0.006*g(t,.29,.05)*g(ax,.036,.014)*front;          // sternocleidomastoid
+  z+=0.034*g(t,.645,.050)*g(ax,.125,.075)*front;        // pectorals
+  z+=0.010*g(t,.435,.012)*g(ax,.10,.07)*front;          // clavicles
+  z-=0.012*g(t,.53,.05)*g(ax,.0,.05)*(1-front);         // spine groove
+  z+=0.010*g(t,.57,.06)*g(ax,.27,.04)*(s<0?0:1);        // deltoid
+  bPos[j*3]=x;bPos[j*3+1]=t-YC;bPos[j*3+2]=z;bUV[j*3]=x;bUV[j*3+1]=t;
+}));
+
+function normals(P,R,out){
+  for(let i=0;i<R;i++){const im=Math.max(i-1,0),ip=Math.min(i+1,R-1);
+    for(let k=0;k<C;k++){const km=k===0?C-2:k-1,kp=k===C-1?1:k+1;
+      const a=(ip*C+k)*3,b=(im*C+k)*3,c=(i*C+kp)*3,d=(i*C+km)*3;
+      const tx=P[a]-P[b],ty=P[a+1]-P[b+1],tz=P[a+2]-P[b+2],bx=P[c]-P[d],by=P[c+1]-P[d+1],bz=P[c+2]-P[d+2];
+      let nx=ty*bz-tz*by,ny=tz*bx-tx*bz,nz=tx*by-ty*bx;const l=Math.hypot(nx,ny,nz);
+      const o=(i*C+k)*3;
+      if(l<1e-12){out[o]=0;out[o+1]=i<R/2?-1:1;out[o+2]=0}else{out[o]=nx/l;out[o+1]=ny/l;out[o+2]=nz/l}}}
+}
+normals(bPos,BR,bN);
+
+// ---------- WebGL ----------
+const VS=`#version 300 es
+layout(location=0) in vec3 aPos;layout(location=1) in vec3 aNrm;layout(location=2) in vec3 aUV;layout(location=3) in float aHl;
+uniform mat3 uRot,uModel;uniform vec3 uPivot,uT;uniform vec2 uScale,uPan;
+out vec3 vN;out vec3 vUV;out float vHl;out float vDep;
+void main(){
+  vec3 p=uModel*(aPos-uPivot)+uPivot+uT;vec3 v=uRot*p;
+  vN=uRot*(uModel*aNrm);vUV=aUV;vHl=aHl;vDep=clamp((v.z+.16)/.32,0.,1.);
+  float f=4./(4.-v.z);
+  gl_Position=vec4(v.x*f*uScale.x+uPan.x,-v.y*f*uScale.y+uPan.y,-v.z*.5,1.);
+}`;
+const FS=`#version 300 es
+precision highp float;
+in vec3 vN;in vec3 vUV;in float vHl;in float vDep;
+uniform float uLW,uOpen,uFeat;uniform vec4 uEye;uniform vec2 uGaze;
+out vec4 o;
+const vec3 BG=vec3(.043,.059,.078);
+float stroke(float d,float w){d=abs(d);return 1.-smoothstep(w*.4,w*.4+1.,d);}
+float sq(float v){return v*v;}
+void main(){
+  float t=vUV.y;
+  vec3 N=normalize(vN),L=normalize(vec3(-.45,-.55,.75));
+  float ndl=max(dot(N,L),0.),rim=pow(1.-clamp(N.z,0.,1.),3.);
+  float h=max(vHl,0.),dim=1.+clamp(vHl,-.95,0.),fade=1.-clamp((t-.58)/.12,0.,1.);
+  float lit=.25+.85*ndl+.25*rim;
+  // facial feature curves (eyes, lips): computed first so they can brighten the contour lines themselves
+  float fm=0.,op=0.,iris=0.,pup=0.,glint=0.,ring=0.,r=1.,an=0.,fs=0.;
+  float ft=max(fwidth(t),1e-7);
+  if(uFeat>.5&&vUV.z>.02){
+    float x=vUV.x,ax=abs(x),sx=x<0.?-1.:1.,e=uEye.z;
+    // eyes: almond opening, lids, crease, iris, pupil, catch-light
+    float dx=ax-uEye.x,qq=dx/.0175,prof=sqrt(max(0.,1.-qq*qq)),eyc=uEye.y-.0012*qq;
+    float u=.0062*e-.0032*(1.-min(e,1.));
+    float tU=eyc-u*prof,tL=eyc+(.0042-.0012*uEye.w)*prof,tC=eyc-.0100*sqrt(max(0.,1.-sq(dx/.019)));
+    float inE=1.-smoothstep(.85,1.,abs(qq)),inC=1.-smoothstep(.8,1.,abs(dx/.019));
+    op=clamp((t-tU)/ft+.5,0.,1.)*clamp((tL-t)/ft+.5,0.,1.)*(1.-smoothstep(.97,1.,abs(qq)));
+    vec2 di=vec2(x-(sx*uEye.x+uGaze.x),t-(uEye.y+uGaze.y));r=length(di);an=atan(di.y,di.x);
+    iris=smoothstep(.0067,.0059,r);pup=smoothstep(.0029,.0023,r);
+    glint=smoothstep(.0010,.0005,length(di+vec2(.0019,.0019)));
+    ring=exp(-sq((r-.0063)/.0007));
+    // lips: cupid's bow, mouth line, lower lip edge
+    float xu=ax/.025;
+    float tUb=.2335+.0012*exp(-sq(x/.0035))-.0008*exp(-sq((ax-.0065)/.003))+.0100*xu*xu*xu;
+    float tS=.244+.0008*xu*xu,tLb=.2585-.0135*sq(ax/.024);
+    float mU=exp(-pow(ax/.0245,6.)),mS=exp(-pow(ax/.026,6.))*(1.-clamp(uOpen*3.,0.,1.)),mL=exp(-pow(ax/.021,4.));
+    // soft proximity (world units) → boosts nearby contour rings
+    fm=inE*(exp(-sq((t-tU)/.0016))+.5*exp(-sq((t-tL)/.0013)))+.35*inC*exp(-sq((t-tC)/.0012))
+      +.6*mU*exp(-sq((t-tUb)/.0013))+.8*mS*exp(-sq((t-tS)/.0012))+.4*mL*exp(-sq((t-tLb)/.0014));
+    // thin, faint guide strokes so the features read without overpowering the rings
+    fs=.55*stroke((t-tU)/ft,uLW*1.2)*inE+.2*stroke((t-tL)/ft,uLW)*inE+.12*stroke((t-tC)/ft,uLW)*inC
+      +.28*stroke((t-tUb)/ft,uLW)*mU+.4*stroke((t-tS)/ft,uLW*1.1)*mS+.18*stroke((t-tLb)/ft,uLW)*mL;
+  }
+  // contour lines (the wavy rings)
+  float q=t/.004,fw=fwidth(q),px=abs(fract(q)-.5)/max(fw,1e-6);
+  float w=uLW*(.9+.5*vDep+.5*min(h,1.5)+.7*fm);
+  float line=(1.-smoothstep(w*.5,w*.5+1.,px)+.3*exp(-px*px/(w*w*5.)))*(1.-smoothstep(.25,.6,fw));
+  // keep strokes a soft saturated blue: brightness is capped and never washes out toward white
+  float k=lit*(.45+.55*vDep)+.5*h+.3*fm;k=1.-exp(-k*1.1);
+  vec3 lc=vec3(.14+.10*h,.50+.12*h,.95)*k*dim;
+  vec3 col=(BG+vec3(.020,.045,.080)*(.5*ndl+.9*rim))*mix(.35,1.,dim)+lc*line*.85;
+  if(op+fs>0.){
+    vec3 ic=vec3(.12,.55,.95)*(.55+.45*smoothstep(.0025,.0062,r))*(.85+.15*sin(an*22.))*(.5+.4*lit);
+    col*=1.-.45*op;                                   // eye opening darker, but rings still show through
+    col+=ic*iris*op*.55;
+    col+=vec3(.25,.6,.9)*ring*op*.25;
+    col*=1.-.75*pup*op;
+    col+=vec3(.5,.75,.95)*glint*op*.45;
+    col+=vec3(.25,.6,1.)*(.35+.35*lit)*(.5+.5*vDep)*fs;
+  }
+  col=min(col,vec3(.42,.72,1.));                      // hard ceiling: no near-white pixels anywhere
+  o=vec4(col*fade,fade);
+}`;
+function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s}
+const prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,VS));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(prog);
+if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(prog));
+gl.useProgram(prog);
+const U={};for(const n of['uRot','uModel','uPivot','uT','uScale','uPan','uLW','uEye','uGaze','uOpen','uFeat'])U[n]=gl.getUniformLocation(prog,n);
+function mesh(R,pos,nrm,uv,hl){
+  const vao=gl.createVertexArray();gl.bindVertexArray(vao);
+  const buf=(loc,data,n)=>{const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,data,gl.DYNAMIC_DRAW);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,n,gl.FLOAT,false,0,0);return b};
+  const m={vao,bp:buf(0,pos,3),bn:buf(1,nrm,3),bu:buf(2,uv,3),bh:buf(3,hl,1)};
+  const idx=new Uint32Array((R-1)*N*6);let o=0;
+  for(let i=0;i<R-1;i++)for(let k=0;k<N;k++){const a=i*C+k,b=a+1,c=a+C,d=c+1;idx.set([a,b,d,a,d,c],o);o+=6}
+  const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,idx,gl.STATIC_DRAW);
+  m.count=idx.length;gl.bindVertexArray(null);return m;
+}
+const hPos=new Float32Array(HV*3),hN=new Float32Array(HV*3),hHl=new Float32Array(HV);
+const headM=mesh(HR,basePos,hN,hUV,baseHl),bodyM=mesh(BR,bPos,bN,bUV,bHl);
+function upload(b,data){gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferSubData(gl.ARRAY_BUFFER,0,data)}
+
+// ---------- face state & expressions ----------
+const EXPR={
+  neutral:  {smile:0,  browUp:0,  browIn:0,  skew:0, eye:1,   tilt:0,   roll:0,   jaw:0,  wide:0},
+  happy:    {smile:1,  browUp:.35,browIn:0,  skew:0, eye:.8,  tilt:-.04,roll:.04, jaw:.08,wide:.3},
+  sad:      {smile:-.8,browUp:.1, browIn:-1, skew:0, eye:.6,  tilt:.12, roll:-.03,jaw:0,  wide:-.1},
+  surprised:{smile:0,  browUp:1.2,browIn:-.2,skew:0, eye:1.35,tilt:-.06,roll:0,   jaw:.55,wide:-.5},
+  angry:    {smile:-.5,browUp:-.4,browIn:1.2,skew:0, eye:.85, tilt:.06, roll:0,   jaw:0,  wide:.3},
+  thinking: {smile:-.2,browUp:.3, browIn:.3, skew:.45,eye:.85, tilt:-.08,roll:.08, jaw:0,  wide:-.2}};
+const NAMES=Object.keys(EXPR);
+const F={...EXPR.neutral,open:0,blink:0,wave:0,level:0};
+let tgt=EXPR.neutral,mode='both',rawLvl=0,rawZ=0,fake=false,time=0,nextBlink=2,blinkT=-1;
+let gaze=[0,0],gazeT=[0,0],nextSac=1;
+
+window.avatar={
+  setExpression(n){if(EXPR[n])tgt=EXPR[n]},
+  setMode(m){if(['mouth','waves','both'].includes(m))mode=m},
+  setLevel(rms,zcr){rawLvl=cl(Math.pow(rms*5,.75),0,1);rawZ=zcr},
+  setSpeaking(b){if(!b){rawLvl=0;rawZ=0}},
+  setEmbedded(){document.getElementById('hint').style.display='none'},
+  expressions:NAMES};
+
+onkeydown=e=>{
+  const i=parseInt(e.key);if(i>=1&&i<=NAMES.length)avatar.setExpression(NAMES[i-1]);
+  if(e.key==='m'||e.key==='M'){const ms=['mouth','waves','both'];avatar.setMode(ms[(ms.indexOf(mode)+1)%3])}
+  if(e.code==='Space'){fake=true;e.preventDefault()}};
+onkeyup=e=>{if(e.code==='Space'){fake=false;rawLvl=0}};
+
+function update(dt){
+  time+=dt;
+  if(fake){rawLvl=cl(.45+.4*Math.sin(time*17)*Math.sin(time*5.3),0,1);rawZ=.15+.15*Math.sin(time*7.1)}
+  F.level+=(rawLvl-F.level)*(rawLvl>F.level?.55:.25);
+  for(const k in tgt)if(k!=='jaw'&&k!=='wide')F[k]+=(tgt[k]-F[k])*0.08;
+  const talkOpen=mode==='waves'?F.level*0.15:F.level*0.9;
+  const talkWide=cl((rawZ-.10)*8,-1,1)*F.level*.8;
+  F.open+=(tgt.jaw+talkOpen-F.open)*0.35;
+  F.wide+=(tgt.wide+talkWide-F.wide)*0.25;
+  F.wave+=((mode==='mouth'?0:F.level)-F.wave)*0.2;
+  if(blinkT<0&&time>nextBlink){blinkT=0;nextBlink=time+2+Math.random()*4}
+  if(blinkT>=0){blinkT+=dt;F.blink=Math.sin(Math.min(1,blinkT/.16)*Math.PI);if(blinkT>.16){blinkT=-1;F.blink=0}}
+  if(time>nextSac){const k=F.level>.1?.4:1;gazeT=[(Math.random()-.5)*.0036*k,(Math.random()-.5)*.0018*k];nextSac=time+.6+Math.random()*2.4}
+  const th=tgt===EXPR.thinking;
+  gaze[0]+=(gazeT[0]+(th?-.0018:0)-gaze[0])*.35;gaze[1]+=(gazeT[1]+(th?-.0016:0)-gaze[1])*.35;
+}
+
+function poseHead(){
+  hPos.set(basePos);hHl.set(baseHl);
+  for(const T of TARGETS){const w=T.w(F),wh=T.wh(F);if(Math.abs(w)<1e-4&&Math.abs(wh)<1e-4)continue;
+    const{idx,d,dh}=T;for(let m=0;m<idx.length;m++){const j=idx[m]*3;hPos[j]+=w*d[m*3];hPos[j+1]+=w*d[m*3+1];hPos[j+2]+=w*d[m*3+2];hHl[idx[m]]+=wh*dh[m]}}
+  if(F.wave>0.002)for(let j=0;j<HV;j++){                          // "signal" waves radiating from the mouth
+    const x=hPos[j*3],t=hPos[j*3+1]+YC,z=hPos[j*3+2];
+    const d=Math.hypot(x,t-MOUTH-.004,(z-.12)*.6);
+    const w=Math.sin(d*95-time*9)*Math.exp(-d*6)*F.wave*FR[j];
+    const rip=Math.sin(x*140+time*13)*g(t,MOUTH,.035)*F.wave*FRONT[j];
+    // in 'both' mode keep the mouth geometry still (color-only waves there) so the speech animation stays clean
+    const keep=mode==='both'?1-g(t,MOUTH,.035)*g(x,0,.05):1;
+    hPos[j*3+1]+=(.006*w+.0035*rip)*keep;hHl[j]+=.9*Math.max(0,w)+.4*Math.abs(rip);
+  }
+  normals(hPos,HR,hN);
+  upload(headM.bp,hPos);upload(headM.bn,hN);upload(headM.bh,hHl);
+}
+
+let rotY=0,rotX=0,drag=false,pan=false,lx=0,ly=0,panX=0,panY=0;
+cv.oncontextmenu=e=>e.preventDefault();
+cv.onmousedown=e=>{pan=e.button===2||e.shiftKey||e.altKey;drag=!pan;lx=e.clientX;ly=e.clientY};onmouseup=()=>{drag=false;pan=false};onmousemove=e=>{if(pan){panX+=e.clientX-lx;panY+=e.clientY-ly;lx=e.clientX;ly=e.clientY}if(drag){rotY+=(e.clientX-lx)*0.01;rotX=cl(rotX-(e.clientY-ly)*0.01,-1.4,1.4);lx=e.clientX;ly=e.clientY}};
+// pinch to zoom: WebKit gesture events (trackpad pinch) with ctrl+wheel fallback
+let zoom=1,gz=1,gest=false;const setZoom=z=>zoom=cl(z,.4,4);
+addEventListener('gesturestart',e=>{e.preventDefault();gest=true;gz=zoom});
+addEventListener('gesturechange',e=>{e.preventDefault();setZoom(gz*e.scale)});
+addEventListener('gestureend',e=>{e.preventDefault();gest=false});
+// pan: two-finger scroll (wheel without ctrl), or shift/option/right-drag
+addEventListener('wheel',e=>{e.preventDefault();if(!e.ctrlKey){panX-=e.deltaX;panY-=e.deltaY;return}if(!gest)setZoom(zoom*Math.exp(-e.deltaY*.01))},{passive:false});
+ondblclick=()=>{rotY=0;rotX=0;zoom=1;panX=0;panY=0};
+
+gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;update(dt);
+  const RY=rotY+0.06*Math.sin(time*.4),RX=rotX+0.03*Math.sin(time*.53)+F.tilt+0.03*F.level;
+  const cY=Math.cos(RY),sY=Math.sin(RY),cX=Math.cos(RX),sX=Math.sin(RX);
+  gl.uniformMatrix3fv(U.uRot,false,[cY,sX*sY,-cX*sY, 0,cX,sX, sY,-sX*cY,cX*cY]);
+  const S=Math.min(cv.height*1.33,cv.width*1.4)*zoom;
+  gl.uniform2f(U.uScale,2*S/cv.width,2*S/cv.height);
+  gl.uniform2f(U.uPan,2*panX/innerWidth,-2*panY/innerHeight);
+  gl.uniform1f(U.uLW,devicePixelRatio);
+  gl.uniform4f(U.uEye,EX,EY,cl(F.eye*(1-F.blink),0,1.5),Math.max(0,F.smile));
+  gl.uniform2f(U.uGaze,gaze[0],gaze[1]);gl.uniform1f(U.uOpen,F.open);
+  gl.uniform3f(U.uPivot,0,PV-YC,0);
+  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  const breath=Math.sin(time*1.6);
+  gl.uniformMatrix3fv(U.uModel,false,[1,0,0,0,1,0,0,0,1]);gl.uniform3f(U.uT,0,-.0008*breath,0);gl.uniform1f(U.uFeat,0);
+  gl.bindVertexArray(bodyM.vao);gl.drawElements(gl.TRIANGLES,bodyM.count,gl.UNSIGNED_INT,0);
+  poseHead();
+  const cr=Math.cos(F.roll),sr=Math.sin(F.roll);
+  gl.uniformMatrix3fv(U.uModel,false,[cr,sr,0,-sr,cr,0,0,0,1]);gl.uniform3f(U.uT,0,-.0012*breath,0);gl.uniform1f(U.uFeat,1);
+  gl.bindVertexArray(headM.vao);gl.drawElements(gl.TRIANGLES,headM.count,gl.UNSIGNED_INT,0);
+  requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script>

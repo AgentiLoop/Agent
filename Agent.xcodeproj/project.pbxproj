@@ -251,6 +251,10 @@
 		1EBCF4BDAECFE598FEC3B400 /* ActivityLogTabCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186E2C0AE9CAF82B1B1F92A /* ActivityLogTabCacheTests.swift */; };
 		4EE92655F0CAFCE498E61EBF /* ContextOverflowDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06FF7974D444A53866B44F9 /* ContextOverflowDetectionTests.swift */; };
 		5308F5C24BE347A2B172254E /* AutoPilot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64F73655D7541A3B5492904 /* AutoPilot.swift */; };
+		1EF9BFCFF2AAF0C07CE980C5 /* AvatarSpeaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5DB4F91516155F9841BE6E /* AvatarSpeaker.swift */; };
+		5B493B361E9291FA27F8496B /* AvatarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B56C841E197D78556C4620 /* AvatarController.swift */; };
+		AAAB78FFAB5CB1D752D58DD6 /* AvatarPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E8E39436A1C0932057F0F9 /* AvatarPaneView.swift */; };
+		D1A7A7A7A7A7A7A7A7A7A701 /* avatar.html in Resources */ = {isa = PBXBuildFile; fileRef = BF80D97BF0588E5E478E70AE /* avatar.html */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -535,6 +539,10 @@
 		4186E2C0AE9CAF82B1B1F92A /* ActivityLogTabCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityLogTabCacheTests.swift"; sourceTree = "<group>"; };
 		D06FF7974D444A53866B44F9 /* ContextOverflowDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextOverflowDetectionTests.swift; sourceTree = "<group>"; };
 		A64F73655D7541A3B5492904 /* AutoPilot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoPilot.swift"; sourceTree = "<group>"; };
+		6B5DB4F91516155F9841BE6E /* AvatarSpeaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Avatar/AvatarSpeaker.swift; sourceTree = "<group>"; };
+		08B56C841E197D78556C4620 /* AvatarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Avatar/AvatarController.swift; sourceTree = "<group>"; };
+		C6E8E39436A1C0932057F0F9 /* AvatarPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Avatar/AvatarPaneView.swift; sourceTree = "<group>"; };
+		BF80D97BF0588E5E478E70AE /* avatar.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = Resources/avatar.html; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -617,6 +625,10 @@
 				EAE00000000000000001 /* UX */,
 				AA10000000000000000022 /* Agent.entitlements */,
 				EAHELP0000000000000002 /* Resources/Agent.help */,
+				BF80D97BF0588E5E478E70AE /* avatar.html */,
+				6B5DB4F91516155F9841BE6E /* AvatarSpeaker.swift */,
+				08B56C841E197D78556C4620 /* AvatarController.swift */,
+				C6E8E39436A1C0932057F0F9 /* AvatarPaneView.swift */,
 				EA60000000000000000002 /* SDEFs */,
 				BB10000000000000000041 /* LaunchDaemons */,
 				CC10000000000000000041 /* LaunchAgents */,
@@ -1276,6 +1288,7 @@
 				AA100000000000000000B3 /* StartupTwentiethAnniversaryMac.wav in Resources */,
 				EA60000000000000000001 /* SDEFs in Resources */,
 				EAHELP0000000000000001 /* Resources/Agent.help in Resources */,
+				D1A7A7A7A7A7A7A7A7A7A701 /* avatar.html in Resources */,
 				F4EDE7E05ED9DA2FF7BFEDD1 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1518,6 +1531,9 @@
 				F36A58D7738933627DF110BF /* LLMCommonSettingsView.swift in Sources */,
 				EAD4DB45DF56D6B65D2F3638 /* MuseCodeAuth.swift in Sources */,
 							5308F5C24BE347A2B172254E /* AutoPilot.swift in Sources */,
+				1EF9BFCFF2AAF0C07CE980C5 /* AvatarSpeaker.swift in Sources */,
+				5B493B361E9291FA27F8496B /* AvatarController.swift in Sources */,
+				AAAB78FFAB5CB1D752D58DD6 /* AvatarPaneView.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
