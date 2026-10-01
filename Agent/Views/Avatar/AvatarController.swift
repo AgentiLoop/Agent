@@ -18,6 +18,7 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     @ObservationIgnored private var jevTask: Task<Void, Never>?
 
     var speaking = false
+    @ObservationIgnored private var working = false
     var expression = "neutral" { didSet { js("avatar.setExpression('\(expression)')") } }
     var mode: String = UserDefaults.standard.string(forKey: AvatarController.modeKey) ?? "both" {
         didSet {
@@ -74,10 +75,16 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         speaking = false
     }
 
+    /// Show the "thinking" face while the tab's AI works; speech overrides it.
+    func setWorking(_ on: Bool) {
+        working = on
+        if !speaking { expression = on ? "thinking" : "neutral" }
+    }
+
     private func speakNext() {
         guard !queue.isEmpty else {
             speaking = false
-            expression = "neutral"
+            expression = working ? "thinking" : "neutral"
             return
         }
         let next = queue.removeFirst()

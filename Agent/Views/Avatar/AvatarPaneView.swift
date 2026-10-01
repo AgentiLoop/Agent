@@ -43,6 +43,9 @@ struct AvatarPaneView: View {
             .padding(8)
         }
         .frame(minWidth: 260, idealWidth: 340, maxWidth: 480)
+        .onChange(of: tab.isLLMRunning || tab.isLLMThinking, initial: true) { _, working in
+            avatar.setWorking(working)
+        }
         .background(Color(red: 0.043, green: 0.059, blue: 0.078))
         .environment(\.colorScheme, .dark)
     }
