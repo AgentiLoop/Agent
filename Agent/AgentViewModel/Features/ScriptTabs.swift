@@ -136,6 +136,11 @@ extension AgentViewModel {
                 tab.cancelHandler?()
                 tab.isRunning = false
             }
+            // The avatar face is shared: don't keep talking / thinking for a closed tab.
+            if tab.isAvatarTab {
+                AvatarController.shared.stop()
+                AvatarController.shared.setWorking(false)
+            }
             tab.logFlushTask?.cancel()
             tab.llmStreamFlushTask?.cancel()
             // Clear log before removal — prevents expensive NSAttributedString copy on tab switch
