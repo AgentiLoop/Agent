@@ -507,6 +507,7 @@ final class ClaudeService {
         messages: [[String: Any]],
         activeGroups: Set<String>? = nil,
         onToolUse: ToolUseHook? = nil,
+        onDoneSummary: (@Sendable (String) -> Void)? = nil,
         onTextDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         guard isLocalEndpoint || !apiKey.isEmpty else { throw AgentError.noAPIKey }
@@ -543,14 +544,33 @@ final class ClaudeService {
             url: endpointURL,
             thinkingEnabled: thinkingBudget > 0 && !isLocalhostEndpoint,
             onToolUse: onToolUse,
+            onDoneSummary: onDoneSummary,
             onTextDelta: onTextDelta
         )
+    }
+
+    /// The `summary` string so far in a still-streaming `done` input JSON, unescaped; nil before it starts.
+    nonisolated static func partialSummary(_ json: String) -> String? {
+        guard let key = json.range(of: "\"summary\""),
+              let quote = json[key.upperBound...].firstIndex(of: "\"") else { return nil }
+        var raw = Substring(json[json.index(after: quote)...])
+        var escaped = false
+        if let end = raw.firstIndex(where: { c in
+            defer { escaped = !escaped && c == "\\" }
+            return !escaped && c == "\""
+        }) { raw = raw[..<end] }
+        // A fragment can end mid-escape ("\" or "\u00"); trim until it decodes.
+        for cut in 0...min(5, raw.count) {
+            if let s = try? JSONDecoder().decode(String.self, from: Data("\"\(raw.dropLast(cut))\"".utf8)) { return s }
+        }
+        return nil
     }
 
     nonisolated private static func performStreamingRequest(
         bodyData: Data, apiKey: String, apiVersion: String, url: URL,
         thinkingEnabled: Bool = false,
         onToolUse: ToolUseHook? = nil,
+        onDoneSummary: (@Sendable (String) -> Void)? = nil,
         onTextDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         var request = URLRequest(url: url)
@@ -653,6 +673,7 @@ final class ClaudeService {
                         // Tool-only responses previously streamed invisibly (args are
                         // input_json_delta) — announce the call so the UI shows life.
                         onTextDelta("⚙️ \(currentToolName)")
+                        if currentToolName == "done" { onDoneSummary?("") }
                     } else if blockType == "server_tool_use" {
                         currentToolId = block["id"] as? String ?? ""
                         currentToolName = block["name"] as? String ?? ""
@@ -674,6 +695,7 @@ final class ClaudeService {
                         onTextDelta(text)
                     } else if deltaType == "input_json_delta", let json = delta["partial_json"] as? String {
                         currentToolJson += json
+                        if currentToolName == "done", let onDoneSummary, let s = partialSummary(currentToolJson) { onDoneSummary(s) }
                     } else if deltaType == "thinking_delta", let text = delta["thinking"] as? String {
                         currentThinking += text
                         // Stream thinking live — display-only; the signed thinking

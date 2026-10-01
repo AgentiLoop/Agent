@@ -22,6 +22,10 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     @ObservationIgnored private let speaker = AvatarSpeaker()
     @ObservationIgnored private var queue: [(text: String, expression: String)] = []
     @ObservationIgnored private var jevTask: Task<Void, Never>?
+    /// Sentences of the streaming `done` summary already queued; -1 = not streaming.
+    @ObservationIgnored private var streamedSentences = -1
+    /// The last summary spoken while streaming, so sayReply doesn't repeat it.
+    @ObservationIgnored private var streamedSummary = ""
 
     var speaking = false
     @ObservationIgnored private var working = false
@@ -83,12 +87,55 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         }
     }
 
+    /// Speak a `done` summary while it streams: each call gets the summary so far and
+    /// queues the sentences that are now complete. "" starts a new summary.
+    func streamSummary(_ partial: String) {
+        if partial.isEmpty {
+            stop()
+            streamedSentences = 0
+            return
+        }
+        guard streamedSentences >= 0 else { return } // late update after finishStreamedSummary
+        // Hold back an unclosed code block until it closes (speakable drops whole blocks).
+        var text = partial
+        if text.components(separatedBy: "```").count % 2 == 0, let open = text.range(of: "```", options: .backwards) {
+            text = String(text[..<open.lowerBound])
+        }
+        let ready = Self.sentences(in: Self.speakable(text)).dropLast() // last one may still be growing
+        enqueue(Array(ready.dropFirst(streamedSentences)))
+    }
+
+    /// The summary finished streaming — queue the rest of it.
+    func finishStreamedSummary(_ full: String) {
+        guard streamedSentences >= 0 else { return }
+        enqueue(Array(Self.sentences(in: Self.speakable(full)).dropFirst(streamedSentences)))
+        streamedSentences = -1
+        streamedSummary = full
+    }
+
+    /// Read the task's reply aloud unless it was already spoken while streaming.
+    func sayReply(_ text: String) {
+        defer { streamedSummary = "" }
+        if text != streamedSummary { say(text) }
+    }
+
+    private func enqueue(_ sentences: [String]) {
+        guard !sentences.isEmpty else { return }
+        streamedSentences += sentences.count
+        queue += sentences.map { ($0, Self.expression(for: $0)) }
+        if !speaking {
+            speaking = true
+            speakNext()
+        }
+    }
+
     func stop() {
         jevTask?.cancel()
         jevTask = nil
         queue.removeAll()
         speaker.stop()
         speaking = false
+        streamedSentences = -1
     }
 
     /// Show the "thinking" face while the tab's AI works; speech overrides it.

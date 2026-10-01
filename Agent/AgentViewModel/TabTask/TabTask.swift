@@ -110,7 +110,7 @@ extension AgentViewModel {
             }
             // Avatar tabs read the reply aloud (both the done and fall-through paths set the summary).
             if tab.isAvatarTab, !Task.isCancelled, !tab.lastTaskCompletionSummary.isEmpty {
-                AvatarController.shared.say(tab.lastTaskCompletionSummary)
+                AvatarController.shared.sayReply(tab.lastTaskCompletionSummary)
             }
             // When done, run next queued task
             if !tab.taskQueue.isEmpty && !tab.isCancelled {
@@ -345,11 +345,20 @@ extension AgentViewModel {
                 // Append-only between compaction events — see tieredCompact above.
                 let sendMessages = messages
                 if let claude = services.claude {
-                    response = try await claude.sendStreaming(messages: sendMessages, activeGroups: activeGroups) { [weak tab] delta in
+                    // Avatar tabs speak the done summary sentence by sentence while it streams.
+                    let speakDone: (@Sendable (String) -> Void)? = tab.isAvatarTab
+                        ? { @Sendable s in Task { @MainActor in AvatarController.shared.streamSummary(s) } } : nil
+                    response = try await claude.sendStreaming(messages: sendMessages, activeGroups: activeGroups, onDoneSummary: speakDone) { [weak tab] delta in
                         Task { @MainActor in
                             tab?.isLLMThinking = false
                             tab?.appendStreamDelta(delta)
                         }
+                    }
+                    // Speak the summary's last sentence now, not after the completion gates.
+                    if tab.isAvatarTab, let done = response.content.first(where: { $0["name"] as? String == "done" }),
+                       let summary = (done["input"] as? [String: Any])?["summary"] as? String {
+                        await Task.yield() // let the queued stream updates land first
+                        AvatarController.shared.finishStreamedSummary(summary)
                     }
 
                     tab.flushStreamBuffer()
