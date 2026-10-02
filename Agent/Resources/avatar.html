@@ -107,6 +107,7 @@ function anat(t,c,s,x,z){
 // Profile kept close to an ellipse (p 2.2/.45, was a boxier 2.5/.4) so the cranium above the brows isn't over-full
 // and the forehead doesn't read too big next to the face
 const hRP=ringParams(HEAD,HSTEP).map(r=>{if(r[0]>=.1)return r;const d=(1-Math.pow((.1-r[0])/.1,2.2))**.45;return[r[0],r[1],r[2],.092*d,.122*d,r[5]]});hRP.unshift([0,0,.02,0,0,2]);  // pole ring closes the dome
+hRP.push([HEAD[HEAD.length-1][0],0,.063,0,0,2]);  // pole ring closes the underside of the chin
 const HR=hRP.length,HV=HR*C;
 const X0=new Float32Array(HV),Z0=new Float32Array(HV),T0=new Float32Array(HV),CC=new Float32Array(HV),SS=new Float32Array(HV),
       FRONT=new Float32Array(HV),FR=new Float32Array(HV),HL0=new Float32Array(HV),hUV=new Float32Array(HV*3);
@@ -162,7 +163,8 @@ const TARGETS=[
 });
 
 // ---------- body mesh (static) ----------
-const bRP=ringParams(BODY,BSTEP),BR=bRP.length,BV=BR*C;
+const bRP=ringParams(BODY,BSTEP);bRP.push([BODY[BODY.length-1][0],0,.004,0,0,2]);  // pole ring: flat solid bottom under the torso
+const BR=bRP.length,BV=BR*C;
 const bPos=new Float32Array(BV*3),bUV=new Float32Array(BV*3),bHl=new Float32Array(BV),bN=new Float32Array(BV*3);
 bRP.forEach(([t,cx,cz,rx,rz,p],i)=>ANG.forEach(([c,s],k)=>{
   const j=i*C+k;let [x,z]=shape(rx,rz,p,c,s);x+=cx;z+=cz;
@@ -210,7 +212,7 @@ void main(){
   float t=vUV.y;
   vec3 N=normalize(vN),L=normalize(vec3(-.45,-.55,.75));
   float ndl=max(dot(N,L),0.),rim=pow(1.-clamp(N.z,0.,1.),3.);
-  float h=max(vHl,0.),dim=1.+clamp(vHl,-.95,0.),fade=1.-clamp((t-.58)/.12,0.,1.);
+  float h=max(vHl,0.),dim=1.+clamp(vHl,-.95,0.);
   float lit=.25+.85*ndl+.25*rim;
   // facial feature curves (eyes, lips): computed first so they can brighten the contour lines themselves
   float fm=0.,op=0.,iris=0.,pup=0.,glint=0.,ring=0.,r=1.,an=0.,fs=0.;
@@ -257,7 +259,7 @@ void main(){
     col+=vec3(.25,.6,1.)*(.35+.35*lit)*(.5+.5*vDep)*fs;
   }
   col=min(col,vec3(.42,.72,1.));                      // hard ceiling: no near-white pixels anywhere
-  o=vec4(col*fade,fade);
+  o=vec4(col,1.);
 }`;
 function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s}
 const prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,VS));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(prog);
