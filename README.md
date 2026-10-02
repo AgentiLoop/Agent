@@ -102,7 +102,33 @@ Just type what you want. Agent! figures out how and makes it happen.
 - **📱 iMessage remote control** — text `Agent! next song` from your iPhone; approved senders only. Needs Full Disk Access for `chat.db`.
 - **🌐 Web** — built-in Safari automation (JavaScript + AppleScript); optional Selenium and [Playwright MCP](https://github.com/microsoft/playwright-mcp) for cross-browser.
 - **🤝 Sub-agents** — up to 3 concurrent (6 read-only) isolated agents with mailbox messaging and per-agent model override.
-- **🧩 MCP** — add any MCP server in Settings → MCP Servers; tools appear as `mcp_<server>_<tool>`. Xcode MCP: `{"mcpServers":{"xcode":{"command":"xcrun","args":["mcpbridge"],"transport":"stdio"}}}`.
+- **🧩 MCP** — add any MCP server in Settings → MCP Servers (paste JSON or fill in the form); tools appear as `mcp_<server>_<tool>`. Examples (stdio and HTTP):
+
+  ```json
+  {
+    "mcpServers": {
+      "xcode": {
+        "transport": "stdio",
+        "command": "xcrun",
+        "args": ["mcpbridge"],
+        "env": {}
+      },
+      "HelloWorld": {
+        "transport": "stdio",
+        "command": "/Users/you/bin/mcp-server-hello",
+        "args": [],
+        "env": {}
+      },
+      "DemoHttp": {
+        "transport": "http",
+        "url": "http://localhost:8085/mcp",
+        "headers": {}
+      }
+    }
+  }
+  ```
+
+  `HelloWorld` and `DemoHttp` are the demo servers from [AgentMCP](https://github.com/AgentiLoop/AgentMCP); start `mcp-server-demo-http` first so `DemoHttp` has something listening on port 8085.
 - **🗂 Tabs, history, memory, plans, skills** — each tab has its own project folder and log; persistent user memory; multi-plan checklists surfaced in every prompt.
 - **🔄 Fallback chain** — auto-switch to the next configured provider on 429/timeout/network failure.
 
