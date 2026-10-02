@@ -46,10 +46,9 @@ struct NewMainTabSheet: View {
                 modelPicker
             }
 
-            // Avatar tab: talking face in a right pane; tasks default to /auto
+            // Avatar tab: talking face in a right pane
             Toggle("Avatar", isOn: $avatar)
                 .help("Show a talking avatar in a right pane that speaks replies and listens")
-                .onChange(of: avatar) { _, on in if on { autoPilot = true } }
             Toggle("Default to Auto-Pilot (/auto)", isOn: $autoPilot)
                 .help("Every task typed in this tab starts an /auto session")
 
