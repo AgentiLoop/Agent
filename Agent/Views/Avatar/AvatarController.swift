@@ -22,6 +22,8 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     @ObservationIgnored private let speaker = AvatarSpeaker()
     @ObservationIgnored private var queue: [(text: String, expression: String)] = []
     @ObservationIgnored private var jevTask: Task<Void, Never>?
+    /// Set by say(_:showing:) — called as each sentence starts playing.
+    @ObservationIgnored private var onSentence: ((String) -> Void)?
     /// Sentences of the streaming `done` summary already queued; -1 = not streaming.
     @ObservationIgnored private var streamedSentences = -1
     /// The streaming segment's text so far.
@@ -73,8 +75,10 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     /// Speak `text`, choosing an expression for each sentence. Starts at once
     /// with the keyword faces; if Jev is configured its picks replace them for
     /// the sentences not yet finished when the answer arrives.
-    func say(_ text: String) {
+    /// `showing` gets each sentence as it starts playing, so the caller can put the words on screen in step with the voice.
+    func say(_ text: String, showing: ((String) -> Void)? = nil) {
         stop()
+        onSentence = showing
         let sentences = Self.sentences(in: Self.speakable(text))
         queue = sentences.map { ($0, Self.expression(for: $0)) }
         guard !queue.isEmpty else { return }
@@ -139,6 +143,7 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         jevTask?.cancel()
         jevTask = nil
         queue.removeAll()
+        onSentence = nil
         speaker.stop()
         speaking = false
         streamedSentences = -1
@@ -157,6 +162,7 @@ final class AvatarController: NSObject, WKNavigationDelegate {
             return
         }
         let next = queue.removeFirst()
+        onSentence?(next.text)
         expression = next.expression
         speaker.speak(next.text)
     }
