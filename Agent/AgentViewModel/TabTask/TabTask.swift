@@ -100,6 +100,10 @@ extension AgentViewModel {
     /// Start executing a task on a tab (not queued).
     func startTabTask(tab: ScriptTab, prompt: String) {
         tab.currentTaskPrompt = prompt
+        // Avatar tabs: the HUD shows the reply word by word as the avatar says it (no fixed-speed drip).
+        if tab.isAvatarTab {
+            AvatarController.shared.onWord = { [weak tab] word in tab?.displayedLLMOutput += word }
+        }
         tab.runningLLMTask = Task {
             // Bind the owning tab for the ENTIRE task so any shared code that
             // logs through AgentViewModel.appendLog / JevConfiguration.report
@@ -408,9 +412,9 @@ extension AgentViewModel {
                 }
                 // Strip done/task_complete from LLM Output
                 Self.stripCompletionText(&tab.rawLLMOutput)
-                // Wait for drip to finish
+                // Wait for drip to finish (avatar tabs keep showing only what's been spoken)
                 await tab.dripTask?.value
-                if !tab.rawLLMOutput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                if !tab.isAvatarTab, !tab.rawLLMOutput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     tab.displayedLLMOutput = tab.rawLLMOutput
                     tab.dripDisplayIndex = tab.rawLLMOutput.unicodeScalars.count
                 }

@@ -387,16 +387,18 @@ final class ScriptTab: Identifiable {
             if !previous.isEmpty { llmOutputPages.append(rawLLMOutput) }
             llmOutputPageIndex = nil
             rawLLMOutput = "[\(AgentViewModel.timestampFormatter.string(from: Date()))] "
-            displayedLLMOutput = ""
+            // Avatar tabs keep the words spoken so far; the voice may still be mid-reply.
+            if !isAvatarTab { displayedLLMOutput = "" }
             dripDisplayIndex = 0
         }
         rawLLMOutput += delta
         startDripIfNeeded()
     }
 
-    /// Drip characters from rawLLMOutput into displayedLLMOutput for a terminal typing effect
+    /// Drip characters from rawLLMOutput into displayedLLMOutput for a terminal typing effect.
+    /// Avatar tabs don't drip: AvatarController.onWord appends each word as it is spoken.
     func startDripIfNeeded() {
-        guard dripTask == nil else { return }
+        guard dripTask == nil, !isAvatarTab else { return }
         dripTask = Task { [weak self] in
             guard let self else { return }
             while !Task.isCancelled {

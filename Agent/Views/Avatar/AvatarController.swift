@@ -22,8 +22,11 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     @ObservationIgnored private let speaker = AvatarSpeaker()
     @ObservationIgnored private var queue: [(text: String, expression: String)] = []
     @ObservationIgnored private var jevTask: Task<Void, Never>?
-    /// Set by say(_:showing:) — called as each sentence starts playing.
-    @ObservationIgnored private var onSentence: ((String) -> Void)?
+    /// Gets each slice of spoken text as the voice reaches it (word by word, sentences joined
+    /// with a space), so the owner can put the words on screen in step with the voice.
+    @ObservationIgnored var onWord: ((String) -> Void)?
+    /// Prepended to the next word: " " once a previous sentence has been spoken.
+    @ObservationIgnored private var separator = ""
     /// Sentences of the streaming `done` summary already queued; -1 = not streaming.
     @ObservationIgnored private var streamedSentences = -1
     /// The streaming segment's text so far.
@@ -61,6 +64,11 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         speaker.onFrame = { [weak self] rms, zcr in self?.js("avatar.setLevel(\(rms),\(zcr))") }
         speaker.onSpeaking = { [weak self] on in self?.js("avatar.setSpeaking(\(on))") }
         speaker.onFinished = { [weak self] in self?.speakNext() }
+        speaker.onWord = { [weak self] w in
+            guard let self else { return }
+            self.onWord?(self.separator + w)
+            self.separator = ""
+        }
         if let saved = AVSpeechSynthesisVoice(identifier: voiceID) { speaker.voice = saved }
     }
 
@@ -75,10 +83,9 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     /// Speak `text`, choosing an expression for each sentence. Starts at once
     /// with the keyword faces; if Jev is configured its picks replace them for
     /// the sentences not yet finished when the answer arrives.
-    /// `showing` gets each sentence as it starts playing, so the caller can put the words on screen in step with the voice.
-    func say(_ text: String, showing: ((String) -> Void)? = nil) {
+    /// Words reach `onWord` as the voice says them.
+    func say(_ text: String) {
         stop()
-        onSentence = showing
         let sentences = Self.sentences(in: Self.speakable(text))
         queue = sentences.map { ($0, Self.expression(for: $0)) }
         guard !queue.isEmpty else { return }
@@ -143,9 +150,9 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         jevTask?.cancel()
         jevTask = nil
         queue.removeAll()
-        onSentence = nil
         speaker.stop()
         speaking = false
+        separator = ""
         streamedSentences = -1
     }
 
@@ -162,9 +169,9 @@ final class AvatarController: NSObject, WKNavigationDelegate {
             return
         }
         let next = queue.removeFirst()
-        onSentence?(next.text)
         expression = next.expression
         speaker.speak(next.text)
+        separator = " "
     }
 
     // MARK: - Text helpers

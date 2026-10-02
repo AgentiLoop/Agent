@@ -49,7 +49,7 @@ extension AgentViewModel {
         persistScriptTabs()
         // A new avatar tab greets the user so it's clear it talks and listens.
         // Open the LLM Output HUD (tabs start with it dismissed + collapsed) and type
-        // each sentence into it as the avatar starts saying it.
+        // each word into it as the avatar says it.
         if avatar {
             tab.thinkingDismissed = false
             tab.thinkingExpanded = true
@@ -57,11 +57,11 @@ extension AgentViewModel {
             tab.rawLLMOutput = ""
             tab.displayedLLMOutput = ""
             tab.dripDisplayIndex = 0
-            AvatarController.shared.say(AvatarController.greeting) { [weak tab] sentence in
-                guard let tab else { return }
-                tab.rawLLMOutput += (tab.rawLLMOutput.isEmpty ? "" : " ") + sentence
-                tab.startDripIfNeeded()
+            AvatarController.shared.onWord = { [weak tab] word in
+                tab?.rawLLMOutput += word
+                tab?.displayedLLMOutput += word
             }
+            AvatarController.shared.say(AvatarController.greeting)
         }
         return tab
     }
