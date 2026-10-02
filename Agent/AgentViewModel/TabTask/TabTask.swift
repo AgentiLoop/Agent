@@ -354,11 +354,11 @@ extension AgentViewModel {
                             tab?.appendStreamDelta(delta)
                         }
                     }
-                    // Speak the summary's last sentence now, not after the completion gates.
-                    if tab.isAvatarTab, let done = response.content.first(where: { $0["name"] as? String == "done" }),
-                       let summary = (done["input"] as? [String: Any])?["summary"] as? String {
+                    // Speak the last segment's final sentence now, not after the completion gates.
+                    if tab.isAvatarTab {
+                        let done = response.content.first(where: { $0["name"] as? String == "done" })
                         await Task.yield() // let the queued stream updates land first
-                        AvatarController.shared.finishStreamedSummary(summary)
+                        AvatarController.shared.finishStreamedSummary((done?["input"] as? [String: Any])?["summary"] as? String)
                     }
 
                     tab.flushStreamBuffer()

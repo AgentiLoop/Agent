@@ -24,6 +24,8 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     @ObservationIgnored private var jevTask: Task<Void, Never>?
     /// Sentences of the streaming `done` summary already queued; -1 = not streaming.
     @ObservationIgnored private var streamedSentences = -1
+    /// The streaming segment's text so far.
+    @ObservationIgnored private var streamPartial = ""
     /// The last summary spoken while streaming, so sayReply doesn't repeat it.
     @ObservationIgnored private var streamedSummary = ""
 
@@ -87,15 +89,18 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         }
     }
 
-    /// Speak a `done` summary while it streams: each call gets the summary so far and
-    /// queues the sentences that are now complete. "" starts a new summary.
+    /// Speak reply text / a `done` summary while it streams: each call gets the segment so far
+    /// and queues the sentences that are now complete. "" starts a new segment, first flushing
+    /// the previous one (a text block followed by `done`) — it never cuts off speech already queued.
     func streamSummary(_ partial: String) {
         if partial.isEmpty {
-            stop()
+            if streamedSentences >= 0 { finishStreamedSummary() }
             streamedSentences = 0
+            streamPartial = ""
             return
         }
         guard streamedSentences >= 0 else { return } // late update after finishStreamedSummary
+        streamPartial = partial
         // Hold back an unclosed code block until it closes (speakable drops whole blocks).
         var text = partial
         if text.components(separatedBy: "```").count % 2 == 0, let open = text.range(of: "```", options: .backwards) {
@@ -105,12 +110,13 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         enqueue(Array(ready.dropFirst(streamedSentences)))
     }
 
-    /// The summary finished streaming — queue the rest of it.
-    func finishStreamedSummary(_ full: String) {
+    /// The segment finished streaming — queue the rest of it (`full` defaults to the text streamed so far).
+    func finishStreamedSummary(_ full: String? = nil) {
         guard streamedSentences >= 0 else { return }
-        enqueue(Array(Self.sentences(in: Self.speakable(full)).dropFirst(streamedSentences)))
+        let text = full ?? streamPartial
+        enqueue(Array(Self.sentences(in: Self.speakable(text)).dropFirst(streamedSentences)))
         streamedSentences = -1
-        streamedSummary = full
+        streamedSummary = text
     }
 
     /// Read the task's reply aloud unless it was already spoken while streaming.

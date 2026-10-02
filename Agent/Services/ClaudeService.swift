@@ -652,6 +652,7 @@ final class ClaudeService {
                         currentTextBlock = ""
                         inToolUse = false
                         inServerToolUse = false
+                        onDoneSummary?("") // avatar speaks reply text as it streams, too
                     } else if blockType == "thinking" {
                         currentThinking = ""
                         currentThinkingSignature = ""
@@ -693,6 +694,7 @@ final class ClaudeService {
                     if deltaType == "text_delta", let text = delta["text"] as? String {
                         currentTextBlock += text
                         onTextDelta(text)
+                        onDoneSummary?(currentTextBlock)
                     } else if deltaType == "input_json_delta", let json = delta["partial_json"] as? String {
                         currentToolJson += json
                         if currentToolName == "done", let onDoneSummary, let s = partialSummary(currentToolJson) { onDoneSummary(s) }
