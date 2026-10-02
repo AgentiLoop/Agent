@@ -48,7 +48,10 @@ extension AgentViewModel {
         selectedTabId = tab.id
         persistScriptTabs()
         // A new avatar tab greets the user so it's clear it talks and listens.
-        if avatar { AvatarController.shared.say(AvatarController.greeting) }
+        if avatar {
+            tab.appendOutput(AvatarController.greeting)
+            AvatarController.shared.say(AvatarController.greeting)
+        }
         return tab
     }
 
