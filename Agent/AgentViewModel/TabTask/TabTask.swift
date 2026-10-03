@@ -350,9 +350,9 @@ extension AgentViewModel {
                 // Append-only between compaction events — see tieredCompact above.
                 let sendMessages = messages
                 if let claude = services.claude {
-                    // Avatar tabs speak the done summary sentence by sentence while it streams.
-                    let speakDone: (@Sendable (String) -> Void)? = tab.isAvatarTab
-                        ? { @Sendable s in Task { @MainActor in AvatarController.shared.streamSummary(s) } } : nil
+                    // Avatar tabs speak the reply text / done summary sentence by sentence while it streams.
+                    let speakDone: (@Sendable (String, Bool) -> Void)? = tab.isAvatarTab
+                        ? { @Sendable s, isDone in Task { @MainActor in AvatarController.shared.streamSummary(s, isDone: isDone) } } : nil
                     response = try await claude.sendStreaming(messages: sendMessages, activeGroups: activeGroups, onDoneSummary: speakDone) { [weak tab] delta in
                         Task { @MainActor in
                             tab?.isLLMThinking = false

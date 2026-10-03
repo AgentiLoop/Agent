@@ -33,6 +33,12 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     @ObservationIgnored private var streamedSentences = -1
     /// The streaming segment's text so far.
     @ObservationIgnored private var streamPartial = ""
+    /// The streaming segment is the `done` tool's summary (not a text block).
+    @ObservationIgnored private var segmentIsDone = false
+    /// Sentences spoken from text blocks in the current response. A `done` summary that follows
+    /// reply text in the same response is a recap of it and isn't read at all.
+    @ObservationIgnored private var turnTextSentences = 0
+    @ObservationIgnored private var skippingSummary = false
     /// Word sets of the sentences already said (or queued) in this reply, so a paraphrased `done`
     /// summary after a text block — or a sentence the model repeats — isn't read twice.
     @ObservationIgnored private var said: [Set<String>] = []
@@ -120,15 +126,19 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     /// Speak reply text / a `done` summary while it streams: each call gets the segment so far
     /// and queues the sentences that are now complete. "" starts a new segment, first flushing
     /// the previous one (a text block followed by `done`) — it never cuts off speech already queued.
-    func streamSummary(_ partial: String) {
+    /// A `done` summary after reply text in the same response is a recap: it isn't read.
+    func streamSummary(_ partial: String, isDone: Bool = false) {
         if partial.isEmpty {
-            if streamedSentences >= 0 { finishStreamedSummary() }
+            if streamedSentences >= 0 { flushSegment() }
             streamedSentences = 0
             streamPartial = ""
+            segmentIsDone = isDone
+            skippingSummary = isDone && turnTextSentences > 0
             return
         }
         guard streamedSentences >= 0 else { return } // late update after finishStreamedSummary
         streamPartial = partial
+        if skippingSummary { return }
         // Hold back an unclosed code block until it closes (speakable drops whole blocks).
         var text = partial
         if text.components(separatedBy: "```").count % 2 == 0, let open = text.range(of: "```", options: .backwards) {
@@ -137,15 +147,29 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         let ready = Self.sentences(in: Self.speakable(text)).dropLast() // last one may still be growing
         let new = Array(ready.dropFirst(streamedSentences))
         streamedSentences += new.count
+        if !segmentIsDone { turnTextSentences += new.count }
         enqueue(unsaid(new))
     }
 
-    /// The segment finished streaming — queue the rest of it (`full` defaults to the text streamed so far).
+    /// The response finished streaming — queue the rest of the last segment (`full` defaults to the
+    /// text streamed so far) and start a fresh text-sentence count for the next response.
     func finishStreamedSummary(_ full: String? = nil) {
+        flushSegment(full)
+        turnTextSentences = 0
+    }
+
+    private func flushSegment(_ full: String? = nil) {
         guard streamedSentences >= 0 else { return }
         let text = full ?? streamPartial
-        enqueue(unsaid(Array(Self.sentences(in: Self.speakable(text)).dropFirst(streamedSentences))))
+        let rest = Array(Self.sentences(in: Self.speakable(text)).dropFirst(streamedSentences))
+        if skippingSummary {
+            said += rest.map(Self.words) // so sayReply doesn't read the skipped summary either
+        } else {
+            if !segmentIsDone { turnTextSentences += rest.count }
+            enqueue(unsaid(rest))
+        }
         streamedSentences = -1
+        skippingSummary = false
     }
 
     /// Read the task's reply aloud — only the sentences not already spoken while streaming.
@@ -189,6 +213,7 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         speaking = false
         separator = ""
         streamedSentences = -1
+        skippingSummary = false
     }
 
     /// Show the "thinking" face while the tab's AI works; speech overrides it.

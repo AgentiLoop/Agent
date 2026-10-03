@@ -507,7 +507,7 @@ final class ClaudeService {
         messages: [[String: Any]],
         activeGroups: Set<String>? = nil,
         onToolUse: ToolUseHook? = nil,
-        onDoneSummary: (@Sendable (String) -> Void)? = nil,
+        onDoneSummary: (@Sendable (String, Bool) -> Void)? = nil,
         onTextDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         guard isLocalEndpoint || !apiKey.isEmpty else { throw AgentError.noAPIKey }
@@ -570,7 +570,7 @@ final class ClaudeService {
         bodyData: Data, apiKey: String, apiVersion: String, url: URL,
         thinkingEnabled: Bool = false,
         onToolUse: ToolUseHook? = nil,
-        onDoneSummary: (@Sendable (String) -> Void)? = nil,
+        onDoneSummary: (@Sendable (String, Bool) -> Void)? = nil,
         onTextDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         var request = URLRequest(url: url)
@@ -652,7 +652,7 @@ final class ClaudeService {
                         currentTextBlock = ""
                         inToolUse = false
                         inServerToolUse = false
-                        onDoneSummary?("") // avatar speaks reply text as it streams, too
+                        onDoneSummary?("", false) // avatar speaks reply text as it streams, too
                     } else if blockType == "thinking" {
                         currentThinking = ""
                         currentThinkingSignature = ""
@@ -674,7 +674,7 @@ final class ClaudeService {
                         // Tool-only responses previously streamed invisibly (args are
                         // input_json_delta) — announce the call so the UI shows life.
                         onTextDelta("⚙️ \(currentToolName)")
-                        if currentToolName == "done" { onDoneSummary?("") }
+                        if currentToolName == "done" { onDoneSummary?("", true) }
                     } else if blockType == "server_tool_use" {
                         currentToolId = block["id"] as? String ?? ""
                         currentToolName = block["name"] as? String ?? ""
@@ -694,10 +694,10 @@ final class ClaudeService {
                     if deltaType == "text_delta", let text = delta["text"] as? String {
                         currentTextBlock += text
                         onTextDelta(text)
-                        onDoneSummary?(currentTextBlock)
+                        onDoneSummary?(currentTextBlock, false)
                     } else if deltaType == "input_json_delta", let json = delta["partial_json"] as? String {
                         currentToolJson += json
-                        if currentToolName == "done", let onDoneSummary, let s = partialSummary(currentToolJson) { onDoneSummary(s) }
+                        if currentToolName == "done", let onDoneSummary, let s = partialSummary(currentToolJson) { onDoneSummary(s, true) }
                     } else if deltaType == "thinking_delta", let text = delta["thinking"] as? String {
                         currentThinking += text
                         // Stream thinking live — display-only; the signed thinking
