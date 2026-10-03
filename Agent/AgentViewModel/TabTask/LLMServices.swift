@@ -43,11 +43,32 @@ extension AgentViewModel {
         } else {
             conversationNote = ""
         }
+        // Avatar tabs: tell the model it has a face, and whether that face can talk right now.
+        let avatarNote: String
+        if tab.isAvatarTab {
+            avatarNote = AvatarController.shared.muted
+                ? """
+                AVATAR MODE (MUTED): The user sees your animated avatar face beside this tab. Audio is muted — \
+                you cannot talk and your lips do not move. Your reply text and done summary still appear on screen \
+                sentence by sentence, and your face shows an expression (neutral, happy, sad, surprised, angry, thinking) \
+                matched to each sentence. Write replies as short, clear sentences the face can react to.
+                """
+                : """
+                AVATAR MODE (VOICE ON): The user sees your animated avatar face beside this tab and it SPEAKS your \
+                reply text and done summary aloud with text-to-speech, lips moving, one sentence at a time, with a facial \
+                expression (neutral, happy, sad, surprised, angry, thinking) matched to each sentence. Write replies as \
+                natural spoken conversation: short sentences, no markdown tables or bullet symbols, no code unless asked \
+                (code blocks, URLs and file paths are not read aloud). The user may also talk back via the microphone.
+                """
+        } else {
+            avatarNote = ""
+        }
         return """
 
         \nYou are in a tab named "\(tab.scriptName)". The user can see the tab's output.
         \(tccNote)
         \(conversationNote)
+        \(avatarNote)
         The tab's recent output is below for context:
 
         \(tabContext)

@@ -13,6 +13,7 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     static let modes: [(id: String, label: String)] = [("mouth", "Mouth"), ("waves", "Waves"), ("both", "Both")]
     private static let modeKey = "avatarAnimationMode"
     private static let voiceKey = "avatarVoiceIdentifier"
+    private static let mutedKey = "avatarMuted"
     /// Voices offered in the pane's voice menu (current language, best quality first).
     static let voices = AvatarSpeaker.voices()
     /// Spoken when an avatar tab opens, and by the pane's Speak button before any reply exists.
@@ -22,6 +23,8 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     @ObservationIgnored private let speaker = AvatarSpeaker()
     @ObservationIgnored private var queue: [(text: String, expression: String)] = []
     @ObservationIgnored private var jevTask: Task<Void, Never>?
+    /// Paces the queue while muted (no audio to wait for).
+    @ObservationIgnored private var muteTask: Task<Void, Never>?
     /// Gets each slice of spoken text as the voice reaches it (word by word, sentences joined
     /// with a space), so the owner can put the words on screen in step with the voice.
     @ObservationIgnored var onWord: ((String) -> Void)?
@@ -37,6 +40,18 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     var speaking = false
     @ObservationIgnored private var working = false
     var expression = "neutral" { didSet { js("avatar.setExpression('\(expression)')") } }
+    /// Muted: the face still changes expression sentence by sentence (and the words still appear
+    /// on screen), but nothing is spoken and the lips don't move.
+    var muted: Bool = UserDefaults.standard.bool(forKey: AvatarController.mutedKey) {
+        didSet {
+            UserDefaults.standard.set(muted, forKey: Self.mutedKey)
+            guard speaking else { return }
+            // Switching mid-reply: drop the current sentence's playback/timer and carry on in the new mode.
+            muteTask?.cancel(); muteTask = nil
+            speaker.stop()
+            speakNext()
+        }
+    }
     var mode: String = UserDefaults.standard.string(forKey: AvatarController.modeKey) ?? "both" {
         didSet {
             UserDefaults.standard.set(mode, forKey: Self.modeKey)
@@ -149,6 +164,8 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     func stop() {
         jevTask?.cancel()
         jevTask = nil
+        muteTask?.cancel()
+        muteTask = nil
         queue.removeAll()
         speaker.stop()
         speaking = false
@@ -170,7 +187,19 @@ final class AvatarController: NSObject, WKNavigationDelegate {
         }
         let next = queue.removeFirst()
         expression = next.expression
-        speaker.speak(next.text)
+        if muted {
+            // No voice: show the whole sentence at once, hold the face for roughly its reading time, then move on.
+            onWord?(separator + next.text)
+            let hold = min(6.0, max(1.2, Double(next.text.count) * 0.05))
+            muteTask = Task { [weak self] in
+                try? await Task.sleep(for: .seconds(hold))
+                guard !Task.isCancelled, let self else { return }
+                self.muteTask = nil
+                self.speakNext()
+            }
+        } else {
+            speaker.speak(next.text)
+        }
         separator = " "
     }
 

@@ -32,6 +32,12 @@ struct AvatarPaneView: View {
                 }
                 .help(viewModel.isListening ? "Stop Listening" : "Listen")
 
+                Toggle(isOn: $avatar.muted) {
+                    Image(systemName: avatar.muted ? "speaker.slash.fill" : "speaker.fill")
+                }
+                .toggleStyle(.button)
+                .help(avatar.muted ? "Unmute — speak replies aloud" : "Mute — facial expressions only, no voice")
+
                 Spacer()
                 Picker("Voice", selection: $avatar.voiceID) {
                     ForEach(AvatarController.voices, id: \.identifier) { v in
