@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AgentOptionsView: View {
     @Bindable var viewModel: AgentViewModel
+    @AppStorage(AppConstants.shellCommandTimeoutKey) private var shellTimeoutSeconds: Double = AppConstants.shellCommandTimeoutDefault
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -179,6 +180,33 @@ struct AgentOptionsView: View {
                 }
                 .pickerStyle(.segmented)
                 .frame(width: 120)
+            }
+
+            row {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Shell timeout").font(.subheadline)
+                    Text("Kills a hung / looping command and returns partial output + [TIMEOUT] to the LLM")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                HStack(spacing: 8) {
+                    Toggle("", isOn: Binding(
+                        get: { shellTimeoutSeconds > 0 },
+                        set: { shellTimeoutSeconds = $0 ? AppConstants.shellCommandTimeoutDefault : 0 }
+                    ))
+                    .toggleStyle(.switch)
+                    .controlSize(.mini)
+                    .labelsHidden()
+
+                    if shellTimeoutSeconds > 0 {
+                        Stepper(
+                            "\(Int(shellTimeoutSeconds / 60)) min",
+                            onIncrement: { shellTimeoutSeconds = min(shellTimeoutSeconds + 60, 7200) },
+                            onDecrement: { shellTimeoutSeconds = max(shellTimeoutSeconds - 60, 60) }
+                        )
+                    }
+                }
             }
 
             row {
