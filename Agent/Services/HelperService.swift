@@ -120,12 +120,21 @@ enum SafeSMAppServiceDaemon {
 
 final class OutputHandler: NSObject, HelperProgressProtocol, @unchecked Sendable {
     private let handler: @Sendable (String) -> Void
+    private let lock = NSLock()
+    private var buffer = ""
 
     init(handler: @escaping @Sendable (String) -> Void) {
         self.handler = handler
     }
 
+    /// Everything streamed so far — returned as partial output when the command times out.
+    var collected: String {
+        lock.lock(); defer { lock.unlock() }
+        return buffer
+    }
+
     func progressUpdate(_ line: String) {
+        lock.lock(); buffer += line; lock.unlock()
         handler(line)
     }
 }
@@ -369,7 +378,25 @@ final class HelperService {
                     return
                 }
 
+                // Finish timeout — the configurable shell timeout (AppConstants.shellCommandTimeout) when set,
+                // otherwise the 12h toolFinishTimeout. Kills the process tree in the daemon and returns
+                // the partial streamed output plus a [TIMEOUT] notice so the LLM can self-correct.
+                let shellTimeout = AppConstants.shellCommandTimeout
+                let finishTimeout = shellTimeout > 0 ? shellTimeout : toolFinishTimeout
+                let finishTimer = DispatchWorkItem {
+                    Self.cancelProcess(instanceID: callID)
+                    connection.invalidate()
+                    AuditLog.log(.launchDaemon, "TIMEOUT after \(Int(finishTimeout))s: \(script.prefix(200))")
+                    let partial = outputHandler.collected
+                    let notice = AppConstants.shellTimeoutNotice(finishTimeout)
+                    outputHandler.progressUpdate((partial.isEmpty ? "" : "\n") + notice)
+                    safeResume((124, partial.isEmpty ? notice : partial + "\n" + notice))
+                }
+                DispatchQueue.global().asyncAfter(deadline: .now() + finishTimeout, execute: finishTimer)
+
                 // Start timeout — tool must begin executing within toolStartTimeout seconds.
+                // Only armed when it would fire BEFORE the finish timer; otherwise the finish timer
+                // (with its partial output + [TIMEOUT] notice) covers it.
                 var started = false
                 let startedLock = NSLock()
                 let startTimer = DispatchWorkItem {
@@ -377,20 +404,15 @@ final class HelperService {
                     let didStart = started
                     startedLock.unlock()
                     if !didStart {
+                        finishTimer.cancel()
                         Self.cancelProcess(instanceID: callID)
                         connection.invalidate()
                         safeResume((-1, "Tool failed to start within \(Int(toolStartTimeout))s"))
                     }
                 }
-                DispatchQueue.global().asyncAfter(deadline: .now() + toolStartTimeout, execute: startTimer)
-
-                // Finish timeout — tool must complete within toolFinishTimeout seconds.
-                let finishTimer = DispatchWorkItem {
-                    Self.cancelProcess(instanceID: callID)
-                    connection.invalidate()
-                    safeResume((-1, "Tool timed out after \(Int(toolFinishTimeout))s"))
+                if toolStartTimeout < finishTimeout {
+                    DispatchQueue.global().asyncAfter(deadline: .now() + toolStartTimeout, execute: startTimer)
                 }
-                DispatchQueue.global().asyncAfter(deadline: .now() + toolFinishTimeout, execute: finishTimer)
 
                 proxy.execute(script: script, instanceID: callID, workingDirectory: workingDirectory) { status, output in
                     startedLock.lock()
