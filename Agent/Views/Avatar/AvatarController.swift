@@ -34,8 +34,9 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     @ObservationIgnored private var streamedSentences = -1
     /// The streaming segment's text so far.
     @ObservationIgnored private var streamPartial = ""
-    /// The last summary spoken while streaming, so sayReply doesn't repeat it.
-    @ObservationIgnored private var streamedSummary = ""
+    /// Word sets of the sentences already said (or queued) in this reply, so a paraphrased `done`
+    /// summary after a text block — or a sentence the model repeats — isn't read twice.
+    @ObservationIgnored private var said: [Set<String>] = []
 
     var speaking = false
     @ObservationIgnored private var working = false
@@ -100,8 +101,13 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     /// the sentences not yet finished when the answer arrives.
     /// Words reach `onWord` as the voice says them.
     func say(_ text: String) {
-        stop()
         let sentences = Self.sentences(in: Self.speakable(text))
+        said = sentences.map(Self.words)
+        speak(sentences)
+    }
+
+    private func speak(_ sentences: [String]) {
+        stop()
         queue = sentences.map { ($0, Self.expression(for: $0)) }
         guard !queue.isEmpty else { return }
         speaking = true
@@ -114,6 +120,9 @@ final class AvatarController: NSObject, WKNavigationDelegate {
             if self.speaking, offset > 0, let pick = picks[offset - 1] { self.expression = pick }
         }
     }
+
+    /// A new task is starting: forget what the previous reply said.
+    func beginReply() { said.removeAll() }
 
     /// Speak reply text / a `done` summary while it streams: each call gets the segment so far
     /// and queues the sentences that are now complete. "" starts a new segment, first flushing
@@ -133,27 +142,43 @@ final class AvatarController: NSObject, WKNavigationDelegate {
             text = String(text[..<open.lowerBound])
         }
         let ready = Self.sentences(in: Self.speakable(text)).dropLast() // last one may still be growing
-        enqueue(Array(ready.dropFirst(streamedSentences)))
+        let new = Array(ready.dropFirst(streamedSentences))
+        streamedSentences += new.count
+        enqueue(unsaid(new))
     }
 
     /// The segment finished streaming — queue the rest of it (`full` defaults to the text streamed so far).
     func finishStreamedSummary(_ full: String? = nil) {
         guard streamedSentences >= 0 else { return }
         let text = full ?? streamPartial
-        enqueue(Array(Self.sentences(in: Self.speakable(text)).dropFirst(streamedSentences)))
+        enqueue(unsaid(Array(Self.sentences(in: Self.speakable(text)).dropFirst(streamedSentences))))
         streamedSentences = -1
-        streamedSummary = text
     }
 
-    /// Read the task's reply aloud unless it was already spoken while streaming.
+    /// Read the task's reply aloud — only the sentences not already spoken while streaming.
     func sayReply(_ text: String) {
-        defer { streamedSummary = "" }
-        if text != streamedSummary { say(text) }
+        let fresh = unsaid(Self.sentences(in: Self.speakable(text)))
+        guard !fresh.isEmpty else { return }
+        if speaking { enqueue(fresh) } else { speak(fresh) }
+    }
+
+    /// Drops sentences that mostly repeat something already said in this reply (60%+ of the
+    /// words in common — catches the model paraphrasing its text block as the done summary)
+    /// and records the rest as said.
+    private func unsaid(_ sentences: [String]) -> [String] {
+        sentences.filter { s in
+            let words = Self.words(s)
+            guard !words.isEmpty else { return false }
+            let repeated = said.contains { prior in
+                Double(words.intersection(prior).count) / Double(words.union(prior).count) >= 0.6
+            }
+            if !repeated { said.append(words) }
+            return !repeated
+        }
     }
 
     private func enqueue(_ sentences: [String]) {
         guard !sentences.isEmpty else { return }
-        streamedSentences += sentences.count
         queue += sentences.map { ($0, Self.expression(for: $0)) }
         if !speaking {
             speaking = true
@@ -224,6 +249,12 @@ final class AvatarController: NSObject, WKNavigationDelegate {
             if let s = s?.trimmingCharacters(in: .whitespacesAndNewlines), !s.isEmpty { out.append(s) }
         }
         return out
+    }
+
+    /// Lowercased word set of a sentence (punctuation dropped, curly apostrophes straightened) for repeat detection.
+    nonisolated static func words(_ sentence: String) -> Set<String> {
+        let t = sentence.lowercased().replacingOccurrences(of: "\u{2019}", with: "'")
+        return Set(t.components(separatedBy: CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "'")).inverted).filter { !$0.isEmpty })
     }
 
     /// Keyword fallback for picking a face for a sentence. Whole-word matches only

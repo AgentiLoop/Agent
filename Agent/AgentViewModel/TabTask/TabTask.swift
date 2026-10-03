@@ -102,6 +102,7 @@ extension AgentViewModel {
         tab.currentTaskPrompt = prompt
         // Avatar tabs: the HUD shows the reply word by word as the avatar says it (no fixed-speed drip).
         if tab.isAvatarTab {
+            AvatarController.shared.beginReply()
             AvatarController.shared.onWord = { [weak tab] word in tab?.displayedLLMOutput += word }
         }
         tab.runningLLMTask = Task {
