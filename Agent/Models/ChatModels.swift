@@ -126,13 +126,17 @@ final class ChatHistoryStore {
     /// Set to true when save has failed fatally — prevents repeated crash attempts
     private var storeDisabled = false
 
-    /// Dedicated chat history store file (SwiftData)
+    /// Dedicated chat history store file (SwiftData). The debug build (bundle id "*.debug") gets its own
+    /// file: UserDefaults are already per bundle id, and `saveScriptTabs` replaces every record, so two
+    /// builds sharing one store wipe each other's tabs — the next launch then finds no record for its
+    /// tab ids and silently drops them.
     private static var storeURL: URL {
+        let name = Bundle.main.bundleIdentifier?.hasSuffix(".debug") == true ? "chat2-debug.store" : "chat2.store"
         let urls = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
         guard let url = urls.first else {
-            return FileManager.default.temporaryDirectory.appendingPathComponent("chat2.store")
+            return FileManager.default.temporaryDirectory.appendingPathComponent(name)
         }
-        return url.appendingPathComponent("chat2.store")
+        return url.appendingPathComponent(name)
     }
 
     private init() {

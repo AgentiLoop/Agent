@@ -8,8 +8,9 @@ struct NewMainTabSheet: View {
 
     @State private var provider: APIProvider
     @State private var selectedModelId: String = ""
-    @State private var avatar = false
-    @State private var autoPilot = false
+    /// Checkbox state is remembered across sheets and launches.
+    @AppStorage("newTabAvatar") private var avatar = false
+    @AppStorage("newTabAutoPilot") private var autoPilot = false
 
     init(viewModel: AgentViewModel) {
         self.viewModel = viewModel
