@@ -47,12 +47,6 @@ struct AvatarPaneView: View {
                 .labelsHidden()
                 .frame(minWidth: 70, maxWidth: 120)
                 .help("Avatar Voice")
-
-                Picker("Face", selection: $avatar.expression) {
-                    ForEach(AvatarController.expressions, id: \.self) { Text($0.capitalized).tag($0) }
-                }
-                .labelsHidden()
-                .frame(minWidth: 70, maxWidth: 110)
             }
             .padding(8)
         }

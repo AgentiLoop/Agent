@@ -65,9 +65,7 @@ struct AvatarControllerTests {
         #expect(ready)
         let names = try await web.evaluateJavaScript("avatar.expressions") as? [String]
         #expect(names == AvatarController.expressions)
-        for m in AvatarController.modes {
-            _ = try await web.evaluateJavaScript("avatar.setMode('\(m.id)');avatar.setLevel(0.3,0.1);avatar.setSpeaking(false);avatar.setEmbedded();1")
-        }
+        _ = try await web.evaluateJavaScript("avatar.setMode('\(AvatarController.mode)');avatar.setLevel(0.3,0.1);avatar.setSpeaking(false);avatar.setEmbedded();1")
     }
 }
 

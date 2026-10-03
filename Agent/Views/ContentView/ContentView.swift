@@ -159,16 +159,6 @@ struct ContentView: View {
             ToolbarItem(placement: .automatic) {
                 Spacer()
             }
-            // Avatar animation style (Mouth / Waves / Both) — only on Avatar tabs
-            if viewModel.selectedTab?.isAvatarTab == true {
-                ToolbarItem(placement: .automatic) {
-                    Picker("Avatar Animation", selection: Bindable(AvatarController.shared).mode) {
-                        ForEach(AvatarController.modes, id: \.id) { Text($0.label).tag($0.id) }
-                    }
-                    .pickerStyle(.segmented)
-                    .help("Avatar animation: mouth, signal waves, or both")
-                }
-            }
             ToolbarItemGroup(placement: .automatic) {
                 HeaderToolbarButtons(
                     viewModel: viewModel,

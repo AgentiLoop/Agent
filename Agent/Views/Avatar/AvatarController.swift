@@ -9,9 +9,8 @@ import WebKit
 final class AvatarController: NSObject, WKNavigationDelegate {
     static let shared = AvatarController()
     static let expressions = ["neutral", "happy", "sad", "surprised", "angry", "thinking"]
-    /// The three animation styles avatar.html supports.
-    static let modes: [(id: String, label: String)] = [("mouth", "Mouth"), ("waves", "Waves"), ("both", "Both")]
-    private static let modeKey = "avatarAnimationMode"
+    /// Of the animation styles avatar.html supports (mouth / waves / both), Agent! only uses the mouth.
+    static let mode = "mouth"
     private static let voiceKey = "avatarVoiceIdentifier"
     private static let mutedKey = "avatarMuted"
     /// Voices offered in the pane's voice menu (current language, best quality first).
@@ -53,12 +52,6 @@ final class AvatarController: NSObject, WKNavigationDelegate {
             speakNext()
         }
     }
-    var mode: String = UserDefaults.standard.string(forKey: AvatarController.modeKey) ?? "both" {
-        didSet {
-            UserDefaults.standard.set(mode, forKey: Self.modeKey)
-            js("avatar.setMode('\(mode)')")
-        }
-    }
     /// Selected TTS voice identifier; falls back to AvatarSpeaker.bestVoice() (Daniel) when unset or no longer listed.
     var voiceID: String = UserDefaults.standard.string(forKey: AvatarController.voiceKey)
         .flatMap { id in AvatarController.voices.contains { $0.identifier == id } ? id : nil }
@@ -89,7 +82,7 @@ final class AvatarController: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        js("avatar.setEmbedded();avatar.setExpression('\(expression)');avatar.setMode('\(mode)')")
+        js("avatar.setEmbedded();avatar.setExpression('\(expression)');avatar.setMode('\(Self.mode)')")
     }
 
     private func js(_ s: String) { webView.evaluateJavaScript(s, completionHandler: nil) }
