@@ -19,6 +19,24 @@ enum AppConstants {
     static var shellPath: String {
         UserDefaults.standard.string(forKey: "agentShellPath") ?? "/bin/zsh"
     }
+
+    /// Hard per-command timeout for every shell tool (in-process, Launch Agent, Launch Daemon).
+    /// Prevents an infinite loop / hung command from wedging a task (and auto-pilot) until the
+    /// 12-hour `toolFinishTimeout`. UserDefaults "shellCommandTimeoutSeconds"; default 600s; 0 = off.
+    static let shellCommandTimeoutKey = "shellCommandTimeoutSeconds"
+    static let shellCommandTimeoutDefault: TimeInterval = 600
+    static var shellCommandTimeout: TimeInterval {
+        guard UserDefaults.standard.object(forKey: shellCommandTimeoutKey) != nil else { return shellCommandTimeoutDefault }
+        return UserDefaults.standard.double(forKey: shellCommandTimeoutKey)
+    }
+
+    /// Appended to the (partial) output of a shell command that hit `shellCommandTimeout`.
+    /// Shaped so the LLM understands what happened and how to bound long commands on the retry.
+    static func shellTimeoutNotice(_ seconds: TimeInterval) -> String {
+        "[TIMEOUT] Command killed after \(Int(seconds))s with no exit (Agent! shell timeout). Output above is partial. "
+        + "Do NOT rerun it unchanged. If it is an infinite loop, fix the loop. If it legitimately runs long, run it in the background "
+        + "(`cmd > /tmp/out.log 2>&1 &`) and poll the log, or bound it (`perl -e 'alarm \(Int(seconds)); exec @ARGV' -- cmd`)."
+    }
 }
 
 extension Notification.Name {

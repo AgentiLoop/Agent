@@ -197,6 +197,8 @@ extension AgentViewModel {
                     return
                 }
                 box.set(process)
+                let timeoutSeconds = AppConstants.shellCommandTimeout
+                box.armTimeout(timeoutSeconds)
 
                 // Drain stderr concurrently: reading the pipes one after another deadlocks
                 // when the child writes >64 KB to stderr while stdout is still open.
@@ -211,12 +213,20 @@ extension AgentViewModel {
                 stderrGroup.wait()
                 let stderrData = stderrBox.data
                 process.waitUntilExit()
+                let timedOut = box.disarmTimeout()
 
                 var output = String(data: stdoutData, encoding: .utf8) ?? ""
                 let errStr = String(data: stderrData, encoding: .utf8) ?? ""
                 if !errStr.isEmpty {
                     if !output.isEmpty { output += "\n" }
                     output += errStr
+                }
+                if timedOut {
+                    AuditLog.log(.shell, "TIMEOUT after \(Int(timeoutSeconds))s: \(command.prefix(200))")
+                    if !output.isEmpty { output += "\n" }
+                    output += AppConstants.shellTimeoutNotice(timeoutSeconds)
+                    continuation.resume(returning: (124, output))
+                    return
                 }
 
                 continuation.resume(returning: (process.terminationStatus, output))
@@ -236,6 +246,8 @@ extension AgentViewModel {
         private let lock = NSLock()
         private var process: Process?
         private var cancelled = false
+        private var timedOut = false
+        private var timeoutItem: DispatchWorkItem?
         func set(_ p: Process) {
             lock.lock()
             process = p
@@ -249,6 +261,28 @@ extension AgentViewModel {
             let p = process
             lock.unlock()
             if let p, p.isRunning { ProcessTree.kill(rootPID: p.processIdentifier) }
+        }
+        /// Kill the process tree after `seconds` (AppConstants.shellCommandTimeout; <= 0 = never).
+        /// The killed pipes hit EOF, so the caller's reads return with whatever partial output exists.
+        func armTimeout(_ seconds: TimeInterval) {
+            guard seconds > 0 else { return }
+            let item = DispatchWorkItem { [weak self] in
+                guard let self else { return }
+                self.lock.lock()
+                self.timedOut = true
+                let p = self.process
+                self.lock.unlock()
+                if let p, p.isRunning { ProcessTree.kill(rootPID: p.processIdentifier) }
+            }
+            lock.lock(); timeoutItem = item; lock.unlock()
+            DispatchQueue.global().asyncAfter(deadline: .now() + seconds, execute: item)
+        }
+        /// Cancel the pending timer; returns true when the timeout already fired.
+        func disarmTimeout() -> Bool {
+            lock.lock(); defer { lock.unlock() }
+            timeoutItem?.cancel()
+            timeoutItem = nil
+            return timedOut
         }
     }
 
@@ -327,6 +361,8 @@ extension AgentViewModel {
                     return
                 }
                 box.set(process)
+                let timeoutSeconds = AppConstants.shellCommandTimeout
+                box.armTimeout(timeoutSeconds)
 
                 // Stream output chunks as they arrive
                 var collected = ""
@@ -340,6 +376,14 @@ extension AgentViewModel {
                     }
                 }
                 process.waitUntilExit()
+                if box.disarmTimeout() {
+                    AuditLog.log(.shell, "TIMEOUT after \(Int(timeoutSeconds))s: \(command.prefix(200))")
+                    let notice = (collected.isEmpty ? "" : "\n") + AppConstants.shellTimeoutNotice(timeoutSeconds)
+                    collected += notice
+                    onOutput(notice)
+                    continuation.resume(returning: (124, collected))
+                    return
+                }
 
                 continuation.resume(returning: (process.terminationStatus, collected))
             }
