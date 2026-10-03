@@ -304,6 +304,9 @@
         }
       }
     },
+    "%lld min" : {
+
+    },
     "%lld of %lld enabled" : {
       "localizations" : {
         "de" : {
@@ -8836,6 +8839,9 @@
         }
       }
     },
+    "Kills a hung / looping command and returns partial output + [TIMEOUT] to the LLM" : {
+
+    },
     "Leave blank if not required" : {
       "localizations" : {
         "de" : {
@@ -14519,6 +14525,9 @@
           }
         }
       }
+    },
+    "Shell timeout" : {
+
     },
     "Shortcuts" : {
       "localizations" : {
