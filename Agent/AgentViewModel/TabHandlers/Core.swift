@@ -13,12 +13,10 @@ extension AgentViewModel {
 
         switch name {
         case "task_complete":
-            // Same completion gates the main loop runs (build / physical files /
-            // critic). The goal gates are skipped: GoalStateStore is a global
-            // singleton, so they'd block this tab on criteria the MAIN task set
-            // (and the tab's routeStopReason already passes openCriteria: []).
-            // For the same reason the tab never clears the store on success —
-            // that would wipe a running main task's criteria out from under it.
+            // Same completion gates the main loop runs (goal / build / physical
+            // files / critic). GoalStateStore.shared resolves to THIS tab's own
+            // goal (TabLogRouter scope), so the goal gates only see criteria this
+            // tab set, and clearing on success never touches another tab's goal.
             // Gate log lines go to THIS tab's log so the refusal reason is visible
             // next to the "⛔ refused" line instead of in the main log.
             // Blocked → feed the refusal back as this tool's result and keep the
@@ -40,7 +38,7 @@ extension AgentViewModel {
             if let blocker = await completionGateBlocker(
                 commandsRun: tab.taskCommandsRun,
                 projectFolder: gateFolder,
-                skipGoalGates: true,
+                skipGoalGates: false,
                 log: { [weak tab] line in tab?.appendLog(line); tab?.flush() }
             ) {
                 tab.appendLog("⛔ task_complete refused by completion gate")
@@ -49,6 +47,10 @@ extension AgentViewModel {
                     toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": blocker],
                     isComplete: false
                 )
+            }
+            if GoalStateStore.forTab(tab.id).current != nil {
+                GoalStateStore.forTab(tab.id).clear()
+                tab.appendLog("🎯 Goal verified — cleared")
             }
             let summary = input["summary"] as? String ?? "Done"
             tab.appendLog("✅ Completed: \(summary)")

@@ -30,7 +30,29 @@ struct GoalState: Codable, Equatable {
 
 @MainActor
 final class GoalStateStore {
-    static let shared = GoalStateStore()
+    /// Main-tab store (legacy location, unchanged).
+    static let main = GoalStateStore()
+    private static var tabStores: [UUID: GoalStateStore] = [:]
+
+    /// The goal store for whichever tab owns the running task. Tab tasks run
+    /// inside `TabLogRouter.$current`, so every existing `.shared` call site
+    /// (prompt blocks, goal_state tool, completion gates) resolves to that
+    /// tab's own goal — multiple tabs (e.g. parallel Auto-Pilot sessions on the
+    /// same project) never read or clear each other's goals.
+    static var shared: GoalStateStore {
+        guard let id = TabLogRouter.current?.id else { return main }
+        return forTab(id)
+    }
+
+    /// Per-tab store at `Application Support/Agent/GoalState/tabs/<uuid>/goal.json`.
+    static func forTab(_ id: UUID) -> GoalStateStore {
+        if let store = tabStores[id] { return store }
+        let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Agent/GoalState/tabs/\(id.uuidString)", isDirectory: true)
+        let store = GoalStateStore(directory: dir)
+        tabStores[id] = store
+        return store
+    }
 
     private let url: URL
     private var cache: GoalState?

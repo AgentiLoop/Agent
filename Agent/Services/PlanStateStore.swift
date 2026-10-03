@@ -22,29 +22,23 @@ enum PlanStateStore {
         return nil
     }
 
-    /// Most recently modified plan_*.md in the plans dir, or nil.
-    private static func mostRecentPlanPath(_ projectFolder: String) -> String? {
+    /// This tab's plan file (`plan_<tab slug>.md`, the name plan_mode writes —
+    /// "main" for the main tab). Scoped per tab so parallel tabs on the same
+    /// project never surface each other's plans.
+    private static func tabPlanPath(_ projectFolder: String, slug: String) -> String? {
         guard let root = gitRoot(projectFolder) else { return nil }
-        let dir = AgentProjectPaths.path(in: root, .plans)
-        let fm = FileManager.default
-        guard let files = try? fm.contentsOfDirectory(atPath: dir) else { return nil }
-        let plans = files.filter { $0.hasPrefix("plan_") && $0.hasSuffix(".md") }
-        guard !plans.isEmpty else { return nil }
-        let sorted = plans.sorted { a, b in
-            let pa = (dir as NSString).appendingPathComponent(a)
-            let pb = (dir as NSString).appendingPathComponent(b)
-            let da = (try? fm.attributesOfItem(atPath: pa)[.modificationDate] as? Date) ?? .distantPast
-            let db = (try? fm.attributesOfItem(atPath: pb)[.modificationDate] as? Date) ?? .distantPast
-            return da > db
-        }
-        return (dir as NSString).appendingPathComponent(sorted[0])
+        let path = (AgentProjectPaths.path(in: root, .plans) as NSString)
+            .appendingPathComponent("plan_\(slug).md")
+        return FileManager.default.fileExists(atPath: path) ? path : nil
     }
 
     /// Compact checklist block for the system prompt. Empty string when there is
     /// no plan, the plan is fully completed (no noise after the work is done),
     /// or the plan file is stale (>24h old — likely from an abandoned task).
+    @MainActor
     static func promptBlock(projectFolder: String) -> String {
-        guard let path = mostRecentPlanPath(projectFolder),
+        let slug = AgentViewModel.sanitizeTabName(TabLogRouter.current?.displayTitle ?? "main")
+        guard let path = tabPlanPath(projectFolder, slug: slug),
               let content = try? String(contentsOfFile: path, encoding: .utf8)
         else { return "" }
 
