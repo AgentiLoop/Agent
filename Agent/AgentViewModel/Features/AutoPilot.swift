@@ -8,11 +8,15 @@ import Foundation
 // active: whenever a cycle's task ends (done, error, stall) and the goal is not
 // reached, the next cycle starts automatically — only after the previous task
 // has fully ended. Works on the main tab and on any LLM tab (session is per tab).
-// Between cycles the summary is appended to `.agent/autopilot/progress.md` in the
-// project folder and fed back into the next cycle's prompt.
+// Between cycles the summary is appended to this tab's `.agent/tabs/<key>/progress.md`
+// in the project folder and fed back into the next cycle's prompt. Several tabs
+// can run Auto-Pilot on the same project — see AutoPilotRegistry.swift.
 //
 //   /auto <goal>              run until the LLM reports the goal reached
 //   /auto 4h <goal>           same, but stop after 4 hours (30m, 1.5h also work)
+//   /auto --worktree <goal>   work in an isolated git worktree/branch (-w); --shared
+//                             forces the shared checkout. Default: worktree only when
+//                             another Auto-Pilot tab is already live on the project.
 //   /auto                     review the project, then ask the user for the goal
 //   /auto history             list previous auto-pilot goals
 //   /auto last | /auto #N     restart the most recent / Nth goal from history
@@ -32,6 +36,14 @@ struct AutoPilotSession: Codable {
     var idleCycles: Int = 0
     /// Set by `/auto stop` — finishes the running cycle, then ends.
     var stopRequested = false
+    /// Project folder the session was started in. Shared state (registry,
+    /// progress log, memory) lives here even when working in a worktree.
+    var projectRoot: String?
+    /// Isolated git worktree folder + branch this session works in (nil = shared checkout).
+    var worktree: String?
+    var branch: String?
+    /// Tab/main folder before switching to the worktree — restored when the session ends.
+    var originalFolder: String?
 
     var isDiscovery: Bool { goal.isEmpty }
 }
@@ -101,6 +113,29 @@ extension AgentViewModel {
     private func autoPilotFolder(_ tab: ScriptTab?) -> String {
         guard let tab, !tab.projectFolder.isEmpty else { return projectFolder }
         return Self.resolvedWorkingDirectory(tab.projectFolder)
+    }
+
+    /// Per-tab key for `.agent/tabs/<key>/` and the registry: "main" or the tab's short id.
+    private func autoPilotKey(_ tab: ScriptTab?) -> String {
+        tab.map { String($0.id.uuidString.prefix(8)).lowercased() } ?? Self.autoPilotMainKey
+    }
+
+    /// Where shared per-project state (registry, progress) lives — the
+    /// session's repo root, never its worktree.
+    private func autoPilotHome(_ tab: ScriptTab?) -> String {
+        autoPilotSession(tab)?.projectRoot ?? autoPilotFolder(tab)
+    }
+
+    private func setAutoPilotWorkFolder(_ folder: String, _ tab: ScriptTab?) {
+        if let tab { tab.projectFolder = folder } else { projectFolder = folder }
+    }
+
+    /// Advertise this session (and refresh its heartbeat) to the other tabs.
+    private func registerAutoPilot(_ session: AutoPilotSession, _ tab: ScriptTab?) {
+        AutoPilotRegistry.upsert(root: autoPilotHome(tab), AutoPilotRegistryEntry(
+            key: autoPilotKey(tab), title: tab?.displayTitle ?? "main", goal: session.goal,
+            workFolder: autoPilotFolder(tab), branch: session.branch
+        ))
     }
 
     private func autoPilotTaskIsRunning(_ tab: ScriptTab?) -> Bool {
@@ -195,7 +230,7 @@ extension AgentViewModel {
             return true
         }
         if lower == "help" || lower == "?" {
-            apLog("Usage: /auto [<N>h|<N>m] [goal] | /auto history | /auto last | /auto #N | /auto add <folder> | /auto remove <folder> | /auto status | /auto stop", tab)
+            apLog("Usage: /auto [<N>h|<N>m] [--worktree|--shared] [goal] | /auto history | /auto last | /auto #N | /auto add <folder> | /auto remove <folder> | /auto status | /auto stop", tab)
             return true
         }
         if autoPilotSession(tab) != nil {
@@ -207,7 +242,17 @@ extension AgentViewModel {
             return true
         }
 
-        let (hours, parsedGoal) = Self.parseAutoPilotArgs(arg)
+        // --worktree / -w forces an isolated git worktree, --shared forces the shared
+        // checkout; default: isolate only when another Auto-Pilot tab is live on this project.
+        var isolate: Bool?
+        let argTokens = arg.split(separator: " ").map(String.init).filter { token in
+            switch token.lowercased() {
+            case "--worktree", "-w", "--isolate": isolate = true; return false
+            case "--shared": isolate = false; return false
+            default: return true
+            }
+        }
+        let (hours, parsedGoal) = Self.parseAutoPilotArgs(argTokens.joined(separator: " "))
         var goal = parsedGoal
         // `/auto last` / `/auto #N` — rerun a goal from history.
         let history = autoPilotGoalHistory
@@ -225,7 +270,7 @@ extension AgentViewModel {
             goal = history[n - 1]
         }
         recordAutoPilotGoal(goal)
-        startAutoPilot(goal: goal, hours: hours, tab: tab)
+        startAutoPilot(goal: goal, hours: hours, tab: tab, isolate: isolate)
         return true
     }
 
@@ -250,9 +295,27 @@ extension AgentViewModel {
 
     // MARK: Session lifecycle
 
-    func startAutoPilot(goal: String, hours: Double?, tab: ScriptTab? = nil) {
+    func startAutoPilot(goal: String, hours: Double?, tab: ScriptTab? = nil, isolate: Bool? = nil) {
         var session = AutoPilotSession(goal: goal)
         if let hours { session.deadline = Date().addingTimeInterval(hours * 3600) }
+        let folder = autoPilotFolder(tab)
+        let gitRoot = AutoPilotRegistry.gitRoot(folder)
+        session.projectRoot = gitRoot ?? folder
+        let others = AutoPilotRegistry.others(root: gitRoot ?? folder, excluding: autoPilotKey(tab))
+        if isolate ?? !others.isEmpty {
+            if gitRoot != nil, let wt = AutoPilotRegistry.worktree(for: folder, key: autoPilotKey(tab)) {
+                session.worktree = wt.folder
+                session.branch = wt.branch
+                session.originalFolder = tab?.projectFolder ?? projectFolder
+                setAutoPilotWorkFolder(wt.folder, tab)
+                apLog("🛩️ Isolated worktree: \(wt.folder) on branch \(wt.branch). Uncommitted changes in the primary checkout are not included.", tab)
+            } else {
+                apLog("🛩️ No git worktree available (not a git repo, or `git worktree add` failed) — using the shared checkout.", tab)
+            }
+        }
+        if !others.isEmpty {
+            apLog("🛩️ Other Auto-Pilot tabs on this project: " + others.map { "\($0.title) (\($0.branch ?? "shared checkout"))" }.joined(separator: ", "), tab)
+        }
         setAutoPilotSession(session, tab)
         let budget = hours.map { Self.autoPilotFormatHours($0) } ?? "no time limit, unlimited cycles"
         apLog("🛩️ Auto-pilot started — \(budget). Goal: \(goal.isEmpty ? "(will ask you after reviewing the project)" : goal)", tab)
@@ -333,6 +396,7 @@ extension AgentViewModel {
 
         session.cycle += 1
         setAutoPilotSession(session, tab)
+        registerAutoPilot(session, tab)
         apLog("🛩️ Auto-pilot cycle \(session.cycle) — \(autoPilotStatusLine(tab))", tab)
         return buildAutoPilotPrompt(session, tab: tab)
     }
@@ -359,20 +423,44 @@ extension AgentViewModel {
             appendAutoPilotProgress("Paused for app quit (\(Self.autoPilotTimestamp()))\n", tab)
             return
         }
+        appendAutoPilotProgress("Session ended — \(reason) (\(Self.autoPilotTimestamp()))\n", tab)
+        AutoPilotRegistry.remove(root: autoPilotHome(tab), key: autoPilotKey(tab))
         setAutoPilotSession(nil, tab)
+        if let original = session.originalFolder { setAutoPilotWorkFolder(original, tab) }
         let elapsed = Self.autoPilotFormatHours(Date().timeIntervalSince(session.startedAt) / 3600)
         apLog("🛩️ Auto-pilot ended — \(reason). Ran \(elapsed), \(session.cycle) cycle(s).", tab)
-        appendAutoPilotProgress("Session ended — \(reason) (\(Self.autoPilotTimestamp()))\n", tab)
+        if let wt = session.worktree, let branch = session.branch {
+            apLog("🛩️ Work is on branch \(branch) (worktree \(wt)). Review and merge it with `git merge \(branch)`, then `git worktree remove \(wt)`.", tab)
+        }
     }
 
     func autoPilotStatusLine(_ tab: ScriptTab? = nil) -> String {
         guard let s = autoPilotSession(tab) else { return "🛩️ Auto-pilot is not running." }
         let elapsed = Self.autoPilotFormatHours(Date().timeIntervalSince(s.startedAt) / 3600)
         let remaining = s.deadline.map { "\(Self.autoPilotFormatHours(max(0, $0.timeIntervalSinceNow) / 3600)) left" } ?? "no time limit"
-        return "cycle \(s.cycle) · \(elapsed) elapsed · \(remaining) · goal: \(s.goal.isEmpty ? "(pending)" : s.goal)"
+        let where_ = s.branch.map { " · branch \($0)" } ?? ""
+        return "cycle \(s.cycle) · \(elapsed) elapsed · \(remaining)\(where_) · goal: \(s.goal.isEmpty ? "(pending)" : s.goal)"
     }
 
     // MARK: Prompt
+
+    /// Multi-tab context: this session's worktree (if isolated), the other
+    /// live Auto-Pilot tabs on the same project, and what is shared.
+    private func autoPilotCoordinationBlock(_ session: AutoPilotSession, _ tab: ScriptTab?) -> String {
+        var p = ""
+        if let wt = session.worktree {
+            p += "ISOLATED WORKTREE: this tab works in \(wt) on branch \(session.branch ?? "?"). Edit, build and commit there only — never in \(session.originalFolder ?? "the primary checkout"), and do not merge; the user merges the branch.\n"
+        }
+        let others = AutoPilotRegistry.others(root: autoPilotHome(tab), excluding: autoPilotKey(tab))
+        if !others.isEmpty {
+            p += "OTHER AUTO-PILOT TABS ON THIS PROJECT (running in parallel — don't duplicate their work\(session.worktree == nil ? ", and don't edit files they are working on" : "")):\n"
+            for o in others {
+                p += "  - \(o.title): \(o.goal.isEmpty ? "(goal pending)" : o.goal) — \(o.branch.map { "branch \($0)" } ?? "shared checkout")\n"
+            }
+        }
+        p += "SHARED vs PER-TAB: project memory (memory tool, scope project) and the index are shared with every tab — record durable findings there. Your goal_state, plan and progress log belong to this tab only.\n"
+        return p
+    }
 
     private func buildAutoPilotPrompt(_ session: AutoPilotSession, tab: ScriptTab?) -> String {
         let remaining = session.deadline.map { "\(Self.autoPilotFormatHours(max(0, $0.timeIntervalSinceNow) / 3600)) remaining" } ?? "no time limit — run until the goal is reached"
@@ -382,6 +470,7 @@ extension AgentViewModel {
             p += "PARITY FOLDERS (must end every cycle matching the primary — port each change you make in the primary to every one of these, build each, commit each):\n"
             for f in autoPilotParityFolders { p += "  - \(f)\n" }
         }
+        p += autoPilotCoordinationBlock(session, tab)
         if session.isDiscovery {
             let recent = autoPilotGoalHistory.suffix(5)
             let past = recent.isEmpty ? "" : "\nPrevious auto-pilot goals (offer these as options):\n" + recent.map { "  - \($0)" }.joined(separator: "\n") + "\n"
@@ -414,8 +503,19 @@ extension AgentViewModel {
 
     // MARK: Progress log
 
+    /// This tab's own progress log: `.agent/tabs/<key>/progress.md` in the
+    /// project root. The pre-multi-tab `.agent/autopilot/progress.md` is moved
+    /// into the main tab's folder the first time it is needed.
     func autoPilotProgressURL(_ tab: ScriptTab? = nil) -> URL {
-        AgentProjectPaths.url(in: autoPilotFolder(tab), .autopilot).appendingPathComponent("progress.md")
+        let home = autoPilotHome(tab)
+        let url = AutoPilotRegistry.tabDir(root: home, key: autoPilotKey(tab)).appendingPathComponent("progress.md")
+        let legacy = AgentProjectPaths.url(in: home, .autopilot).appendingPathComponent("progress.md")
+        let fm = FileManager.default
+        if tab == nil, !fm.fileExists(atPath: url.path), fm.fileExists(atPath: legacy.path) {
+            try? fm.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try? fm.moveItem(at: legacy, to: url)
+        }
+        return url
     }
 
     private func appendAutoPilotProgress(_ text: String, _ tab: ScriptTab?) {

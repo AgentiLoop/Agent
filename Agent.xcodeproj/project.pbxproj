@@ -256,6 +256,7 @@
 		AAAB78FFAB5CB1D752D58DD6 /* AvatarPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E8E39436A1C0932057F0F9 /* AvatarPaneView.swift */; };
 		D1A7A7A7A7A7A7A7A7A7A701 /* avatar.html in Resources */ = {isa = PBXBuildFile; fileRef = BF80D97BF0588E5E478E70AE /* avatar.html */; };
 		33D52D2CE01A775259C27580 /* AvatarControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F1EA9AEA14A0CC1B69CD575 /* AvatarControllerTests.swift */; };
+		E09A4851FAEBEBC6CDAB2156 /* AutoPilotRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66787BD46E097C69BC10C8E /* AutoPilotRegistry.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -545,6 +546,7 @@
 		C6E8E39436A1C0932057F0F9 /* AvatarPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Avatar/AvatarPaneView.swift; sourceTree = "<group>"; };
 		BF80D97BF0588E5E478E70AE /* avatar.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = Resources/avatar.html; sourceTree = "<group>"; };
 		6F1EA9AEA14A0CC1B69CD575 /* AvatarControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AvatarControllerTests.swift"; sourceTree = "<group>"; };
+		E66787BD46E097C69BC10C8E /* AutoPilotRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoPilotRegistry.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -785,6 +787,7 @@
 				6CD920ED377E5386B020BC79 /* ModelFetching.swift */,
 				AA10000000000000000237 /* DefaultModels.swift */,
 							A64F73655D7541A3B5492904 /* AutoPilot.swift */,
+				E66787BD46E097C69BC10C8E /* AutoPilotRegistry.swift */,
 );
 			path = Features;
 			sourceTree = "<group>";
@@ -1537,6 +1540,7 @@
 				1EF9BFCFF2AAF0C07CE980C5 /* AvatarSpeaker.swift in Sources */,
 				5B493B361E9291FA27F8496B /* AvatarController.swift in Sources */,
 				AAAB78FFAB5CB1D752D58DD6 /* AvatarPaneView.swift in Sources */,
+				E09A4851FAEBEBC6CDAB2156 /* AutoPilotRegistry.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

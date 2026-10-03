@@ -20,11 +20,21 @@ enum AgentProjectPaths {
         case worktrees = "worktrees"
         case plans = "plans"
         case autopilot = "autopilot"
+        /// Per-tab state (`tabs/<key>/…`) + `tabs/registry.json` for parallel Auto-Pilot tabs.
+        case tabs = "tabs"
     }
 
     /// Return `{projectFolder}/.agent/{subdir}/` as a URL.
+    /// Shared subdirs (memory, tabs registry) resolve out of an agent worktree
+    /// (`…/.agent/worktrees/<name>`) back to the main checkout, so parallel
+    /// tabs working in isolated worktrees still share one project memory.
     static func url(in projectFolder: String, _ subdir: Subdir) -> URL {
-        URL(fileURLWithPath: projectFolder)
+        var folder = projectFolder
+        if subdir == .memory || subdir == .tabs,
+           let r = folder.range(of: "/\(rootDirName)/\(Subdir.worktrees.rawValue)/") {
+            folder = String(folder[..<r.lowerBound])
+        }
+        return URL(fileURLWithPath: folder)
             .appendingPathComponent(rootDirName, isDirectory: true)
             .appendingPathComponent(subdir.rawValue, isDirectory: true)
     }
