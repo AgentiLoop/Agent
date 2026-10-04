@@ -14,6 +14,8 @@
 [![Swift 6.4](https://img.shields.io/badge/Swift-6.4-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
+<a href="https://launchnest.io/p/agentiloop-agent" target="_blank"><img src="https://launchnest.io/badge/agentiloop-agent.svg?variant=featured" alt="AgentiLoop Agent! on LaunchNest" width="220" height="56" /></a>
+
 ## 🆕 New Kid on the Block: AgentiLoop CLI ⚡️
 
 **The agentic loop, unleashed in your terminal. Mac. Windows. Linux. Your call.**
