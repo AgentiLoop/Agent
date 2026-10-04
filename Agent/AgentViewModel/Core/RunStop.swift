@@ -259,6 +259,25 @@ extension AgentViewModel {
         continueAutoPilotAfterCancel(nil)
     }
 
+    /// Auto-Pilot "Stop All" — ends the auto-pilot session and stops the task on ONE tab
+    /// (nil = main tab). Other tabs and their auto-pilot sessions keep running.
+    func stopAutoPilotTab(_ tab: ScriptTab?) {
+        endAutoPilot(reason: "Stop All", tab: tab)
+        guard let tab else { stop(); return }
+        if tab.isLLMRunning || !tab.taskQueue.isEmpty {
+            stopTabTask(tab: tab)
+        }
+        if tab.isRunning {
+            tab.isCancelled = true
+            tab.cancelHandler?()
+            tab.isRunning = false
+        }
+        tab.logFlushTask?.cancel()
+        tab.llmStreamFlushTask?.cancel()
+        tab.flush()
+        persistScriptTabs()
+    }
+
     /// Stop everything — main task AND all script tabs — and end every auto-pilot session.
     func stopAll() {
         endAutoPilot(reason: "Stop All")

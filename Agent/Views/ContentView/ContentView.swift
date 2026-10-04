@@ -85,7 +85,7 @@ struct ContentView: View {
                     },
                     onStopAll: viewModel.autoPilotSession(
                         viewModel.selectedTabId.flatMap { viewModel.tab(for: $0) }
-                    ) != nil ? { viewModel.stopAll() } : nil
+                    ) != nil ? { viewModel.stopAutoPilotTab(viewModel.selectedTabId.flatMap { viewModel.tab(for: $0) }) } : nil
                 )
             }
 

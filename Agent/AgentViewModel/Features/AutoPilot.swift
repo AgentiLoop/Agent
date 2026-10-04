@@ -176,9 +176,9 @@ extension AgentViewModel {
         let arg = task.dropFirst(5).trimmingCharacters(in: .whitespaces)
         let lower = arg.lowercased()
 
-        // /auto stop all | stopall | stop-all — same as the Stop All button.
+        // /auto stop all | stopall | stop-all — same as the Stop All button (this tab only).
         if ["stop all", "stopall", "stop-all"].contains(lower.split(separator: " ").joined(separator: " ")) {
-            stopAll()
+            stopAutoPilotTab(tab)
             return true
         }
         if lower == "stop" {
