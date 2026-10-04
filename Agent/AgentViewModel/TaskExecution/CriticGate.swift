@@ -125,7 +125,28 @@ extension AgentViewModel {
                   .trimmingCharacters(in: .whitespacesAndNewlines),
               !out.isEmpty
         else { return "" }
-        return String(out.prefix(12_000))
+        return capDiff(out)
+    }
+
+    /// Marker appended when the diff exceeds the cap. The critic prompt tells the
+    /// reviewer not to report the cut as truncated or missing code.
+    nonisolated static let diffTruncatedMarker = "[DIFF TRUNCATED BY AGENT — remaining changes omitted for length]"
+
+    /// Caps `diff` at `limit` chars on a line boundary (file boundary when one is
+    /// in reach) and appends `diffTruncatedMarker`, so the critic never sees a
+    /// line cut in half and flags it as broken code.
+    nonisolated static func capDiff(_ diff: String, limit: Int = 12_000) -> String {
+        guard diff.count > limit else { return diff }
+        let budget = limit - diffTruncatedMarker.count - 1
+        let head = String(diff.prefix(budget))
+        var cut = head.endIndex
+        if let file = head.range(of: "\ndiff --git ", options: .backwards),
+           head.distance(from: head.startIndex, to: file.lowerBound) > budget / 2 {
+            cut = file.lowerBound
+        } else if let nl = head.lastIndex(of: "\n") {
+            cut = nl
+        }
+        return String(head[..<cut]) + "\n" + diffTruncatedMarker
     }
 
     /// One-shot review call on the currently selected provider. Text-only —
@@ -140,6 +161,9 @@ extension AgentViewModel {
             "ISSUES:" followed by a short bulleted list of concrete problems \
             (bugs, truncated code, leftover debug output, broken syntax, changes \
             that contradict each other). Do NOT nitpick style. Do NOT use tools. \
+            If the diff ends with "\(Self.diffTruncatedMarker)", the agent shortened it: \
+            do NOT report truncation, cut-off hunks, or code "missing" past that \
+            point — review only what is shown. \
             Reply in plain text only.
             """
         let userMessage = "Review this diff:\n\n```diff\n\(diff)\n```"

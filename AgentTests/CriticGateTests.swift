@@ -121,13 +121,28 @@ struct CriticGateTests {
         #expect(AgentViewModel.uncommittedDiff(folder: dir) == "")
     }
 
-    @Test("uncommittedDiff: capped at 12_000 chars")
+    @Test("uncommittedDiff: capped at 12_000 chars on a line boundary with marker")
     func diffCapped() {
         let dir = repoWithCommit()
         defer { try? FileManager.default.removeItem(atPath: dir) }
         let big = (0..<2000).map { "line \($0) padding padding padding" }.joined(separator: "\n")
         try! big.write(toFile: dir + "/a.txt", atomically: true, encoding: .utf8)
-        #expect(AgentViewModel.uncommittedDiff(folder: dir).count == 12_000)
+        let diff = AgentViewModel.uncommittedDiff(folder: dir)
+        #expect(diff.count <= 12_000)
+        #expect(diff.hasSuffix("\n" + AgentViewModel.diffTruncatedMarker))
+        let lastLine = diff.dropLast(AgentViewModel.diffTruncatedMarker.count + 1)
+            .split(separator: "\n").last.map(String.init) ?? ""
+        #expect(lastLine.hasSuffix("padding padding padding"))
+    }
+
+    @Test("capDiff: short diff untouched; cuts at a file boundary when in reach")
+    func capDiffBoundaries() {
+        #expect(AgentViewModel.capDiff("abc\ndef", limit: 100) == "abc\ndef")
+        let fileA = "diff --git a/a b/a\n" + String(repeating: "+aaaa\n", count: 20)
+        let fileB = "diff --git a/b b/b\n" + String(repeating: "+bbbb\n", count: 40)
+        let capped = AgentViewModel.capDiff(fileA + fileB, limit: fileA.count + 120)
+        #expect(!capped.contains("a/b b/b"))
+        #expect(capped.hasSuffix(AgentViewModel.diffTruncatedMarker))
     }
 
     // MARK: - Gate short-circuits (no LLM call)
