@@ -66,6 +66,11 @@ actor LLMRateLimiter {
         retryAfterUntil.removeValue(forKey: provider)
     }
 
+    /// Drop every provider's Retry-After backoff (used when a new tab opens).
+    func clearAllRetryAfter() {
+        retryAfterUntil.removeAll()
+    }
+
     /// Configure a minimum gap between requests for `provider`. 0 disables.
     func setMinGap(_ seconds: Double, provider: String) {
         if seconds > 0 {

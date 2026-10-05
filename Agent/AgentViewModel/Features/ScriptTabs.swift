@@ -47,6 +47,8 @@ extension AgentViewModel {
         scriptTabs.append(tab)
         selectedTabId = tab.id
         persistScriptTabs()
+        // A new tab starts fresh — forget any rate-limit backoff from earlier requests.
+        Task { await LLMRateLimiter.shared.clearAllRetryAfter() }
         // A new avatar tab greets the user so it's clear it talks and listens.
         // Open the LLM Output HUD (tabs start with it dismissed + collapsed) and type
         // each word into it as the avatar says it.

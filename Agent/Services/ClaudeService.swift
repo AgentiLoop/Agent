@@ -438,9 +438,14 @@ final class ClaudeService {
         let thinkingFlag = thinkingEnabled ? ",interleaved-thinking-2025-05-14" : ""
         if clean.hasPrefix("sk-ant-oat01-") {
             request.setValue("Bearer \(clean)", forHTTPHeaderField: "Authorization")
+            // Fixed Claude Code client profile for OAuth compatibility testing.
+            request.setValue("claude-cli/2.1.83 (external, cli)", forHTTPHeaderField: "User-Agent")
+            request.setValue("cli", forHTTPHeaderField: "x-app")
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
+            request.setValue("true", forHTTPHeaderField: "anthropic-dangerous-direct-browser-access")
             // All beta flags in a single comma-separated header value.
             request.setValue(
-                "oauth-2025-04-20,prompt-caching-2024-07-31,extended-cache-ttl-2025-04-11" + thinkingFlag,
+                "claude-code-20250219,oauth-2025-04-20,prompt-caching-2024-07-31,extended-cache-ttl-2025-04-11" + thinkingFlag,
                 forHTTPHeaderField: "anthropic-beta"
             )
         } else if clean.hasPrefix("sk-or-") {
