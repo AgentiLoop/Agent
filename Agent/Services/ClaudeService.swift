@@ -385,16 +385,13 @@ final class ClaudeService {
         sanitizedCredential(credential).hasPrefix("sk-ant-oat01-")
     }
 
-    /// Claude Code's identity system prompt. OAuth tokens minted by
-    /// `claude setup-token` are gated at the API to requests whose first
-    /// system block is this string; anything else 429s immediately with a
-    /// bare `"message":"Error"` body (no Retry-After). API-key requests
-    /// skip this block — only Agent's own prompt goes through.
+    /// Claude Code's identity system prompt, retained after the experimental
+    /// billing-context block for OAuth requests. API-key requests skip both.
     nonisolated static let claudeCodeIdentityPrompt =
         "You are Claude Code, Anthropic's official CLI for Claude."
 
-    /// Build the `system` array. For OAuth credentials, prepend the Claude
-    /// Code identity block so the request passes Anthropic's OAuth gate.
+    /// Build the `system` array. For OAuth credentials, prepend billing context
+    /// and the Claude Code identity block for compatibility testing.
     /// The stable base and the per-task dynamic suffix are separate blocks,
     /// each with its own cache breakpoint — a new task only re-prefills the
     /// small dynamic suffix instead of the whole system prompt.
@@ -406,6 +403,11 @@ final class ClaudeService {
     ) -> [[String: Any]] {
         var blocks: [[String: Any]] = []
         if isOAuthToken(credential) {
+            // Captured client version/entrypoint only; cch was redacted in the capture.
+            blocks.append([
+                "type": "text",
+                "text": "x-anthropic-billing-header: cc_version=2.1.289.391; cc_entrypoint=sdk-cli;"
+            ])
             blocks.append(["type": "text", "text": claudeCodeIdentityPrompt])
         }
         blocks.append(["type": "text", "text": stable, "cache_control": longCacheControl])
