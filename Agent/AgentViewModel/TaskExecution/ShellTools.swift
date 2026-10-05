@@ -200,19 +200,13 @@ extension AgentViewModel {
                 let timeoutSeconds = AppConstants.shellCommandTimeout
                 box.armTimeout(timeoutSeconds)
 
-                // Drain stderr concurrently: reading the pipes one after another deadlocks
-                // when the child writes >64 KB to stderr while stdout is still open.
-                let stderrBox = StderrBox()
-                let stderrGroup = DispatchGroup()
-                stderrGroup.enter()
-                DispatchQueue.global().async {
-                    stderrBox.data = stderrPipe.fileHandleForReading.readDataToEndOfFile()
-                    stderrGroup.leave()
-                }
-                let stdoutData = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
-                stderrGroup.wait()
-                let stderrData = stderrBox.data
+                // Drain both pipes concurrently (sequential reads deadlock past 64 KB) and never
+                // block on EOF after the shell exits — orphaned background jobs can hold them open.
+                let stdoutReader = PipeReader(stdoutPipe.fileHandleForReading)
+                let stderrReader = PipeReader(stderrPipe.fileHandleForReading)
                 process.waitUntilExit()
+                let stdoutData = stdoutReader.finish()
+                let stderrData = stderrReader.finish()
                 let timedOut = box.disarmTimeout()
 
                 var output = String(data: stdoutData, encoding: .utf8) ?? ""
@@ -234,9 +228,38 @@ extension AgentViewModel {
         }
     }
 
-    /// Written once by the stderr drain thread, read after DispatchGroup.wait().
-    final class StderrBox: @unchecked Sendable {
-        var data = Data()
+    /// Drains a pipe on its own thread. `finish()` is called after the shell exits and waits
+    /// only a short grace for EOF: a background job (`cmd &`, or an npx/node child that outlived
+    /// a `perl alarm` wrapper) re-parented to launchd keeps the write end open forever and is no
+    /// longer in the process tree the timeout kills — blocking on EOF here hung a task for 9h.
+    final class PipeReader: @unchecked Sendable {
+        private let lock = NSLock()
+        private var data = Data()
+        private var finished = false
+        private let eof = DispatchSemaphore(value: 0)
+
+        init(_ handle: FileHandle, onChunk: (@Sendable (String) -> Void)? = nil) {
+            DispatchQueue.global().async { [self] in
+                while true {
+                    let chunk = handle.availableData
+                    if chunk.isEmpty { break }
+                    lock.lock()
+                    let live = !finished
+                    if live { data.append(chunk) }
+                    lock.unlock()
+                    if live, let onChunk, let text = String(data: chunk, encoding: .utf8) { onChunk(text) }
+                }
+                eof.signal()
+            }
+        }
+
+        /// Wait up to `grace` seconds for EOF, then stop collecting and return what was read.
+        func finish(grace: TimeInterval = 2) -> Data {
+            _ = eof.wait(timeout: .now() + grace)
+            lock.lock(); defer { lock.unlock() }
+            finished = true
+            return data
+        }
     }
 
     /// Holds the in-process `Process` so a Swift Task cancellation can kill it (and its
@@ -364,18 +387,11 @@ extension AgentViewModel {
                 let timeoutSeconds = AppConstants.shellCommandTimeout
                 box.armTimeout(timeoutSeconds)
 
-                // Stream output chunks as they arrive
-                var collected = ""
-                let handle = pipe.fileHandleForReading
-                while true {
-                    let data = handle.availableData
-                    if data.isEmpty { break }
-                    if let chunk = String(data: data, encoding: .utf8) {
-                        collected += chunk
-                        onOutput(chunk)
-                    }
-                }
+                // Stream output chunks as they arrive. The reader runs on its own thread so an
+                // orphaned background job holding the pipe open can't block us past shell exit.
+                let reader = PipeReader(pipe.fileHandleForReading, onChunk: onOutput)
                 process.waitUntilExit()
+                var collected = String(data: reader.finish(), encoding: .utf8) ?? ""
                 if box.disarmTimeout() {
                     AuditLog.log(.shell, "TIMEOUT after \(Int(timeoutSeconds))s: \(command.prefix(200))")
                     let notice = (collected.isEmpty ? "" : "\n") + AppConstants.shellTimeoutNotice(timeoutSeconds)
