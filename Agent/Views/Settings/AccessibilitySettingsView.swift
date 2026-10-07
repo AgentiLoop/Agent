@@ -37,9 +37,7 @@ struct AccessibilitySettingsView: View {
             VStack(alignment: .leading, spacing: 12) {
                 // Accessibility Permission
                 HStack(spacing: 8) {
-                    Circle()
-                        .fill(hasAccessibility ? Color.green : Color.red.opacity(0.6))
-                        .frame(width: 8, height: 8)
+                    OnOffDot(isOn: hasAccessibility, offColor: Color.red.opacity(0.6))
                     Text("Accessibility: \(hasAccessibility ? "Granted" : "Not Granted")")
                         .font(.caption)
                         .foregroundStyle(hasAccessibility ? .green : .red)
@@ -81,9 +79,7 @@ struct AccessibilitySettingsView: View {
 
                 // Apple Events Permission
                 HStack(spacing: 8) {
-                    Circle()
-                        .fill(Color.green.opacity(0.6))
-                        .frame(width: 8, height: 8)
+                    OnOffDot(isOn: true, onColor: Color.green.opacity(0.6))
                     Text("Apple Events: Granted on first use of each application")
                         .font(.caption)
                         .foregroundStyle(.secondary)

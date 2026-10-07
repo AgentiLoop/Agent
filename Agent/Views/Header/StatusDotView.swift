@@ -40,3 +40,27 @@ struct StatusDot: View {
         .frame(width: 12, height: 12) // Fixed frame prevents layout shift
     }
 }
+
+/// Small on/off dot shown next to a text label. Swaps to a checkmark/xmark when Differentiate Without Color is on.
+/// Hidden from VoiceOver — the adjacent text already states the status.
+struct OnOffDot: View {
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
+    let isOn: Bool
+    var onColor: Color = .green
+    var offColor: Color = .red
+
+    var body: some View {
+        Group {
+            if differentiateWithoutColor {
+                Image(systemName: isOn ? "checkmark.circle.fill" : "xmark.circle.fill")
+                    .font(.system(size: 10))
+                    .foregroundStyle(isOn ? onColor : offColor)
+            } else {
+                Circle()
+                    .fill(isOn ? onColor : offColor)
+                    .frame(width: 8, height: 8)
+            }
+        }
+        .accessibilityHidden(true)
+    }
+}

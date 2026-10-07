@@ -29,10 +29,7 @@ struct AppleIntelligencePopover: View {
                 .accessibilityAddTraits(.isHeader)
 
             HStack(spacing: 6) {
-                Circle()
-                    .fill(AppleIntelligenceMediator.isAvailable ? Color.green : Color.red.opacity(0.6))
-                    .frame(width: 8, height: 8)
-                    .accessibilityHidden(true)
+                OnOffDot(isOn: AppleIntelligenceMediator.isAvailable, offColor: Color.red.opacity(0.6))
                 Text(AppleIntelligenceMediator.isAvailable ? "Available" : "Not Available")
                     .font(.caption)
                     .foregroundStyle(AppleIntelligenceMediator.isAvailable ? .green : .secondary)

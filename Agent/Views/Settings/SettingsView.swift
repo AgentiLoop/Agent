@@ -144,10 +144,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Server").font(.caption).foregroundStyle(.secondary)
                 HStack(spacing: 8) {
-                    Circle()
-                        .fill(fm.isRunning ? Color.green : Color.red)
-                        .frame(width: 8, height: 8)
-                        .accessibilityHidden(true)
+                    OnOffDot(isOn: fm.isRunning)
                     Text(fm.isRunning ? "Running" : (fm.isAvailable ? "Not running" : "fm not found (macOS 27 required)"))
                         .font(.caption)
 
