@@ -172,6 +172,8 @@ extension AgentViewModel {
                 attachedImages.append(image)
                 attachedImagesBase64.append(base64)
             }
+            let count = tab?.attachedImages.count ?? attachedImages.count
+            announceForAccessibility("Screenshot attached, \(count) attached")
             if let path = saveHiResAttachment(data: payloadData, image: image) {
                 let w = encoded?.width ?? Int(image.size.width)
                 let h = encoded?.height ?? Int(image.size.height)
@@ -259,6 +261,8 @@ extension AgentViewModel {
                     attachedImages.append(image)
                     attachedImagesBase64.append(encoded.base64)
                 }
+                let count = tab?.attachedImages.count ?? attachedImages.count
+                announceForAccessibility("Image attached, \(count) attached")
                 if let path = saveHiResAttachment(data: encoded.pngData, image: image) {
                     let pct = Int((scale * 100).rounded())
                     let msg = "📎 Attached: \(path) (\(encoded.width)x\(encoded.height), sending at \(pct)%)"

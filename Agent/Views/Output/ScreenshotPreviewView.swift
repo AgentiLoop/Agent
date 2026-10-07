@@ -25,7 +25,9 @@ struct ScreenshotPreviewView: View {
                             )
                             .accessibilityLabel("Attached image \(index + 1) of \(images.count)")
                         Button {
+                            let remaining = images.count - 1
                             onRemove(index)
+                            announceForAccessibility("Image \(index + 1) removed, \(remaining) remaining")
                         } label: {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.caption)
@@ -40,7 +42,10 @@ struct ScreenshotPreviewView: View {
                 Text("\(images.count) image(s)")
                     .font(.caption)
                     .foregroundStyle(captionStyle)
-                Button("Clear All") { onRemoveAll() }
+                Button("Clear All") {
+                    onRemoveAll()
+                    announceForAccessibility("All images removed")
+                }
                     .buttonStyle(.bordered)
                     .controlSize(.mini)
                     .accessibilityLabel("Remove all images")
