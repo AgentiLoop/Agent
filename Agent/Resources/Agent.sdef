@@ -88,6 +88,11 @@
                       description="One-line auto-pilot status: cycle, elapsed, time left, branch, goal.">
                 <cocoa key="autoPilotStatus"/>
             </property>
+            <property name="queued tasks" code="AgQd" access="r"
+                      description="Prompts waiting to run after the current task, in order.">
+                <type type="text" list="yes"/>
+                <cocoa key="queuedTasks"/>
+            </property>
             <responds-to command="close">
                 <cocoa method="handleCloseScriptCommand:"/>
             </responds-to>
@@ -99,6 +104,9 @@
             </responds-to>
             <responds-to command="stop task">
                 <cocoa method="handleStopTaskScriptCommand:"/>
+            </responds-to>
+            <responds-to command="clear queue">
+                <cocoa method="handleClearQueueScriptCommand:"/>
             </responds-to>
             <responds-to command="stop auto pilot">
                 <cocoa method="handleStopAutoPilotScriptCommand:"/>
@@ -117,6 +125,26 @@
                 <cocoa key="tab"/>
             </parameter>
             <result type="boolean"/>
+        </command>
+
+        <command name="queue task" code="AgntQueT" description="Run a task now if the tab is idle, otherwise add it to the tab's queue (same as submitting while a task runs). Returns its queue position, 0 when it started now.">
+            <cocoa class="AgentQueueTaskCommand"/>
+            <direct-parameter type="text" description="The task prompt."/>
+            <parameter name="in tab" code="AgTt" type="tab" optional="yes"
+                       description="Tab to queue in (default: the Main tab).">
+                <cocoa key="tab"/>
+            </parameter>
+            <result type="integer"/>
+        </command>
+
+        <command name="clear queue" code="AgntClrQ" description="Remove a tab's queued tasks; the running task keeps going. Returns how many were removed.">
+            <cocoa class="AgentClearQueueCommand"/>
+            <direct-parameter type="tab" optional="yes" description="Tab whose queue to clear, e.g. clear queue tab 2 (default: the Main tab)."/>
+            <parameter name="in tab" code="AgTt" type="tab" optional="yes"
+                       description="Tab whose queue to clear (default: the Main tab).">
+                <cocoa key="tab"/>
+            </parameter>
+            <result type="integer"/>
         </command>
 
         <command name="stop task" code="AgntStpT" description="Stop a running task.">

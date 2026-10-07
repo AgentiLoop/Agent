@@ -178,11 +178,43 @@ final class ScriptingTab: NSObject {
                                    key: "scriptingTabs", uniqueID: uniqueID)
     }
 
+    /// Prompts waiting to run after the current task, in order.
+    @objc var queuedTasks: [String] {
+        guard tabId != nil else { return vm?.mainTaskQueue ?? [] }
+        return tab?.taskQueue ?? []
+    }
+
+    /// Removes every queued prompt without stopping the running task. Returns the number removed,
+    /// or nil when the tab no longer exists.
+    func clearQueue() -> Int? {
+        guard let vm, tabExists else { return nil }
+        let count = queuedTasks.count
+        if let tab { tab.taskQueue.removeAll() } else { vm.mainTaskQueue.removeAll() }
+        return count
+    }
+
+    /// `clear queue tab 2`.
+    @objc func handleClearQueueScriptCommand(_ command: NSScriptCommand) -> Any? {
+        Self.queueCleared(clearQueue(), command)
+    }
+
+    /// Result of `clear queue`: the count removed, or a script error for a closed tab.
+    nonisolated static func queueCleared(_ count: Int?, _ command: NSScriptCommand) -> Any? {
+        guard let count else {
+            command.scriptErrorNumber = -10000
+            command.scriptErrorString = "That tab no longer exists."
+            return 0
+        }
+        return count
+    }
+
     /// Starts `prompt` in this tab. Returns an error message, or nil when it started.
-    func run(prompt: String, folder: String?) -> String? {
+    /// With `queue`, a busy tab queues the prompt (same as submitting it in the task field) instead of failing.
+    func run(prompt: String, folder: String?, queue: Bool = false) -> String? {
         guard let vm else { return "Agent! is not ready." }
         guard !prompt.isEmpty else { return "Task prompt is empty." }
-        guard !taskRunning else { return "A task is already running in the \(name) tab." }
+        guard tabExists else { return "That tab no longer exists." }
+        guard queue || !taskRunning else { return "A task is already running in the \(name) tab." }
         if let folder, !folder.isEmpty { projectFolder = folder }
         if tabId == nil {
             vm.selectMainTab()
@@ -315,6 +347,37 @@ final class AgentRunTaskCommand: NSScriptCommand {
             return false
         }
         return true
+    }
+}
+
+/// `queue task "prompt" [in tab tab 2]` — runs now if the tab is idle, otherwise waits in the tab's queue
+/// (same as submitting in the task field while busy). Returns the queue position, 0 when it started now.
+@objc(AgentQueueTaskCommand)
+final class AgentQueueTaskCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        let prompt = (directParameter as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let target = scriptingTarget(self)
+        let (error, position): (String?, Int) = MainActor.assumeIsolated {
+            let wasRunning = target.taskRunning
+            if let error = target.run(prompt: prompt, folder: nil, queue: true) { return (error, 0) }
+            return (nil, wasRunning ? target.queuedTasks.count : 0)
+        }
+        if let error {
+            scriptErrorNumber = -10000
+            scriptErrorString = error
+        }
+        return position
+    }
+}
+
+/// `clear queue [tab 2 | in tab tab 2]` — drops queued prompts (Main tab unless a tab is given); the running
+/// task keeps going. Returns how many were removed.
+@objc(AgentClearQueueCommand)
+final class AgentClearQueueCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        let target = scriptingTarget(self)
+        let count: Int? = MainActor.assumeIsolated { target.clearQueue() }
+        return ScriptingTab.queueCleared(count, self)
     }
 }
 
