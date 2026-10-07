@@ -695,13 +695,14 @@ final class AgentMemoryCommand: NSScriptCommand {
     }
 }
 
-/// `call tool "git" [with input "{\"action\":\"status\"}"]` — runs one of the agent's tools directly on the
-/// Main tab (no LLM) and returns its result text. Root shell is refused unless Launch Daemon is enabled.
+/// `call tool "git" [with input "{\"action\":\"status\"}"] [in tab tab 2]` — runs one of the agent's tools directly
+/// (no LLM) on the Main tab, or on the given tab, and returns its result text. Root shell is refused unless Launch Daemon is enabled.
 @objc(AgentCallToolCommand)
 final class AgentCallToolCommand: NSScriptCommand {
     override func performDefaultImplementation() -> Any? {
         let name = (directParameter as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         let json = (evaluatedArguments?["input"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let tabId = scriptingTarget(self).tabId
         func fail(_ message: String) -> String {
             scriptErrorNumber = -10000
             scriptErrorString = message
@@ -720,6 +721,7 @@ final class AgentCallToolCommand: NSScriptCommand {
         let (expanded, expandedInput) = expansion.value
         let refusal: String? = MainActor.assumeIsolated {
             guard let vm = AgentViewModel.current else { return "Agent! is not ready." }
+            if let tabId, vm.tab(for: tabId) == nil { return "That tab no longer exists." }
             if expanded == "execute_daemon_command" && !vm.rootEnabled {
                 return "Root shell is off. Set launch daemon enabled to true first."
             }
@@ -730,14 +732,22 @@ final class AgentCallToolCommand: NSScriptCommand {
         suspendExecution()
         let command = Unchecked(value: self)
         let sendable = Unchecked(value: expandedInput)
-        // Same path as an LLM tool call (hooks, MCP, file guards, native handlers), like SubAgent's loop.
         Task { @MainActor in
             guard let vm = AgentViewModel.current else { return command.value.resumeExecution(withResult: "Agent! is not ready.") }
-            let ctx = ToolContext(toolId: "applescript-\(UUID().uuidString)", projectFolder: vm.projectFolder,
-                                  selectedProvider: vm.selectedProvider, tavilyAPIKey: vm.tavilyAPIKey)
-            var results: [[String: Any]] = []
-            _ = await vm.dispatchTool(name: expanded, input: sendable.value, ctx: ctx, toolResults: &results)
-            let result = results.compactMap { $0["content"] as? String }.joined(separator: "\n")
+            let toolId = "applescript-\(UUID().uuidString)"
+            let result: String
+            if let tabId, let tab = vm.tab(for: tabId) {
+                // Same path as a tab's own LLM tool call: the tab's folder, log and Steps list.
+                let tabResult = await vm.handleTabToolCall(tab: tab, name: expanded, input: sendable.value, toolId: toolId)
+                result = tabResult.toolResult?["content"] as? String ?? ""
+            } else {
+                // Same path as an LLM tool call (hooks, MCP, file guards, native handlers), like SubAgent's loop.
+                let ctx = ToolContext(toolId: toolId, projectFolder: vm.projectFolder,
+                                      selectedProvider: vm.selectedProvider, tavilyAPIKey: vm.tavilyAPIKey)
+                var results: [[String: Any]] = []
+                _ = await vm.dispatchTool(name: expanded, input: sendable.value, ctx: ctx, toolResults: &results)
+                result = results.compactMap { $0["content"] as? String }.joined(separator: "\n")
+            }
             if result.hasPrefix("⚠️ Tool '") && result.contains("not handled") {
                 command.value.scriptErrorNumber = -10000
                 command.value.scriptErrorString = "Unknown tool \"\(name)\". call tool \"list_tools\" lists them."
