@@ -109,10 +109,16 @@ extension AgentViewModel {
         case "read_agent":
             let readName = input["name"] as? String ?? ""
             return await Self.offMain { [ss = scriptService] in ss.readScript(name: readName) ?? "Not found" }
-        case "create_agent", "update_agent":
+        case "create_agent":
             let createName = input["name"] as? String ?? ""
             let createContent = input["content"] as? String ?? ""
             return await Self.offMain { [ss = scriptService] in ss.createScript(name: createName, content: createContent) }
+        case "update_agent":
+            // Was routed to createScript, which refuses existing scripts with
+            // "already exists. Use update_agent" — update could never succeed.
+            let updateName = input["name"] as? String ?? ""
+            let updateContent = input["content"] as? String ?? ""
+            return await Self.offMain { [ss = scriptService] in ss.updateScript(name: updateName, content: updateContent) }
         case "delete_agent":
             let deleteName = input["name"] as? String ?? ""
             return await Self.offMain { [ss = scriptService] in ss.deleteScript(name: deleteName) }
