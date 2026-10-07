@@ -122,6 +122,28 @@ struct DependencyOverlay: View {
                 withAnimation(.easeOut(duration: 0.3).delay(0.5)) { showRow2 = true }
                 withAnimation(.easeOut(duration: 0.3).delay(0.7)) { showRow3 = true }
 
+                // VoiceOver may not reach the rows before the overlay closes —
+                // announce the result, and when something is missing keep the
+                // overlay up until the user picks Install or Dismiss.
+                let voiceOver = NSWorkspace.shared.isVoiceOverEnabled
+                if voiceOver {
+                    let missing = [
+                        status.xcodeTools ? nil : "Xcode Command Line Tools",
+                        status.clang ? nil : "Clang Compiler",
+                        status.appleIntelligence ? nil : "Apple Intelligence",
+                    ].compactMap { $0 }
+                    let summary = missing.isEmpty
+                        ? "System Check: all good."
+                        : "System Check: missing \(missing.joined(separator: ", "))."
+                            + (status.allGood ? "" : " Install and Dismiss buttons available.")
+                    NSAccessibility.post(
+                        element: NSApp as Any,
+                        notification: .announcementRequested,
+                        userInfo: [.announcement: summary, .priority: NSAccessibilityPriorityLevel.high.rawValue]
+                    )
+                }
+                if voiceOver, !status.allGood { return }
+
                 // Always auto-dismiss — 2.5s if all good, 5s if something missing
                 let delay: Double = status.allGood ? 2.5 : 5.0
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
