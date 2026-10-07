@@ -1,13 +1,13 @@
 {
-  "originHash" : "9c6813c435023293b78b24e8c6a1f817139f41d54c8f9c1417c29aff360cb9a3",
+  "originHash" : "082c792025e045b9c53f4ed2061c31821bfdb1d9438bf749b0e82105b8a2fd23",
   "pins" : [
     {
       "identity" : "agentaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentAccess.git",
       "state" : {
-        "revision" : "d7931551a0f3e5a265e91260977244f6d30b90d0",
-        "version" : "2.10.28"
+        "revision" : "1801a7b09a4973c683d99f3d793a3a32e588af69",
+        "version" : "2.10.29"
       }
     },
     {
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentTools.git",
       "state" : {
-        "revision" : "0ef996a8cac7af3ed726d662f75d1e3ec12b9de4",
-        "version" : "2.53.23"
+        "revision" : "574068a23fef1999e4fe0424fd621d29533f0f54",
+        "version" : "2.53.24"
       }
     },
     {
