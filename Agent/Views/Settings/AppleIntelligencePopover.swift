@@ -26,15 +26,20 @@ struct AppleIntelligencePopover: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Apple Intelligence Mediator")
                 .font(.headline)
+                .accessibilityAddTraits(.isHeader)
 
             HStack(spacing: 6) {
                 Circle()
                     .fill(AppleIntelligenceMediator.isAvailable ? Color.green : Color.red.opacity(0.6))
                     .frame(width: 8, height: 8)
+                    .accessibilityHidden(true)
                 Text(AppleIntelligenceMediator.isAvailable ? "Available" : "Not Available")
                     .font(.caption)
                     .foregroundStyle(AppleIntelligenceMediator.isAvailable ? .green : .secondary)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Apple Intelligence")
+            .accessibilityValue(AppleIntelligenceMediator.isAvailable ? "Available" : "Not Available")
 
             if !AppleIntelligenceMediator.isAvailable {
                 Text(AppleIntelligenceMediator.unavailabilityReason)
@@ -56,6 +61,8 @@ struct AppleIntelligencePopover: View {
                         .controlSize(.mini)
                         .labelsHidden()
                         .tint(aiMediator.isEnabled ? Color.blue : Color.gray)
+                        .accessibilityLabel("Enable Mediator")
+                        .accessibilityHint("Master switch for on-device Apple AI")
                 }
 
                 if aiMediator.isEnabled {
@@ -72,6 +79,8 @@ struct AppleIntelligencePopover: View {
                             .controlSize(.mini)
                             .labelsHidden()
                             .tint(aiMediator.triageEnabled ? Color.green : Color.orange)
+                            .accessibilityLabel("Triage greetings")
+                            .accessibilityHint("Answer small talk on-device before the cloud model")
                     }
 
                     GridRow {
@@ -87,6 +96,8 @@ struct AppleIntelligencePopover: View {
                             .controlSize(.mini)
                             .labelsHidden()
                             .tint(aiMediator.showAnnotationsToUser ? Color.pink : Color.orange)
+                            .accessibilityLabel("Show annotations to user")
+                            .accessibilityHint("Display task summaries and error explanations in the activity log")
                     }
 
                     GridRow {
@@ -102,6 +113,8 @@ struct AppleIntelligencePopover: View {
                             .controlSize(.mini)
                             .labelsHidden()
                             .tint(aiMediator.tokenCompressionEnabled ? Color.purple : Color.orange)
+                            .accessibilityLabel("Token compression")
+                            .accessibilityHint("Summarize old messages on-device when context runs low")
                     }
 
                 }

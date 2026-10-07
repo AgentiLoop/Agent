@@ -53,6 +53,7 @@ struct LLMUsageView: View {
                 HStack {
                     Text("LLM Usage")
                         .font(.headline)
+                        .accessibilityAddTraits(.isHeader)
                     Spacer()
                     if !store.modelUsage.isEmpty {
                         Button("Reset") {
@@ -62,6 +63,7 @@ struct LLMUsageView: View {
                         .font(.caption)
                         .buttonStyle(.plain)
                         .foregroundStyle(.secondary)
+                        .accessibilityHint("Clears all token usage and cache counts")
                     }
                 }
                 Text("Token usage per model since last Reset.")
@@ -171,6 +173,9 @@ struct LLMUsageView: View {
                         }
                         .padding(.vertical, 8)
                         .padding(.horizontal)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(shortModel(model))
+                        .accessibilityValue(rowSummary(model: model, usage: usage))
                     }
                 }
                 }
@@ -195,9 +200,11 @@ struct LLMUsageView: View {
                             Text("↑ \(fmt(totalIn))")
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(.blue)
+                                .accessibilityLabel("Input \(fmt(totalIn))")
                             Text("↓ \(fmt(totalOut))")
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(.green)
+                                .accessibilityLabel("Output \(fmt(totalOut))")
                             if nonSubCost > 0 {
                                 Text(String(format: "$%.3f", nonSubCost))
                                     .font(.caption.monospacedDigit().weight(.semibold))
@@ -211,6 +218,7 @@ struct LLMUsageView: View {
                     }
                     .padding(.vertical, 8)
                     .padding(.horizontal)
+                    .accessibilityElement(children: .combine)
                 }
 
                 // Cache metrics (session-wide, not scoped per tab yet)
@@ -235,6 +243,9 @@ struct LLMUsageView: View {
                         }
                         .padding(.vertical, 8)
                         .padding(.horizontal)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Cache")
+                        .accessibilityValue("Hit \(fmt(store.sessionCacheReadTokens)), Miss \(fmt(store.sessionCacheCreationTokens)), \(store.cacheHitRate) percent hit rate")
                     }
                 }
             }
@@ -257,6 +268,7 @@ struct LLMUsageView: View {
             }
             .labelsHidden()
             .pickerStyle(.menu)
+            .accessibilityLabel("Usage Scope")
         }
     }
 
@@ -285,6 +297,19 @@ struct LLMUsageView: View {
         if count >= 1_000_000 { return String(format: "%.1fM", Double(count) / 1_000_000) }
         if count >= 1_000 { return String(format: "%.1fK", Double(count) / 1_000) }
         return "\(count)"
+    }
+
+    /// Spoken summary of one model row for VoiceOver.
+    private func rowSummary(model: String, usage: TokenUsageStore.ModelUsage) -> String {
+        let calls = "\(usage.callCount) call\(usage.callCount == 1 ? "" : "s")"
+        let cost: String
+        if isSubscriptionBilled(model: model) {
+            cost = "Included"
+        } else {
+            let c = store.estimatedCost(model: model, inputTokens: usage.inputTokens, outputTokens: usage.outputTokens)
+            cost = c > 0 ? String(format: "$%.3f", c) : "free"
+        }
+        return "\(calls), Input \(fmt(usage.inputTokens)), Output \(fmt(usage.outputTokens)), \(cost)"
     }
 
     private func shortModel(_ model: String) -> String {
