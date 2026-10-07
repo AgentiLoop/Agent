@@ -25,16 +25,19 @@ struct NewMainTabSheet: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("New LLM Tab")
                 .font(.headline)
+                .accessibilityAddTraits(.isHeader)
 
             // Provider picker
             VStack(alignment: .leading, spacing: 4) {
                 Text("Provider").font(.caption).foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
                 Picker("Provider", selection: $provider) {
                     ForEach(APIProvider.selectableProviders, id: \.self) { p in
                         Text(p.displayName).tag(p)
                     }
                 }
                 .labelsHidden()
+                .accessibilityLabel("Provider")
                 .onChange(of: provider) { _, newProvider in
                     ensureModelsLoaded(for: newProvider)
                     selectedModelId = defaultModelId(for: newProvider)
@@ -44,6 +47,7 @@ struct NewMainTabSheet: View {
             // Model picker (adapts per provider)
             VStack(alignment: .leading, spacing: 4) {
                 Text("Model").font(.caption).foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
                 modelPicker
             }
 
@@ -58,6 +62,7 @@ struct NewMainTabSheet: View {
                 Text(validationMessage)
                     .font(.caption)
                     .foregroundStyle(.red)
+                    .accessibilityLabel("Error: \(validationMessage)")
             }
 
             HStack {
@@ -96,6 +101,7 @@ struct NewMainTabSheet: View {
                 }
             }
             .labelsHidden()
+            .accessibilityLabel("Model")
 
         case .ollama:
             ollamaModelPicker(models: viewModel.ollamaModels, fetch: { viewModel.fetchModelsIfNeeded(for: .ollama, force: true) })
@@ -107,6 +113,7 @@ struct NewMainTabSheet: View {
             // No /models endpoint — free-form id.
             TextField("Model (e.g. glm-4.7)", text: $selectedModelId)
                 .textFieldStyle(.roundedBorder)
+                .accessibilityLabel("Model")
 
         case .foundationModel:
             HStack {
@@ -136,6 +143,7 @@ struct NewMainTabSheet: View {
             if models.isEmpty {
                 TextField("Model name", text: fallbackBinding)
                     .textFieldStyle(.roundedBorder)
+                    .accessibilityLabel("Model")
             } else {
                 Picker("Model", selection: $selectedModelId) {
                     ForEach(models) { model in
@@ -145,11 +153,13 @@ struct NewMainTabSheet: View {
                                 Image(systemName: "eye")
                                     .foregroundStyle(.blue)
                                     .font(.caption2)
+                                    .accessibilityLabel("Vision")
                             }
                         }.tag(model.id)
                     }
                 }
                 .labelsHidden()
+                .accessibilityLabel("Model")
             }
             Button(action: fetch) {
                 if isFetching {
@@ -162,6 +172,7 @@ struct NewMainTabSheet: View {
             .controlSize(.small)
             .disabled(isFetching)
             .help("Refresh Models")
+            .accessibilityLabel(isFetching ? "Fetching Models" : "Refresh Models")
         }
     }
 
@@ -171,6 +182,7 @@ struct NewMainTabSheet: View {
             if models.isEmpty {
                 TextField("Model name", text: $selectedModelId)
                     .textFieldStyle(.roundedBorder)
+                    .accessibilityLabel("Model")
             } else {
                 Picker("Model", selection: $selectedModelId) {
                     ForEach(models) { model in
@@ -180,11 +192,13 @@ struct NewMainTabSheet: View {
                                 Image(systemName: "eye")
                                     .foregroundStyle(.blue)
                                     .font(.caption2)
+                                    .accessibilityLabel("Vision")
                             }
                         }.tag(model.id)
                     }
                 }
                 .labelsHidden()
+                .accessibilityLabel("Model")
             }
             Button(action: fetch) {
                 Image(systemName: "arrow.clockwise")
@@ -192,6 +206,7 @@ struct NewMainTabSheet: View {
             .buttonStyle(.bordered)
             .controlSize(.small)
             .help("Refresh Ollama Models")
+            .accessibilityLabel("Refresh Ollama Models")
         }
     }
 
