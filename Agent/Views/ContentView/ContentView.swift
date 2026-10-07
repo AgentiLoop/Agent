@@ -557,7 +557,7 @@ struct ContentView: View {
         .menuToggleChevrons, .menuToggleOverlay, .menuRunTask, .menuCancelTask,
         .menuFind, .menuNewTab, .menuCloseTab, .menuNextTab, .menuPrevTab,
         .menuClearAll, .menuClearLog, .menuClearLLM, .menuClearHistory,
-        .menuClearTasks, .menuClearTokens
+        .menuClearTasks, .menuClearTokens, .menuToggleMessagesMonitor
     ]
 
     func setupMenuObservers() {
@@ -641,6 +641,7 @@ struct ContentView: View {
         case .menuClearTokens:
             viewModel.taskInputTokens = 0; viewModel.taskOutputTokens = 0
             viewModel.sessionInputTokens = 0; viewModel.sessionOutputTokens = 0
+        case .menuToggleMessagesMonitor: viewModel.messagesMonitorEnabled.toggle()
         default: break
         }
     }

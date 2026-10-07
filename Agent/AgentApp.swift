@@ -62,6 +62,7 @@ extension Notification.Name {
     static let menuClearHistory = Notification.Name("menuClearHistory")
     static let menuClearTasks = Notification.Name("menuClearTasks")
     static let menuClearTokens = Notification.Name("menuClearTokens")
+    static let menuToggleMessagesMonitor = Notification.Name("menuToggleMessagesMonitor")
 }
 
 private func post(_ name: Notification.Name) {
@@ -229,6 +230,9 @@ struct AgentApp: App {
                     .keyboardShortcut("j", modifiers: [.command, .shift])
                 Button("Clear Tokens") { post(.menuClearTokens) }
                     .keyboardShortcut("u", modifiers: [.command, .shift])
+                Divider()
+                Button("Toggle Messages Monitor") { post(.menuToggleMessagesMonitor) }
+                    .keyboardShortcut("m", modifiers: [.command, .shift])
             }
         }
     }
