@@ -14,8 +14,11 @@ extension ActivityLogView.Coordinator {
     ) {
         guard let storage = textView.textStorage else { return }
 
-        let highlightColor = NSColor.systemYellow.withAlphaComponent(0.3)
-        let currentColor = NSColor.systemYellow.withAlphaComponent(0.8)
+        // Increase Contrast: the faint 0.3 tint under black text is hard to read (worst in Dark Mode),
+        // so use a near-opaque fill for every match and a fully opaque one for the current match.
+        let increaseContrast = NSWorkspace.shared.accessibilityDisplayShouldIncreaseContrast
+        let highlightColor = NSColor.systemYellow.withAlphaComponent(increaseContrast ? 0.7 : 0.3)
+        let currentColor = increaseContrast ? NSColor.systemOrange : NSColor.systemYellow.withAlphaComponent(0.8)
 
         // Batch all attribute changes in a single editing pass
         storage.beginEditing()
