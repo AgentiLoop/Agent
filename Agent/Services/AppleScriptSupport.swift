@@ -13,7 +13,8 @@ extension AppDelegate {
         "toolGroups", "toolNames", "disabledToolGroups", "disabledTools",
         "mcpServers", "enabledMCPServers", "connectedMCPServers", "mcpTools", "disabledMCPTools",
         "llmOutput", "inputTokens", "outputTokens", "sessionInputTokens", "sessionOutputTokens",
-        "accessibilityAutomation", "showHUD", "smoothStreaming", "terminalSpeed", "scanLines", "hudLogBelow"]
+        "accessibilityAutomation", "showHUD", "smoothStreaming", "terminalSpeed", "scanLines", "hudLogBelow",
+        "activityLogTextSize", "shellTimeout"]
 
     func application(_ sender: NSApplication, delegateHandlesKey key: String) -> Bool {
         Self.scriptingKeys.contains(key)
@@ -218,6 +219,29 @@ extension AppDelegate {
     @objc var hudLogBelow: Bool {
         get { setting(\.hudLogBelow, false) }
         set { setSetting(\.hudLogBelow, newValue) }
+    }
+
+    /// View > Bigger / Smaller / Actual Size Text, in points (9–36).
+    @objc var activityLogTextSize: Int {
+        get { Int(ActivityLogTextSize.current) }
+        set {
+            let range = ActivityLogTextSize.range
+            guard range.contains(CGFloat(newValue)) else {
+                return ScriptingTab.scriptError("Activity log text size must be \(Int(range.lowerBound)) to \(Int(range.upperBound)).")
+            }
+            ActivityLogTextSize.set(CGFloat(newValue))
+        }
+    }
+
+    /// Settings > Agent Options > Shell timeout, in minutes (1–120); 0 turns it off.
+    @objc var shellTimeout: Int {
+        get { Int(AppConstants.shellCommandTimeout / 60) }
+        set {
+            guard newValue == 0 || (1...120).contains(newValue) else {
+                return ScriptingTab.scriptError("Shell timeout must be 0 (off) or 1 to 120 minutes.")
+            }
+            UserDefaults.standard.set(Double(newValue * 60), forKey: AppConstants.shellCommandTimeoutKey)
+        }
     }
 
     // MARK: - Tools window (same toggles as Tools; groups are global, tools are per Main-tab provider)

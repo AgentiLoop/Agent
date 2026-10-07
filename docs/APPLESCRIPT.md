@@ -66,6 +66,8 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `terminal speed` | text | rw | HUD popover: `Normal`, `Fast`, `Faster`, `Blazing` or `Ludicrous` (any capitalization). |
 | `scan lines` | boolean | rw | HUD popover: draw scan lines over the HUD. |
 | `activity log below hud` | boolean | rw | HUD popover: start the activity log below the HUD instead of behind it. |
+| `activity log text size` | integer | rw | Activity log text size in points, 9 to 36 (View > Bigger / Smaller / Actual Size Text). |
+| `shell timeout` | integer | rw | Settings > Agent Options: minutes before a hung shell command is killed, 1 to 120; 0 turns it off. |
 | `tool groups` | list of text | r | Every tool group name, as in the Tools window. |
 | `tool names` | list of text | r | Every built-in tool name, as in the Tools window. |
 | `disabled tool groups` | list of text | rw | Groups switched off for every provider (the Tools window's group switches). Turning `User` or `Root` off or on also turns the Launch Agent or Launch Daemon off or on. |
@@ -79,7 +81,7 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `input tokens` / `output tokens` | integer | r | Tokens of the Main tab's current or last task. |
 | `session input tokens` / `session output tokens` | integer | r | Tokens used since Agent! launched (or since `clear tokens`). |
 
-Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", `terminal speed` "warp", or a negative count) and unknown tool, group or MCP server names give an error and change nothing.
+Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", `terminal speed` "warp", `activity log text size` 50, `shell timeout` 500, or a negative count) and unknown tool, group or MCP server names give an error and change nothing.
 
 ```applescript
 tell application "Agent!"

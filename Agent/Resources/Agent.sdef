@@ -149,6 +149,14 @@
                       description="Start the activity log below the HUD instead of behind it.">
                 <cocoa key="hudLogBelow"/>
             </property>
+            <property name="activity log text size" code="AgW1" type="integer"
+                      description="Activity log text size in points, 9 to 36 (View &gt; Bigger / Smaller / Actual Size Text).">
+                <cocoa key="activityLogTextSize"/>
+            </property>
+            <property name="shell timeout" code="AgW2" type="integer"
+                      description="Minutes before a hung shell command is killed, 1 to 120; 0 turns the timeout off.">
+                <cocoa key="shellTimeout"/>
+            </property>
             <property name="tool groups" code="AgG1" access="r"
                       description="Every tool group name, as in the Tools window.">
                 <type type="text" list="yes"/>
