@@ -56,7 +56,7 @@ final class AgentViewModel {
     // Stored property drives live UI; ChatHistoryStore persists across launches via SwiftData
     var activityLog = ""
     var isRunning = false {
-        didSet { if oldValue && !isRunning { announceForAccessibility("Task finished") } }
+        didSet { if oldValue && !isRunning { announceForAccessibility(spokenTaskFinished("Task", summary: lastTaskCompletionSummary)) } }
     }
     var isThinking = false
 

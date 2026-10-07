@@ -30,6 +30,17 @@ func announceForAccessibility(_ message: String) {
     ])
 }
 
+/// "<title> finished" plus the start of the completion summary (markdown stripped, ~300 chars)
+/// so VoiceOver users hear the result without navigating into the activity log.
+func spokenTaskFinished(_ title: String, summary: String) -> String {
+    let plain = summary
+        .replacingOccurrences(of: "[*`#]", with: "", options: .regularExpression)
+        .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        .trimmingCharacters(in: .whitespaces)
+    guard !plain.isEmpty else { return "\(title) finished" }
+    return "\(title) finished. " + (plain.count > 300 ? String(plain.prefix(300)) + "…" : plain)
+}
+
 @MainActor @Observable
 final class ScriptTab: Identifiable {
     let id: UUID
@@ -95,7 +106,7 @@ final class ScriptTab: Identifiable {
     /// Summary the last tab task ended with ("" when cancelled/incomplete). Read by auto-pilot between cycles.
     var lastTaskCompletionSummary: String = ""
     var isLLMRunning: Bool = false {
-        didSet { if oldValue && !isLLMRunning { announceForAccessibility("\(displayTitle) task finished") } }
+        didSet { if oldValue && !isLLMRunning { announceForAccessibility(spokenTaskFinished("\(displayTitle) task", summary: lastTaskCompletionSummary)) } }
     }
     var isLLMThinking: Bool = false
     var thinkingDismissed: Bool = true
