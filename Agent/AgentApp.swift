@@ -186,6 +186,16 @@ struct AgentApp: App {
                         .labelStyle(.titleAndIcon)
                 }
             }
+            // View menu: activity log text size for low-vision users
+            CommandGroup(after: .toolbar) {
+                Divider()
+                Button("Bigger Text") { ActivityLogTextSize.set(ActivityLogTextSize.current + ActivityLogTextSize.step) }
+                    .keyboardShortcut("=", modifiers: .command)
+                Button("Smaller Text") { ActivityLogTextSize.set(ActivityLogTextSize.current - ActivityLogTextSize.step) }
+                    .keyboardShortcut("-", modifiers: .command)
+                Button("Actual Size Text") { ActivityLogTextSize.set(NSFont.systemFontSize) }
+                    .keyboardShortcut("0", modifiers: .command)
+            }
             CommandMenu("Sponsors") {
                 SponsorsMenu()
             }

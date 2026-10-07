@@ -64,7 +64,15 @@ extension ActivityLogView.Coordinator {
         forceTabSwitch = false
 
         let currentAppearance = scrollView.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua])
-        let appearanceChanged = currentAppearance != lastAppearanceName
+        let textSize = ActivityLogTextSize.current
+        let textSizeChanged = textSize != font.pointSize
+        if textSizeChanged {
+            // View > Bigger/Smaller Text: rebuild every line with the new base font
+            font = NSFont.monospacedSystemFont(ofSize: textSize, weight: .regular)
+            textView.font = font
+            cancelAsyncRender()
+        }
+        let appearanceChanged = currentAppearance != lastAppearanceName || textSizeChanged
         if appearanceChanged {
             lastAppearanceName = currentAppearance
             lastLength = 0

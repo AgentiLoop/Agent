@@ -50,6 +50,31 @@ final class BottomPinnedScrollView: NSScrollView {
     }
 }
 
+/// Activity log text size for low-vision users — View > Bigger Text / Smaller Text / Actual Size Text.
+enum ActivityLogTextSize {
+    static let key = "activityLogTextSize"
+    static let range: ClosedRange<CGFloat> = 9...36
+    static let step: CGFloat = 2
+
+    /// Stored size clamped to `range`; the system font size when never set.
+    nonisolated static var current: CGFloat {
+        let v = UserDefaults.standard.double(forKey: key)
+        return v > 0 ? min(max(CGFloat(v), range.lowerBound), range.upperBound) : NSFont.systemFontSize
+    }
+
+    /// Store the new size, re-render every open log, and speak it for VoiceOver.
+    @MainActor static func set(_ size: CGFloat) {
+        let clamped = min(max(size, range.lowerBound), range.upperBound)
+        UserDefaults.standard.set(Double(clamped), forKey: key)
+        NotificationCenter.default.post(name: .activityLogTextSizeDidChange, object: nil)
+        announceForAccessibility("Text size \(Int(clamped)) points")
+    }
+}
+
+extension Notification.Name {
+    static let activityLogTextSizeDidChange = Notification.Name("activityLogTextSizeDidChange")
+}
+
 /// / NSTextView-backed activity log — avoids SwiftUI Text layout storms. / Detects image/HTML paths and shows clickable
 /// links. Optimized for streaming. / Rendering, scroll, search, markdown, and cache live on `Coordinator`, split across: / ActivityLogView+Update.swift, +Scroll, +Search, +Markdown, +MarkdownBlock, / +MarkdownInline, +Cache, +Rendering.
 struct ActivityLogView: NSViewRepresentable {
@@ -90,7 +115,7 @@ struct ActivityLogView: NSViewRepresentable {
         // Unnamed text views read as just "text" in VoiceOver — name the log
         textView.setAccessibilityLabel("Activity log")
         scrollView.setAccessibilityLabel("Activity log")
-        textView.font = .monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        textView.font = .monospacedSystemFont(ofSize: ActivityLogTextSize.current, weight: .regular)
         textView.backgroundColor = .clear
         textView.textContainerInset = NSSize(width: 12, height: 12)
         textView.isAutomaticQuoteSubstitutionEnabled = false
@@ -165,7 +190,8 @@ struct ActivityLogView: NSViewRepresentable {
         var showingPlaceholder = true
         var lastSearch = ""
         var lastMatchIndex = -1
-        nonisolated(unsafe) let font = NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        /// Base log font — replaced by performRender when the View > text size changes.
+        nonisolated(unsafe) var font = NSFont.monospacedSystemFont(ofSize: ActivityLogTextSize.current, weight: .regular)
         /// Latest state from updateNSView
         var latestText = ""
         var latestSearchText = ""
@@ -289,7 +315,16 @@ struct ActivityLogView: NSViewRepresentable {
                     self.performRender()
                 }
             }
+            // View > Bigger/Smaller/Actual Size Text — performRender picks up the new size
+            textSizeObserver = NotificationCenter.default.addObserver(
+                forName: .activityLogTextSizeDidChange,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                MainActor.assumeIsolated { self?.performRender() }
+            }
         }
+        nonisolated(unsafe) var textSizeObserver: NSObjectProtocol?
 
         /// Schedule rendering AFTER SwiftUI's layout pass completes.
         /// If already scheduled, marks dirty so a follow-up render fires.
@@ -342,6 +377,9 @@ struct ActivityLogView: NSViewRepresentable {
                 NotificationCenter.default.removeObserver(observer)
             }
             if let observer = logObserver {
+                NotificationCenter.default.removeObserver(observer)
+            }
+            if let observer = textSizeObserver {
                 NotificationCenter.default.removeObserver(observer)
             }
         }
