@@ -90,7 +90,7 @@ extension AgentViewModel {
         case "xcode_list_projects":
             return await Self.offMain { XcodeService.shared.listProjects() }
         case "xcode_select_project":
-            let number = input["number"] as? Int ?? 0
+            let number = input["number"] as? Int ?? Int(input["number"] as? String ?? "") ?? 0
             return await Self.offMain { XcodeService.shared.selectProject(number: number) }
         case "xcode_grant_permission":
             return await Self.offMain { XcodeService.shared.grantPermission() }

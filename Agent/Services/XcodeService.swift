@@ -269,8 +269,12 @@ final class XcodeService: @unchecked Sendable {
         }
 
         let sorted = projects.sorted()
+        // No number (0) with a single open project: that's the one meant —
+        // used to fail "out of range (1-1)" on every such call.
+        let number = number == 0 && sorted.count == 1 ? 1 : number
         guard number >= 1, number <= sorted.count else {
-            return "Error: Project number \(number) out of range (1-\(sorted.count))"
+            let list = sorted.enumerated().map { "\($0.offset + 1). \(($0.element as NSString).lastPathComponent)" }
+            return "Error: Project number \(number) out of range (1-\(sorted.count)). Pass number: " + list.joined(separator: ", ")
         }
 
         let selected = sorted[number - 1]
