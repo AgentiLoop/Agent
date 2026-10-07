@@ -356,11 +356,9 @@ struct ContentView: View {
 
                 // Cmd+Shift+P: Open System Prompts
                 if event.modifierFlags.contains([.command, .shift]),
-                   event.charactersIgnoringModifiers == "p"
+                   event.charactersIgnoringModifiers?.lowercased() == "p"
                 {
-                    // System prompts window would be opened here
-                    // For now, focus on settings
-                    showSettings = true
+                    SystemPromptWindow.shared.show()
                     return nil
                 }
 
