@@ -571,6 +571,7 @@ extension AgentViewModel {
             taskOutputTokens = 0
             clearLog()
         }
+        announceForAccessibility("Log cleared")
     }
 
     /// Clear everything: log, LLM output, prompt history, task history, token counts.

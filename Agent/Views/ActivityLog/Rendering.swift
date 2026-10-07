@@ -100,6 +100,7 @@ class CopyButtonCell: NSTextAttachmentCell {
     {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(codeText, forType: .string)
+        announceForAccessibility("Code copied")
         // Brief flash feedback
         if let tv = controlView as? NSTextView {
             let orig = tv.backgroundColor

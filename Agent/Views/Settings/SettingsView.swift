@@ -880,6 +880,7 @@ struct LockedSecureField: View {
             Button {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(text, forType: .string)
+                announceForAccessibility("\(label) copied")
             } label: {
                 Image(systemName: "doc.on.doc")
                     .foregroundStyle(.secondary)
