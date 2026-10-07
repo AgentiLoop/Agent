@@ -43,7 +43,7 @@ struct AccessibilitySettingsView: View {
                     OnOffDot(isOn: hasAccessibility, offColor: Color.red.opacity(0.6))
                     Text("Accessibility: \(hasAccessibility ? "Granted" : "Not Granted")")
                         .font(.caption)
-                        .foregroundStyle(contrast == .increased ? .primary : (hasAccessibility ? Color.green : Color.red))
+                        .foregroundStyle(contrast == .increased ? .primary : (hasAccessibility ? Color.readableGreen : Color.readableRed))
                     Spacer()
                     if !hasAccessibility {
                         Button("Request Access") {

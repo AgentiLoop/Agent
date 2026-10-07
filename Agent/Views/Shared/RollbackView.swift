@@ -127,7 +127,7 @@ struct RollbackView: View {
             if let result = restoreResult {
                 Text(result)
                     .font(.caption)
-                    .foregroundStyle(contrast == .increased ? .primary : (result.hasPrefix("Error") ? Color.red : Color.green))
+                    .foregroundStyle(contrast == .increased ? .primary : (result.hasPrefix("Error") ? Color.readableRed : Color.readableGreen))
                     // Announce restore/clear outcome so VoiceOver users hear it without hunting for it
                     .task(id: result) { AccessibilityNotification.Announcement(result).post() }
             }
