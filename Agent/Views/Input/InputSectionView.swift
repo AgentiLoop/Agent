@@ -112,6 +112,8 @@ struct InputSectionView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.4), lineWidth: 1))
                 .lineLimit(2...16)
+                .accessibilityLabel(tab.isMainTab ? "Task" : tab.isMessagesTab ? "Messages task" : "Question about \(tab.scriptName)")
+                .accessibilityHint("Press Return to run. Press Tab to accept a suggestion.")
                 .background(GeometryReader { geo in
                     Color.clear.onChange(of: geo.size.width, initial: true) { _, w in
                         viewModel.inputFieldWidth = w - 14 // minus horizontal padding
@@ -207,6 +209,8 @@ struct InputSectionView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.4), lineWidth: 1))
                     .lineLimit(2...16)
+                    .accessibilityLabel("Task")
+                    .accessibilityHint("Press Return to run. Press Tab to accept a suggestion.")
                     .background(GeometryReader { geo in
                         Color.clear.onChange(of: geo.size.width, initial: true) { _, w in
                             viewModel.inputFieldWidth = w - 14
@@ -292,6 +296,7 @@ struct InputSectionView: View {
                             }
                             .buttonStyle(.plain)
                             .help("Dismiss suggestions")
+                            .accessibilityLabel("Dismiss suggestions")
                             .frame(width: 14)
                             Text(suggestion)
                                 .font(.system(size: 11))
@@ -314,6 +319,8 @@ struct InputSectionView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("Suggestion: \(suggestion)")
+                    .accessibilityHint("Fills the task field with this earlier task")
                     .background(
                         hoveredSuggestionIndex == idx ? Color.blue.opacity(0.2) :
                             idx == selectedSuggestionIndex ? Color.accentColor.opacity(0.15) : Color.clear
@@ -401,6 +408,7 @@ struct InputSectionView: View {
                 Image(systemName: "doc.plaintext")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
                 Text("Pasted text")
                     .font(.caption)
                 Text("\(item.text.count.formatted()) chars")
@@ -420,6 +428,7 @@ struct InputSectionView: View {
                 }
                 .buttonStyle(.plain)
                 .help("Remove attachment")
+                .accessibilityLabel("Remove pasted text")
             }
             Text(head.isEmpty ? " " : (tail.isEmpty ? head : "\(head) …"))
                 .font(.system(size: 10, design: .monospaced))
