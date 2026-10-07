@@ -281,6 +281,14 @@ struct ThinkingIndicatorView: View {
                                 showStreamText.toggle()
                             }
                         }
+                        // Full Keyboard Access: Tab to the toggle, Space/Return shows or hides the LLM output
+                        .focusable()
+                        .onKeyPress(keys: [.space, .return]) { _ in
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                showStreamText.toggle()
+                            }
+                            return .handled
+                        }
 
                         // Model name
                         HStack(spacing: 3) {
