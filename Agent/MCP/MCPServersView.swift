@@ -530,7 +530,7 @@ struct MCPServerEditView: View {
                 if let jsonError {
                     Text(jsonError)
                         .font(.caption2)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(contrast == .increased ? AnyShapeStyle(.primary) : AnyShapeStyle(.red))
                         .accessibilityLabel("Error: \(jsonError)")
                 }
             }
@@ -793,7 +793,7 @@ struct MCPImportView: View {
             if let errorText {
                 Text(errorText)
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(contrast == .increased ? AnyShapeStyle(.primary) : AnyShapeStyle(.red))
                     .accessibilityLabel("Error: \(errorText)")
             }
 

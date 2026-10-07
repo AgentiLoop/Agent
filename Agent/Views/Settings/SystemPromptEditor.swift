@@ -312,7 +312,7 @@ struct SystemPromptsView: View {
                 if currentDirty {
                     Text("Unsaved")
                         .font(.caption)
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(contrast == .increased ? AnyShapeStyle(.primary) : AnyShapeStyle(.orange))
                         .accessibilityLabel("Unsaved changes")
                 }
 

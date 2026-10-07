@@ -102,7 +102,7 @@ struct LLMCommonSettingsView: View {
                 if let error = viewModel.jevModelsError {
                     Text(error)
                         .font(.caption2)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(contrast == .increased ? AnyShapeStyle(.primary) : AnyShapeStyle(.red))
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityLabel("Error: \(error)")
                 }

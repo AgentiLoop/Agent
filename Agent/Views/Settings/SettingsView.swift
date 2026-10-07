@@ -175,8 +175,9 @@ struct SettingsView: View {
                 if let error = fm.lastError {
                     Text(error)
                         .font(.caption2)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(contrast == .increased ? AnyShapeStyle(.primary) : AnyShapeStyle(.red))
                         .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityLabel("Error: \(error)")
                 }
             }
 
@@ -567,7 +568,7 @@ struct SettingsView: View {
                                     let mins = Int(exp.timeIntervalSinceNow / 60)
                                     Text(mins > 0 ? "expires in \(mins)m" : "expired")
                                         .font(.caption2)
-                                        .foregroundStyle(mins > 0 ? AnyShapeStyle(captionStyle) : AnyShapeStyle(Color.red))
+                                        .foregroundStyle(mins > 0 ? AnyShapeStyle(captionStyle) : AnyShapeStyle(contrast == .increased ? Color.primary : Color.red))
                                 }
                             }
                             HStack(spacing: 8) {

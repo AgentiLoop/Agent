@@ -63,7 +63,7 @@ struct NewMainTabSheet: View {
             if !canCreate {
                 Text(validationMessage)
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(contrast == .increased ? AnyShapeStyle(.primary) : AnyShapeStyle(.red))
                     .accessibilityLabel("Error: \(validationMessage)")
             }
 

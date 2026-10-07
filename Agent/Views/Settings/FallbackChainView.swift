@@ -91,7 +91,7 @@ struct FallbackChainView: View {
                             if service.currentIndex == index {
                                 Text("active")
                                     .font(.caption2)
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(contrast == .increased ? AnyShapeStyle(.primary) : AnyShapeStyle(.green))
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
                                     .background(Color.green.opacity(highContrast ? 0.3 : 0.15))
