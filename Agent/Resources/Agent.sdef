@@ -16,6 +16,14 @@
                       description="Full text of the Main tab activity log.">
                 <cocoa key="activityLog"/>
             </property>
+            <property name="task summary" code="AgLR" type="text" access="r"
+                      description="Completion summary of the Main tab's most recent task (empty while running, after a stop, or before any task).">
+                <cocoa key="lastResult"/>
+            </property>
+            <property name="task error" code="AgLE" type="text" access="r"
+                      description="Last error logged by the Main tab's most recent task (empty when none).">
+                <cocoa key="lastError"/>
+            </property>
             <property name="project folder" code="AgPF" type="text"
                       description="The Main tab project folder (absolute path).">
                 <cocoa key="projectFolder"/>
@@ -156,6 +164,14 @@
             <property name="auto pilot status" code="AgAS" type="text" access="r"
                       description="One-line auto-pilot status: cycle, elapsed, time left, branch, goal.">
                 <cocoa key="autoPilotStatus"/>
+            </property>
+            <property name="task summary" code="AgLR" type="text" access="r"
+                      description="Completion summary of the tab's most recent task (empty while running, after a stop, or before any task).">
+                <cocoa key="lastResult"/>
+            </property>
+            <property name="task error" code="AgLE" type="text" access="r"
+                      description="Last error logged by the tab's most recent task (empty when none).">
+                <cocoa key="lastError"/>
             </property>
             <property name="queued tasks" code="AgQd" access="r"
                       description="Prompts waiting to run after the current task, in order.">

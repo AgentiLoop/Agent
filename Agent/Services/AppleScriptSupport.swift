@@ -5,7 +5,7 @@ import AppKit
 /// Application properties are KVC keys handled by AppDelegate; commands are NSScriptCommand subclasses.
 @MainActor
 extension AppDelegate {
-    private static let scriptingKeys: Set<String> = ["taskRunning", "activityLog", "projectFolder", "taskInput", "providerName", "modelName", "scriptingTabs",
+    private static let scriptingKeys: Set<String> = ["taskRunning", "activityLog", "lastResult", "lastError", "projectFolder", "taskInput", "providerName", "modelName", "scriptingTabs",
         "maxIterations", "maxRetries", "maxTokens", "tokenBudget", "temperature", "reasoningEffort",
         "autoVerify", "criticReview", "visualTests", "autoPR", "autoScaffold", "autoScreenshot", "forceVision",
         "messagesMonitor", "taskAutoComplete", "userAgentEnabled", "launchDaemonEnabled"]
@@ -17,6 +17,10 @@ extension AppDelegate {
     @objc var taskRunning: Bool { AgentViewModel.current?.isRunning ?? false }
 
     @objc var activityLog: String { AgentViewModel.current?.activityLog ?? "" }
+
+    @objc var lastResult: String { ScriptingTab(tabId: nil).lastResult }
+
+    @objc var lastError: String { ScriptingTab(tabId: nil).lastError }
 
     @objc var projectFolder: String {
         get { AgentViewModel.current?.projectFolder ?? "" }
@@ -217,6 +221,17 @@ final class ScriptingTab: NSObject {
     @objc var activityLog: String {
         guard tabId != nil else { return vm?.activityLog ?? "" }
         return tab?.activityLog ?? ""
+    }
+
+    /// Completion summary of the most recent task (cleared when a task starts or is stopped).
+    @objc var lastResult: String {
+        guard tabId != nil else { return vm?.lastTaskCompletionSummary ?? "" }
+        return tab?.lastTaskCompletionSummary ?? ""
+    }
+
+    @objc var lastError: String {
+        guard tabId != nil else { return vm?.lastTaskError ?? "" }
+        return tab?.lastTaskError ?? ""
     }
 
     @objc var taskInput: String {

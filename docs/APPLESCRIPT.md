@@ -14,7 +14,8 @@ tell application "Agent!"
     repeat while task running
         delay 1
     end repeat
-    return activity log
+    if task error is not "" then error task error
+    return task summary
 end tell
 ```
 
@@ -33,6 +34,8 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 |---|---|---|---|
 | `task running` | boolean | r | Whether the Main tab is running a task. |
 | `activity log` | text | r | Full text of the Main tab activity log. |
+| `task summary` | text | r | Completion summary of the Main tab's most recent task. Empty while a task runs, after it is stopped, or before any task. |
+| `task error` | text | r | Last error logged by the Main tab's most recent task (empty when none). |
 | `project folder` | text | rw | Main tab project folder (absolute path). |
 | `task input` | text | rw | Main tab task field text. |
 | `provider` | text | rw | LLM provider display name, e.g. `"Claude"`. An unknown name gives an error that lists the choices. |
@@ -77,6 +80,8 @@ end tell
 | `name` | text | r | Tab title. |
 | `task running` | boolean | r | Whether the tab is running a task. |
 | `activity log` | text | r | Full text of the tab's activity log. |
+| `task summary` | text | r | Completion summary of the tab's most recent task (empty while running, after a stop, or before any task). |
+| `task error` | text | r | Last error logged by the tab's most recent task (empty when none). |
 | `task input` | text | rw | The tab's task field text. |
 | `project folder` | text | rw | The tab's project folder. |
 | `provider` | text | rw* | Provider name. *Settable only on the Main tab or in `make new tab with properties`. |
@@ -98,9 +103,9 @@ tell application "Agent!"
     repeat while task running of t
         delay 2
     end repeat
-    set theLog to activity log of t
+    set theSummary to task summary of t
     close t
-    return theLog
+    return theSummary
 end tell
 ```
 
