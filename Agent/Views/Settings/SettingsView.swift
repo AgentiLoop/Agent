@@ -89,6 +89,7 @@ struct SettingsView: View {
                                         Image(systemName: "eye")
                                             .foregroundStyle(.blue)
                                             .font(.caption2)
+                                            .accessibilityLabel("Vision")
                                     }
                                 }.tag(model.id)
                             }
@@ -112,6 +113,7 @@ struct SettingsView: View {
                         .controlSize(.small)
                         .disabled(viewModel.fetchingModels.contains(provider))
                         .help("Fetch available models")
+                        .accessibilityLabel("Fetch Models")
                     }
                 }
             }
@@ -145,6 +147,7 @@ struct SettingsView: View {
                     Circle()
                         .fill(fm.isRunning ? Color.green : Color.red)
                         .frame(width: 8, height: 8)
+                        .accessibilityHidden(true)
                     Text(fm.isRunning ? "Running" : (fm.isAvailable ? "Not running" : "fm not found (macOS 27 required)"))
                         .font(.caption)
 
@@ -161,6 +164,7 @@ struct SettingsView: View {
                         Image(systemName: "arrow.clockwise")
                     }
                     .help("Check server status")
+                    .accessibilityLabel("Check Server Status")
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
@@ -203,6 +207,7 @@ struct SettingsView: View {
                     .controlSize(.small)
                     .disabled(viewModel.fetchingModels.contains(.fmServe))
                     .help("Fetch available models")
+                    .accessibilityLabel("Fetch Models")
                 }
             }
         }
@@ -284,6 +289,7 @@ struct SettingsView: View {
                             .controlSize(.small)
                             .disabled(viewModel.fetchingModels.contains(.claude))
                             .help("Fetch available models")
+                            .accessibilityLabel("Fetch Models")
                         }
                     }
                 }
@@ -317,6 +323,7 @@ struct SettingsView: View {
                                                 Image(systemName: "eye")
                                                     .foregroundStyle(.blue)
                                                     .font(.caption2)
+                                                    .accessibilityLabel("Vision")
                                             }
                                         }
                                         .tag(model.name)
@@ -339,6 +346,7 @@ struct SettingsView: View {
                             .controlSize(.small)
                             .disabled(viewModel.fetchingModels.contains(.ollama))
                             .help("Fetch available models")
+                            .accessibilityLabel("Fetch Models")
                         }
                     }
                 }
@@ -400,6 +408,7 @@ struct SettingsView: View {
                             .controlSize(.small)
                             .disabled(viewModel.fetchingModels.contains(.lmStudio))
                             .help("Fetch available models")
+                            .accessibilityLabel("Fetch Models")
                         }
                     }
                 }
@@ -449,6 +458,7 @@ struct SettingsView: View {
                             .controlSize(.small)
                             .disabled(viewModel.fetchingModels.contains(.vLLM))
                             .help("Fetch available models")
+                            .accessibilityLabel("Fetch Models")
                         }
                     }
                 }
@@ -469,7 +479,7 @@ struct SettingsView: View {
                         Text("Authentication").font(.caption).foregroundStyle(.secondary)
                         if MuseCodeAuth.isSignedIn {
                             HStack(spacing: 6) {
-                                Image(systemName: "checkmark.seal.fill").foregroundStyle(.green)
+                                Image(systemName: "checkmark.seal.fill").foregroundStyle(.green).accessibilityHidden(true)
                                 Text("Signed in")
                                 Spacer()
                                 Button("Sign In Again") {
@@ -479,7 +489,7 @@ struct SettingsView: View {
                             }
                         } else {
                             HStack(spacing: 6) {
-                                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange).accessibilityHidden(true)
                                 Text("Not signed in")
                                 Spacer()
                                 Button("Sign In via Muse CLI") {
@@ -520,6 +530,7 @@ struct SettingsView: View {
                             .controlSize(.small)
                             .disabled(viewModel.fetchingModels.contains(.museCode))
                             .help("Fetch available models from the Meta Model API")
+                            .accessibilityLabel("Fetch Models")
                         }
                     }
                 }
@@ -540,7 +551,7 @@ struct SettingsView: View {
                         Text("Authentication").font(.caption).foregroundStyle(.secondary)
                         if let auth = CodexAuthFile.load() {
                             HStack(spacing: 6) {
-                                Image(systemName: "checkmark.seal.fill").foregroundStyle(.green)
+                                Image(systemName: "checkmark.seal.fill").foregroundStyle(.green).accessibilityHidden(true)
                                 Text("Signed in")
                                 Spacer()
                                 if let exp = CodexJWT.expiry(auth.accessToken) {
@@ -565,7 +576,7 @@ struct SettingsView: View {
                             }
                         } else {
                             HStack(spacing: 6) {
-                                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange).accessibilityHidden(true)
                                 Text("Not signed in")
                                 Spacer()
                                 Button("Sign In via Codex CLI") {
@@ -606,6 +617,7 @@ struct SettingsView: View {
                             .controlSize(.small)
                             .disabled(viewModel.fetchingModels.contains(.codex))
                             .help("Fetch available models from Codex")
+                            .accessibilityLabel("Fetch Models")
                         }
                     }
                 }
@@ -636,6 +648,7 @@ struct SettingsView: View {
                                                 Image(systemName: "eye")
                                                     .foregroundStyle(.blue)
                                                     .font(.caption2)
+                                                    .accessibilityLabel("Vision")
                                             }
                                         }
                                         .tag(model.name)
@@ -658,6 +671,7 @@ struct SettingsView: View {
                             .controlSize(.small)
                             .disabled(viewModel.fetchingModels.contains(.localOllama))
                             .help("Fetch available local models")
+                            .accessibilityLabel("Fetch Models")
                         }
                     }
 
@@ -727,6 +741,7 @@ struct SettingsView: View {
                         .pickerStyle(.segmented)
                         .labelsHidden()
                         .frame(width: 260)
+                        .accessibilityLabel("Reasoning")
 
                         Text(viewModel.reasoningEffort == "off"
                              ? "No extended thinking"
@@ -776,6 +791,7 @@ struct SettingsView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .help("Always send images to LLM, even for non-vision models")
+                    .accessibilityLabel("Force Vision")
             }
 
             HStack {
@@ -785,6 +801,7 @@ struct SettingsView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .help("Keep the Steps list scrolled to the newest step while the mouse is not hovering over it")
+                    .accessibilityLabel("Auto-scroll Steps")
             }
 
         }
@@ -824,6 +841,7 @@ struct LockedSecureField: View {
     var body: some View {
         HStack(spacing: 4) {
             SecureField(placeholder, text: $text)
+                .accessibilityLabel("API Key")
                 .textContentType(.oneTimeCode)
                 .textFieldStyle(.roundedBorder)
                 .disabled(isLocked)
@@ -840,6 +858,7 @@ struct LockedSecureField: View {
             .buttonStyle(.bordered)
             .controlSize(.small)
             .help(isLocked ? "Unlock to edit" : "Lock to protect")
+            .accessibilityLabel(isLocked ? "Unlock Key" : "Lock Key")
 
             Button {
                 NSPasteboard.general.clearContents()
@@ -853,6 +872,7 @@ struct LockedSecureField: View {
             .controlSize(.small)
             .disabled(text.isEmpty)
             .help("Copy key to clipboard")
+            .accessibilityLabel("Copy Key")
         }
     }
 }
