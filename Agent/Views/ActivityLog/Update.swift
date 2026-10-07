@@ -22,6 +22,14 @@ extension ActivityLogView.Coordinator {
         let tabID = latestTabID
 
         if text.isEmpty {
+            // View > Bigger/Smaller Text on an empty log: redraw the placeholder at the new size
+            let placeholderSize = ActivityLogTextSize.current
+            let placeholderSizeChanged = placeholderSize != font.pointSize
+            if placeholderSizeChanged {
+                font = NSFont.monospacedSystemFont(ofSize: placeholderSize, weight: .regular)
+                textView.font = font
+                invalidateAllCaches()
+            }
             // Invalidate old background results before acknowledging the clear.
             cancelAsyncRender()
             pendingRenderWork?.cancel()
@@ -36,11 +44,13 @@ extension ActivityLogView.Coordinator {
             lastSearchRanges = []
             savedForegroundColors = []
             userIsAtBottom = true
-            guard !showingPlaceholder else { return }
-            textView.alphaValue = 0
-            NSAnimationContext.runAnimationGroup { ctx in
-                ctx.duration = 0.3
-                textView.animator().alphaValue = 1
+            guard !showingPlaceholder || placeholderSizeChanged else { return }
+            if !showingPlaceholder {
+                textView.alphaValue = 0
+                NSAnimationContext.runAnimationGroup { ctx in
+                    ctx.duration = 0.3
+                    textView.animator().alphaValue = 1
+                }
             }
             textView.textStorage?.setAttributedString(
                 NSAttributedString(
