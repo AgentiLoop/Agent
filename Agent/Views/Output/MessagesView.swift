@@ -62,12 +62,14 @@ struct MessagesView: View {
                     Button("All") {
                         let filtered = Set(viewModel.filteredRecipients.map(\.id))
                         viewModel.enabledHandleIds.formUnion(filtered)
+                        announceForAccessibility("All recipients enabled")
                     }
                     .buttonStyle(.bordered).controlSize(.mini)
                     .accessibilityLabel("Enable All Recipients")
                     Button("None") {
                         let filtered = Set(viewModel.filteredRecipients.map(\.id))
                         viewModel.enabledHandleIds.subtract(filtered)
+                        announceForAccessibility("All recipients disabled")
                     }
                     .buttonStyle(.bordered).controlSize(.mini)
                     .accessibilityLabel("Disable All Recipients")
@@ -77,6 +79,7 @@ struct MessagesView: View {
                         UserDefaults.standard.removeObject(forKey: "agentDiscoveredHandles")
                         UserDefaults.standard.removeObject(forKey: "agentDiscoveredServices")
                         UserDefaults.standard.removeObject(forKey: "agentDiscoveredFromMe")
+                        announceForAccessibility("Recipient list cleared")
                     }
                     .buttonStyle(.bordered).controlSize(.mini)
                     .accessibilityLabel("Clear Recipient List")

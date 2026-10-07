@@ -61,6 +61,7 @@ struct LLMUsageView: View {
                         Button("Reset") {
                             store.resetModelUsage()
                             store.resetCacheMetrics()
+                            announceForAccessibility("LLM usage reset")
                         }
                         .font(.caption)
                         .buttonStyle(.plain)

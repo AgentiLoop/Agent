@@ -195,6 +195,7 @@ struct FallbackChainView: View {
                         Spacer()
                         Button("Clear All") {
                             service.clear()
+                            announceForAccessibility("Fallback providers cleared")
                         }
                         .font(.caption)
                         .buttonStyle(.plain)

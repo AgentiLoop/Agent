@@ -79,7 +79,10 @@ struct HistoryView: View {
                     .font(.caption)
                     .foregroundStyle(captionStyle)
                 Spacer()
-                Button("Clear All") { onClear(selectedTaskType.rawValue) }
+                Button("Clear All") {
+                    onClear(selectedTaskType.rawValue)
+                    announceForAccessibility("\(selectedTaskType.rawValue) cleared")
+                }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
                     .disabled(currentItems.isEmpty)
