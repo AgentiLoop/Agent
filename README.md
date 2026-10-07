@@ -398,7 +398,7 @@ Slash commands run locally: `/clear [log|all|llm|history|tasks|tokens]`, `/memor
 **What Mac do I need?** Apple Silicon or Intel, macOS 14.6+. Any modern Mac for cloud providers; 64GB+ for 30B local models.
 **How is this different from Siri?** Siri answers. Agent! *acts* — apps, files, code, system.
 
-More: [docs/FAQ.md](docs/FAQ.md) · [Technical Architecture](docs/TECHNICAL.md) · [Comparisons](docs/COMPARISON.md) (vs Claude Code, Cursor, Cline, OpenClaw) · [Security Model](docs/SECURITY.md)
+More: [docs/FAQ.md](docs/FAQ.md) · [Technical Architecture](docs/TECHNICAL.md) · [Comparisons](docs/COMPARISON.md) (vs Claude Code, Cursor, Cline, OpenClaw) · [Security Model](docs/SECURITY.md) · [AppleScript Scripting](docs/APPLESCRIPT.md)
 
 ## Backstory
 
