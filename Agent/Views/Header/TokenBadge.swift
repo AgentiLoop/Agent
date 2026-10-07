@@ -27,7 +27,7 @@ struct TokenBadge: View {
                 if budgetUsedFraction > 0 {
                     Text("\(Int(budgetUsedFraction * 100))%")
                         .font(.caption2.monospacedDigit())
-                        .foregroundStyle(highContrast ? Color.primary : budgetUsedFraction >= 0.9 ? Color.red : budgetUsedFraction >= 0.7 ? Color.orange : Color.secondary)
+                        .foregroundStyle(highContrast ? Color.primary : budgetUsedFraction >= 0.9 ? Color.readableRed : budgetUsedFraction >= 0.7 ? Color.readableOrange : Color.secondary)
                 }
             }
             .padding(.horizontal, 5)
@@ -153,7 +153,7 @@ private struct TokenDetailView: View {
                         .accessibilityLabel("Sent \(fmt(store.todayInput))")
                     Text("↓ \(fmt(store.todayOutput))")
                         .font(.caption.monospacedDigit())
-                        .foregroundStyle(highContrast ? Color.primary : Color.green)
+                        .foregroundStyle(highContrast ? Color.primary : Color.readableGreen)
                         .accessibilityLabel("Received \(fmt(store.todayOutput))")
                     Text("Total: \(fmt(store.todayInput + store.todayOutput))")
                         .font(.caption.monospacedDigit())

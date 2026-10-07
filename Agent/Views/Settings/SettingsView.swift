@@ -568,7 +568,7 @@ struct SettingsView: View {
                                     let mins = Int(exp.timeIntervalSinceNow / 60)
                                     Text(mins > 0 ? "expires in \(mins)m" : "expired")
                                         .font(.caption2)
-                                        .foregroundStyle(mins > 0 ? AnyShapeStyle(captionStyle) : AnyShapeStyle(contrast == .increased ? Color.primary : Color.red))
+                                        .foregroundStyle(mins > 0 ? AnyShapeStyle(captionStyle) : AnyShapeStyle(contrast == .increased ? Color.primary : Color.readableRed))
                                 }
                             }
                             HStack(spacing: 8) {
