@@ -9,7 +9,10 @@ private class FocusAwareTextField: NSTextField {
     private var hasBeenClicked = false
 
     override func becomeFirstResponder() -> Bool {
-        guard hasBeenClicked else { return false }
+        // VoiceOver / Full Keyboard Access users can't click first — always allow focus for them.
+        let assistive = NSWorkspace.shared.isVoiceOverEnabled
+            || NSApp.isFullKeyboardAccessEnabled
+        guard hasBeenClicked || assistive else { return false }
         return super.becomeFirstResponder()
     }
 
@@ -39,6 +42,7 @@ private struct PathTextField: NSViewRepresentable {
         UserDefaults.standard.set(false, forKey: "NSUseSpellCheckerForCompletions")
         let tf = FocusAwareTextField()
         tf.placeholderString = placeholder
+        tf.setAccessibilityLabel("Project folder")
         tf.isAutomaticTextCompletionEnabled = false
         tf.contentType = .none
         tf.isBordered = false
@@ -138,6 +142,7 @@ struct ProjectFolderField: View {
                 .clipShape(Capsule())
                 .controlSize(.small)
                 .help("Pick project folder")
+                .accessibilityLabel("Pick project folder")
                 .popover(isPresented: $showTree) {
                     FolderTreePopover(
                         selectedFolder: projectFolder,
@@ -167,6 +172,7 @@ struct ProjectFolderField: View {
                 .clipShape(Capsule())
                 .controlSize(.small)
                 .help("Browse for folder")
+                .accessibilityLabel("Browse for folder")
 
                 Button {
                     projectFolder = FileManager.default.homeDirectoryForCurrentUser.path
@@ -180,6 +186,7 @@ struct ProjectFolderField: View {
                 .clipShape(Capsule())
                 .controlSize(.small)
                 .help("Home folder")
+                .accessibilityLabel("Home folder")
 
                 Button {
                     projectFolder = ""
@@ -193,6 +200,7 @@ struct ProjectFolderField: View {
                 .clipShape(Capsule())
                 .controlSize(.small)
                 .help("Clear project folder")
+                .accessibilityLabel("Clear project folder")
 
                 Button {
                     RecentFoldersService.shared.clearAll()
@@ -207,6 +215,7 @@ struct ProjectFolderField: View {
                 .controlSize(.small)
                 .disabled(recentFolders.isEmpty)
                 .help("Clear recent folders")
+                .accessibilityLabel("Clear recent folders")
 
                 Button {
                     RecentFoldersService.shared.restore()
@@ -220,6 +229,7 @@ struct ProjectFolderField: View {
                 .controlSize(.small)
                 .disabled(!canRestoreRecent)
                 .help("Restore recent folders")
+                .accessibilityLabel("Restore recent folders")
 
                 PathTextField(
                     text: $projectFolder,
@@ -295,6 +305,10 @@ struct ProjectFolderField: View {
                                 .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("Recent folder \((folder as NSString).lastPathComponent)")
+                            .accessibilityValue(folder)
+                            .accessibilityAddTraits(folder == projectFolder ? [.isButton, .isSelected] : .isButton)
                             .background(folder == projectFolder ? Color.accentColor.opacity(0.15) : Color.clear)
                             .cornerRadius(4)
                         }
@@ -355,6 +369,7 @@ private struct FolderTreePopover: View {
                 .controlSize(.small)
                 .clipShape(Capsule())
                 .help("Done")
+                .accessibilityLabel("Done")
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
@@ -456,6 +471,7 @@ private struct FolderTreeRow: View {
                         .frame(width: 16, height: 16)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(isExpanded ? "Collapse \(name)" : "Expand \(name)")
 
                 // Folder icon + name: single click selects, double click toggles expand
                 HStack(spacing: 4) {
@@ -473,6 +489,15 @@ private struct FolderTreeRow: View {
                 }
                 .onTapGesture(count: 1) {
                     onSelect(path)
+                }
+                // Tap gestures are invisible to VoiceOver — expose the row as a button.
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Folder \(name)")
+                .accessibilityAddTraits(path == selectedFolder ? [.isButton, .isSelected] : .isButton)
+                .accessibilityAction { onSelect(path) }
+                .accessibilityAction(named: "Select and close") {
+                    onSelect(path)
+                    onDone?()
                 }
             }
             .padding(.vertical, 2)
