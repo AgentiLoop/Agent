@@ -29,13 +29,16 @@ struct TabBarView: View {
                         for: tab.id,
                         in: viewModel.scriptTabs
                     )
+                    let index = viewModel.scriptTabs.firstIndex(where: { $0.id == tab.id }) ?? 0
                     TabItem(
                         title: tab.displayTitle,
                         isSelected: viewModel.selectedTabId == tab.id,
                         isRunning: (tab.isMainTab || tab.isMessagesTab) ? tab.isLLMRunning : tab.isRunning,
                         tint: color,
                         onSelect: { viewModel.selectedTabId = tab.id },
-                        onClose: { viewModel.closeScriptTab(id: tab.id) }
+                        onClose: { viewModel.closeScriptTab(id: tab.id) },
+                        onMoveLeft: index > 0 ? { moveTab(tab.id, by: -1) } : nil,
+                        onMoveRight: index < viewModel.scriptTabs.count - 1 ? { moveTab(tab.id, by: 1) } : nil
                     )
                     .zIndex(isDragging ? 1 : 0)
                     .offset(x: isDragging ? dragOffset : 0)
@@ -73,6 +76,15 @@ struct TabBarView: View {
         .frame(height: 28)
         .background(Color(nsColor: .windowBackgroundColor))
     }
+
+    /// Keyboard/VoiceOver alternative to drag-reordering.
+    private func moveTab(_ id: UUID, by delta: Int) {
+        guard let from = viewModel.scriptTabs.firstIndex(where: { $0.id == id }) else { return }
+        let to = from + delta
+        guard viewModel.scriptTabs.indices.contains(to) else { return }
+        viewModel.scriptTabs.swapAt(from, to)
+        announceForAccessibility("\(viewModel.scriptTabs[to].displayTitle) moved to position \(to + 2) of \(viewModel.scriptTabs.count + 1)")
+    }
 }
 
 private struct TabItem: View {
@@ -82,6 +94,8 @@ private struct TabItem: View {
     let tint: Color
     let onSelect: () -> Void
     let onClose: (() -> Void)?
+    var onMoveLeft: (() -> Void)? = nil
+    var onMoveRight: (() -> Void)? = nil
 
     @State private var isHovering = false
 
@@ -133,6 +147,12 @@ private struct TabItem: View {
         .accessibilityActions {
             if let onClose {
                 Button("Close Tab", action: onClose)
+            }
+            if let onMoveLeft {
+                Button("Move Tab Left", action: onMoveLeft)
+            }
+            if let onMoveRight {
+                Button("Move Tab Right", action: onMoveRight)
             }
         }
     }
