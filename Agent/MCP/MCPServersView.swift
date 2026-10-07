@@ -25,6 +25,7 @@ struct MCPServersView: View {
             // Header
             Text("MCP Servers")
                 .font(.headline)
+                .accessibilityAddTraits(.isHeader)
 
             Text("Connect external tools via Model Context Protocol.")
                 .font(.caption)
@@ -40,6 +41,7 @@ struct MCPServersView: View {
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .help("Refresh server status")
+                .accessibilityLabel("Refresh Server Status")
 
                 Button {
                     showingImport = true
@@ -49,6 +51,7 @@ struct MCPServersView: View {
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .help("Import server configuration")
+                .accessibilityLabel("Import Server Configuration")
 
                 if !MCPPresets.all.isEmpty {
                     Menu {
@@ -64,6 +67,7 @@ struct MCPServersView: View {
                     .menuIndicator(.hidden)
                     .frame(width: 28, height: 22)
                     .help("Add a preset MCP server")
+                    .accessibilityLabel("Add Preset MCP Server")
                 }
 
                 Button {
@@ -74,6 +78,7 @@ struct MCPServersView: View {
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .help("Add MCP server")
+                .accessibilityLabel("Add MCP Server")
             }
 
             if registry.servers.isEmpty {
@@ -81,6 +86,7 @@ struct MCPServersView: View {
                     Image(systemName: "server.rack")
                         .font(.system(size: 32))
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                     Text("No MCP servers configured")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -203,21 +209,23 @@ struct MCPServersView: View {
                 ))
                 .toggleStyle(.switch)
                 .controlSize(.mini)
+                .accessibilityLabel("Enable \(server.name)")
 
                 HStack(spacing: 3) {
                     switch status {
                     case .connected:
-                        Circle().fill(.green).frame(width: 6, height: 6)
+                        Circle().fill(.green).frame(width: 6, height: 6).accessibilityHidden(true)
                         Text("Connected").font(.caption2).foregroundStyle(.green)
                     case .connecting:
                         ProgressView().controlSize(.mini)
                         Text("Connecting...").font(.caption2).foregroundStyle(.secondary)
                     case .disconnected:
-                        Circle().fill(.secondary).frame(width: 6, height: 6)
+                        Circle().fill(.secondary).frame(width: 6, height: 6).accessibilityHidden(true)
                         Text("Disconnected").font(.caption2).foregroundStyle(.secondary)
                     case .error(let message):
-                        Circle().fill(.red).frame(width: 6, height: 6)
+                        Circle().fill(.red).frame(width: 6, height: 6).accessibilityHidden(true)
                         Text(message).font(.caption2).foregroundStyle(.red).lineLimit(1)
+                            .accessibilityLabel("Error: \(message)")
                     }
                 }
             }
@@ -253,6 +261,9 @@ struct MCPServersView: View {
                             }
                             .buttonStyle(.plain)
                             .help(tool.description)
+                            .accessibilityLabel("Tool \(tool.name)")
+                            .accessibilityValue(enabled ? "Enabled" : "Disabled")
+                            .accessibilityHint("Toggles whether this tool is available to Agent!")
                         }
                     }
                 }
@@ -266,6 +277,7 @@ struct MCPServersView: View {
                 }
                 .buttonStyle(.bordered).controlSize(.mini)
                 .help("Edit server")
+                .accessibilityLabel("Edit \(server.name)")
 
                 Button(role: .destructive) {
                     let serverId = server.id
@@ -278,6 +290,7 @@ struct MCPServersView: View {
                 }
                 .buttonStyle(.bordered).controlSize(.mini)
                 .help("Remove server")
+                .accessibilityLabel("Remove \(server.name)")
             }
         }
         .padding(8)
@@ -393,6 +406,7 @@ struct MCPServerEditView: View {
             HStack {
                 Text(server == nil ? "Add MCP Server" : "Edit MCP Server")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
                 Spacer()
                 Button("Cancel") { dismiss() }
                     .buttonStyle(.bordered).controlSize(.small)
@@ -403,7 +417,9 @@ struct MCPServerEditView: View {
             VStack(alignment: .leading, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Name").font(.caption).foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                     TextField("My MCP Server", text: $name).textFieldStyle(.roundedBorder)
+                        .accessibilityLabel("Name")
                 }
 
                 // Transport picker
@@ -417,19 +433,27 @@ struct MCPServerEditView: View {
                     // HTTP fields
                     VStack(alignment: .leading, spacing: 4) {
                         Text("URL").font(.caption).foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                         TextField("https://example.com/mcp", text: $urlText).textFieldStyle(.roundedBorder)
+                            .accessibilityLabel("URL")
                     }
                     VStack(alignment: .leading, spacing: 4) {
                         Text("SSE Endpoint (optional)").font(.caption).foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                         TextField("/sse", text: $sseEndpointText).textFieldStyle(.roundedBorder)
+                            .accessibilityLabel("SSE Endpoint (optional)")
                     }
                     VStack(alignment: .leading, spacing: 4) {
                         Text("HTTP Endpoint (optional)").font(.caption).foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                         TextField("/message", text: $httpEndpointText).textFieldStyle(.roundedBorder)
+                            .accessibilityLabel("HTTP Endpoint (optional)")
                     }
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Headers (Name: Value, one per line)").font(.caption).foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                         TextField("Authorization: Bearer ...", text: $headersText, axis: .vertical)
+                            .accessibilityLabel("Headers (Name: Value, one per line)")
                             .font(.system(.caption, design: .monospaced))
                             .textFieldStyle(.roundedBorder)
                             .lineLimit(3...6)
@@ -438,18 +462,24 @@ struct MCPServerEditView: View {
                     // Stdio fields
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Command").font(.caption).foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                         TextField("/usr/local/bin/my-mcp-server", text: $command).textFieldStyle(.roundedBorder)
+                            .accessibilityLabel("Command")
                     }
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Arguments (one per line)").font(.caption).foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                         TextField("arg1", text: $argumentsText, axis: .vertical)
+                            .accessibilityLabel("Arguments (one per line)")
                             .font(.system(.caption, design: .monospaced))
                             .textFieldStyle(.roundedBorder)
                             .lineLimit(3...6)
                     }
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Environment Variables (KEY=value, one per line)").font(.caption).foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                         TextField("API_KEY=abc123", text: $environmentText, axis: .vertical)
+                            .accessibilityLabel("Environment Variables (KEY=value, one per line)")
                             .font(.system(.caption, design: .monospaced))
                             .textFieldStyle(.roundedBorder)
                             .lineLimit(3...6)
@@ -479,6 +509,7 @@ struct MCPServerEditView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("JSON").font(.caption).foregroundStyle(.secondary)
                 PlainTextEditor(text: $jsonText)
+                    .accessibilityLabel("Server JSON")
                     .frame(height: 120)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
                     .onChange(of: jsonText) {
@@ -488,6 +519,7 @@ struct MCPServerEditView: View {
                     Text(jsonError)
                         .font(.caption2)
                         .foregroundStyle(.red)
+                        .accessibilityLabel("Error: \(jsonError)")
                 }
             }
 
@@ -730,11 +762,13 @@ struct MCPImportView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Import MCP Server")
                 .font(.headline)
+                .accessibilityAddTraits(.isHeader)
             Text("Paste standard MCP JSON configuration:")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
             PlainTextEditor(text: $jsonText)
+                .accessibilityLabel("MCP Server JSON")
                 .frame(height: 200)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
 
@@ -742,6 +776,7 @@ struct MCPImportView: View {
                 Text(errorText)
                     .font(.caption)
                     .foregroundStyle(.red)
+                    .accessibilityLabel("Error: \(errorText)")
             }
 
             HStack {
