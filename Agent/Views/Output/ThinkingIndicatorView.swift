@@ -30,6 +30,8 @@ struct ThinkingIndicatorView: View {
     @State private var dots = ""
     @State private var tick = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var highContrast: Bool { contrast == .increased }
     /// Elapsed time — stored on the tab to survive tab switches
     private var elapsed: TimeInterval {
         get { tab?.taskElapsed ?? viewModel.mainTaskElapsed }
@@ -175,7 +177,7 @@ struct ThinkingIndicatorView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 9, weight: .bold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(highContrast ? .primary : .secondary)
                         .rotationEffect(.degrees(isExpanded ? 90 : 0))
 
                     if isActive {
@@ -189,7 +191,7 @@ struct ThinkingIndicatorView: View {
 
                     Text("(\(Self.formatElapsed(elapsed)))")
                         .font(.caption.monospaced())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(highContrast ? .primary : .secondary)
 
                     if isActive {
                         if isScriptOnly {
@@ -268,7 +270,7 @@ struct ThinkingIndicatorView: View {
                                 .font(.system(size: 8, weight: .bold))
                             Text("LLM Output").font(.caption)
                         }
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(highContrast ? .primary : .secondary)
                         // Row toggles via onTapGesture, which VoiceOver can't trigger — expose it as a button
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel("LLM Output")
@@ -285,16 +287,16 @@ struct ThinkingIndicatorView: View {
                             Image(systemName: "brain").font(.caption)
                             Text(modelName).font(.caption).lineLimit(1)
                         }
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(highContrast ? .primary : .secondary)
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel("Model")
                         .accessibilityValue(modelName)
 
                         HStack(spacing: 2) {
                             Text("↑").font(.caption).foregroundStyle(.blue)
-                            Text(Self.fmtTokens(inputTokens)).font(.caption).foregroundStyle(.secondary)
+                            Text(Self.fmtTokens(inputTokens)).font(.caption).foregroundStyle(highContrast ? .primary : .secondary)
                             Text("↓").font(.caption).foregroundStyle(.green)
-                            Text(Self.fmtTokens(outputTokens)).font(.caption).foregroundStyle(.secondary)
+                            Text(Self.fmtTokens(outputTokens)).font(.caption).foregroundStyle(highContrast ? .primary : .secondary)
                         }
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel("Tokens")
@@ -313,7 +315,7 @@ struct ThinkingIndicatorView: View {
                                 GeometryReader { geo in
                                     ZStack(alignment: .leading) {
                                         RoundedRectangle(cornerRadius: 2)
-                                            .fill(Color.gray.opacity(0.3))
+                                            .fill(Color.gray.opacity(highContrast ? 0.6 : 0.3))
                                         RoundedRectangle(cornerRadius: 2)
                                             .fill(barColor)
                                             .frame(width: geo.size.width * fraction)
@@ -452,6 +454,7 @@ struct ThinkingIndicatorView: View {
 private struct LLMOutputBox: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorSchemeContrast) private var contrast
     let text: String
     var rawText: String = ""
     @Binding var height: CGFloat
@@ -798,7 +801,7 @@ private struct LLMOutputBox: View {
         }
         .background(termBg)
         .cornerRadius(6)
-        .overlay(RoundedRectangle(cornerRadius: 6).stroke(termBorder, lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 6).stroke(contrast == .increased ? termText : termBorder, lineWidth: contrast == .increased ? 2 : 1))
         .task {
             // Blink cursor at ~2Hz — always running, seamless streaming→idle
             while !Task.isCancelled {
@@ -849,6 +852,8 @@ struct ToolStepsView: View {
     /// When true, the list follows the newest step unless the mouse is over it.
     let autoScroll: Bool
 
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var highContrast: Bool { contrast == .increased }
     @State private var isHovering = false
     @State private var dragStartHeight: Double?
     /// Live height while a drag is in flight. Kept local so every mouse move doesn't
@@ -887,7 +892,7 @@ struct ToolStepsView: View {
                         .font(.caption)
                     Spacer()
                 }
-                .foregroundStyle(.secondary)
+                .foregroundStyle(highContrast ? .primary : .secondary)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -902,7 +907,7 @@ struct ToolStepsView: View {
                                 HStack(spacing: 6) {
                                     Text("\(idx + 1)")
                                         .font(.system(size: 9, design: .monospaced))
-                                        .foregroundStyle(.tertiary)
+                                        .foregroundStyle(highContrast ? .primary : .tertiary)
                                         .frame(width: 20, alignment: .trailing)
                                     switch step.status {
                                     case .running:
@@ -922,7 +927,7 @@ struct ToolStepsView: View {
                                     if !step.detail.isEmpty {
                                         Text(step.detail)
                                             .font(.system(size: 10, design: .monospaced))
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(highContrast ? .primary : .secondary)
                                             .lineLimit(1)
                                             .truncationMode(.middle)
                                     }
@@ -930,7 +935,7 @@ struct ToolStepsView: View {
                                     if let d = step.duration {
                                         Text(String(format: "%.1fs", d))
                                             .font(.system(size: 9, design: .monospaced))
-                                            .foregroundStyle(.tertiary)
+                                            .foregroundStyle(highContrast ? .primary : .tertiary)
                                     }
                                 }
                                 .padding(.vertical, 1)
@@ -953,7 +958,7 @@ struct ToolStepsView: View {
 
                 // Horizontal drag bar — resizes the list vertically
                 RoundedRectangle(cornerRadius: 1.5)
-                    .fill(Color.secondary.opacity(isDragging ? 0.7 : 0.35))
+                    .fill(Color.secondary.opacity(isDragging || highContrast ? 0.7 : 0.35))
                     .frame(width: 36, height: 3)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 3)
