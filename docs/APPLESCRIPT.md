@@ -68,6 +68,14 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `activity log below hud` | boolean | rw | HUD popover: start the activity log below the HUD instead of behind it. |
 | `activity log text size` | integer | rw | Activity log text size in points, 9 to 36 (View > Bigger / Smaller / Actual Size Text). |
 | `shell timeout` | integer | rw | Settings > Agent Options: minutes before a hung shell command is killed, 1 to 120; 0 turns it off. |
+| `network retry delay` | integer | rw | Settings > Agent Options: seconds between network retries — 10, 20, 30, 40, 50 or 60. |
+| `output lines` | integer | rw | Settings > Agent Options: tool output lines kept before truncating — 10, 50, 75, 100, 150, 200, 250, 500, 750, 1000 or 1500. |
+| `read file preview lines` | integer | rw | Settings > Agent Options: lines shown when a file is read — 3, 10, 50, 100, 250, 500, 750 or 1000. |
+| `capture script stderr` | boolean | rw | Settings > Agent Options: AgentScript runs capture stderr. |
+| `apple ai mediator` | boolean | rw | Apple Intelligence popover: Enable Mediator, the master switch for on-device Apple AI. |
+| `apple ai triage` | boolean | rw | Apple Intelligence popover: answer greetings on-device before the cloud LLM. |
+| `apple ai annotations` | boolean | rw | Apple Intelligence popover: show task summaries and error explanations in the activity log. |
+| `apple ai token compression` | boolean | rw | Apple Intelligence popover: summarize old messages on-device when context runs low. |
 | `fallback enabled` | boolean | rw | Settings > Fallback Chain: switch to the next provider when the current one keeps failing. |
 | `fallback chain` | list of text | rw | Fallback providers in order, each `"Provider / model"` (e.g. `"Claude / claude-sonnet-4"`; the provider may also be its id such as `ollama`). Setting it replaces the chain; entries already in it keep their on/off switch. |
 | `disabled fallback entries` | list of text | rw | Fallback chain entries switched off (skipped). Each must be in `fallback chain`. |

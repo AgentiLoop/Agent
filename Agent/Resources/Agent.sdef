@@ -157,6 +157,38 @@
                       description="Minutes before a hung shell command is killed, 1 to 120; 0 turns the timeout off.">
                 <cocoa key="shellTimeout"/>
             </property>
+            <property name="network retry delay" code="AgW3" type="integer"
+                      description="Settings &gt; Agent Options: seconds between network retries — 10, 20, 30, 40, 50 or 60.">
+                <cocoa key="networkRetryDelay"/>
+            </property>
+            <property name="output lines" code="AgW4" type="integer"
+                      description="Settings &gt; Agent Options: tool output lines kept before truncating — 10, 50, 75, 100, 150, 200, 250, 500, 750, 1000 or 1500.">
+                <cocoa key="outputLines"/>
+            </property>
+            <property name="read file preview lines" code="AgW5" type="integer"
+                      description="Settings &gt; Agent Options: lines shown when a file is read — 3, 10, 50, 100, 250, 500, 750 or 1000.">
+                <cocoa key="readFilePreviewLines"/>
+            </property>
+            <property name="capture script stderr" code="AgW6" type="boolean"
+                      description="Settings &gt; Agent Options: AgentScript runs capture stderr.">
+                <cocoa key="captureScriptStderr"/>
+            </property>
+            <property name="apple ai mediator" code="AgZ1" type="boolean"
+                      description="Apple Intelligence popover: Enable Mediator (master switch for on-device Apple AI).">
+                <cocoa key="appleAIMediator"/>
+            </property>
+            <property name="apple ai triage" code="AgZ2" type="boolean"
+                      description="Apple Intelligence popover: answer greetings on-device before the cloud LLM.">
+                <cocoa key="appleAITriage"/>
+            </property>
+            <property name="apple ai annotations" code="AgZ3" type="boolean"
+                      description="Apple Intelligence popover: show task summaries and error explanations in the activity log.">
+                <cocoa key="appleAIAnnotations"/>
+            </property>
+            <property name="apple ai token compression" code="AgZ4" type="boolean"
+                      description="Apple Intelligence popover: summarize old messages on-device when context runs low.">
+                <cocoa key="appleAITokenCompression"/>
+            </property>
             <property name="fallback enabled" code="AgB1" type="boolean"
                       description="Settings &gt; Fallback Chain: switch to the next provider when the current one keeps failing.">
                 <cocoa key="fallbackEnabled"/>

@@ -14,7 +14,8 @@ extension AppDelegate {
         "mcpServers", "enabledMCPServers", "connectedMCPServers", "mcpTools", "disabledMCPTools",
         "llmOutput", "inputTokens", "outputTokens", "sessionInputTokens", "sessionOutputTokens",
         "accessibilityAutomation", "showHUD", "smoothStreaming", "terminalSpeed", "scanLines", "hudLogBelow",
-        "activityLogTextSize", "shellTimeout",
+        "activityLogTextSize", "shellTimeout", "networkRetryDelay", "outputLines", "readFilePreviewLines", "captureScriptStderr",
+        "appleAIMediator", "appleAITriage", "appleAIAnnotations", "appleAITokenCompression",
         "fallbackEnabled", "fallbackChain", "disabledFallbackEntries", "activeFallback",
         "systemPrompt", "compactSystemPrompt"]
 
@@ -244,6 +245,56 @@ extension AppDelegate {
             }
             UserDefaults.standard.set(Double(newValue * 60), forKey: AppConstants.shellCommandTimeoutKey)
         }
+    }
+
+    /// Sets an Agent Options picker/stepper value; only the window's choices are accepted.
+    private func setChoice(_ keyPath: ReferenceWritableKeyPath<AgentViewModel, Int>, _ value: Int, _ choices: [Int], _ name: String) {
+        guard choices.contains(value) else {
+            return ScriptingTab.scriptError("\(name) must be one of \(choices.map(String.init).joined(separator: ", ")).")
+        }
+        setSetting(keyPath, value)
+    }
+
+    @objc var networkRetryDelay: Int {
+        get { setting(\.networkRetryDelay, 60) }
+        set { setChoice(\.networkRetryDelay, newValue, [10, 20, 30, 40, 50, 60], "Network retry delay") }
+    }
+
+    @objc var outputLines: Int {
+        get { setting(\.maxOutputLines, 1000) }
+        set { setChoice(\.maxOutputLines, newValue, AgentViewModel.outputLineOptions, "Output lines") }
+    }
+
+    @objc var readFilePreviewLines: Int {
+        get { setting(\.readFilePreviewLines, 3) }
+        set { setChoice(\.readFilePreviewLines, newValue, AgentViewModel.readPreviewOptions, "Read file preview lines") }
+    }
+
+    @objc var captureScriptStderr: Bool {
+        get { setting(\.scriptCaptureStderr, false) }
+        set { setSetting(\.scriptCaptureStderr, newValue) }
+    }
+
+    // MARK: - Apple Intelligence popover (on-device mediator switches)
+
+    @objc var appleAIMediator: Bool {
+        get { AppleIntelligenceMediator.shared.isEnabled }
+        set { AppleIntelligenceMediator.shared.isEnabled = newValue }
+    }
+
+    @objc var appleAITriage: Bool {
+        get { AppleIntelligenceMediator.shared.triageEnabled }
+        set { AppleIntelligenceMediator.shared.triageEnabled = newValue }
+    }
+
+    @objc var appleAIAnnotations: Bool {
+        get { AppleIntelligenceMediator.shared.showAnnotationsToUser }
+        set { AppleIntelligenceMediator.shared.showAnnotationsToUser = newValue }
+    }
+
+    @objc var appleAITokenCompression: Bool {
+        get { AppleIntelligenceMediator.shared.tokenCompressionEnabled }
+        set { AppleIntelligenceMediator.shared.tokenCompressionEnabled = newValue }
     }
 
     // MARK: - Fallback Chain (Settings > Fallback Chain; entries are "Provider / model", as in the window)
