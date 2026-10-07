@@ -106,7 +106,12 @@ final class ScriptTab: Identifiable {
     /// Summary the last tab task ended with ("" when cancelled/incomplete). Read by auto-pilot between cycles.
     var lastTaskCompletionSummary: String = ""
     var isLLMRunning: Bool = false {
-        didSet { if oldValue && !isLLMRunning { announceForAccessibility(spokenTaskFinished("\(displayTitle) task", summary: lastTaskCompletionSummary)) } }
+        didSet {
+            guard oldValue && !isLLMRunning else { return }
+            announceForAccessibility(runningLLMTask?.isCancelled == true
+                ? "\(displayTitle) task cancelled"
+                : spokenTaskFinished("\(displayTitle) task", summary: lastTaskCompletionSummary))
+        }
     }
     var isLLMThinking: Bool = false
     var thinkingDismissed: Bool = true

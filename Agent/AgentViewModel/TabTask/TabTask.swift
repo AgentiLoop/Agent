@@ -133,8 +133,8 @@ extension AgentViewModel {
         let queueCount = tab.taskQueue.count
         tab.taskQueue.removeAll()
         tab.runningLLMTask?.cancel()
+        tab.isLLMRunning = false // before clearing runningLLMTask: its didSet reads isCancelled to announce "cancelled"
         tab.runningLLMTask = nil
-        tab.isLLMRunning = false
         tab.isLLMThinking = false
         tab.currentTaskPrompt = ""
         tab.currentAppleAIPrompt = ""
