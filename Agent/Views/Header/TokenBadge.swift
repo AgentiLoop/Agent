@@ -27,7 +27,7 @@ struct TokenBadge: View {
                 if budgetUsedFraction > 0 {
                     Text("\(Int(budgetUsedFraction * 100))%")
                         .font(.caption2.monospacedDigit())
-                        .foregroundStyle(budgetUsedFraction >= 0.9 ? .red : budgetUsedFraction >= 0.7 ? .orange : highContrast ? .primary : .secondary)
+                        .foregroundStyle(highContrast ? Color.primary : budgetUsedFraction >= 0.9 ? Color.red : budgetUsedFraction >= 0.7 ? Color.orange : Color.secondary)
                 }
             }
             .padding(.horizontal, 5)
@@ -149,11 +149,11 @@ private struct TokenDetailView: View {
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("↑ \(fmt(store.todayInput))")
                         .font(.caption.monospacedDigit())
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(highContrast ? Color.primary : Color.blue)
                         .accessibilityLabel("Sent \(fmt(store.todayInput))")
                     Text("↓ \(fmt(store.todayOutput))")
                         .font(.caption.monospacedDigit())
-                        .foregroundStyle(.green)
+                        .foregroundStyle(highContrast ? Color.primary : Color.green)
                         .accessibilityLabel("Received \(fmt(store.todayOutput))")
                     Text("Total: \(fmt(store.todayInput + store.todayOutput))")
                         .font(.caption.monospacedDigit())
@@ -161,7 +161,7 @@ private struct TokenDetailView: View {
                     if store.todayCacheRead > 0 {
                         Text("⚡︎ Cache: \(fmt(store.todayCacheRead))")
                             .font(.caption.monospacedDigit())
-                            .foregroundStyle(.cyan)
+                            .foregroundStyle(highContrast ? Color.primary : Color.cyan)
                             .accessibilityLabel("Cache \(fmt(store.todayCacheRead))")
                     }
                 }

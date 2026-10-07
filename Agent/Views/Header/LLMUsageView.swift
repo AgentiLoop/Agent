@@ -116,7 +116,7 @@ struct LLMUsageView: View {
                                 HStack(spacing: 4) {
                                     Text("↑")
                                         .font(.caption2)
-                                        .foregroundStyle(.blue)
+                                        .foregroundStyle(highContrast ? Color.primary : Color.blue)
                                         .frame(width: 12)
                                     GeometryReader { geo in
                                         let frac = CGFloat(usage.inputTokens) / CGFloat(max(maxTokens, 1))
@@ -134,7 +134,7 @@ struct LLMUsageView: View {
                                 HStack(spacing: 4) {
                                     Text("↓")
                                         .font(.caption2)
-                                        .foregroundStyle(.green)
+                                        .foregroundStyle(highContrast ? Color.primary : Color.green)
                                         .frame(width: 12)
                                     GeometryReader { geo in
                                         let frac = CGFloat(usage.outputTokens) / CGFloat(max(maxTokens, 1))
@@ -155,7 +155,7 @@ struct LLMUsageView: View {
                             if isSubscriptionBilled(model: model) {
                                 Text("Included")
                                     .font(.caption)
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(highContrast ? Color.primary : Color.green)
                                     .frame(width: 62, alignment: .trailing)
                                     .help("Billed against your ChatGPT / Claude subscription — no per-token cost.")
                             } else {
@@ -163,7 +163,7 @@ struct LLMUsageView: View {
                                 if cost > 0 {
                                     Text(String(format: "$%.3f", cost))
                                         .font(.caption.monospacedDigit())
-                                        .foregroundStyle(.orange)
+                                        .foregroundStyle(highContrast ? Color.primary : Color.orange)
                                         .frame(width: 62, alignment: .trailing)
                                 } else {
                                     Text("free")
@@ -201,20 +201,20 @@ struct LLMUsageView: View {
                         HStack(spacing: 8) {
                             Text("↑ \(fmt(totalIn))")
                                 .font(.caption.monospacedDigit())
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(highContrast ? Color.primary : Color.blue)
                                 .accessibilityLabel("Input \(fmt(totalIn))")
                             Text("↓ \(fmt(totalOut))")
                                 .font(.caption.monospacedDigit())
-                                .foregroundStyle(.green)
+                                .foregroundStyle(highContrast ? Color.primary : Color.green)
                                 .accessibilityLabel("Output \(fmt(totalOut))")
                             if nonSubCost > 0 {
                                 Text(String(format: "$%.3f", nonSubCost))
                                     .font(.caption.monospacedDigit().weight(.semibold))
-                                    .foregroundStyle(.orange)
+                                    .foregroundStyle(highContrast ? Color.primary : Color.orange)
                             } else if hasSub {
                                 Text("Included")
                                     .font(.caption.weight(.semibold))
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(highContrast ? Color.primary : Color.green)
                             }
                         }
                     }
@@ -234,7 +234,7 @@ struct LLMUsageView: View {
                             HStack(spacing: 8) {
                                 Text("Hit: \(fmt(store.sessionCacheReadTokens))")
                                     .font(.caption.monospacedDigit())
-                                    .foregroundStyle(.cyan)
+                                    .foregroundStyle(highContrast ? Color.primary : Color.cyan)
                                 Text("Miss: \(fmt(store.sessionCacheCreationTokens))")
                                     .font(.caption.monospacedDigit())
                                     .foregroundStyle(highContrast ? .primary : .secondary)
