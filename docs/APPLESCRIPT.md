@@ -72,6 +72,8 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `fallback chain` | list of text | rw | Fallback providers in order, each `"Provider / model"` (e.g. `"Claude / claude-sonnet-4"`; the provider may also be its id such as `ollama`). Setting it replaces the chain; entries already in it keep their on/off switch. |
 | `disabled fallback entries` | list of text | rw | Fallback chain entries switched off (skipped). Each must be in `fallback chain`. |
 | `active fallback` | text | r | The fallback entry in use after the primary provider failed; empty while on the primary. |
+| `system prompt` | text | rw | Settings > System Prompt: the full prompt template, with its `{placeholders}`. Setting it saves like the window's Save. |
+| `compact system prompt` | text | rw | The Apple AI compact prompt template. Setting it saves like the window's Save. |
 | `tool groups` | list of text | r | Every tool group name, as in the Tools window. |
 | `tool names` | list of text | r | Every built-in tool name, as in the Tools window. |
 | `disabled tool groups` | list of text | rw | Groups switched off for every provider (the Tools window's group switches). Turning `User` or `Root` off or on also turns the Launch Agent or Launch Daemon off or on. |
@@ -85,7 +87,7 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `input tokens` / `output tokens` | integer | r | Tokens of the Main tab's current or last task. |
 | `session input tokens` / `session output tokens` | integer | r | Tokens used since Agent! launched (or since `clear tokens`). |
 
-Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", `terminal speed` "warp", `activity log text size` 50, `shell timeout` 500, or a negative count), unknown tool, group or MCP server names, and fallback entries with an unknown provider or no model give an error and change nothing.
+Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", `terminal speed` "warp", `activity log text size` 50, `shell timeout` 500, or a negative count), unknown tool, group or MCP server names, fallback entries with an unknown provider or no model, and an empty `system prompt` give an error and change nothing.
 
 ```applescript
 tell application "Agent!"
@@ -182,6 +184,10 @@ Clears the tab's LLM Output pane, like Shortcuts > Clear LLM Output.
 ### `clear tokens`
 `clear tokens [t]` or `clear tokens [in tab t]`
 Resets token counts, like Shortcuts > Clear Tokens. For the Main tab it resets the task and session counts; for another tab, that tab's counts.
+
+### `reset system prompt`
+`reset system prompt [compact bool]`
+Restores the built-in system prompt, like Settings > System Prompt > Reset to Default. `compact true` resets the Apple AI compact prompt instead.
 
 ### `start auto pilot`
 `start auto pilot ["goal"] [hours N] [isolated bool] [in tab t]` → boolean

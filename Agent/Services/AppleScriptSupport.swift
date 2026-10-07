@@ -15,7 +15,8 @@ extension AppDelegate {
         "llmOutput", "inputTokens", "outputTokens", "sessionInputTokens", "sessionOutputTokens",
         "accessibilityAutomation", "showHUD", "smoothStreaming", "terminalSpeed", "scanLines", "hudLogBelow",
         "activityLogTextSize", "shellTimeout",
-        "fallbackEnabled", "fallbackChain", "disabledFallbackEntries", "activeFallback"]
+        "fallbackEnabled", "fallbackChain", "disabledFallbackEntries", "activeFallback",
+        "systemPrompt", "compactSystemPrompt"]
 
     func application(_ sender: NSApplication, delegateHandlesKey key: String) -> Bool {
         Self.scriptingKeys.contains(key)
@@ -296,6 +297,25 @@ extension AppDelegate {
 
     /// The entry in use after the primary failed, or "" while on the primary.
     @objc var activeFallback: String { FallbackChainService.shared.activeFallback?.displayName ?? "" }
+
+    // MARK: - System Prompt window (templates with their {placeholders}; setting saves like the window's Save)
+
+    @objc var systemPrompt: String {
+        get { SystemPromptService.shared.rawTemplate(compact: false) }
+        set { saveSystemPrompt(newValue, compact: false) }
+    }
+
+    @objc var compactSystemPrompt: String {
+        get { SystemPromptService.shared.rawTemplate(compact: true) }
+        set { saveSystemPrompt(newValue, compact: true) }
+    }
+
+    private func saveSystemPrompt(_ text: String, compact: Bool) {
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return ScriptingTab.scriptError("The system prompt can't be empty. Use reset system prompt to restore the default.")
+        }
+        SystemPromptService.shared.saveTemplate(text, compact: compact)
+    }
 
     // MARK: - Tools window (same toggles as Tools; groups are global, tools are per Main-tab provider)
 
@@ -1006,6 +1026,16 @@ final class AgentClearTokensCommand: NSScriptCommand {
     override func performDefaultImplementation() -> Any? {
         let target = scriptingTarget(self)
         return ScriptingTab.report(MainActor.assumeIsolated { target.clearTokens() }, self)
+    }
+}
+
+/// `reset system prompt [compact true]` — Settings > System Prompt > Reset to Default.
+@objc(AgentResetSystemPromptCommand)
+final class AgentResetSystemPromptCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        let compact = evaluatedArguments?["compact"] as? Bool ?? false
+        MainActor.assumeIsolated { SystemPromptService.shared.resetToDefault(compact: compact) }
+        return nil
     }
 }
 

@@ -175,6 +175,14 @@
                       description="The fallback entry in use after the primary provider failed, or empty while on the primary.">
                 <cocoa key="activeFallback"/>
             </property>
+            <property name="system prompt" code="AgS1" type="text"
+                      description="Settings &gt; System Prompt: the full prompt template, with its {placeholders}. Setting it saves like the window's Save; it can't be empty.">
+                <cocoa key="systemPrompt"/>
+            </property>
+            <property name="compact system prompt" code="AgS2" type="text"
+                      description="Settings &gt; System Prompt: the Apple AI compact prompt template. Setting it saves like the window's Save; it can't be empty.">
+                <cocoa key="compactSystemPrompt"/>
+            </property>
             <property name="tool groups" code="AgG1" access="r"
                       description="Every tool group name, as in the Tools window.">
                 <type type="text" list="yes"/>
@@ -425,6 +433,14 @@
             <parameter name="in tab" code="AgTt" type="tab" optional="yes"
                        description="Tab to clear (default: the Main tab).">
                 <cocoa key="tab"/>
+            </parameter>
+        </command>
+
+        <command name="reset system prompt" code="AgntRsSP" description="Restore the built-in system prompt (Settings &gt; System Prompt &gt; Reset to Default).">
+            <cocoa class="AgentResetSystemPromptCommand"/>
+            <parameter name="compact" code="AgCp" type="boolean" optional="yes"
+                       description="true: reset the Apple AI compact prompt instead of the full one.">
+                <cocoa key="compact"/>
             </parameter>
         </command>
 
