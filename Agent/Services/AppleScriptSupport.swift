@@ -1,5 +1,6 @@
 import AppKit
 import AgentTools
+import AgentLLM
 
 /// AppleScript (Cocoa Scripting) support. Terminology is in Resources/Agent.sdef,
 /// enabled by NSAppleScriptEnabled + OSAScriptingDefinition in Info.plist.
@@ -16,6 +17,7 @@ extension AppDelegate {
         "accessibilityAutomation", "showHUD", "smoothStreaming", "terminalSpeed", "scanLines", "hudLogBelow",
         "activityLogTextSize", "shellTimeout", "networkRetryDelay", "outputLines", "readFilePreviewLines", "captureScriptStderr",
         "exaAPIKey", "tavilyAPIKey", "jevAPIKey", "jevModel", "jevAdvisory", "jevRejectPercent",
+        "lmStudioProtocol", "lmStudioEndpoint", "vLLMEndpoint", "localOllamaEndpoint", "openRouterProtocol", "fluxionProtocol",
         "appleAIMediator", "appleAITriage", "appleAIAnnotations", "appleAITokenCompression",
         "fallbackEnabled", "fallbackChain", "disabledFallbackEntries", "activeFallback",
         "systemPrompt", "compactSystemPrompt"]
@@ -321,6 +323,68 @@ extension AppDelegate {
                 return ScriptingTab.scriptError("Jev reject percent must be 0 to 100 in steps of 10.")
             }
             setSetting(\.jevBlockPercent, Double(newValue))
+        }
+    }
+
+    // MARK: - Per-provider settings (LM Studio / vLLM / Local Ollama endpoints, API protocol pickers)
+
+    /// Endpoints must be http(s) URLs with a host, like the ones the window's fields expect.
+    private func setEndpoint(_ keyPath: ReferenceWritableKeyPath<AgentViewModel, String>, _ value: String, _ name: String) {
+        let text = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let url = URL(string: text), ["http", "https"].contains(url.scheme?.lowercased() ?? ""), url.host != nil else {
+            return ScriptingTab.scriptError("\(name) must be an http:// or https:// URL.")
+        }
+        setSetting(keyPath, text)
+    }
+
+    /// Matches a protocol by its window label ("OpenAI Compatible") or short name ("openAI").
+    private func matchProtocol<P>(_ value: String, _ choices: [P], label: (P) -> String, raw: (P) -> String, _ name: String) -> P? {
+        if let match = choices.first(where: {
+            label($0).caseInsensitiveCompare(value) == .orderedSame || raw($0).caseInsensitiveCompare(value) == .orderedSame
+        }) { return match }
+        ScriptingTab.scriptError("\(name) must be one of \(choices.map(label).joined(separator: ", ")).")
+        return nil
+    }
+
+    /// LM Studio API Protocol. Like the picker, changing it resets lm studio endpoint to that protocol's default.
+    @objc var lmStudioProtocol: String {
+        get { setting(\.lmStudioProtocol, .openAI).displayName }
+        set {
+            guard let proto = matchProtocol(newValue, LMStudioProtocol.allCases, label: \.displayName, raw: \.rawValue, "LM Studio protocol") else { return }
+            setSetting(\.lmStudioProtocol, proto)
+        }
+    }
+
+    @objc var lmStudioEndpoint: String {
+        get { setting(\.lmStudioEndpoint, "") }
+        set { setEndpoint(\.lmStudioEndpoint, newValue, "LM Studio endpoint") }
+    }
+
+    @objc var vLLMEndpoint: String {
+        get { setting(\.vLLMEndpoint, "") }
+        set { setEndpoint(\.vLLMEndpoint, newValue, "vLLM endpoint") }
+    }
+
+    @objc var localOllamaEndpoint: String {
+        get { setting(\.localOllamaEndpoint, "") }
+        set { setEndpoint(\.localOllamaEndpoint, newValue, "Local Ollama endpoint") }
+    }
+
+    @objc var openRouterProtocol: String {
+        get { setting(\.openRouterProtocol, .openAI).displayName }
+        set {
+            let choices = APIProvider.openRouter.config.supportedProtocols
+            guard let proto = matchProtocol(newValue, choices, label: \.displayName, raw: \.rawValue, "OpenRouter protocol") else { return }
+            setSetting(\.openRouterProtocol, proto)
+        }
+    }
+
+    @objc var fluxionProtocol: String {
+        get { setting(\.fluxionProtocol, .openAI).displayName }
+        set {
+            let choices = APIProvider.fluxion.config.supportedProtocols
+            guard let proto = matchProtocol(newValue, choices, label: \.displayName, raw: \.rawValue, "Fluxion protocol") else { return }
+            setSetting(\.fluxionProtocol, proto)
         }
     }
 
@@ -1136,6 +1200,29 @@ final class AgentResetSystemPromptCommand: NSScriptCommand {
         let compact = evaluatedArguments?["compact"] as? Bool ?? false
         MainActor.assumeIsolated { SystemPromptService.shared.resetToDefault(compact: compact) }
         return nil
+    }
+}
+
+/// `store api key "sk-…" for provider "OpenAI"` — the provider's API Key field in Settings (Keychain).
+/// Write-only: there is no way to read a key back. An empty key clears it.
+@objc(AgentStoreAPIKeyCommand)
+final class AgentStoreAPIKeyCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        let key = (directParameter as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let name = (evaluatedArguments?["provider"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let error: String? = MainActor.assumeIsolated {
+            guard let vm = AgentViewModel.current else { return "Agent! is not ready." }
+            guard let provider = APIProvider.selectableProviders.first(where: {
+                $0.displayName.caseInsensitiveCompare(name) == .orderedSame
+                    || $0.rawValue.caseInsensitiveCompare(name) == .orderedSame
+            }) else {
+                let names = APIProvider.selectableProviders.map(\.displayName).joined(separator: ", ")
+                return "Unknown provider \"\(name)\". Available: \(names)."
+            }
+            vm.apiKeys[provider] = key
+            return nil
+        }
+        return ScriptingTab.report(error, self)
     }
 }
 

@@ -197,6 +197,30 @@
                       description="LLM Common Settings: Jev blocks a command it rates at least this % destructive — 0 to 100 in steps of 10.">
                 <cocoa key="jevRejectPercent"/>
             </property>
+            <property name="lm studio protocol" code="AgP1" type="text"
+                      description="LM Studio API Protocol: OpenAI Compatible, Anthropic Compatible or LM Studio Native. Changing it resets lm studio endpoint to that protocol's default, like the picker.">
+                <cocoa key="lmStudioProtocol"/>
+            </property>
+            <property name="lm studio endpoint" code="AgP2" type="text"
+                      description="LM Studio Endpoint URL (http:// or https://; anything else raises an error).">
+                <cocoa key="lmStudioEndpoint"/>
+            </property>
+            <property name="vllm endpoint" code="AgP3" type="text"
+                      description="vLLM Endpoint URL (http:// or https://; anything else raises an error).">
+                <cocoa key="vLLMEndpoint"/>
+            </property>
+            <property name="local ollama endpoint" code="AgP4" type="text"
+                      description="Local Ollama Endpoint URL (http:// or https://; anything else raises an error).">
+                <cocoa key="localOllamaEndpoint"/>
+            </property>
+            <property name="openrouter protocol" code="AgP5" type="text"
+                      description="OpenRouter API Protocol, one of the picker's choices (e.g. OpenAI Compatible, Anthropic Compatible).">
+                <cocoa key="openRouterProtocol"/>
+            </property>
+            <property name="fluxion protocol" code="AgP6" type="text"
+                      description="Fluxion AI API Protocol, one of the picker's choices. Match your key's group: Anthropic-group keys use Anthropic Compatible.">
+                <cocoa key="fluxionProtocol"/>
+            </property>
             <property name="apple ai mediator" code="AgZ1" type="boolean"
                       description="Apple Intelligence popover: Enable Mediator (master switch for on-device Apple AI).">
                 <cocoa key="appleAIMediator"/>
@@ -500,6 +524,14 @@
             </parameter>
         </command>
 
+        <command name="store api key" code="AgntSAPK" description="Save a provider's API key (the API Key field in Settings, kept in the Keychain). Keys can't be read back. An empty key clears it.">
+            <cocoa class="AgentStoreAPIKeyCommand"/>
+            <direct-parameter type="text" description="The API key."/>
+            <parameter name="for provider" code="AgPk" type="text"
+                       description="Provider name as in the provider menu, e.g. OpenAI, OpenRouter, LM Studio.">
+                <cocoa key="provider"/>
+            </parameter>
+        </command>
         <command name="clear llm output" code="AgntClrO" description="Clear a tab's LLM Output pane (Shortcuts &gt; Clear LLM Output).">
             <cocoa class="AgentClearLLMOutputCommand"/>
             <direct-parameter type="tab" optional="yes" description="Tab to clear, e.g. clear llm output tab 2 (default: the Main tab)."/>

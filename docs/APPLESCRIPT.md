@@ -78,6 +78,12 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `jev model` | text | rw | LLM Common Settings > Jev: model name; empty raises -10000. |
 | `jev advisory` | boolean | rw | LLM Common Settings: Consult Jev before tools. Turning it on without a `jev api key` raises -10000. |
 | `jev reject percent` | integer | rw | LLM Common Settings: Jev blocks a command it rates at least this % destructive — 0 to 100 in steps of 10, else -10000. |
+| `lm studio protocol` | text | rw | Settings > LM Studio > API Protocol: `OpenAI Compatible`, `Anthropic Compatible` or `LM Studio Native` (short ids such as `anthropic` also work). Changing it resets `lm studio endpoint` to that protocol's default, like the picker. Anything else raises -10000. |
+| `lm studio endpoint` | text | rw | Settings > LM Studio > Endpoint. Must be an http:// or https:// URL, else -10000. |
+| `vllm endpoint` | text | rw | Settings > vLLM > Endpoint. Must be an http:// or https:// URL, else -10000. |
+| `local ollama endpoint` | text | rw | Settings > Local Ollama > Endpoint. Must be an http:// or https:// URL, else -10000. |
+| `openrouter protocol` | text | rw | Settings > OpenRouter > API Protocol: `OpenAI Compatible` or `Anthropic Compatible`, else -10000. |
+| `fluxion protocol` | text | rw | Settings > Fluxion AI > API Protocol: one of the picker's choices, else -10000. Anthropic-group keys use Anthropic Compatible. |
 | `apple ai mediator` | boolean | rw | Apple Intelligence popover: Enable Mediator, the master switch for on-device Apple AI. |
 | `apple ai triage` | boolean | rw | Apple Intelligence popover: answer greetings on-device before the cloud LLM. |
 | `apple ai annotations` | boolean | rw | Apple Intelligence popover: show task summaries and error explanations in the activity log. |
@@ -203,6 +209,8 @@ Resets token counts, like Shortcuts > Clear Tokens. For the Main tab it resets t
 `reset system prompt [compact bool]`
 Restores the built-in system prompt, like Settings > System Prompt > Reset to Default. `compact true` resets the Apple AI compact prompt instead.
 
+### `store api key`
+`store api key "key" for provider "Name"` — saves a provider's API key, the API Key field in Settings (kept in the Keychain). Provider names are as in the provider menu (`OpenAI`, `OpenRouter`, `LM Studio`…) or their ids. Keys can't be read back; an empty key clears it. An unknown provider raises -10000 and lists the valid names.
 ### `start auto pilot`
 `start auto pilot ["goal"] [hours N] [isolated bool] [in tab t]` → boolean
 Starts an auto-pilot session (same as `/auto`): the tab works in cycles until the goal is reached, the time runs out, or it is stopped. Omit the goal to have Agent! review the project and ask for one. `isolated true` works in a separate git worktree; `false` uses the shared checkout (default: isolate only when another auto-pilot tab is on the same project). Errors if auto-pilot is already running in that tab or the tab has no project folder.
