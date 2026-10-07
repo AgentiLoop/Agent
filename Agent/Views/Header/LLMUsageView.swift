@@ -4,6 +4,8 @@ import SwiftUI
 /// Scope picker: All tabs (aggregate), Current tab, or any individual tab that produced usage this session.
 struct LLMUsageView: View {
     @Bindable var viewModel: AgentViewModel
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var highContrast: Bool { contrast == .increased }
 
     private var store: TokenUsageStore { TokenUsageStore.shared }
 
@@ -62,13 +64,13 @@ struct LLMUsageView: View {
                         }
                         .font(.caption)
                         .buttonStyle(.plain)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(highContrast ? .primary : .secondary)
                         .accessibilityHint("Clears all token usage and cache counts")
                     }
                 }
                 Text("Token usage per model since last Reset.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(highContrast ? .primary : .secondary)
 
                 scopePicker
             }
@@ -81,7 +83,7 @@ struct LLMUsageView: View {
                     Divider()
                     Text(emptyMessage)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(highContrast ? .primary : .tertiary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 20)
                 }
@@ -104,7 +106,7 @@ struct LLMUsageView: View {
                                     .truncationMode(.middle)
                                 Text("\(usage.callCount) call\(usage.callCount == 1 ? "" : "s")")
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(highContrast ? .primary : .tertiary)
                             }
                             .frame(width: 120, alignment: .leading)
                             .help(store.modelProvider[model].map { "Provider: \($0)\nModel: \(model)" } ?? model)
@@ -119,13 +121,13 @@ struct LLMUsageView: View {
                                     GeometryReader { geo in
                                         let frac = CGFloat(usage.inputTokens) / CGFloat(max(maxTokens, 1))
                                         RoundedRectangle(cornerRadius: 3)
-                                            .fill(Color.blue.opacity(0.6))
+                                            .fill(Color.blue.opacity(highContrast ? 1 : 0.6))
                                             .frame(width: geo.size.width * frac)
                                     }
                                     .frame(height: 8)
                                     Text(fmt(usage.inputTokens))
                                         .font(.caption2.monospacedDigit())
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(highContrast ? .primary : .secondary)
                                         .frame(width: 45, alignment: .trailing)
                                 }
                                 // Output bar
@@ -137,13 +139,13 @@ struct LLMUsageView: View {
                                     GeometryReader { geo in
                                         let frac = CGFloat(usage.outputTokens) / CGFloat(max(maxTokens, 1))
                                         RoundedRectangle(cornerRadius: 3)
-                                            .fill(Color.green.opacity(0.6))
+                                            .fill(Color.green.opacity(highContrast ? 1 : 0.6))
                                             .frame(width: geo.size.width * frac)
                                     }
                                     .frame(height: 8)
                                     Text(fmt(usage.outputTokens))
                                         .font(.caption2.monospacedDigit())
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(highContrast ? .primary : .secondary)
                                         .frame(width: 45, alignment: .trailing)
                                 }
                             }
@@ -166,7 +168,7 @@ struct LLMUsageView: View {
                                 } else {
                                     Text("free")
                                         .font(.caption)
-                                        .foregroundStyle(.tertiary)
+                                        .foregroundStyle(highContrast ? .primary : .tertiary)
                                         .frame(width: 62, alignment: .trailing)
                                 }
                             }
@@ -235,7 +237,7 @@ struct LLMUsageView: View {
                                     .foregroundStyle(.cyan)
                                 Text("Miss: \(fmt(store.sessionCacheCreationTokens))")
                                     .font(.caption.monospacedDigit())
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(highContrast ? .primary : .secondary)
                                 Text("\(store.cacheHitRate)%")
                                     .font(.caption.monospacedDigit().weight(.medium))
                                     .foregroundStyle(store.cacheHitRate > 70 ? .green : store.cacheHitRate > 30 ? .yellow : .red)
