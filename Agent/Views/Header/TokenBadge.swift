@@ -78,6 +78,7 @@ private struct TokenDetailView: View {
     let providerName: String
     let modelName: String
     @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var noColor
     private var highContrast: Bool { contrast == .increased }
 
     var body: some View {
@@ -186,6 +187,7 @@ private struct TokenDetailView: View {
                                 y: .value("Tokens", day.inputTokens)
                             )
                             .foregroundStyle(.blue)
+                            .symbol(noColor ? .circle : .circle)
                             .symbolSize(40)
 
                             PointMark(
@@ -193,6 +195,7 @@ private struct TokenDetailView: View {
                                 y: .value("Tokens", day.outputTokens)
                             )
                             .foregroundStyle(.green)
+                            .symbol(noColor ? .square : .circle)
                             .symbolSize(40)
 
                             PointMark(
@@ -200,6 +203,7 @@ private struct TokenDetailView: View {
                                 y: .value("Tokens", day.cacheReadTokens)
                             )
                             .foregroundStyle(.cyan)
+                            .symbol(noColor ? .triangle : .circle)
                             .symbolSize(40)
 
                             LineMark(
@@ -208,6 +212,7 @@ private struct TokenDetailView: View {
                                 series: .value("Type", "Sent")
                             )
                             .foregroundStyle(.blue)
+                            .lineStyle(StrokeStyle(lineWidth: 2, dash: noColor ? [] : []))
                             .interpolationMethod(.catmullRom)
 
                             LineMark(
@@ -216,6 +221,7 @@ private struct TokenDetailView: View {
                                 series: .value("Type", "Received")
                             )
                             .foregroundStyle(.green)
+                            .lineStyle(StrokeStyle(lineWidth: 2, dash: noColor ? [5, 3] : []))
                             .interpolationMethod(.catmullRom)
 
                             LineMark(
@@ -224,6 +230,7 @@ private struct TokenDetailView: View {
                                 series: .value("Type", "Cache")
                             )
                             .foregroundStyle(.cyan)
+                            .lineStyle(StrokeStyle(lineWidth: 2, dash: noColor ? [1, 3] : []))
                             .interpolationMethod(.catmullRom)
                         }
                     }
@@ -257,15 +264,21 @@ private struct TokenDetailView: View {
                     // Legend
                     HStack(spacing: 12) {
                         HStack(spacing: 4) {
-                            Circle().fill(.blue).frame(width: 6, height: 6)
+                            Image(systemName: noColor ? "circle.fill" : "circle.fill")
+                                .font(.system(size: 6))
+                                .foregroundStyle(.blue)
                             Text("↑ Sent").font(.caption2).foregroundStyle(.secondary)
                         }
                         HStack(spacing: 4) {
-                            Circle().fill(.green).frame(width: 6, height: 6)
+                            Image(systemName: noColor ? "square.fill" : "circle.fill")
+                                .font(.system(size: 6))
+                                .foregroundStyle(.green)
                             Text("↓ Received").font(.caption2).foregroundStyle(.secondary)
                         }
                         HStack(spacing: 4) {
-                            Circle().fill(.cyan).frame(width: 6, height: 6)
+                            Image(systemName: noColor ? "triangle.fill" : "circle.fill")
+                                .font(.system(size: 6))
+                                .foregroundStyle(.cyan)
                             Text("⚡︎ Cache").font(.caption2).foregroundStyle(.secondary)
                         }
                     }
