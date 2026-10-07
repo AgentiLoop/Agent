@@ -24,6 +24,21 @@
                       description="Last error logged by the Main tab's most recent task (empty when none).">
                 <cocoa key="lastError"/>
             </property>
+            <property name="prompt history" code="AgHp" access="r"
+                      description="Prompts submitted in the Main tab, oldest first (the task field's ↑ history).">
+                <type type="text" list="yes"/>
+                <cocoa key="promptHistory"/>
+            </property>
+            <property name="task history" code="AgHt" access="r"
+                      description="Recent task summaries, &quot;[time] prompt → summary&quot;, oldest first (History window, Task Summaries).">
+                <type type="text" list="yes"/>
+                <cocoa key="taskHistory"/>
+            </property>
+            <property name="error history" code="AgHe" access="r"
+                      description="Recent errors, &quot;[time] type: message&quot;, oldest first (History window, Error History).">
+                <type type="text" list="yes"/>
+                <cocoa key="errorHistory"/>
+            </property>
             <property name="project folder" code="AgPF" type="text"
                       description="The Main tab project folder (absolute path).">
                 <cocoa key="projectFolder"/>
@@ -173,6 +188,21 @@
                       description="Last error logged by the tab's most recent task (empty when none).">
                 <cocoa key="lastError"/>
             </property>
+            <property name="prompt history" code="AgHp" access="r"
+                      description="Prompts submitted in the tab, oldest first (the task field's ↑ history).">
+                <type type="text" list="yes"/>
+                <cocoa key="promptHistory"/>
+            </property>
+            <property name="task history" code="AgHt" access="r"
+                      description="Recent task summaries (LLM tabs share the Main tab's), &quot;[time] prompt → summary&quot;, oldest first (History window, Task Summaries).">
+                <type type="text" list="yes"/>
+                <cocoa key="taskHistory"/>
+            </property>
+            <property name="error history" code="AgHe" access="r"
+                      description="Recent errors (LLM tabs share the Main tab's), &quot;[time] type: message&quot;, oldest first (History window, Error History).">
+                <type type="text" list="yes"/>
+                <cocoa key="errorHistory"/>
+            </property>
             <property name="queued tasks" code="AgQd" access="r"
                       description="Prompts waiting to run after the current task, in order.">
                 <type type="text" list="yes"/>
@@ -232,6 +262,20 @@
             <result type="integer"/>
         </command>
 
+        <enumeration name="history kind" code="AgHk">
+            <enumerator name="prompts" code="AgKP" description="Prompt history."/>
+            <enumerator name="task summaries" code="AgKS" description="Task history."/>
+            <enumerator name="errors" code="AgKE" description="Error history."/>
+        </enumeration>
+        <command name="clear history" code="AgntClrH" description="Clear one kind of history, like the History window's Clear button. Returns how many entries were removed.">
+            <cocoa class="AgentClearHistoryCommand"/>
+            <direct-parameter type="history kind" description="prompts, task summaries or errors."/>
+            <parameter name="in tab" code="AgTt" type="tab" optional="yes"
+                       description="Tab whose history to clear (default: the Main tab). Task summaries and errors of LLM tabs are shared with the Main tab.">
+                <cocoa key="tab"/>
+            </parameter>
+            <result type="integer"/>
+        </command>
         <command name="stop task" code="AgntStpT" description="Stop a running task.">
             <cocoa class="AgentStopTaskCommand"/>
             <direct-parameter type="tab" optional="yes" description="Tab to stop, e.g. stop task tab 2 (default: the Main tab)."/>

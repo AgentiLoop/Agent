@@ -1,14 +1,15 @@
 @preconcurrency import Foundation
 
 extension AgentViewModel {
+    /// The selected tab, or nil for Main.
+    private var selectedScriptTab: ScriptTab? { selectedTabId.flatMap { tab(for: $0) } }
+
     /// Prompt history for whichever tab is currently selected.
-    var currentTabPromptHistory: [String] {
-        if let selectedId = selectedTabId,
-           let tab = tab(for: selectedId)
-        {
-            return tab.promptHistory
-        }
-        return promptHistory
+    var currentTabPromptHistory: [String] { promptHistory(for: selectedScriptTab) }
+
+    /// Prompt history of `tab` (nil = Main).
+    func promptHistory(for tab: ScriptTab?) -> [String] {
+        tab?.promptHistory ?? promptHistory
     }
 
     /// Display name for the currently selected tab.
@@ -22,11 +23,11 @@ extension AgentViewModel {
     }
 
     /// Error history for UI display — per-tab when a tab is selected, global for main
-    var errorHistory: [String] {
-        if let selectedId = selectedTabId,
-           let tab = tab(for: selectedId),
-           !tab.isMainTab
-        {
+    var errorHistory: [String] { errorHistory(for: selectedScriptTab) }
+
+    /// Error history of `tab` (nil = Main): per-tab for script tabs, global for Main and LLM tabs.
+    func errorHistory(for tab: ScriptTab?) -> [String] {
+        if let tab, !tab.isMainTab {
             return tab.tabErrors
         }
         return ErrorHistory.shared.recentErrors(limit: 50).map { error in
@@ -39,11 +40,11 @@ extension AgentViewModel {
     }
 
     /// Task summaries for UI display — per-tab when a tab is selected, global for main
-    var taskSummaries: [String] {
-        if let selectedId = selectedTabId,
-           let tab = tab(for: selectedId),
-           !tab.isMainTab
-        {
+    var taskSummaries: [String] { taskSummaries(for: selectedScriptTab) }
+
+    /// Task summaries of `tab` (nil = Main): per-tab for script tabs, global for Main and LLM tabs.
+    func taskSummaries(for tab: ScriptTab?) -> [String] {
+        if let tab, !tab.isMainTab {
             return tab.tabTaskSummaries
         }
         return history.records.suffix(50).map { record in
@@ -55,10 +56,11 @@ extension AgentViewModel {
     }
 
     /// Clear prompt history for whichever tab is currently selected.
-    func clearCurrentTabPromptHistory() {
-        if let selectedId = selectedTabId,
-           let tab = tab(for: selectedId)
-        {
+    func clearCurrentTabPromptHistory() { clearPromptHistory(of: selectedScriptTab) }
+
+    /// Clear prompt history of `tab` (nil = Main).
+    func clearPromptHistory(of tab: ScriptTab?) {
+        if let tab {
             tab.promptHistory.removeAll()
             tab.historyIndex = -1
             tab.savedInput = ""
@@ -71,16 +73,14 @@ extension AgentViewModel {
     }
 
     /// Clear history by type: "Prompts", "Error History", or "Task Summaries".
-    func clearHistory(type: String) {
-        if let selectedId = selectedTabId,
-           let tab = tab(for: selectedId),
-           !tab.isMainTab
-        {
+    func clearHistory(type: String) { clearHistory(type: type, of: selectedScriptTab) }
+
+    /// Clear `tab`'s history (nil = Main) by type: "Prompts", "Error History", or "Task Summaries".
+    func clearHistory(type: String, of tab: ScriptTab?) {
+        if let tab, !tab.isMainTab {
             switch type {
             case "Prompts":
-                tab.promptHistory.removeAll()
-                tab.historyIndex = -1
-                tab.savedInput = ""
+                clearPromptHistory(of: tab)
             case "Error History":
                 tab.tabErrors.removeAll()
             case "Task Summaries":
@@ -91,7 +91,7 @@ extension AgentViewModel {
         } else {
             switch type {
             case "Prompts":
-                clearCurrentTabPromptHistory()
+                clearPromptHistory(of: tab)
             case "Error History":
                 ErrorHistory.shared.clear()
             case "Task Summaries":

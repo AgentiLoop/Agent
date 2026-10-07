@@ -5,7 +5,7 @@ import AppKit
 /// Application properties are KVC keys handled by AppDelegate; commands are NSScriptCommand subclasses.
 @MainActor
 extension AppDelegate {
-    private static let scriptingKeys: Set<String> = ["taskRunning", "activityLog", "lastResult", "lastError", "projectFolder", "taskInput", "providerName", "modelName", "scriptingTabs",
+    private static let scriptingKeys: Set<String> = ["taskRunning", "activityLog", "lastResult", "lastError", "promptHistory", "taskHistory", "errorHistory", "projectFolder", "taskInput", "providerName", "modelName", "scriptingTabs",
         "maxIterations", "maxRetries", "maxTokens", "tokenBudget", "temperature", "reasoningEffort",
         "autoVerify", "criticReview", "visualTests", "autoPR", "autoScaffold", "autoScreenshot", "forceVision",
         "messagesMonitor", "taskAutoComplete", "userAgentEnabled", "launchDaemonEnabled"]
@@ -21,6 +21,12 @@ extension AppDelegate {
     @objc var lastResult: String { ScriptingTab(tabId: nil).lastResult }
 
     @objc var lastError: String { ScriptingTab(tabId: nil).lastError }
+
+    @objc var promptHistory: [String] { ScriptingTab(tabId: nil).promptHistory }
+
+    @objc var taskHistory: [String] { ScriptingTab(tabId: nil).taskHistory }
+
+    @objc var errorHistory: [String] { ScriptingTab(tabId: nil).errorHistory }
 
     @objc var projectFolder: String {
         get { AgentViewModel.current?.projectFolder ?? "" }
@@ -318,6 +324,33 @@ final class ScriptingTab: NSObject {
         return tab?.taskQueue ?? []
     }
 
+    // MARK: History (same lists as the History window)
+
+    @objc var promptHistory: [String] { tabExists ? (vm?.promptHistory(for: tab) ?? []) : [] }
+    @objc var taskHistory: [String] { tabExists ? (vm?.taskSummaries(for: tab) ?? []) : [] }
+    @objc var errorHistory: [String] { tabExists ? (vm?.errorHistory(for: tab) ?? []) : [] }
+
+    /// History kinds of `clear history`: sdef enumerator code → History window type.
+    nonisolated static let historyKinds: [FourCharCode: String] = [
+        0x41674B50: "Prompts",        // 'AgKP'
+        0x41674B53: "Task Summaries", // 'AgKS'
+        0x41674B45: "Error History",  // 'AgKE'
+    ]
+
+    /// Clears one kind of history. Returns the number of entries removed (all of them, not just
+    /// the recent ones listed), or nil when the tab no longer exists.
+    func clearHistory(type: String) -> Int? {
+        guard let vm, tabExists else { return nil }
+        let shared = tab.map { $0.isMainTab } ?? true
+        let count = switch type {
+        case "Prompts": promptHistory.count
+        case "Task Summaries": shared ? vm.history.records.count : (tab?.tabTaskSummaries.count ?? 0)
+        default: shared ? ErrorHistory.shared.records.count : (tab?.tabErrors.count ?? 0)
+        }
+        vm.clearHistory(type: type, of: tab)
+        return count
+    }
+
     /// Removes every queued prompt without stopping the running task. Returns the number removed,
     /// or nil when the tab no longer exists.
     func clearQueue() -> Int? {
@@ -511,6 +544,22 @@ final class AgentClearQueueCommand: NSScriptCommand {
     override func performDefaultImplementation() -> Any? {
         let target = scriptingTarget(self)
         let count: Int? = MainActor.assumeIsolated { target.clearQueue() }
+        return ScriptingTab.queueCleared(count, self)
+    }
+}
+
+/// `clear history prompts|task summaries|errors [in tab tab 2]` — Main tab unless a tab is given.
+/// Returns how many entries were removed.
+@objc(AgentClearHistoryCommand)
+final class AgentClearHistoryCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        guard let code = (directParameter as? NSNumber)?.uint32Value, let type = ScriptingTab.historyKinds[code] else {
+            scriptErrorNumber = -10000
+            scriptErrorString = "Say which history to clear: prompts, task summaries or errors."
+            return 0
+        }
+        let target = scriptingTarget(self)
+        let count: Int? = MainActor.assumeIsolated { target.clearHistory(type: type) }
         return ScriptingTab.queueCleared(count, self)
     }
 }

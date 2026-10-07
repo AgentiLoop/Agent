@@ -36,6 +36,9 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `activity log` | text | r | Full text of the Main tab activity log. |
 | `task summary` | text | r | Completion summary of the Main tab's most recent task. Empty while a task runs, after it is stopped, or before any task. |
 | `task error` | text | r | Last error logged by the Main tab's most recent task (empty when none). |
+| `prompt history` | list of text | r | Prompts submitted in the Main tab, oldest first (the task field's ↑ history). |
+| `task history` | list of text | r | Recent task summaries, `[time] prompt → summary`, oldest first (History window, Task Summaries). |
+| `error history` | list of text | r | Recent errors, `[time] type: message`, oldest first (History window, Error History). |
 | `project folder` | text | rw | Main tab project folder (absolute path). |
 | `task input` | text | rw | Main tab task field text. |
 | `provider` | text | rw | LLM provider display name, e.g. `"Claude"`. An unknown name gives an error that lists the choices. |
@@ -82,6 +85,9 @@ end tell
 | `activity log` | text | r | Full text of the tab's activity log. |
 | `task summary` | text | r | Completion summary of the tab's most recent task (empty while running, after a stop, or before any task). |
 | `task error` | text | r | Last error logged by the tab's most recent task (empty when none). |
+| `prompt history` | list of text | r | Prompts submitted in the tab, oldest first. |
+| `task history` | list of text | r | Recent task summaries. LLM tabs (including tabs made by `make new tab`) share the Main tab's list, as in the History window. |
+| `error history` | list of text | r | Recent errors. LLM tabs share the Main tab's list. |
 | `task input` | text | rw | The tab's task field text. |
 | `project folder` | text | rw | The tab's project folder. |
 | `provider` | text | rw* | Provider name. *Settable only on the Main tab or in `make new tab with properties`. |
@@ -93,7 +99,7 @@ end tell
 | `auto pilot cycle` | integer | r | Current cycle number (0 when no session). |
 | `auto pilot status` | text | r | One-line status: cycle, elapsed, time left, branch, goal. |
 
-Tabs respond to `close`, `select`, `clear log`, `stop task`, `clear queue` and `stop auto pilot`.
+Tabs respond to `close`, `select`, `clear log`, `stop task`, `clear queue` and `stop auto pilot`. Use `clear history … in tab t` for a tab's history.
 
 ```applescript
 tell application "Agent!"
@@ -131,6 +137,10 @@ Runs the task now if the tab is idle (returns 0); otherwise adds it to the tab's
 `clear queue [t]` or `clear queue [in tab t]` → integer
 Removes the tab's queued tasks; the running task keeps going. Returns how many were removed.
 
+### `clear history`
+`clear history prompts|task summaries|errors [in tab t]` → integer
+Clears one kind of history, like the History window's Clear button, and returns how many entries were removed. Without `in tab` it clears the Main tab's. Task summaries and errors of LLM tabs are shared with the Main tab, so clearing them in an LLM tab clears Main's too.
+
 ### `stop task`
 `stop task [t]` or `stop task [in tab t]`
 Stops the running task.
@@ -159,6 +169,17 @@ tell application "Agent!"
     queue task "update the README"
     queue task "run the tests"
     queued tasks of tab 1
+end tell
+```
+
+**Read and clear history**
+
+```applescript
+tell application "Agent!"
+    set recent to task history
+    set n to count of (error history)
+    clear history prompts in tab 1
+    {n, recent}
 end tell
 ```
 
