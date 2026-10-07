@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentTools.git",
       "state" : {
-        "revision" : "9a7fb4199e687ce4c114ee3b0a96b906d453c97f",
-        "version" : "2.53.33"
+        "revision" : "b4aaf891c865949e19d7db90e5c52b4f6214a5d9",
+        "version" : "2.53.34"
       }
     },
     {
