@@ -219,11 +219,12 @@ extension AgentViewModel {
 
         case "web_switch_tab":
             let browser = input["browser"] as? String
-            let index = input["index"] as? Int
-            let title = input["title"] as? String
+            let target = WebAutomationService.tabTarget(
+                index: input["index"] as? Int, title: input["title"] as? String,
+                text: input["text"] as? String ?? input["query"] as? String)
             tab.appendLog("🔄 switch tab...")
             tab.flush()
-            let output = await WebAutomationService.shared.switchTab(browser: browser, index: index, titleContains: title)
+            let output = await WebAutomationService.shared.switchTab(browser: browser, index: target.index, titleContains: target.title)
             tab.appendLog(output)
             tab.flush()
             return TabToolResult(toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": output], isComplete: false)

@@ -109,9 +109,10 @@ extension AgentViewModel {
             return await ws.listTabs(browser: browser)
 
         case "web_switch_tab":
-            let title = input["title"] as? String
-            let index = input["index"] as? Int
-            return await ws.switchTab(browser: browser, index: index, titleContains: title)
+            let target = WebAutomationService.tabTarget(
+                index: input["index"] as? Int, title: input["title"] as? String,
+                text: input["text"] as? String ?? input["query"] as? String)
+            return await ws.switchTab(browser: browser, index: target.index, titleContains: target.title)
 
         case "web_list_windows":
             return await ws.listWindows(browser: browser)

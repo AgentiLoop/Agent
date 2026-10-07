@@ -4,6 +4,17 @@ import AppKit
 extension WebAutomationService {
     // MARK: - Tab Switching
 
+    /// Tab target from tool input. The consolidated safari/web tool has no
+    /// index/title fields, so switch_tab arrives with text/query — every call
+    /// failed "specify index or titleContains". A number in text/query is the
+    /// 1-based tab number list_tabs prints; other text matches the tab title.
+    nonisolated static func tabTarget(index: Int?, title: String?, text: String?) -> (index: Int?, title: String?) {
+        if index != nil || !(title ?? "").isEmpty { return (index, title) }
+        let t = (text ?? "").trimmingCharacters(in: .whitespaces)
+        if let n = Int(t.trimmingCharacters(in: CharacterSet(charactersIn: "#."))), n >= 1 { return (n - 1, nil) }
+        return (nil, t.isEmpty ? nil : t)
+    }
+
     /// Switch to a browser tab by index (0-based) or by title substring
     func switchTab(browser: String? = nil, index: Int? = nil, titleContains: String? = nil) async -> String {
         let browserId = browser ?? detectActiveBrowser() ?? "com.apple.Safari"
@@ -49,7 +60,7 @@ extension WebAutomationService {
                 return "Error: tab switching not supported for this browser"
             }
         } else {
-            return "Error: specify index or titleContains"
+            return "Error: switch_tab needs text:\"<tab number from list_tabs>\" or text:\"<part of the tab title>\""
         }
 
         let result = await Task.detached { () -> String in
