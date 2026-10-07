@@ -9,6 +9,7 @@ struct CodingPreferencesView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Coding Preferences")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
                 Text("Opt-in features for autonomous coding workflows.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -27,6 +28,8 @@ struct CodingPreferencesView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .labelsHidden()
+                    .accessibilityLabel("Auto-Verify")
+                    .accessibilityHint("After build succeeds, launch app and test via accessibility")
             }
 
             row {
@@ -41,6 +44,8 @@ struct CodingPreferencesView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .labelsHidden()
+                    .accessibilityLabel("Critic Review")
+                    .accessibilityHint("LLM reviews the task's diff before task_complete is accepted")
             }
 
             row {
@@ -55,6 +60,8 @@ struct CodingPreferencesView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .labelsHidden()
+                    .accessibilityLabel("Visual Tests")
+                    .accessibilityHint("LLM can define click/verify UI assertions")
             }
 
             row {
@@ -69,6 +76,8 @@ struct CodingPreferencesView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .labelsHidden()
+                    .accessibilityLabel("Auto PR")
+                    .accessibilityHint("Create branch, commit, push, open GitHub PR")
             }
 
             row {
@@ -83,6 +92,8 @@ struct CodingPreferencesView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .labelsHidden()
+                    .accessibilityLabel("Project Templates")
+                    .accessibilityHint("Scaffold new Xcode projects from prompts")
             }
         }
         .padding(.bottom, 15)

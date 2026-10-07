@@ -684,6 +684,7 @@ struct SettingsView: View {
                             ))
                             .textFieldStyle(.roundedBorder)
                             .frame(width: 100)
+                            .accessibilityLabel("Context Window")
 
                             Text(
                                 viewModel
@@ -708,6 +709,7 @@ struct SettingsView: View {
                         ))
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 100)
+                        .accessibilityLabel("Max Output Tokens")
 
                         Text(
                             viewModel.maxTokens == 0
@@ -766,6 +768,8 @@ struct SettingsView: View {
                 }
                 Slider(value: llmTemperatureBinding, in: 0...2, step: 0.1)
                     .id(viewModel.selectedProvider)
+                    .accessibilityLabel("Temperature")
+                    .accessibilityValue(String(format: "%.1f", llmTemperatureBinding.wrappedValue))
                     .tint(viewModel.temperatureColor(llmTemperatureBinding.wrappedValue))
                     .onAppear {
                         // Force the slider thumb + tint color to redraw on first appear.
