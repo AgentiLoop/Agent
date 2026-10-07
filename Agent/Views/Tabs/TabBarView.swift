@@ -124,5 +124,16 @@ private struct TabItem: View {
         .contentShape(Capsule())
         .onTapGesture(perform: onSelect)
         .onHover { isHovering = $0 }
+        // Tap gesture alone is invisible to VoiceOver — expose the tab as a selectable button
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityValue(isRunning ? "Running" : "")
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityAction(.default, onSelect)
+        .accessibilityActions {
+            if let onClose {
+                Button("Close Tab", action: onClose)
+            }
+        }
     }
 }
