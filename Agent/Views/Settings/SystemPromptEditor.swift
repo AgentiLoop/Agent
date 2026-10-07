@@ -232,10 +232,25 @@ struct SystemPromptsView: View {
 
     private var currentDirty: Bool { isCompact ? isCompactDirty : isFullDirty }
 
-    private let fullColor = Color(red: 0.20, green: 0.90, blue: 0.30) // Terminal green
-    private let fullNSColor = NSColor(red: 0.20, green: 0.90, blue: 0.30, alpha: 1.0)
-    private let compactColor = Color(red: 1.0, green: 0.40, blue: 0.60) // Apple pink
-    private let compactNSColor = NSColor(red: 1.0, green: 0.40, blue: 0.60, alpha: 1.0)
+    // Bright terminal green / Apple pink fail text contrast on a light background
+    // (~1.6:1 / ~2.6:1), so Light mode and Increase Contrast use darker shades.
+    private static func promptColor(dark: NSColor, light: NSColor) -> NSColor {
+        NSColor(name: nil) { appearance in
+            switch appearance.bestMatch(from: [.darkAqua, .aqua, .accessibilityHighContrastDarkAqua, .accessibilityHighContrastAqua]) {
+            case .darkAqua: return dark
+            case .accessibilityHighContrastDarkAqua: return dark.blended(withFraction: 0.4, of: .white) ?? dark
+            default: return light
+            }
+        }
+    }
+    private let fullNSColor = SystemPromptsView.promptColor(
+        dark: NSColor(red: 0.20, green: 0.90, blue: 0.30, alpha: 1.0), // Terminal green
+        light: NSColor(red: 0.0, green: 0.45, blue: 0.10, alpha: 1.0))
+    private let compactNSColor = SystemPromptsView.promptColor(
+        dark: NSColor(red: 1.0, green: 0.40, blue: 0.60, alpha: 1.0), // Apple pink
+        light: NSColor(red: 0.75, green: 0.0, blue: 0.30, alpha: 1.0))
+    private var fullColor: Color { Color(nsColor: fullNSColor) }
+    private var compactColor: Color { Color(nsColor: compactNSColor) }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -305,6 +320,7 @@ struct SystemPromptsView: View {
                         fullText = service.rawTemplate(compact: false)
                         isFullDirty = false
                     }
+                    announceForAccessibility("Prompt reset to default")
                 }
                 .controlSize(.small)
                 .accessibilityHint("Replaces the current prompt with the built-in default")
@@ -322,6 +338,7 @@ struct SystemPromptsView: View {
                     service.saveTemplate(isCompact ? compactText : fullText, compact: isCompact)
                     if isCompact { isCompactDirty = false }
                     else { isFullDirty = false }
+                    announceForAccessibility("Prompt saved")
                 }
                 .controlSize(.small)
                 .keyboardShortcut("s", modifiers: .command)
