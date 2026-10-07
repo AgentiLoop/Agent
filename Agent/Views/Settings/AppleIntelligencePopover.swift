@@ -3,6 +3,9 @@ import SwiftUI
 
 struct AppleIntelligencePopover: View {
     @ObservedObject private var aiMediator = AppleIntelligenceMediator.shared
+    @Environment(\.colorSchemeContrast) private var contrast
+    /// Primary text under Increase Contrast; secondary otherwise.
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -32,7 +35,7 @@ struct AppleIntelligencePopover: View {
                 OnOffDot(isOn: AppleIntelligenceMediator.isAvailable, offColor: Color.red.opacity(0.6))
                 Text(AppleIntelligenceMediator.isAvailable ? "Available" : "Not Available")
                     .font(.caption)
-                    .foregroundStyle(AppleIntelligenceMediator.isAvailable ? .green : .secondary)
+                    .foregroundStyle(AppleIntelligenceMediator.isAvailable ? AnyShapeStyle(.green) : AnyShapeStyle(captionStyle))
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Apple Intelligence")
@@ -41,7 +44,7 @@ struct AppleIntelligencePopover: View {
             if !AppleIntelligenceMediator.isAvailable {
                 Text(AppleIntelligenceMediator.unavailabilityReason)
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
             }
 
             Grid(alignment: .leading, verticalSpacing: 8) {
@@ -51,7 +54,7 @@ struct AppleIntelligencePopover: View {
                             .font(.caption)
                         Text("Master switch for on-device Apple AI — sub-features below are only active when this is on")
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(captionStyle)
                     }
                     Toggle("", isOn: $aiMediator.isEnabled)
                         .toggleStyle(.switch)
@@ -69,7 +72,7 @@ struct AppleIntelligencePopover: View {
                                 .font(.caption)
                             Text("Answer hi / hello / thanks on-device before the cloud LLM — skip the round-trip for small talk")
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(captionStyle)
                         }
                         Toggle("", isOn: $aiMediator.triageEnabled)
                             .toggleStyle(.switch)
@@ -86,7 +89,7 @@ struct AppleIntelligencePopover: View {
                                 .font(.caption)
                             Text("Display task summaries and error explanations in the activity log")
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(captionStyle)
                         }
                         Toggle("", isOn: $aiMediator.showAnnotationsToUser)
                             .toggleStyle(.switch)
@@ -103,7 +106,7 @@ struct AppleIntelligencePopover: View {
                                 .font(.caption)
                             Text("Fallback tier of context compaction — when the active model can't produce a summary (or for sub-agents), Apple AI summarizes old messages on-device at the model's context threshold. Free, private, no API tokens consumed")
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(captionStyle)
                         }
                         Toggle("", isOn: $aiMediator.tokenCompressionEnabled)
                             .toggleStyle(.switch)

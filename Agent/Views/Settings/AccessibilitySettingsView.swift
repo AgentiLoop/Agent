@@ -28,6 +28,9 @@ final class AccessibilityEnabled {
 // MARK: - View
 
 struct AccessibilitySettingsView: View {
+    @Environment(\.colorSchemeContrast) private var contrast
+    /// Primary text under Increase Contrast; secondary otherwise.
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
     @Bindable var settings = AccessibilityEnabled.shared
 
     @State private var hasAccessibility = AccessibilityService.hasAccessibilityPermission()
@@ -69,7 +72,7 @@ struct AccessibilitySettingsView: View {
                                 "All accessibility actions are blocked"
                         )
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(captionStyle)
                     }
                 }
                 .toggleStyle(.switch)
@@ -82,7 +85,7 @@ struct AccessibilitySettingsView: View {
                     OnOffDot(isOn: true, onColor: Color.green.opacity(0.6))
                     Text("Apple Events: Granted on first use of each application")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(captionStyle)
                     Spacer()
                     Button("Settings") {
                         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation") {

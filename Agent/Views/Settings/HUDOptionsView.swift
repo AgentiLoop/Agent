@@ -4,6 +4,9 @@ import SwiftUI
 /// for the LLM Output overlay. Shown via the viewfinder icon in the toolbar.
 struct HUDOptionsView: View {
     @Bindable var viewModel: AgentViewModel
+    @Environment(\.colorSchemeContrast) private var contrast
+    /// Primary text under Increase Contrast; secondary otherwise.
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -12,7 +15,7 @@ struct HUDOptionsView: View {
                 .accessibilityAddTraits(.isHeader)
             Text("Heads-Up Display for LLM Output. Press ⌘B to show/hide during a task.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(captionStyle)
                 .fixedSize(horizontal: false, vertical: true)
 
             Divider()
