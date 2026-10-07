@@ -448,6 +448,7 @@ struct MCPServerEditView: View {
                     Text("HTTP").tag(true)
                 }
                 .pickerStyle(.segmented)
+                .accessibilityLabel("Transport")
 
                 if useHTTP {
                     // HTTP fields
@@ -528,6 +529,7 @@ struct MCPServerEditView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("JSON").font(.caption).foregroundStyle(captionStyle)
+                    .accessibilityHidden(true)
                 PlainTextEditor(text: $jsonText, label: "Server JSON")
                     .frame(height: 120)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
@@ -816,6 +818,8 @@ struct MCPImportView: View {
                         isPresented = false
                     } else {
                         errorText = "Invalid JSON. Expected format: {\"mcpServers\": {\"name\": {\"command\": \"...\", \"args\": [...]}}}"
+                        // The error appears below the editor, away from VoiceOver's cursor on the Import button
+                        announceForAccessibility("Import failed: invalid JSON")
                     }
                 }
                 .buttonStyle(.borderedProminent)
