@@ -63,6 +63,8 @@ extension Notification.Name {
     static let menuClearTasks = Notification.Name("menuClearTasks")
     static let menuClearTokens = Notification.Name("menuClearTokens")
     static let menuToggleMessagesMonitor = Notification.Name("menuToggleMessagesMonitor")
+    static let menuFocusLog = Notification.Name("menuFocusLog")
+    static let menuFocusTaskField = Notification.Name("menuFocusTaskField")
 }
 
 private func post(_ name: Notification.Name) {
@@ -210,6 +212,12 @@ struct AgentApp: App {
                     .keyboardShortcut("d", modifiers: .command)
                 Button("Toggle LLM Overlay") { post(.menuToggleOverlay) }
                     .keyboardShortcut("b", modifiers: .command)
+                Divider()
+                // Keyboard / VoiceOver: jump between the task field and the activity log
+                Button("Go to Activity Log") { post(.menuFocusLog) }
+                    .keyboardShortcut("l", modifiers: [.command, .option])
+                Button("Go to Task Field") { post(.menuFocusTaskField) }
+                    .keyboardShortcut("i", modifiers: [.command, .option])
                 Divider()
                 Button("Run Task") { post(.menuRunTask) }
                     .keyboardShortcut(.return, modifiers: .command)

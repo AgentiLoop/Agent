@@ -411,6 +411,7 @@ struct ContentView: View {
                 // Cmd+L: Clear log
                 if event.modifierFlags.contains(.command),
                    !event.modifierFlags.contains(.shift),
+                   !event.modifierFlags.contains(.option), // Cmd+Option+L = Go to Activity Log
                    event.charactersIgnoringModifiers == "l"
                 {
                     viewModel.clearSelectedLog()
@@ -511,7 +512,10 @@ struct ContentView: View {
 
                 // Up/Down arrow for prompt history (per-tab or main) Only navigate history for short, single-line
                 // input; let arrows move the cursor in longer/multi-line text. Always allow history navigation when already browsing history.
-                if event.keyCode == 126 || event.keyCode == 125 {
+                // Skip while the activity log has focus so arrows move its caret (VoiceOver / keyboard reading).
+                if event.keyCode == 126 || event.keyCode == 125,
+                   !(NSApp.keyWindow?.firstResponder is ArrowCursorTextView)
+                {
                     let text: String
                     let browsingHistory: Bool
                     if let tabId = viewModel.selectedTabId,
@@ -557,7 +561,8 @@ struct ContentView: View {
         .menuToggleChevrons, .menuToggleOverlay, .menuRunTask, .menuCancelTask,
         .menuFind, .menuNewTab, .menuCloseTab, .menuNextTab, .menuPrevTab,
         .menuClearAll, .menuClearLog, .menuClearLLM, .menuClearHistory,
-        .menuClearTasks, .menuClearTokens, .menuToggleMessagesMonitor
+        .menuClearTasks, .menuClearTokens, .menuToggleMessagesMonitor,
+        .menuFocusLog, .menuFocusTaskField
     ]
 
     func setupMenuObservers() {
@@ -642,8 +647,31 @@ struct ContentView: View {
             viewModel.taskInputTokens = 0; viewModel.taskOutputTokens = 0
             viewModel.sessionInputTokens = 0; viewModel.sessionOutputTokens = 0
         case .menuToggleMessagesMonitor: viewModel.messagesMonitorEnabled.toggle()
+        case .menuFocusLog: focusActivityLog()
+        case .menuFocusTaskField: isTaskFieldFocused = true
         default: break
         }
+    }
+
+    /// Move keyboard / VoiceOver focus into the visible activity log, caret at the end
+    /// so VoiceOver can read the newest output line by line from there.
+    private func focusActivityLog() {
+        guard let window = NSApp.keyWindow ?? NSApp.mainWindow,
+              let root = window.contentView,
+              let log = Self.visibleActivityLog(in: root) else { return }
+        window.makeFirstResponder(log)
+        log.setSelectedRange(NSRange(location: (log.string as NSString).length, length: 0))
+        log.scrollToEndOfDocument(nil)
+    }
+
+    private static func visibleActivityLog(in view: NSView) -> ArrowCursorTextView? {
+        if let log = view as? ArrowCursorTextView, !log.isHiddenOrHasHiddenAncestor, log.window != nil {
+            return log
+        }
+        for sub in view.subviews {
+            if let found = visibleActivityLog(in: sub) { return found }
+        }
+        return nil
     }
 
     private func nextMatch() {
