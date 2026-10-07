@@ -216,6 +216,9 @@ struct SystemPromptsView: View {
     @State private var isCompactDirty = false
 
     private let service = SystemPromptService.shared
+    @Environment(\.colorSchemeContrast) private var contrast
+    /// Primary text under Increase Contrast; secondary otherwise.
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
 
     private var currentText: Binding<String> {
         Binding(
@@ -251,7 +254,7 @@ struct SystemPromptsView: View {
                 }
                 .buttonStyle(.plain)
                 .background(!isCompact ? fullColor.opacity(0.3) : Color.clear)
-                .foregroundColor(!isCompact ? fullColor : .secondary)
+                .foregroundStyle(!isCompact ? AnyShapeStyle(fullColor) : AnyShapeStyle(captionStyle))
                 .cornerRadius(6)
                 .accessibilityAddTraits(!isCompact ? .isSelected : [])
                 .accessibilityHint("Edit the full system prompt")
@@ -267,7 +270,7 @@ struct SystemPromptsView: View {
                 }
                 .buttonStyle(.plain)
                 .background(isCompact ? compactColor.opacity(0.3) : Color.clear)
-                .foregroundColor(isCompact ? compactColor : .secondary)
+                .foregroundStyle(isCompact ? AnyShapeStyle(compactColor) : AnyShapeStyle(captionStyle))
                 .cornerRadius(6)
                 .accessibilityAddTraits(isCompact ? .isSelected : [])
                 .accessibilityHint("Edit the compact prompt used by Apple Intelligence")

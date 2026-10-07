@@ -4,6 +4,9 @@ import AgentLLM
 
 struct SettingsView: View {
     @Bindable var viewModel: AgentViewModel
+    @Environment(\.colorSchemeContrast) private var contrast
+    /// Primary text under Increase Contrast; secondary otherwise.
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
 
     /// Per-provider temperature binding so the slider always edits the active provider's temp
     /// (the same `temperatures[selectedProvider]` slot that requests read from).
@@ -45,7 +48,7 @@ struct SettingsView: View {
 
             if provider == .openRouter {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("API Protocol").font(.caption).foregroundStyle(.secondary)
+                    Text("API Protocol").font(.caption).foregroundStyle(captionStyle)
                     Picker("Protocol", selection: $viewModel.openRouterProtocol) {
                         ForEach(APIProvider.openRouter.config.supportedProtocols, id: \.self) { proto in
                             Text(proto.displayName).tag(proto)
@@ -57,7 +60,7 @@ struct SettingsView: View {
 
             if provider == .fluxion {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("API Protocol").font(.caption).foregroundStyle(.secondary)
+                    Text("API Protocol").font(.caption).foregroundStyle(captionStyle)
                     Picker("Protocol", selection: $viewModel.fluxionProtocol) {
                         ForEach(APIProvider.fluxion.config.supportedProtocols, id: \.self) { proto in
                             Text(proto.displayName).tag(proto)
@@ -65,17 +68,17 @@ struct SettingsView: View {
                     }
                     .labelsHidden()
                     Text("Match your key's group: Anthropic-group keys use Anthropic; OpenAI and Other (Grok) keys use OpenAI.")
-                        .font(.caption2).foregroundStyle(.secondary)
+                        .font(.caption2).foregroundStyle(captionStyle)
                 }
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("API Key").font(.caption).foregroundStyle(.secondary)
+                Text("API Key").font(.caption).foregroundStyle(captionStyle)
                 LockedSecureField(text: $viewModel.apiKeys[provider], placeholder: keyPlaceholder(provider), lockKey: "lock.apiKeys[.\(provider.rawValue)]")
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Model").font(.caption).foregroundStyle(.secondary)
+                Text("Model").font(.caption).foregroundStyle(captionStyle)
                 HStack {
                     if viewModel.modelLists[provider].isEmpty {
                         TextField("e.g. \(provider.config.model)", text: $viewModel.models[provider])
@@ -138,11 +141,11 @@ struct SettingsView: View {
 
             Text("Uses the macOS 27 `fm` CLI, which serves the on-device Apple Foundation Model over a local Chat Completions API (127.0.0.1:1976). Requires `sudo fm license` to have been accepted once. Experimental — Apple may change or remove this tool.")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(captionStyle)
                 .fixedSize(horizontal: false, vertical: true)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Server").font(.caption).foregroundStyle(.secondary)
+                Text("Server").font(.caption).foregroundStyle(captionStyle)
                 HStack(spacing: 8) {
                     OnOffDot(isOn: fm.isRunning)
                     Text(fm.isRunning ? "Running" : (fm.isAvailable ? "Not running" : "fm not found (macOS 27 required)"))
@@ -176,7 +179,7 @@ struct SettingsView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Model").font(.caption).foregroundStyle(.secondary)
+                Text("Model").font(.caption).foregroundStyle(captionStyle)
                 HStack {
                     if viewModel.modelLists[.fmServe].isEmpty {
                         TextField("system", text: $viewModel.models[.fmServe])
@@ -222,7 +225,7 @@ struct SettingsView: View {
 
                 Text("Configure your AI provider and API keys.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
 
                 Picker("AI", selection: $viewModel.selectedProvider) {
                     ForEach(APIProvider.selectableProviders, id: \.self) { provider in
@@ -233,7 +236,7 @@ struct SettingsView: View {
 
                 Text("Ollama Pro is preferred")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
             }
 
             Divider()
@@ -246,7 +249,7 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 6) {
-                            Text("API Key or OAuth Token").font(.caption).foregroundStyle(.secondary)
+                            Text("API Key or OAuth Token").font(.caption).foregroundStyle(captionStyle)
                             if ClaudeService.isOAuthToken(viewModel.apiKey) {
                                 Text("OAuth (subscription)")
                                     .font(.caption2).bold()
@@ -258,12 +261,12 @@ struct SettingsView: View {
                         LockedSecureField(text: $viewModel.apiKey, placeholder: "sk-ant-api… (key) or sk-ant-oat01… (OAuth)", lockKey: "lock.apiKeys[.claude]")
                         Text("Paste `sk-ant-api…` for pay-per-token billing, or run `claude setup-token` in Claude Code and paste the resulting `sk-ant-oat01…` to bill against your Claude subscription.")
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(captionStyle)
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
+                        Text("Model").font(.caption).foregroundStyle(captionStyle)
                         HStack {
                             Picker("Model", selection: $viewModel.selectedModel) {
                                 ForEach(viewModel.availableClaudeModels) { model in
@@ -301,12 +304,12 @@ struct SettingsView: View {
                         .font(.headline)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key").font(.caption).foregroundStyle(.secondary)
+                        Text("API Key").font(.caption).foregroundStyle(captionStyle)
                         LockedSecureField(text: $viewModel.apiKeys[.ollama], placeholder: "Required for cloud", lockKey: "lock.apiKeys[.ollama]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
+                        Text("Model").font(.caption).foregroundStyle(captionStyle)
                         HStack {
                             if viewModel.ollamaModels.isEmpty {
                                 TextField("Model name", text: $viewModel.models[.ollama])
@@ -354,7 +357,7 @@ struct SettingsView: View {
                         .font(.headline)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("API Protocol").font(.caption).foregroundStyle(.secondary)
+                        Text("API Protocol").font(.caption).foregroundStyle(captionStyle)
                         Picker("Protocol", selection: $viewModel.lmStudioProtocol) {
                             ForEach(LMStudioProtocol.allCases, id: \.self) { proto in
                                 Text(proto.displayName).tag(proto)
@@ -364,20 +367,20 @@ struct SettingsView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key (optional)").font(.caption).foregroundStyle(.secondary)
+                        Text("API Key (optional)").font(.caption).foregroundStyle(captionStyle)
                         SecureField("Leave blank if not required", text: $viewModel.apiKeys[.lmStudio])
                             .textContentType(.oneTimeCode)
                             .textFieldStyle(.roundedBorder)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Endpoint").font(.caption).foregroundStyle(.secondary)
+                        Text("Endpoint").font(.caption).foregroundStyle(captionStyle)
                         TextField(viewModel.lmStudioProtocol.defaultEndpoint, text: $viewModel.lmStudioEndpoint)
                             .textFieldStyle(.roundedBorder)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
+                        Text("Model").font(.caption).foregroundStyle(captionStyle)
                         HStack {
                             if viewModel.modelLists[.lmStudio].isEmpty {
                                 TextField("Model name", text: $viewModel.models[.lmStudio])
@@ -416,18 +419,18 @@ struct SettingsView: View {
                         .font(.headline)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Endpoint").font(.caption).foregroundStyle(.secondary)
+                        Text("Endpoint").font(.caption).foregroundStyle(captionStyle)
                         TextField("http://localhost:8000/v1/chat/completions", text: $viewModel.vLLMEndpoint)
                             .textFieldStyle(.roundedBorder)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("API Key (optional)").font(.caption).foregroundStyle(.secondary)
+                        Text("API Key (optional)").font(.caption).foregroundStyle(captionStyle)
                         LockedSecureField(text: $viewModel.apiKeys[.vLLM], placeholder: "Optional", lockKey: "lock.apiKeys[.vLLM]")
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
+                        Text("Model").font(.caption).foregroundStyle(captionStyle)
                         HStack {
                             if viewModel.modelLists[.vLLM].isEmpty {
                                 TextField("Model name", text: $viewModel.models[.vLLM])
@@ -473,7 +476,7 @@ struct SettingsView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Authentication").font(.caption).foregroundStyle(.secondary)
+                        Text("Authentication").font(.caption).foregroundStyle(captionStyle)
                         if MuseCodeAuth.isSignedIn {
                             HStack(spacing: 6) {
                                 Image(systemName: "checkmark.seal.fill").foregroundStyle(.green).accessibilityHidden(true)
@@ -497,12 +500,12 @@ struct SettingsView: View {
                         }
                         Text("Uses the key `muse login` stores for your Meta Model API account (keychain item ai.meta.dev.credentials or ~/.config/muse/auth.json). Sign In launches `muse login` in Terminal — approve the device code in your browser, then return here. macOS may ask once to allow Agent! to read the keychain item.")
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(captionStyle)
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
+                        Text("Model").font(.caption).foregroundStyle(captionStyle)
                         HStack {
                             if viewModel.modelLists[.museCode].isEmpty {
                                 TextField("Model id (e.g. muse-spark-1.3)", text: $viewModel.models[.museCode])
@@ -545,7 +548,7 @@ struct SettingsView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Authentication").font(.caption).foregroundStyle(.secondary)
+                        Text("Authentication").font(.caption).foregroundStyle(captionStyle)
                         if let auth = CodexAuthFile.load() {
                             HStack(spacing: 6) {
                                 Image(systemName: "checkmark.seal.fill").foregroundStyle(.green).accessibilityHidden(true)
@@ -555,7 +558,7 @@ struct SettingsView: View {
                                     let mins = Int(exp.timeIntervalSinceNow / 60)
                                     Text(mins > 0 ? "expires in \(mins)m" : "expired")
                                         .font(.caption2)
-                                        .foregroundStyle(mins > 0 ? Color.secondary : Color.red)
+                                        .foregroundStyle(mins > 0 ? AnyShapeStyle(captionStyle) : AnyShapeStyle(Color.red))
                                 }
                             }
                             HStack(spacing: 8) {
@@ -584,12 +587,12 @@ struct SettingsView: View {
                         }
                         Text("Codex uses your ChatGPT Plus/Pro/Business/Edu/Enterprise subscription for billing. Sign In launches `codex login` in Terminal — complete the browser OAuth flow, then return here. Agent! reads `~/.codex/auth.json`; tokens refresh automatically.")
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(captionStyle)
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
+                        Text("Model").font(.caption).foregroundStyle(captionStyle)
                         HStack {
                             if viewModel.modelLists[.codex].isEmpty {
                                 TextField("Model id (e.g. gpt-5)", text: $viewModel.models[.codex])
@@ -625,13 +628,13 @@ struct SettingsView: View {
                         .font(.headline)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Endpoint").font(.caption).foregroundStyle(.secondary)
+                        Text("Endpoint").font(.caption).foregroundStyle(captionStyle)
                         TextField("http://localhost:11434/api/chat", text: $viewModel.localOllamaEndpoint)
                             .textFieldStyle(.roundedBorder)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Model").font(.caption).foregroundStyle(.secondary)
+                        Text("Model").font(.caption).foregroundStyle(captionStyle)
                         HStack {
                             if viewModel.localOllamaModels.isEmpty {
                                 TextField("Model name", text: $viewModel.models[.localOllama])
@@ -673,7 +676,7 @@ struct SettingsView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Context Window").font(.caption).foregroundStyle(.secondary)
+                        Text("Context Window").font(.caption).foregroundStyle(captionStyle)
                         HStack {
                             TextField("0 = auto", text: Binding(
                                 get: { viewModel.localOllamaContextSize == 0 ? "" : "\(viewModel.localOllamaContextSize)" },
@@ -688,7 +691,7 @@ struct SettingsView: View {
                                     .localOllamaContextSize == 0 ? "Model default" : "\(viewModel.localOllamaContextSize / 1024)K tokens"
                             )
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(captionStyle)
                         }
                     }
                 }
@@ -698,7 +701,7 @@ struct SettingsView: View {
             if viewModel.selectedProvider != .localOllama && viewModel.selectedProvider != .foundationModel {
                 Divider()
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Max Output Tokens").font(.caption).foregroundStyle(.secondary)
+                    Text("Max Output Tokens").font(.caption).foregroundStyle(captionStyle)
                     HStack {
                         TextField(viewModel.selectedProvider == .claude ? "0 = window/16" : "0 = default", text: Binding(
                             get: { viewModel.maxTokens == 0 ? "" : "\(viewModel.maxTokens)" },
@@ -716,7 +719,7 @@ struct SettingsView: View {
                                 : "\(viewModel.maxTokens) tokens"
                         )
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(captionStyle)
                     }
                 }
             }
@@ -726,7 +729,7 @@ struct SettingsView: View {
             if viewModel.selectedProvider != .localOllama && viewModel.selectedProvider != .foundationModel {
                 Divider()
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Reasoning").font(.caption).foregroundStyle(.secondary)
+                    Text("Reasoning").font(.caption).foregroundStyle(captionStyle)
                     HStack {
                         Picker("", selection: Binding(
                             get: { viewModel.reasoningEffort },
@@ -746,7 +749,7 @@ struct SettingsView: View {
                              ? "No extended thinking"
                              : "Thinking between tool calls")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(captionStyle)
                     }
                 }
             }
@@ -755,9 +758,9 @@ struct SettingsView: View {
             Divider()
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text("Temperature").font(.caption).foregroundStyle(.secondary)
+                    Text("Temperature").font(.caption).foregroundStyle(captionStyle)
                     Spacer()
-                    Text(viewModel.selectedProvider.displayName).font(.caption).foregroundStyle(.secondary)
+                    Text(viewModel.selectedProvider.displayName).font(.caption).foregroundStyle(captionStyle)
                     Text(String(format: "%.1f", llmTemperatureBinding.wrappedValue))
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(viewModel.temperatureColor(llmTemperatureBinding.wrappedValue))

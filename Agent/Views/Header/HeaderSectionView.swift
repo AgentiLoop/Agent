@@ -3,6 +3,9 @@ import SwiftUI
 /// Left side of the toolbar: status indicators and spinner
 struct HeaderStatusView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var contrast
+    /// Primary text under Increase Contrast; secondary otherwise.
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
     @Bindable var viewModel: AgentViewModel
 
     /// Yellow that's readable on both light and dark
@@ -20,7 +23,7 @@ struct HeaderStatusView: View {
                 )
                 Text("Agent!")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
             }
             .help("User Agent: \(viewModel.userServiceActive ? "Running" : (viewModel.userEnabled ? "Stopped" : "Disabled"))")
             .accessibilityElement(children: .combine)
@@ -36,7 +39,7 @@ struct HeaderStatusView: View {
                 )
                 Text("Daemon")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
             }
             .help("Daemon: \(viewModel.rootServiceActive ? "Running" : (viewModel.rootEnabled ? "Stopped" : "Disabled"))")
             .accessibilityElement(children: .combine)
