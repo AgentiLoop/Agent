@@ -32,6 +32,75 @@
                       description="The Main tab LLM model ID. Setting it changes the selected model for the Main tab's provider.">
                 <cocoa key="modelName"/>
             </property>
+            <!-- Settings (same values as the Settings window, persisted) -->
+            <property name="max iterations" code="AgMI" type="integer"
+                      description="Maximum LLM turns per task (1 or more).">
+                <cocoa key="maxIterations"/>
+            </property>
+            <property name="max retries" code="AgMR" type="integer"
+                      description="Maximum retries after a failed LLM request.">
+                <cocoa key="maxRetries"/>
+            </property>
+            <property name="max tokens" code="AgMT" type="integer"
+                      description="Maximum output tokens per response (0 = provider default).">
+                <cocoa key="maxTokens"/>
+            </property>
+            <property name="token budget" code="AgTB" type="integer"
+                      description="Per-task token budget, input + output (0 = unlimited).">
+                <cocoa key="tokenBudget"/>
+            </property>
+            <property name="temperature" code="AgTm" type="real"
+                      description="Temperature (0–2) of the Main tab's provider.">
+                <cocoa key="temperature"/>
+            </property>
+            <property name="reasoning effort" code="AgRE" type="text"
+                      description="Reasoning effort: off, low, medium or high.">
+                <cocoa key="reasoningEffort"/>
+            </property>
+            <property name="auto verify" code="AgAV" type="boolean"
+                      description="After a successful build, launch the app and run accessibility checks.">
+                <cocoa key="autoVerify"/>
+            </property>
+            <property name="critic review" code="AgCR" type="boolean"
+                      description="Have the LLM review the task's diff before the task can complete.">
+                <cocoa key="criticReview"/>
+            </property>
+            <property name="visual tests" code="AgVT" type="boolean"
+                      description="Allow the LLM to define click/verify UI tests.">
+                <cocoa key="visualTests"/>
+            </property>
+            <property name="auto pull request" code="AgPR" type="boolean"
+                      description="After a task completes, create a branch, commit, push and open a pull request.">
+                <cocoa key="autoPR"/>
+            </property>
+            <property name="auto scaffold" code="AgSc" type="boolean"
+                      description="Allow the LLM to create new Xcode projects from templates.">
+                <cocoa key="autoScaffold"/>
+            </property>
+            <property name="auto screenshot" code="AgSS" type="boolean"
+                      description="Take a screenshot after UI actions.">
+                <cocoa key="autoScreenshot"/>
+            </property>
+            <property name="force vision" code="AgFV" type="boolean"
+                      description="Send images to every provider.">
+                <cocoa key="forceVision"/>
+            </property>
+            <property name="messages monitor" code="AgMM" type="boolean"
+                      description="Watch Messages for incoming Agent! commands.">
+                <cocoa key="messagesMonitor"/>
+            </property>
+            <property name="task auto complete" code="AgTC" type="boolean"
+                      description="Show prompt-history suggestions while typing in the task field.">
+                <cocoa key="taskAutoComplete"/>
+            </property>
+            <property name="user agent enabled" code="AgUA" type="boolean"
+                      description="Whether the user Launch Agent is enabled. Setting false shuts it down.">
+                <cocoa key="userAgentEnabled"/>
+            </property>
+            <property name="launch daemon enabled" code="AgLD" type="boolean"
+                      description="Whether the root Launch Daemon is enabled. Setting false shuts it down.">
+                <cocoa key="launchDaemonEnabled"/>
+            </property>
             <element type="tab" description="Tabs in tab-bar order. tab 1 is always the Main tab.">
                 <cocoa key="scriptingTabs"/>
             </element>

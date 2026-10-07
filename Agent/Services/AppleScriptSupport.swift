@@ -5,7 +5,10 @@ import AppKit
 /// Application properties are KVC keys handled by AppDelegate; commands are NSScriptCommand subclasses.
 @MainActor
 extension AppDelegate {
-    private static let scriptingKeys: Set<String> = ["taskRunning", "activityLog", "projectFolder", "taskInput", "providerName", "modelName", "scriptingTabs"]
+    private static let scriptingKeys: Set<String> = ["taskRunning", "activityLog", "projectFolder", "taskInput", "providerName", "modelName", "scriptingTabs",
+        "maxIterations", "maxRetries", "maxTokens", "tokenBudget", "temperature", "reasoningEffort",
+        "autoVerify", "criticReview", "visualTests", "autoPR", "autoScaffold", "autoScreenshot", "forceVision",
+        "messagesMonitor", "taskAutoComplete", "userAgentEnabled", "launchDaemonEnabled"]
 
     func application(_ sender: NSApplication, delegateHandlesKey key: String) -> Bool {
         Self.scriptingKeys.contains(key)
@@ -33,6 +36,122 @@ extension AppDelegate {
     @objc var modelName: String {
         get { ScriptingTab(tabId: nil).modelName }
         set { ScriptingTab(tabId: nil).modelName = newValue }
+    }
+
+    // MARK: - Settings (same values as the Settings window; persisted to UserDefaults by the view model)
+
+    /// Reads/writes one view-model setting; `nil` VM reads as `fallback` and ignores writes.
+    private func setting<T>(_ keyPath: ReferenceWritableKeyPath<AgentViewModel, T>, _ fallback: T) -> T {
+        AgentViewModel.current?[keyPath: keyPath] ?? fallback
+    }
+
+    private func setSetting<T>(_ keyPath: ReferenceWritableKeyPath<AgentViewModel, T>, _ value: T) {
+        AgentViewModel.current?[keyPath: keyPath] = value
+    }
+
+    /// Integer settings reject negative values (0 means "no limit / provider default" where it applies).
+    private func setCount(_ keyPath: ReferenceWritableKeyPath<AgentViewModel, Int>, _ value: Int, minimum: Int = 0) {
+        guard value >= minimum else { return ScriptingTab.scriptError("Value must be \(minimum) or more.") }
+        setSetting(keyPath, value)
+    }
+
+    @objc var maxIterations: Int {
+        get { setting(\.maxIterations, 50) }
+        set { setCount(\.maxIterations, newValue, minimum: 1) }
+    }
+
+    @objc var maxRetries: Int {
+        get { setting(\.maxRetries, 10) }
+        set { setCount(\.maxRetries, newValue) }
+    }
+
+    @objc var maxTokens: Int {
+        get { setting(\.maxTokens, 0) }
+        set { setCount(\.maxTokens, newValue) }
+    }
+
+    @objc var tokenBudget: Int {
+        get { setting(\.tokenBudgetCeiling, 0) }
+        set { setCount(\.tokenBudgetCeiling, newValue) }
+    }
+
+    /// Temperature of the Main tab's provider.
+    @objc var temperature: Double {
+        get {
+            guard let vm = AgentViewModel.current else { return 0 }
+            return vm.temperatures[vm.mainTabProvider]
+        }
+        set {
+            guard let vm = AgentViewModel.current else { return }
+            guard (0...2).contains(newValue) else { return ScriptingTab.scriptError("Temperature must be between 0 and 2.") }
+            vm.temperatures[vm.mainTabProvider] = newValue
+        }
+    }
+
+    @objc var reasoningEffort: String {
+        get { setting(\.reasoningEffort, "off") }
+        set {
+            let effort = newValue.lowercased()
+            guard ["off", "low", "medium", "high"].contains(effort) else {
+                return ScriptingTab.scriptError("Reasoning effort must be off, low, medium or high.")
+            }
+            setSetting(\.reasoningEffort, effort)
+        }
+    }
+
+    @objc var autoVerify: Bool {
+        get { setting(\.autoVerifyEnabled, false) }
+        set { setSetting(\.autoVerifyEnabled, newValue) }
+    }
+
+    @objc var criticReview: Bool {
+        get { setting(\.criticReviewEnabled, false) }
+        set { setSetting(\.criticReviewEnabled, newValue) }
+    }
+
+    @objc var visualTests: Bool {
+        get { setting(\.visualTestsEnabled, false) }
+        set { setSetting(\.visualTestsEnabled, newValue) }
+    }
+
+    @objc var autoPR: Bool {
+        get { setting(\.autoPREnabled, false) }
+        set { setSetting(\.autoPREnabled, newValue) }
+    }
+
+    @objc var autoScaffold: Bool {
+        get { setting(\.autoScaffoldEnabled, false) }
+        set { setSetting(\.autoScaffoldEnabled, newValue) }
+    }
+
+    @objc var autoScreenshot: Bool {
+        get { setting(\.visionAutoScreenshotEnabled, false) }
+        set { setSetting(\.visionAutoScreenshotEnabled, newValue) }
+    }
+
+    @objc var forceVision: Bool {
+        get { setting(\.forceVision, false) }
+        set { setSetting(\.forceVision, newValue) }
+    }
+
+    @objc var messagesMonitor: Bool {
+        get { setting(\.messagesMonitorEnabled, false) }
+        set { setSetting(\.messagesMonitorEnabled, newValue) }
+    }
+
+    @objc var taskAutoComplete: Bool {
+        get { setting(\.taskAutoComplete, true) }
+        set { setSetting(\.taskAutoComplete, newValue) }
+    }
+
+    @objc var userAgentEnabled: Bool {
+        get { setting(\.userEnabled, true) }
+        set { setSetting(\.userEnabled, newValue) }
+    }
+
+    @objc var launchDaemonEnabled: Bool {
+        get { setting(\.rootEnabled, true) }
+        set { setSetting(\.rootEnabled, newValue) }
     }
 
     // MARK: - tab elements (Main tab first, then every other tab in tab-bar order)
@@ -158,7 +277,7 @@ final class ScriptingTab: NSObject {
     }
 
     /// Reports an error from a property setter back to the running script.
-    private static func scriptError(_ message: String) {
+    static func scriptError(_ message: String) {
         guard let command = NSScriptCommand.current() else { return }
         command.scriptErrorNumber = -10000
         command.scriptErrorString = message
