@@ -37,6 +37,8 @@ struct AgentOptionsView: View {
                             }
                         }
                     )
+                    .accessibilityLabel("Max iterations per task")
+                    .accessibilityValue("\(viewModel.maxIterations)")
                 }
             }
 
@@ -60,6 +62,8 @@ struct AgentOptionsView: View {
                             }
                         }
                     )
+                    .accessibilityLabel("Retries on server or timeout errors")
+                    .accessibilityValue("\(viewModel.maxRetries)")
                 }
             }
 
@@ -75,6 +79,7 @@ struct AgentOptionsView: View {
                     }
                     .labelsHidden()
                     .frame(width: 80)
+                    .accessibilityLabel("Seconds between network retries")
                 }
             }
 
@@ -98,6 +103,8 @@ struct AgentOptionsView: View {
                             }
                         }
                     )
+                    .accessibilityLabel("Output lines before truncated")
+                    .accessibilityValue("\(viewModel.maxOutputLines)")
                 }
             }
 
@@ -121,6 +128,8 @@ struct AgentOptionsView: View {
                             }
                         }
                     )
+                    .accessibilityLabel("Read file preview lines")
+                    .accessibilityValue("\(viewModel.readFilePreviewLines)")
                 }
             }
 
@@ -131,6 +140,7 @@ struct AgentOptionsView: View {
                 Toggle("Capture stderr", isOn: $viewModel.scriptCaptureStderr)
                     .toggleStyle(.switch)
                     .controlSize(.mini)
+                    .accessibilityLabel("AgentScript: capture stderr")
             }
 
             row {
@@ -139,6 +149,7 @@ struct AgentOptionsView: View {
                 Toggle("Autocomplete", isOn: $viewModel.taskAutoComplete)
                     .toggleStyle(.switch)
                     .controlSize(.mini)
+                    .accessibilityLabel("Task input autocomplete")
             }
 
             row {
@@ -151,6 +162,8 @@ struct AgentOptionsView: View {
                         onIncrement: { if viewModel.maxHistoryBeforeSummary > 5 { viewModel.maxHistoryBeforeSummary -= 5 } },
                         onDecrement: { if viewModel.maxHistoryBeforeSummary < 50 { viewModel.maxHistoryBeforeSummary += 5 } }
                     )
+                    .accessibilityLabel("Summarize history after")
+                    .accessibilityValue("\(viewModel.maxHistoryBeforeSummary) tasks")
                 }
                 Spacer().frame(width: 12)
                 VStack(alignment: .trailing, spacing: 2) {
@@ -160,6 +173,8 @@ struct AgentOptionsView: View {
                         onIncrement: { if viewModel.visibleTaskCount > 1 { viewModel.visibleTaskCount -= 1 } },
                         onDecrement: { if viewModel.visibleTaskCount < 5 { viewModel.visibleTaskCount += 1 } }
                     )
+                    .accessibilityLabel("Tasks visible in chat")
+                    .accessibilityValue("\(viewModel.visibleTaskCount)")
                 }
             }
 
@@ -180,6 +195,7 @@ struct AgentOptionsView: View {
                 }
                 .pickerStyle(.segmented)
                 .frame(width: 120)
+                .accessibilityLabel("Shell")
             }
 
             row {
@@ -198,6 +214,7 @@ struct AgentOptionsView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .labelsHidden()
+                    .accessibilityLabel("Shell timeout enabled")
 
                     if shellTimeoutSeconds > 0 {
                         Stepper(
@@ -205,6 +222,8 @@ struct AgentOptionsView: View {
                             onIncrement: { shellTimeoutSeconds = min(shellTimeoutSeconds + 60, 7200) },
                             onDecrement: { shellTimeoutSeconds = max(shellTimeoutSeconds - 60, 60) }
                         )
+                        .accessibilityLabel("Shell timeout")
+                        .accessibilityValue("\(Int(shellTimeoutSeconds / 60)) minutes")
                     }
                 }
             }
@@ -220,6 +239,7 @@ struct AgentOptionsView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .labelsHidden()
+                    .accessibilityLabel("Token budget limit")
 
                     if viewModel.tokenBudgetCeiling > 0 {
                         Stepper(
@@ -241,6 +261,8 @@ struct AgentOptionsView: View {
                                 }
                             }
                         )
+                        .accessibilityLabel("Token budget")
+                        .accessibilityValue("\(Self.formatBudget(viewModel.tokenBudgetCeiling)) tokens")
                         Button {
                             viewModel.budgetUsedFraction = 0
                         } label: {
@@ -249,6 +271,7 @@ struct AgentOptionsView: View {
                         }
                         .buttonStyle(.plain)
                         .help("Reset token usage for current task")
+                        .accessibilityLabel("Reset token usage for current task")
                     } else {
                         Text("Unlimited")
                             .font(.caption)

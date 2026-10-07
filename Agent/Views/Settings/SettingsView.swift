@@ -829,19 +829,21 @@ struct LockedSecureField: View {
     @Binding var text: String
     let placeholder: String
     let lockKey: String
+    let label: String
     @State private var isLocked: Bool
 
-    init(text: Binding<String>, placeholder: String, lockKey: String) {
+    init(text: Binding<String>, placeholder: String, lockKey: String, label: String = "API Key") {
         self._text = text
         self.placeholder = placeholder
         self.lockKey = lockKey
+        self.label = label
         _isLocked = State(initialValue: UserDefaults.standard.bool(forKey: lockKey))
     }
 
     var body: some View {
         HStack(spacing: 4) {
             SecureField(placeholder, text: $text)
-                .accessibilityLabel("API Key")
+                .accessibilityLabel(label)
                 .textContentType(.oneTimeCode)
                 .textFieldStyle(.roundedBorder)
                 .disabled(isLocked)
@@ -858,7 +860,7 @@ struct LockedSecureField: View {
             .buttonStyle(.bordered)
             .controlSize(.small)
             .help(isLocked ? "Unlock to edit" : "Lock to protect")
-            .accessibilityLabel(isLocked ? "Unlock Key" : "Lock Key")
+            .accessibilityLabel(isLocked ? "Unlock \(label)" : "Lock \(label)")
 
             Button {
                 NSPasteboard.general.clearContents()
@@ -872,7 +874,7 @@ struct LockedSecureField: View {
             .controlSize(.small)
             .disabled(text.isEmpty)
             .help("Copy key to clipboard")
-            .accessibilityLabel("Copy Key")
+            .accessibilityLabel("Copy \(label)")
         }
     }
 }

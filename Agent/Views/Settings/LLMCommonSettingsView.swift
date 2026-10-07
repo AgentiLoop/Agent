@@ -21,12 +21,12 @@ struct LLMCommonSettingsView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             VStack(alignment: .leading, spacing: 4) {
-                Text("Exa API Key").font(.caption).foregroundStyle(.secondary)
-                LockedSecureField(text: $viewModel.exaAPIKey, placeholder: "exa-...", lockKey: "lock.exaAPIKey")
+                Text("Exa API Key").font(.caption).foregroundStyle(.secondary).accessibilityHidden(true)
+                LockedSecureField(text: $viewModel.exaAPIKey, placeholder: "exa-...", lockKey: "lock.exaAPIKey", label: "Exa API Key")
             }
             VStack(alignment: .leading, spacing: 4) {
-                Text("Tavily API Key").font(.caption).foregroundStyle(.secondary)
-                LockedSecureField(text: $viewModel.tavilyAPIKey, placeholder: "tvly-...", lockKey: "lock.tavilyAPIKey")
+                Text("Tavily API Key").font(.caption).foregroundStyle(.secondary).accessibilityHidden(true)
+                LockedSecureField(text: $viewModel.tavilyAPIKey, placeholder: "tvly-...", lockKey: "lock.tavilyAPIKey", label: "Tavily API Key")
             }
         }
     }
@@ -55,7 +55,7 @@ struct LLMCommonSettingsView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("API Key").font(.caption).foregroundStyle(.secondary)
-                LockedSecureField(text: $viewModel.jevAPIKey, placeholder: "TypeSafe API key", lockKey: "lock.jevAPIKey")
+                LockedSecureField(text: $viewModel.jevAPIKey, placeholder: "TypeSafe API key", lockKey: "lock.jevAPIKey", label: "Jev API Key")
             }
 
             VStack(alignment: .leading, spacing: 4) {
@@ -64,8 +64,9 @@ struct LLMCommonSettingsView: View {
                     if viewModel.jevModels.isEmpty {
                         TextField("e.g. \(JevConfiguration.defaultModel)", text: $viewModel.jevModel)
                             .textFieldStyle(.roundedBorder)
+                            .accessibilityLabel("Jev Model")
                     } else {
-                        Picker("Model", selection: $viewModel.jevModel) {
+                        Picker("Jev Model", selection: $viewModel.jevModel) {
                             if !viewModel.jevModels.contains(where: { $0.name == viewModel.jevModel }) {
                                 Text(viewModel.jevModel).tag(viewModel.jevModel)
                             }
@@ -90,6 +91,7 @@ struct LLMCommonSettingsView: View {
                     .controlSize(.small)
                     .disabled(viewModel.fetchingJevModels || viewModel.jevAPIKey.isEmpty)
                     .help("Fetch available models")
+                    .accessibilityLabel(viewModel.fetchingJevModels ? "Fetching Jev Models" : "Fetch Jev Models")
                 }
 
                 if let error = viewModel.jevModelsError {
@@ -97,17 +99,20 @@ struct LLMCommonSettingsView: View {
                         .font(.caption2)
                         .foregroundStyle(.red)
                         .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityLabel("Error: \(error)")
                 }
             }
 
             HStack {
                 Text("Consult Jev before tools").font(.caption)
+                    .accessibilityHidden(true)
                 Spacer()
                 Toggle("", isOn: $viewModel.jevAdvisoryEnabled)
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .tint(.blue)
                     .help("Ask Jev for a second opinion before running a shell command. Requires an API key.")
+                    .accessibilityLabel("Consult Jev before tools")
             }
             .disabled(viewModel.jevAPIKey.isEmpty)
 
@@ -118,9 +123,12 @@ struct LLMCommonSettingsView: View {
                     Text("\(Int(viewModel.jevBlockPercent))% destructive")
                         .font(.caption).monospacedDigit()
                 }
+                .accessibilityHidden(true)
                 Slider(value: $viewModel.jevBlockPercent, in: 0...100, step: 10)
                     .controlSize(.small)
                     .tint(.blue)
+                    .accessibilityLabel("Jev reject threshold")
+                    .accessibilityValue("\(Int(viewModel.jevBlockPercent))% destructive")
                 Text("Jev blocks a command it rates this likely — or more — to irreversibly destroy data. 0% rejects everything Jev is asked about; 100% only certainties.")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
