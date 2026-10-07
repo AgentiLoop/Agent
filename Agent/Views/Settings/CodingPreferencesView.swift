@@ -3,6 +3,11 @@ import SwiftUI
 /// Coding preferences — opt-in features for agentic coding workflows.
 struct CodingPreferencesView: View {
     @Bindable var viewModel: AgentViewModel
+    @Environment(\.colorSchemeContrast) private var contrast
+    /// Increase Contrast: promote faint secondary/tertiary captions to primary text.
+    private var highContrast: Bool { contrast == .increased }
+    private var captionStyle: HierarchicalShapeStyle { highContrast ? .primary : .secondary }
+    private var detailStyle: HierarchicalShapeStyle { highContrast ? .primary : .tertiary }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -12,7 +17,7 @@ struct CodingPreferencesView: View {
                     .accessibilityAddTraits(.isHeader)
                 Text("Opt-in features for autonomous coding workflows.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
             }
             .padding()
 
@@ -21,7 +26,7 @@ struct CodingPreferencesView: View {
                     Text("Auto-Verify").font(.subheadline)
                     Text("After build succeeds, launch app and test via accessibility")
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(detailStyle)
                 }
                 Spacer()
                 Toggle("", isOn: $viewModel.autoVerifyEnabled)
@@ -37,7 +42,7 @@ struct CodingPreferencesView: View {
                     Text("Critic Review").font(.subheadline)
                     Text("LLM reviews the task's diff before task_complete is accepted")
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(detailStyle)
                 }
                 Spacer()
                 Toggle("", isOn: $viewModel.criticReviewEnabled)
@@ -53,7 +58,7 @@ struct CodingPreferencesView: View {
                     Text("Visual Tests").font(.subheadline)
                     Text("LLM can define click/verify UI assertions")
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(detailStyle)
                 }
                 Spacer()
                 Toggle("", isOn: $viewModel.visualTestsEnabled)
@@ -69,7 +74,7 @@ struct CodingPreferencesView: View {
                     Text("Auto PR").font(.subheadline)
                     Text("Create branch, commit, push, open GitHub PR")
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(detailStyle)
                 }
                 Spacer()
                 Toggle("", isOn: $viewModel.autoPREnabled)
@@ -85,7 +90,7 @@ struct CodingPreferencesView: View {
                     Text("Project Templates").font(.subheadline)
                     Text("Scaffold new Xcode projects from prompts")
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(detailStyle)
                 }
                 Spacer()
                 Toggle("", isOn: $viewModel.autoScaffoldEnabled)

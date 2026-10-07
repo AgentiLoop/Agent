@@ -6,6 +6,12 @@ struct FallbackChainView: View {
     @Bindable var viewModel: AgentViewModel
     @State private var selectedProvider: APIProvider
     @State private var selectedModel: String = ""
+    @Environment(\.colorSchemeContrast) private var contrast
+    /// Increase Contrast: promote faint captions to primary text and drop faded fills.
+    private var highContrast: Bool { contrast == .increased }
+    private var captionStyle: HierarchicalShapeStyle { highContrast ? .primary : .secondary }
+    private var detailStyle: HierarchicalShapeStyle { highContrast ? .primary : .tertiary }
+    private var removeColor: Color { highContrast ? .red : .red.opacity(0.7) }
 
     init(viewModel: AgentViewModel) {
         self.viewModel = viewModel
@@ -35,7 +41,7 @@ struct FallbackChainView: View {
                 }
                 Text("When the primary LLM fails 3 times, auto-switch to the next provider. Drag to reorder.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
             }
             .padding()
 
@@ -46,7 +52,7 @@ struct FallbackChainView: View {
                 VStack(spacing: 8) {
                     Text("No fallback providers configured.")
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(detailStyle)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 20)
                 }
@@ -57,7 +63,7 @@ struct FallbackChainView: View {
                         HStack(spacing: 8) {
                             Text("\(index + 1).")
                                 .font(.caption.monospacedDigit())
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(captionStyle)
                                 .frame(width: 20)
 
                             VStack(alignment: .leading, spacing: 1) {
@@ -66,7 +72,7 @@ struct FallbackChainView: View {
                                 HStack(spacing: 4) {
                                     Text(shortModel(entry.model))
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(captionStyle)
                                         .lineLimit(1)
                                         .truncationMode(.middle)
                                     if let p = APIProvider(rawValue: entry.provider),
@@ -88,8 +94,9 @@ struct FallbackChainView: View {
                                     .foregroundStyle(.green)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
-                                    .background(Color.green.opacity(0.15))
+                                    .background(Color.green.opacity(highContrast ? 0.3 : 0.15))
                                     .clipShape(Capsule())
+                                    .overlay(Capsule().strokeBorder(Color.green, lineWidth: highContrast ? 1 : 0))
                             }
 
                             Toggle("", isOn: Binding(
@@ -105,7 +112,7 @@ struct FallbackChainView: View {
                                 service.remove(id: entry.id)
                             } label: {
                                 Image(systemName: "minus.circle.fill")
-                                    .foregroundStyle(.red.opacity(0.7))
+                                    .foregroundStyle(removeColor)
                             }
                             .buttonStyle(.plain)
                             .help("Remove from Fallback Chain")
@@ -184,14 +191,14 @@ struct FallbackChainView: View {
                     HStack {
                         Text("\(service.chain.filter(\.enabled).count) of \(service.chain.count) enabled")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(captionStyle)
                         Spacer()
                         Button("Clear All") {
                             service.clear()
                         }
                         .font(.caption)
                         .buttonStyle(.plain)
-                        .foregroundStyle(.red.opacity(0.7))
+                        .foregroundStyle(removeColor)
                         .accessibilityLabel("Clear All Fallback Providers")
                     }
                     .padding(.vertical, 6)
