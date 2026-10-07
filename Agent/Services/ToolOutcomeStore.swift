@@ -17,7 +17,7 @@ final class ToolOutcomeStore {
     }
 
     /// Failures of one tool within the current task before an advisory fires.
-    static let advisoryThreshold = 3
+    nonisolated static let advisoryThreshold = 3
     /// Persisted failures with zero successes that mark a tool as chronic.
     static let chronicThreshold = 5
 
@@ -85,24 +85,33 @@ final class ToolOutcomeStore {
     /// App-automation tools whose failures have an accessibility fallback. After
     /// two failures the third try should be accessibility, so a UI task works
     /// within three tries instead of retrying scripting until the budget runs out.
-    static let accessibilityFallbackTools: Set<String> = [
+    nonisolated static let accessibilityFallbackTools: Set<String> = [
         "applescript", "run_applescript", "run_osascript", "run_apple_script",
         "javascript", "execute_javascript", "run_javascript",
         "agent_script", "run_agent",
         "safari", "selenium", "web_open", "web_find", "web_click", "web_type",
     ]
-    static let accessibilityFallbackThreshold = 2
+    nonisolated static let accessibilityFallbackThreshold = 2
 
     /// One-shot advisory once a tool crosses the in-task failure threshold.
     /// Returns nil when below threshold or already advised this task.
     func advisory(for tool: String) -> String? {
-        let fallback = Self.accessibilityFallbackTools.contains(tool)
         guard let failures = taskFailures[tool],
-              failures >= (fallback ? Self.accessibilityFallbackThreshold : Self.advisoryThreshold),
+              failures >= Self.threshold(for: tool),
               !advisedTools.contains(tool) else { return nil }
         advisedTools.insert(tool)
-        let lastError = taskLastError[tool] ?? ""
-        if fallback {
+        return Self.advisoryText(tool: tool, failures: failures, lastError: taskLastError[tool] ?? "")
+    }
+
+    /// Failures of `tool` in one task before its advisory fires.
+    nonisolated static func threshold(for tool: String) -> Int {
+        accessibilityFallbackTools.contains(tool) ? accessibilityFallbackThreshold : advisoryThreshold
+    }
+
+    /// Advisory text — shared by the main task loop (this store) and tab tasks,
+    /// which run concurrently and keep their own per-task failure counts.
+    nonisolated static func advisoryText(tool: String, failures: Int, lastError: String) -> String {
+        if accessibilityFallbackTools.contains(tool) {
             return "⚠️ \(tool) has failed \(failures)x this task (last: \(lastError)). "
                 + "Do NOT try it a third time — do it with accessibility instead, which works on any app's UI: "
                 + "accessibility(action:\"click_element\"|\"type_into_element\"|\"select_option\"|\"select_row\"|\"click_menu_item\"|\"press_key\"|\"read_text\", appBundleId:\"<app>\", title:\"<visible name>\"). "

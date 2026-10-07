@@ -270,6 +270,7 @@ extension AgentViewModel {
         var compactionState = CompactionState(contextWindow: contextWindow(for: provider, model: modelId), maxTokens: mt)
         var stuckFiles: [String: Int] = [:] // Edit failure count per file (for nudge)
         var repeatedCalls: [String: Int] = [:] // Identical tool-call fingerprint counts (broken-record guard)
+        var toolFailures: [String: Int] = [:] // Per-tool failure counts (accessibility-fallback advisory)
         // Plan-mode enforcement state
         var filesEditedThisTask: Set<String> = []
         // Full system prompt + full tool descriptions on every turn — no condensed prompt, no compactTools, no mode
@@ -455,6 +456,7 @@ extension AgentViewModel {
                     commandsRun: &commandsRun,
                     stuckFiles: &stuckFiles,
                     repeatedCalls: &repeatedCalls,
+                    toolFailures: &toolFailures,
                     filesEditedThisTask: &filesEditedThisTask,
                     completionSummary: &completionSummary,
                     unbuiltEditCount: &unbuiltEditCount,

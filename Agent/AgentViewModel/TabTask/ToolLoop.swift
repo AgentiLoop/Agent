@@ -24,6 +24,7 @@ extension AgentViewModel {
         commandsRun: inout [String],
         stuckFiles: inout [String: Int],
         repeatedCalls: inout [String: Int],
+        toolFailures: inout [String: Int],
         filesEditedThisTask: inout Set<String>,
         completionSummary: inout String,
         unbuiltEditCount: inout Int,
@@ -31,6 +32,7 @@ extension AgentViewModel {
     ) async -> TabToolProcessingOutcome {
         var toolResults: [[String: Any]] = []
         var hasToolUse = false
+        var advisories: [String] = [] // appended after every tool_result (API requires them first)
 
         // Native (server-side) web search runs inside the API call. If the model
         // searched but wrote no text before calling task_complete, the user never
@@ -150,6 +152,20 @@ extension AgentViewModel {
                         toolResult["content"] = output + note
                     }
                     toolResults.append(toolResult)
+                    // Per-tab failure advisory (the main loop's ToolOutcomeStore is
+                    // shared, so concurrent tabs count their own): scripting/web tools
+                    // steer to accessibility after 2 failures, others after 3 — once.
+                    if let output = toolResult["content"] as? String, Self.isToolFailure(output: output) {
+                        toolFailures[name, default: 0] += 1
+                        let failures = toolFailures[name] ?? 0
+                        if failures == ToolOutcomeStore.threshold(for: name) {
+                            let advisory = ToolOutcomeStore.advisoryText(
+                                tool: name, failures: failures, lastError: String(output.prefix(300)))
+                            tab.appendLog(advisory)
+                            tab.flush()
+                            advisories.append(advisory)
+                        }
+                    }
                     // Stuck-file nudge: if this was an edit tool and the result looks like a failure, increment the
                     // per-file failure count. At 3 failures, append an actionable recovery nudge.
                     appendStuckFileNudgeIfNeeded(
@@ -199,6 +215,7 @@ extension AgentViewModel {
             }
         }
 
+        for advisory in advisories { toolResults.append(["type": "text", "text": advisory]) }
         return .normal(hasToolUse: hasToolUse, toolResults: toolResults)
     }
 }
