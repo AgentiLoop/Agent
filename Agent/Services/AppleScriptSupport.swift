@@ -20,7 +20,7 @@ extension AppDelegate {
         "lmStudioProtocol", "lmStudioEndpoint", "vLLMEndpoint", "localOllamaEndpoint", "openRouterProtocol", "fluxionProtocol",
         "appleAIMediator", "appleAITriage", "appleAIAnnotations", "appleAITokenCompression",
         "fallbackEnabled", "fallbackChain", "disabledFallbackEntries", "activeFallback",
-        "systemPrompt", "compactSystemPrompt"]
+        "systemPrompt", "compactSystemPrompt", "includePrereleases"]
 
     func application(_ sender: NSApplication, delegateHandlesKey key: String) -> Bool {
         Self.scriptingKeys.contains(key)
@@ -276,6 +276,12 @@ extension AppDelegate {
     @objc var captureScriptStderr: Bool {
         get { setting(\.scriptCaptureStderr, false) }
         set { setSetting(\.scriptCaptureStderr, newValue) }
+    }
+
+    /// Agent! menu > Include Pre-releases (the menu's @AppStorage toggle).
+    @objc var includePrereleases: Bool {
+        get { UserDefaults.standard.bool(forKey: UpdateChecker.includePrereleasesKey) }
+        set { UserDefaults.standard.set(newValue, forKey: UpdateChecker.includePrereleasesKey) }
     }
 
     // MARK: - LLM Common Settings (web search keys, Jev). Keys are write-only so scripts can't read secrets.
@@ -822,6 +828,21 @@ final class ScriptingTab: NSObject {
         return tab?.rawLLMOutput ?? ""
     }
 
+    /// Shortcuts > Toggle LLM Overlay.
+    @objc var llmOutputHidden: Bool {
+        get { tabId == nil ? (vm?.thinkingDismissed ?? false) : (tab?.thinkingDismissed ?? false) }
+        set { if tabId == nil { vm?.thinkingDismissed = newValue } else { tab?.thinkingDismissed = newValue } }
+    }
+
+    /// Shortcuts > Toggle LLM Chevrons (sets both chevrons, like the menu item).
+    @objc var llmOutputExpanded: Bool {
+        get { tabId == nil ? (vm?.thinkingExpanded ?? false) : (tab?.thinkingExpanded ?? false) }
+        set {
+            if tabId == nil { vm?.thinkingExpanded = newValue; vm?.thinkingOutputExpanded = newValue }
+            else { tab?.thinkingExpanded = newValue; tab?.thinkingOutputExpanded = newValue }
+        }
+    }
+
     /// Input tokens of the current/last task (Main), or of the tab.
     @objc var inputTokens: Int {
         guard tabId != nil else { return vm?.taskInputTokens ?? 0 }
@@ -1223,6 +1244,24 @@ final class AgentStoreAPIKeyCommand: NSScriptCommand {
             return nil
         }
         return ScriptingTab.report(error, self)
+    }
+}
+
+/// `check for updates` — Agent! menu > Check for Updates… (result shown in an alert).
+@objc(AgentCheckForUpdatesCommand)
+final class AgentCheckForUpdatesCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        MainActor.assumeIsolated { UpdateChecker.shared.checkForUpdates() }
+        return nil
+    }
+}
+
+/// `show system prompts` — Window > System Prompts.
+@objc(AgentShowSystemPromptsCommand)
+final class AgentShowSystemPromptsCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        MainActor.assumeIsolated { SystemPromptWindow.shared.show() }
+        return nil
     }
 }
 /// `fm server "start"|"stop"|"restart"|"status"` — the Server row's buttons in Settings

@@ -106,6 +106,7 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `llm output` | text | r | Text of the Main tab's LLM Output pane (the LLM's latest response). |
 | `input tokens` / `output tokens` | integer | r | Tokens of the Main tab's current or last task. |
 | `session input tokens` / `session output tokens` | integer | r | Tokens used since Agent! launched (or since `clear tokens`). |
+| `include prereleases` | boolean | rw | Agent! menu > Include Pre-releases: `check for updates` also offers pre-release builds. |
 
 Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", `terminal speed` "warp", `activity log text size` 50, `shell timeout` 500, or a negative count), unknown tool, group or MCP server names, fallback entries with an unknown provider or no model, and an empty `system prompt` give an error and change nothing.
 
@@ -145,6 +146,8 @@ end tell
 | `auto pilot cycle` | integer | r | Current cycle number (0 when no session). |
 | `auto pilot status` | text | r | One-line status: cycle, elapsed, time left, branch, goal. |
 | `llm output` | text | r | Text of the tab's LLM Output pane. |
+| `llm output hidden` | boolean | rw | Whether the tab's LLM Output overlay is hidden (Shortcuts > Toggle LLM Overlay). |
+| `llm output expanded` | boolean | rw | Whether the tab's LLM chevrons are expanded (Shortcuts > Toggle LLM Chevrons; sets both chevrons). |
 | `input tokens` / `output tokens` | integer | r | The tab's token counts (Main: current or last task; other tabs: since the tab's log was last cleared). |
 
 Tabs respond to `close`, `select`, `clear log`, `clear llm output`, `clear tokens`, `stop task`, `clear queue` and `stop auto pilot`. Use `clear history … in tab t` for a tab's history.
@@ -211,6 +214,10 @@ Restores the built-in system prompt, like Settings > System Prompt > Reset to De
 
 ### `store api key`
 `store api key "key" for provider "Name"` — saves a provider's API key, the API Key field in Settings (kept in the Keychain). Provider names are as in the provider menu (`OpenAI`, `OpenRouter`, `LM Studio`…) or their ids. Keys can't be read back; an empty key clears it. An unknown provider raises -10000 and lists the valid names.
+### `check for updates`
+`check for updates` — Agent! menu > Check for Updates…: looks for a newer release on GitHub and shows the result in an alert (returns right away).
+### `show system prompts`
+`show system prompts` — Window > System Prompts: opens the System Prompts editor window.
 ### `fm server`
 `fm server ["start"|"stop"|"restart"|"status"]` → boolean — the Server row's Start / Stop / Restart / refresh buttons for the Apple fm serve provider in Settings. Waits for the action, then returns whether the server is running (`status`, the default, only checks). Start and Restart also refresh the provider's model list. An unknown action, a missing `fm` binary (macOS 27 required), a busy server, or a start failure (such as the fm license not accepted) raises -10000.
 ### `start auto pilot`

@@ -173,6 +173,10 @@
                       description="Settings &gt; Agent Options: AgentScript runs capture stderr.">
                 <cocoa key="captureScriptStderr"/>
             </property>
+            <property name="include prereleases" code="AgUP" type="boolean"
+                      description="Agent! menu &gt; Include Pre-releases: Check for Updates also offers pre-release builds.">
+                <cocoa key="includePrereleases"/>
+            </property>
             <property name="exa api key" code="AgJ1" type="text" access="w"
                       description="LLM Common Settings &gt; Web Search: Exa API key (write-only; empty clears it).">
                 <cocoa key="exaAPIKey"/>
@@ -416,6 +420,14 @@
                       description="Text of the tab's LLM Output pane (the LLM's latest response).">
                 <cocoa key="llmOutput"/>
             </property>
+            <property name="llm output hidden" code="AgOH" type="boolean"
+                      description="Whether the tab's LLM Output overlay is hidden (Shortcuts &gt; Toggle LLM Overlay).">
+                <cocoa key="llmOutputHidden"/>
+            </property>
+            <property name="llm output expanded" code="AgOX" type="boolean"
+                      description="Whether the tab's LLM chevrons are expanded (Shortcuts &gt; Toggle LLM Chevrons).">
+                <cocoa key="llmOutputExpanded"/>
+            </property>
             <property name="input tokens" code="AgKI" type="integer" access="r"
                       description="Input tokens of the tab's current or last task (Main), or of the tab since its log was last cleared.">
                 <cocoa key="inputTokens"/>
@@ -531,6 +543,12 @@
                        description="Provider name as in the provider menu, e.g. OpenAI, OpenRouter, LM Studio.">
                 <cocoa key="provider"/>
             </parameter>
+        </command>
+        <command name="check for updates" code="AgntChkU" description="Agent! menu &gt; Check for Updates…: look for a newer release on GitHub and show the result in an alert.">
+            <cocoa class="AgentCheckForUpdatesCommand"/>
+        </command>
+        <command name="show system prompts" code="AgntShSP" description="Window &gt; System Prompts: open the System Prompts editor window.">
+            <cocoa class="AgentShowSystemPromptsCommand"/>
         </command>
         <command name="fm server" code="AgntFMsv" description="Start, stop, restart or check the Apple fm serve server (the Server row in Settings). Waits for the action and returns whether the server is running.">
             <cocoa class="AgentFMServerCommand"/>
