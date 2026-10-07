@@ -228,6 +228,12 @@ struct GroupRowView: View {
                 .accessibilityValue(groupEnabled ? (isCollapsed ? "Collapsed" : "Expanded") : "Disabled")
                 .accessibilityAddTraits(.isButton)
                 .accessibilityAction { if groupEnabled { toggleCollapse() } }
+                // Full Keyboard Access: Tab to the header, Space/Return collapses or expands
+                .focusable(groupEnabled)
+                .onKeyPress(keys: [.space, .return]) { _ in
+                    toggleCollapse()
+                    return .handled
+                }
 
                 Spacer()
 

@@ -499,6 +499,17 @@ private struct FolderTreeRow: View {
                     onSelect(path)
                     onDone?()
                 }
+                // Full Keyboard Access: Tab to the row, Space selects, Return selects and closes
+                .focusable()
+                .onKeyPress(.space) {
+                    onSelect(path)
+                    return .handled
+                }
+                .onKeyPress(.return) {
+                    onSelect(path)
+                    onDone?()
+                    return .handled
+                }
             }
             .padding(.vertical, 2)
             .padding(.horizontal, 4)
