@@ -4,6 +4,18 @@ import Foundation
 
 // MARK: - Keyboard Shortcuts
 
+/// Keyboard tab switches leave focus in the task field, so VoiceOver gets no cue — speak the new tab.
+@MainActor
+private func announceSelectedTab(viewModel: AgentViewModel) {
+    let total = viewModel.scriptTabs.count + 1
+    guard let id = viewModel.selectedTabId,
+          let index = viewModel.scriptTabs.firstIndex(where: { $0.id == id }) else {
+        announceForAccessibility("Main tab, 1 of \(total)")
+        return
+    }
+    announceForAccessibility("\(viewModel.scriptTabs[index].displayTitle) tab, \(index + 2) of \(total)")
+}
+
 /// Navigate to next tab (cycle right)
 @MainActor
 func nextTab(viewModel: AgentViewModel) {
@@ -12,6 +24,7 @@ func nextTab(viewModel: AgentViewModel) {
         // On main tab - go to first script tab
         if let firstTab = viewModel.scriptTabs.first {
             viewModel.selectedTabId = firstTab.id
+            announceSelectedTab(viewModel: viewModel)
         }
         return
     }
@@ -20,6 +33,7 @@ func nextTab(viewModel: AgentViewModel) {
     let nextIndex = (currentIndex + 1) % viewModel.scriptTabs.count
     viewModel.selectedTabId = viewModel.scriptTabs[nextIndex].id
     viewModel.persistScriptTabs()
+    announceSelectedTab(viewModel: viewModel)
 }
 
 /// Navigate to previous tab (cycle left)
@@ -30,6 +44,7 @@ func previousTab(viewModel: AgentViewModel) {
         // On main tab - go to last script tab
         if let lastTab = viewModel.scriptTabs.last {
             viewModel.selectedTabId = lastTab.id
+            announceSelectedTab(viewModel: viewModel)
         }
         return
     }
@@ -38,6 +53,7 @@ func previousTab(viewModel: AgentViewModel) {
     let prevIndex = (currentIndex - 1 + viewModel.scriptTabs.count) % viewModel.scriptTabs.count
     viewModel.selectedTabId = viewModel.scriptTabs[prevIndex].id
     viewModel.persistScriptTabs()
+    announceSelectedTab(viewModel: viewModel)
 }
 
 /// Navigate to tab by number (1-9)
@@ -47,6 +63,7 @@ func selectTab(viewModel: AgentViewModel, number: Int) {
     if number == 1 {
         // Cmd+1 = Main tab
         viewModel.selectMainTab()
+        announceSelectedTab(viewModel: viewModel)
         return
     }
 
@@ -55,4 +72,5 @@ func selectTab(viewModel: AgentViewModel, number: Int) {
     guard tabIndex < viewModel.scriptTabs.count else { return }
     viewModel.selectedTabId = viewModel.scriptTabs[tabIndex].id
     viewModel.persistScriptTabs()
+    announceSelectedTab(viewModel: viewModel)
 }
