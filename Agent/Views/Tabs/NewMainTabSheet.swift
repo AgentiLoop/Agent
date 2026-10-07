@@ -3,6 +3,8 @@ import AgentTools
 
 /// Sheet for creating a new main tab with a specific LLM provider and model.
 struct NewMainTabSheet: View {
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
     @Bindable var viewModel: AgentViewModel
     @Environment(\.dismiss) private var dismiss
 
@@ -29,7 +31,7 @@ struct NewMainTabSheet: View {
 
             // Provider picker
             VStack(alignment: .leading, spacing: 4) {
-                Text("Provider").font(.caption).foregroundStyle(.secondary)
+                Text("Provider").font(.caption).foregroundStyle(captionStyle)
                     .accessibilityHidden(true)
                 Picker("Provider", selection: $provider) {
                     ForEach(APIProvider.selectableProviders, id: \.self) { p in
@@ -46,7 +48,7 @@ struct NewMainTabSheet: View {
 
             // Model picker (adapts per provider)
             VStack(alignment: .leading, spacing: 4) {
-                Text("Model").font(.caption).foregroundStyle(.secondary)
+                Text("Model").font(.caption).foregroundStyle(captionStyle)
                     .accessibilityHidden(true)
                 modelPicker
             }
@@ -118,7 +120,7 @@ struct NewMainTabSheet: View {
         case .foundationModel:
             HStack {
                 Text("Apple Intelligence")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
                 Spacer()
             }
 

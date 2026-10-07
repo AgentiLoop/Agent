@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct HistoryView: View {
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
     let prompts: [String]
     let errorHistory: [String]
     let taskSummaries: [String]
@@ -32,7 +34,7 @@ struct HistoryView: View {
 
             Text("View past prompts, errors, and task summaries.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(captionStyle)
 
             Picker(selection: $selectedTaskType) {
                 ForEach(TaskViewType.allCases, id: \.self) { type in
@@ -50,11 +52,11 @@ struct HistoryView: View {
                     VStack(spacing: 12) {
                         Image(systemName: emptyIcon)
                             .font(.system(size: 32))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(captionStyle)
                             .accessibilityHidden(true)
                         Text("No \(selectedTaskType.rawValue.lowercased()) yet.")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(captionStyle)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
@@ -75,7 +77,7 @@ struct HistoryView: View {
             HStack {
                 Text("\(currentItems.count) entries")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
                 Spacer()
                 Button("Clear All") { onClear(selectedTaskType.rawValue) }
                     .buttonStyle(.bordered)

@@ -3,6 +3,8 @@
 import SwiftUI
 
 struct ScreenshotPreviewView: View {
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
     let images: [NSImage]
     let onRemove: (Int) -> Void
     let onRemoveAll: () -> Void
@@ -37,7 +39,7 @@ struct ScreenshotPreviewView: View {
                 }
                 Text("\(images.count) image(s)")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
                 Button("Clear All") { onRemoveAll() }
                     .buttonStyle(.bordered)
                     .controlSize(.mini)

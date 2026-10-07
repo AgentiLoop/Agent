@@ -3,6 +3,8 @@
 import SwiftUI
 
 struct SearchBarView: View {
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
     @Binding var searchText: String
     @Binding var caseSensitive: Bool
     let totalMatches: Int
@@ -15,13 +17,13 @@ struct SearchBarView: View {
         VStack(spacing: 0) {
             HStack(spacing: 4) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
                     .accessibilityHidden(true)
 
                 Button { caseSensitive.toggle() } label: {
                     Text("Aa")
                         .font(.system(size: 12, weight: caseSensitive ? .bold : .regular))
-                        .foregroundStyle(caseSensitive ? .blue : .secondary)
+                        .foregroundStyle(caseSensitive ? Color.blue : (contrast == .increased ? Color.primary : Color.secondary))
                         .frame(width: 24, height: 14)
                 }
                 .buttonStyle(.bordered)
@@ -57,7 +59,7 @@ struct SearchBarView: View {
 
                 Button { onClose() } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(captionStyle)
                         .frame(height: 14)
                 }
                 .buttonStyle(.bordered)
@@ -68,7 +70,7 @@ struct SearchBarView: View {
 
                 Text(searchText.isEmpty ? "" : (totalMatches > 0 ? "\(currentMatchIndex + 1)/\(totalMatches)" : "0 results"))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
                     .frame(minWidth: 50)
                     .accessibilityLabel(searchText.isEmpty ? "" : (totalMatches > 0 ? "Match \(currentMatchIndex + 1) of \(totalMatches)" : "No results"))
                     .accessibilityHidden(searchText.isEmpty)

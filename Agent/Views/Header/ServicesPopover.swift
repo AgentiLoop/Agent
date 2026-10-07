@@ -3,6 +3,8 @@
 import SwiftUI
 
 struct ServicesPopover: View {
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
     @Bindable var viewModel: AgentViewModel
 
     var body: some View {
@@ -13,7 +15,7 @@ struct ServicesPopover: View {
 
             Text("Background agents for shell commands and automation.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(captionStyle)
 
             Grid(alignment: .leading, verticalSpacing: 10) {
                 GridRow {

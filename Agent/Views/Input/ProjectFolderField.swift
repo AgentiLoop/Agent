@@ -109,6 +109,8 @@ private struct PathTextField: NSViewRepresentable {
 
 /// A text field with a dropdown of recent project folders
 struct ProjectFolderField: View {
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
     @Binding var projectFolder: String
     var onFolderSelected: (() -> Void)? = nil
 
@@ -193,7 +195,7 @@ struct ProjectFolderField: View {
                     onFolderSelected?()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(captionStyle)
                         .frame(width: 18)
                 }
                 .buttonStyle(.bordered)
@@ -295,7 +297,7 @@ struct ProjectFolderField: View {
 
                                         Text(folder)
                                             .font(.system(size: 9))
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(captionStyle)
                                             .lineLimit(1)
                                     }
                                 }
@@ -402,6 +404,8 @@ private struct FolderTreePopover: View {
 
 /// A single row in the folder tree. Loads children lazily on expand.
 private struct FolderTreeRow: View {
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
     let path: String
     let name: String
     let depth: Int
@@ -466,7 +470,7 @@ private struct FolderTreeRow: View {
                 } label: {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 9, weight: .bold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(captionStyle)
                         .rotationEffect(.degrees(isExpanded ? 90 : 0))
                         .frame(width: 16, height: 16)
                 }
