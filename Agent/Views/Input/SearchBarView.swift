@@ -16,6 +16,7 @@ struct SearchBarView: View {
             HStack(spacing: 4) {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
 
                 Button { caseSensitive.toggle() } label: {
                     Text("Aa")
@@ -28,6 +29,9 @@ struct SearchBarView: View {
                 .controlSize(.small)
                 .disabled(searchText.isEmpty)
                 .help(caseSensitive ? "Case Sensitive: ON" : "Case Sensitive: OFF")
+                .accessibilityLabel("Case Sensitive")
+                .accessibilityValue(caseSensitive ? "On" : "Off")
+                .accessibilityAddTraits(caseSensitive ? .isSelected : [])
 
                 Button { previousMatch() } label: {
                     Image(systemName: "chevron.up")
@@ -38,6 +42,7 @@ struct SearchBarView: View {
                 .controlSize(.small)
                 .disabled(searchText.isEmpty || totalMatches == 0)
                 .help("Previous Match")
+                .accessibilityLabel("Previous Match")
 
                 Button { nextMatch() } label: {
                     Image(systemName: "chevron.down")
@@ -48,6 +53,7 @@ struct SearchBarView: View {
                 .controlSize(.small)
                 .disabled(searchText.isEmpty || totalMatches == 0)
                 .help("Next Match")
+                .accessibilityLabel("Next Match")
 
                 Button { onClose() } label: {
                     Image(systemName: "xmark.circle.fill")
@@ -58,15 +64,19 @@ struct SearchBarView: View {
                 .clipShape(Capsule())
                 .controlSize(.small)
                 .help("Close Search")
+                .accessibilityLabel("Close Search")
 
                 Text(searchText.isEmpty ? "" : (totalMatches > 0 ? "\(currentMatchIndex + 1)/\(totalMatches)" : "0 results"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .frame(minWidth: 50)
+                    .accessibilityLabel(searchText.isEmpty ? "" : (totalMatches > 0 ? "Match \(currentMatchIndex + 1) of \(totalMatches)" : "No results"))
+                    .accessibilityHidden(searchText.isEmpty)
 
                 TextField("Find in log...", text: $searchText)
                     .textFieldStyle(.roundedBorder)
                     .controlSize(.small)
+                    .accessibilityLabel("Find in log")
                     .onSubmit { nextMatch() }
             }
             .padding(.horizontal)
