@@ -114,7 +114,7 @@ struct HistoryView: View {
                                 .accessibilityHidden(true)
                             Text("Error")
                                 .font(.caption2)
-                                .foregroundColor(.orange)
+                                .foregroundColor(contrast == .increased ? .primary : .orange)
                         }
                     }
 
@@ -126,7 +126,7 @@ struct HistoryView: View {
                                 .accessibilityHidden(true)
                             Text("Completed")
                                 .font(.caption2)
-                                .foregroundColor(.green)
+                                .foregroundColor(contrast == .increased ? .primary : .green)
                         }
                     }
                 }
