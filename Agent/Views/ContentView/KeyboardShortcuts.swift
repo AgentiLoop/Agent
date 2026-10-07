@@ -30,8 +30,13 @@ func nextTab(viewModel: AgentViewModel) {
     }
 
     guard let currentIndex = viewModel.scriptTabs.firstIndex(where: { $0.id == currentId }) else { return }
-    let nextIndex = (currentIndex + 1) % viewModel.scriptTabs.count
-    viewModel.selectedTabId = viewModel.scriptTabs[nextIndex].id
+    // Wrap through Main so keyboard users can reach every tab, matching the "N of M" announcement
+    if currentIndex == viewModel.scriptTabs.count - 1 {
+        viewModel.selectMainTab()
+        announceSelectedTab(viewModel: viewModel)
+        return
+    }
+    viewModel.selectedTabId = viewModel.scriptTabs[currentIndex + 1].id
     viewModel.persistScriptTabs()
     announceSelectedTab(viewModel: viewModel)
 }
@@ -50,8 +55,13 @@ func previousTab(viewModel: AgentViewModel) {
     }
 
     guard let currentIndex = viewModel.scriptTabs.firstIndex(where: { $0.id == currentId }) else { return }
-    let prevIndex = (currentIndex - 1 + viewModel.scriptTabs.count) % viewModel.scriptTabs.count
-    viewModel.selectedTabId = viewModel.scriptTabs[prevIndex].id
+    // Wrap through Main so keyboard users can reach every tab, matching the "N of M" announcement
+    if currentIndex == 0 {
+        viewModel.selectMainTab()
+        announceSelectedTab(viewModel: viewModel)
+        return
+    }
+    viewModel.selectedTabId = viewModel.scriptTabs[currentIndex - 1].id
     viewModel.persistScriptTabs()
     announceSelectedTab(viewModel: viewModel)
 }
