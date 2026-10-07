@@ -43,7 +43,7 @@ struct HUDOptionsView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Terminal Speed")
                     .font(.caption)
-                    .foregroundStyle(.green)
+                    .foregroundStyle(contrast == .increased ? Color.primary : Color.green)
                     .accessibilityHidden(true)
                 Picker("", selection: $viewModel.terminalSpeed) {
                     ForEach(AgentViewModel.TerminalSpeed.allCases, id: \.self) { speed in

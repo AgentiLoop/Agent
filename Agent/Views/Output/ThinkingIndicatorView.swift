@@ -236,18 +236,18 @@ struct ThinkingIndicatorView: View {
                     } else {
                         Text("Done")
                             .font(.caption.bold())
-                            .foregroundStyle(.green)
+                            .foregroundStyle(highContrast ? Color.primary : Color.green)
                     }
 
                     // Queue count
                     if let t = tab, !t.taskQueue.isEmpty {
                         Text("+\(t.taskQueue.count) queued")
                             .font(.caption)
-                            .foregroundStyle(.teal)
+                            .foregroundStyle(highContrast ? Color.primary : Color.teal)
                     } else if tab == nil && !viewModel.mainTaskQueue.isEmpty {
                         Text("+\(viewModel.mainTaskQueue.count) queued")
                             .font(.caption)
-                            .foregroundStyle(.teal)
+                            .foregroundStyle(highContrast ? Color.primary : Color.teal)
                     }
 
                     Spacer()
