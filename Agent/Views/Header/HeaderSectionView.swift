@@ -69,6 +69,7 @@ struct HeaderToolbarButtons: View {
     @State private var showFallbackChain = false
     @State private var showHUDOptions = false
     @ObservedObject var aiMediator = AppleIntelligenceMediator.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// Fallback chain icon color: green when configured (enabled + has ≥1 enabled entry),
     /// orange when enabled but empty, gray when disabled.
@@ -110,7 +111,7 @@ struct HeaderToolbarButtons: View {
         Button { showSettings.toggle() } label: {
             Image(systemName: "cpu")
                 .foregroundStyle(llmIconColor)
-                .symbolEffect(.pulse, isActive: isLLMActive)
+                .symbolEffect(.pulse, isActive: isLLMActive && !reduceMotion)
         }
         .help("LLM Settings: \(isLLMActive ? "Active" : "Idle")")
         .accessibilityLabel("LLM Settings")
@@ -258,6 +259,7 @@ struct HeaderToolbarButtons: View {
         }
         .help(viewModel.showThinkingIndicator ? "HUD: ON" : "HUD: OFF")
         .accessibilityLabel("HUD")
+        .accessibilityValue(viewModel.showThinkingIndicator ? "On" : "Off")
         .popover(isPresented: $showHUDOptions, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
             HUDOptionsView(viewModel: viewModel)
         }
