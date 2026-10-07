@@ -191,11 +191,15 @@ struct GroupRowView: View {
     let toggleCollapse: () -> Void
     let onGroupToggled: (Bool) -> Void
     var onToolToggled: ((String, Bool) -> Void)? = nil
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var highContrast: Bool { contrast == .increased }
 
     var body: some View {
         let groupEnabled = prefs.isGroupEnabled(groupName)
         let isServiceGroup: Bool = groupName == Tool.Group.user || groupName == Tool.Group.root
         let offColor: Color = isServiceGroup ? .yellow : .red
+        // Increase Contrast: drop the faded opacities so disabled groups stay legible.
+        let offStyle: (Double) -> Color = { highContrast ? offColor : offColor.opacity($0) }
 
         VStack(alignment: .leading, spacing: 4) {
             // Group header with collapse toggle and group toggle
@@ -204,20 +208,20 @@ struct GroupRowView: View {
                     // Collapse arrow
                     Image(systemName: (isCollapsed || !groupEnabled) ? "chevron.right" : "chevron.down")
                         .font(.caption2)
-                        .foregroundColor(groupEnabled ? .secondary : offColor.opacity(0.5))
+                        .foregroundColor(groupEnabled ? (highContrast ? .primary : .secondary) : offStyle(0.5))
 
                     // Group icon and name
                     Image(systemName: icon)
                         .font(.caption)
-                        .foregroundColor(groupEnabled ? (isServiceGroup ? .green : .primary) : offColor.opacity(0.6))
+                        .foregroundColor(groupEnabled ? (isServiceGroup ? .green : .primary) : offStyle(0.6))
                     Text(groupName)
                         .font(.caption).bold()
-                        .foregroundColor(groupEnabled ? .secondary : offColor.opacity(0.6))
+                        .foregroundColor(groupEnabled ? (highContrast ? .primary : .secondary) : offStyle(0.6))
 
                     // Tool count
                     Text("\(groupTools.count)")
                         .font(.caption2)
-                        .foregroundColor(groupEnabled ? .gray : offColor.opacity(0.4))
+                        .foregroundColor(groupEnabled ? (highContrast ? .primary : .gray) : offStyle(0.4))
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("\(groupName) group, \(groupTools.count) tools")
@@ -260,9 +264,19 @@ struct GroupRowView: View {
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
                                 .background(enabled ? Color.accentColor.opacity(0.2) : Color.secondary.opacity(0.1))
-                                .foregroundStyle(enabled ? .primary : .tertiary)
+                                .foregroundStyle(enabled ? AnyShapeStyle(.primary) : (highContrast ? AnyShapeStyle(.secondary) : AnyShapeStyle(.tertiary)))
                                 .clipShape(Capsule())
-                                .overlay(Capsule().stroke(enabled ? Color.accentColor.opacity(0.5) : Color.clear, lineWidth: 0.5))
+                                // Increase Contrast: solid accent border when on, dashed gray border when off,
+                                // so on/off isn't conveyed by a faint tint alone.
+                                .overlay(
+                                    Capsule().stroke(
+                                        highContrast
+                                            ? (enabled ? Color.accentColor : Color.secondary)
+                                            : (enabled ? Color.accentColor.opacity(0.5) : Color.clear),
+                                        style: StrokeStyle(lineWidth: highContrast ? (enabled ? 1.5 : 1) : 0.5,
+                                                           dash: highContrast && !enabled ? [2, 2] : [])
+                                    )
+                                )
                         }
                         .buttonStyle(.plain)
                         .help(tool.description.components(separatedBy: ". ").first ?? tool.description)
