@@ -446,6 +446,26 @@ extension WebAutomationService {
 
     // MARK: - Browser Navigation
 
+    /// web_navigate from tool input. The consolidated safari/web tool's own
+    /// `action` key is "navigate", so the direction can't ride in `action` —
+    /// it comes from text/query/direction; a url means "go to this page".
+    /// Before this, every navigate call failed with "unknown action 'navigate'".
+    func navigate(input: [String: String], browser: String? = nil) async -> String {
+        let directions: Set<String> = ["back", "forward", "reload"]
+        let candidates = ["direction", "action", "text", "query"].compactMap {
+            input[$0]?.trimmingCharacters(in: .whitespaces).lowercased()
+        }
+        if let dir = candidates.first(where: { directions.contains($0) }) {
+            return await navigate(action: dir, browser: browser)
+        }
+        if let urlStr = input["url"]?.trimmingCharacters(in: .whitespaces), !urlStr.isEmpty {
+            let full = urlStr.contains("://") || urlStr.hasPrefix("about:") ? urlStr : "https://" + urlStr
+            guard let url = URL(string: full) else { return "Error: invalid URL '\(urlStr)'" }
+            do { return try await open(url: url) } catch { return "Error: \(error.localizedDescription)" }
+        }
+        return "Error: navigate needs text:\"back\"|\"forward\"|\"reload\" or url:\"https://…\""
+    }
+
     /// Navigate back, forward, or reload
     func navigate(action: String, browser: String? = nil) async -> String {
         let browserId = browser ?? detectActiveBrowser() ?? "com.apple.Safari"

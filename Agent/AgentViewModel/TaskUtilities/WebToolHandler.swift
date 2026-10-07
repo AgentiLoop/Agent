@@ -103,7 +103,7 @@ extension AgentViewModel {
             return await ws.submitForm(selector: selector.isEmpty ? nil : selector, browser: browser)
 
         case "web_navigate":
-            return await ws.navigate(action: input["action"] as? String ?? "back", browser: browser)
+            return await ws.navigate(input: input.compactMapValues { $0 as? String }, browser: browser)
 
         case "web_list_tabs":
             return await ws.listTabs(browser: browser)

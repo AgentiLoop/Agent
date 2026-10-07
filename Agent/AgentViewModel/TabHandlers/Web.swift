@@ -309,11 +309,10 @@ extension AgentViewModel {
             return TabToolResult(toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": output], isComplete: false)
 
         case "web_navigate":
-            let action = input["action"] as? String ?? "back"
             let browser = input["browser"] as? String
-            tab.appendLog("🧭 \(action)...")
+            tab.appendLog("🧭 \(input["url"] as? String ?? input["text"] as? String ?? "navigate")...")
             tab.flush()
-            let output = await WebAutomationService.shared.navigate(action: action, browser: browser)
+            let output = await WebAutomationService.shared.navigate(input: input.compactMapValues { $0 as? String }, browser: browser)
             tab.appendLog(output)
             tab.flush()
             return TabToolResult(toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": output], isComplete: false)
