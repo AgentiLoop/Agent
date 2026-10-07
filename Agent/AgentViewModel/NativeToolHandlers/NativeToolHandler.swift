@@ -414,6 +414,12 @@ extension AgentViewModel {
                 return "{\"success\":false,\"error\":\"select_option needs text: option name, on/off, or a number\"}"
             }
             return ax.selectOption(role: role, title: title, value: value, appBundleId: app, option: option)
+        case "select_row":
+            guard let rowText = (input["text"] as? String) ?? (input["row"] as? String) else {
+                return "{\"success\":false,\"error\":\"select_row needs text: the text of any cell in the row\"}"
+            }
+            let open = (input["ax_action"] as? String)?.caseInsensitiveCompare("AXOpen") == .orderedSame
+            return ax.selectRow(role: role, title: title, value: value, appBundleId: app, rowText: rowText, open: open)
         case "set_properties":
             return ax.setProperties(
                 role: role, title: title, value: value,
