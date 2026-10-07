@@ -128,6 +128,16 @@ struct ProjectFolderField: View {
         projectFolder = path
         RecentFoldersService.shared.addFolder(path)
         onFolderSelected?()
+        announceFolder()
+    }
+
+    /// VoiceOver: the folder buttons change the project silently — speak the result.
+    private func announceFolder() {
+        announceForAccessibility(
+            projectFolder.isEmpty
+                ? "Project folder cleared"
+                : "Project folder \((projectFolder as NSString).lastPathComponent)"
+        )
     }
 
     var body: some View {
@@ -166,6 +176,7 @@ struct ProjectFolderField: View {
                         projectFolder = Self.resolveToFolder(url.path)
                         RecentFoldersService.shared.addFolder(projectFolder)
                         onFolderSelected?()
+                        announceFolder()
                     }
                 } label: {
                     Image(systemName: "folder.badge.plus")
@@ -181,6 +192,7 @@ struct ProjectFolderField: View {
                     projectFolder = FileManager.default.homeDirectoryForCurrentUser.path
                     RecentFoldersService.shared.addFolder(projectFolder)
                     onFolderSelected?()
+                    announceFolder()
                 } label: {
                     Image(systemName: "house")
                         .frame(width: 18)
@@ -194,6 +206,7 @@ struct ProjectFolderField: View {
                 Button {
                     projectFolder = ""
                     onFolderSelected?()
+                    announceFolder()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(captionStyle)
@@ -209,6 +222,7 @@ struct ProjectFolderField: View {
                     RecentFoldersService.shared.clearAll()
                     showRecentFolders = false
                     canRestoreRecent = RecentFoldersService.shared.canRestore
+                    announceForAccessibility("Recent folders cleared")
                 } label: {
                     Image(systemName: "clock.badge.xmark")
                         .frame(width: 18)
@@ -223,6 +237,7 @@ struct ProjectFolderField: View {
                 Button {
                     RecentFoldersService.shared.restore()
                     canRestoreRecent = RecentFoldersService.shared.canRestore
+                    announceForAccessibility("Recent folders restored")
                 } label: {
                     Image(systemName: "arrow.uturn.backward.circle")
                         .frame(width: 18)
@@ -284,6 +299,7 @@ struct ProjectFolderField: View {
                                 RecentFoldersService.shared.addFolder(folder)
                                 showRecentFolders = false
                                 onFolderSelected?()
+                                announceFolder()
                             } label: {
                                 HStack(spacing: 8) {
                                     Image(systemName: "folder.fill")
