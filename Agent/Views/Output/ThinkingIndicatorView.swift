@@ -170,7 +170,7 @@ struct ThinkingIndicatorView: View {
 
         VStack(alignment: .leading, spacing: 0) {
             Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                     isExpanded.toggle()
                 }
             } label: {
@@ -277,14 +277,14 @@ struct ThinkingIndicatorView: View {
                         .accessibilityValue(showStreamText ? "Shown" : "Hidden")
                         .accessibilityAddTraits(.isButton)
                         .accessibilityAction {
-                            withAnimation(.easeInOut(duration: 0.2)) {
+                            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                                 showStreamText.toggle()
                             }
                         }
                         // Full Keyboard Access: Tab to the toggle, Space/Return shows or hides the LLM output
                         .focusable()
                         .onKeyPress(keys: [.space, .return]) { _ in
-                            withAnimation(.easeInOut(duration: 0.2)) {
+                            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                                 showStreamText.toggle()
                             }
                             return .handled
@@ -347,7 +347,7 @@ struct ThinkingIndicatorView: View {
                     .padding(.horizontal, 12)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        withAnimation(.easeInOut(duration: 0.2)) {
+                        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                             showStreamText.toggle()
                         }
                     }
@@ -370,7 +370,7 @@ struct ThinkingIndicatorView: View {
                                 if let tab { tab.llmOutputPageIndex = idx } else { viewModel.llmOutputPageIndex = idx }
                             },
                             onDismiss: {
-                                withAnimation(.easeInOut(duration: 0.2)) {
+                                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                                     showStreamText = false
                                 }
                             }
@@ -860,6 +860,7 @@ struct ToolStepsView: View {
     /// When true, the list follows the newest step unless the mouse is over it.
     let autoScroll: Bool
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorSchemeContrast) private var contrast
     private var highContrast: Bool { contrast == .increased }
     @State private var isHovering = false
@@ -888,7 +889,7 @@ struct ToolStepsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                     isExpanded.toggle()
                 }
             } label: {
@@ -1017,7 +1018,7 @@ struct ToolStepsView: View {
 
     private func scrollToBottom(_ proxy: ScrollViewProxy) {
         guard autoScroll, !isHovering, !isDragging, let last = steps.last else { return }
-        withAnimation(.easeOut(duration: 0.15)) {
+        withAnimation(reduceMotion ? nil : .easeOut(duration: 0.15)) {
             proxy.scrollTo(last.id, anchor: .bottom)
         }
     }
