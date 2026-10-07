@@ -14,6 +14,7 @@ private class PromptTextView: NSTextView {
 struct PromptEditor: NSViewRepresentable {
     @Binding var text: String
     var textColor: NSColor = .labelColor
+    var accessibilityLabel: String = "Prompt Editor"
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
@@ -41,6 +42,7 @@ struct PromptEditor: NSViewRepresentable {
         textView.textContainer?.widthTracksTextView = true
         textView.delegate = context.coordinator
         textView.string = text
+        textView.setAccessibilityLabel(accessibilityLabel)
 
         let scrollView = NSScrollView()
         scrollView.hasVerticalScroller = true
@@ -50,6 +52,7 @@ struct PromptEditor: NSViewRepresentable {
 
         if let ruler = PromptLineNumberRuler(textView: textView) {
             ruler.clipsToBounds = true
+            ruler.setAccessibilityElement(false)
             scrollView.verticalRulerView = ruler
         }
         scrollView.hasVerticalRuler = true
@@ -250,6 +253,8 @@ struct SystemPromptsView: View {
                 .background(!isCompact ? fullColor.opacity(0.3) : Color.clear)
                 .foregroundColor(!isCompact ? fullColor : .secondary)
                 .cornerRadius(6)
+                .accessibilityAddTraits(!isCompact ? .isSelected : [])
+                .accessibilityHint("Edit the full system prompt")
 
                 Button(action: { isCompact = true }) {
                     Text("Apple AI (Compact)")
@@ -264,16 +269,24 @@ struct SystemPromptsView: View {
                 .background(isCompact ? compactColor.opacity(0.3) : Color.clear)
                 .foregroundColor(isCompact ? compactColor : .secondary)
                 .cornerRadius(6)
+                .accessibilityAddTraits(isCompact ? .isSelected : [])
+                .accessibilityHint("Edit the compact prompt used by Apple Intelligence")
 
                 Spacer(minLength: 0)
             }
             .padding(.vertical, 4)
             .background(Color(nsColor: .controlBackgroundColor))
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Prompt Type")
 
             Divider()
 
             // Editor
-            PromptEditor(text: currentText, textColor: isCompact ? compactNSColor : fullNSColor)
+            PromptEditor(
+                text: currentText,
+                textColor: isCompact ? compactNSColor : fullNSColor,
+                accessibilityLabel: isCompact ? "Apple AI Compact Prompt" : "System Prompt"
+            )
                 .id(isCompact)
 
             Divider()
@@ -291,11 +304,13 @@ struct SystemPromptsView: View {
                     }
                 }
                 .controlSize(.small)
+                .accessibilityHint("Replaces the current prompt with the built-in default")
 
                 if currentDirty {
                     Text("Unsaved")
                         .font(.caption)
                         .foregroundStyle(.orange)
+                        .accessibilityLabel("Unsaved changes")
                 }
 
                 Spacer()
