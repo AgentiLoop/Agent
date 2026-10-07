@@ -144,6 +144,25 @@ struct ThinkingIndicatorView: View {
         return viewModel.contextWindow(for: provider)
     }
 
+    private var accessibilityStatus: String {
+        let state: String
+        if !isActive {
+            state = "Done"
+        } else if isScriptOnly {
+            state = "Running"
+        } else if isExecuting {
+            state = viewModel.rootServiceActive ? "Running as root" : "Executing"
+        } else if let t = tab, t.isLLMThinking {
+            state = "Thinking"
+        } else if tab == nil && viewModel.isThinking {
+            state = "Thinking"
+        } else {
+            state = "Running"
+        }
+        let queued = tab?.taskQueue.count ?? viewModel.mainTaskQueue.count
+        return "\(state), \(Self.formatElapsed(elapsed)) elapsed" + (queued > 0 ? ", \(queued) queued" : "")
+    }
+
     var body: some View {
 
         VStack(alignment: .leading, spacing: 0) {
@@ -234,6 +253,10 @@ struct ThinkingIndicatorView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            // Spoken summary instead of icon + shimmer pieces: "Task status, Thinking, 1:05 elapsed, 2 queued"
+            .accessibilityLabel("Task status")
+            .accessibilityValue(accessibilityStatus)
+            .accessibilityHint(isExpanded ? "Collapses details" : "Expands details")
 
             if isExpanded {
                 VStack(alignment: .leading, spacing: 4) {
@@ -245,6 +268,16 @@ struct ThinkingIndicatorView: View {
                             Text("LLM Output").font(.caption)
                         }
                         .foregroundStyle(.secondary)
+                        // Row toggles via onTapGesture, which VoiceOver can't trigger — expose it as a button
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("LLM Output")
+                        .accessibilityValue(showStreamText ? "Shown" : "Hidden")
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityAction {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                showStreamText.toggle()
+                            }
+                        }
 
                         // Model name
                         HStack(spacing: 3) {
@@ -252,6 +285,9 @@ struct ThinkingIndicatorView: View {
                             Text(modelName).font(.caption).lineLimit(1)
                         }
                         .foregroundStyle(.secondary)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Model")
+                        .accessibilityValue(modelName)
 
                         HStack(spacing: 2) {
                             Text("↑").font(.caption).foregroundStyle(.blue)
@@ -259,6 +295,9 @@ struct ThinkingIndicatorView: View {
                             Text("↓").font(.caption).foregroundStyle(.green)
                             Text(Self.fmtTokens(outputTokens)).font(.caption).foregroundStyle(.secondary)
                         }
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Tokens")
+                        .accessibilityValue("\(Self.fmtTokens(inputTokens)) in, \(Self.fmtTokens(outputTokens)) out")
 
                         // Context budget bar
                         if lastInputTokens > 0 {
@@ -665,6 +704,7 @@ private struct LLMOutputBox: View {
                             }
                             .buttonStyle(.plain)
                             .disabled(pageIndex <= 1)
+                            .accessibilityLabel("Previous page")
                             Text("\(pageIndex)/\(pageCount)")
                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
                                 .foregroundColor(termText)
@@ -672,6 +712,7 @@ private struct LLMOutputBox: View {
                                 .frame(height: 20)
                                 .background(termBg.opacity(0.9))
                                 .clipShape(Capsule())
+                                .accessibilityLabel("Page \(pageIndex) of \(pageCount)")
                             Button { onPage?(1) } label: {
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 10, weight: .bold))
@@ -682,6 +723,7 @@ private struct LLMOutputBox: View {
                             }
                             .buttonStyle(.plain)
                             .disabled(pageIndex >= pageCount)
+                            .accessibilityLabel("Next page")
                         }
                         Button {
                             onDismiss?()
@@ -695,6 +737,7 @@ private struct LLMOutputBox: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(!dismissEnabled)
+                        .accessibilityLabel("Dismiss LLM output")
                     }
                     .padding(8)
                 }
@@ -787,6 +830,17 @@ struct ToolStepsView: View {
     private var isDragging: Bool { dragStartHeight != nil }
     private var effectiveHeight: Double { dragHeight ?? listHeight }
 
+    static func statusText(_ status: AgentViewModel.ToolStep.Status, duration: Double?) -> String {
+        let word: String
+        switch status {
+        case .running: word = "Running"
+        case .success: word = "Succeeded"
+        case .error: word = "Failed"
+        }
+        guard let duration else { return word }
+        return word + ", " + String(format: "%.1f seconds", duration)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Button {
@@ -806,6 +860,8 @@ struct ToolStepsView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Steps, \(steps.count)")
+            .accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
 
             if isExpanded {
                 ScrollViewReader { proxy in
@@ -847,6 +903,10 @@ struct ToolStepsView: View {
                                     }
                                 }
                                 .padding(.vertical, 1)
+                                // One VoiceOver element per step: "Step 3, read_file, path, succeeded, 0.4s"
+                                .accessibilityElement(children: .combine)
+                                .accessibilityLabel("Step \(idx + 1), \(step.name)\(step.detail.isEmpty ? "" : ", \(step.detail)")")
+                                .accessibilityValue(Self.statusText(step.status, duration: step.duration))
                                 .id(step.id)
                             }
                         }
