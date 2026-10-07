@@ -676,7 +676,10 @@ struct ContentView: View {
     /// Move keyboard / VoiceOver focus into the visible activity log, caret at the end
     /// so VoiceOver can read the newest output line by line from there.
     private func focusActivityLog() {
-        guard let window = NSApp.keyWindow ?? NSApp.mainWindow,
+        // No key/main window when the app isn't active (e.g. menu pressed via VoiceOver or
+        // another assistive app) — fall back to the visible window that holds the log.
+        guard let window = NSApp.keyWindow ?? NSApp.mainWindow
+                ?? NSApp.windows.first(where: { $0.isVisible && $0.contentView.flatMap(Self.visibleActivityLog) != nil }),
               let root = window.contentView,
               let log = Self.visibleActivityLog(in: root) else { return }
         window.makeFirstResponder(log)
