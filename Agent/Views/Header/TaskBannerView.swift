@@ -4,6 +4,7 @@ import SwiftUI
 
 /// Green banner showing current task with cancel button and optional Apple AI prompt
 struct TaskBannerView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let prompt: String
     let appleAIPrompt: String?
     @Binding var showAppleAIBanner: Bool
@@ -80,7 +81,7 @@ struct TaskBannerView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 4)
                 .background(Color.blue.opacity(0.6))
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
             }
         }
     }

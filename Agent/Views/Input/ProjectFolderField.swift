@@ -405,6 +405,7 @@ private struct FolderTreePopover: View {
 /// A single row in the folder tree. Loads children lazily on expand.
 private struct FolderTreeRow: View {
     @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
     let path: String
     let name: String
@@ -464,7 +465,7 @@ private struct FolderTreeRow: View {
                     if children == nil {
                         children = loadChildren()
                     }
-                    withAnimation(.easeInOut(duration: 0.2)) {
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                         isExpanded.toggle()
                     }
                 } label: {
@@ -531,7 +532,7 @@ private struct FolderTreeRow: View {
                         onSelect: onSelect,
                         onDone: onDone
                     )
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
                 }
             }
         }

@@ -9,6 +9,7 @@ struct InputSectionView: View {
     @State private var selectedSuggestionIndex = 0
     @State private var hoveredSuggestionIndex = -1
     @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private var highContrast: Bool { contrast == .increased }
     // Increase Contrast: solid, thicker field border so the task field's edges are clearly visible.
     private var fieldBorderColor: Color { highContrast ? Color.primary.opacity(0.8) : Color.gray.opacity(0.4) }
@@ -340,7 +341,7 @@ struct InputSectionView: View {
             .overlay(RoundedRectangle(cornerRadius: 8).stroke(highContrast ? Color.primary.opacity(0.8) : Color.gray.opacity(0.3), lineWidth: highContrast ? 1.5 : 1))
             .shadow(radius: 4)
             .padding(.horizontal, 50)
-            .transition(.opacity.combined(with: .move(edge: .bottom)))
+            .transition(reduceMotion ? .opacity : .opacity.combined(with: .move(edge: .bottom)))
         }
     }
 

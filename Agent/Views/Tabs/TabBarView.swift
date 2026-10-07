@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct TabBarView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Bindable var viewModel: AgentViewModel
     @State private var draggingTabId: UUID?
     @State private var dragOffset: CGFloat = 0
@@ -42,8 +43,8 @@ struct TabBarView: View {
                     )
                     .zIndex(isDragging ? 1 : 0)
                     .offset(x: isDragging ? dragOffset : 0)
-                    .scaleEffect(isDragging ? 1.05 : 1.0)
-                    .animation(isDragging ? nil : .easeInOut(duration: 0.2), value: viewModel.scriptTabs.map(\.id))
+                    .scaleEffect(isDragging && !reduceMotion ? 1.05 : 1.0)
+                    .animation(isDragging || reduceMotion ? nil : .easeInOut(duration: 0.2), value: viewModel.scriptTabs.map(\.id))
                     .gesture(
                         DragGesture(minimumDistance: 10)
                             .onChanged { value in
