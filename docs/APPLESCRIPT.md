@@ -211,6 +211,8 @@ Restores the built-in system prompt, like Settings > System Prompt > Reset to De
 
 ### `store api key`
 `store api key "key" for provider "Name"` — saves a provider's API key, the API Key field in Settings (kept in the Keychain). Provider names are as in the provider menu (`OpenAI`, `OpenRouter`, `LM Studio`…) or their ids. Keys can't be read back; an empty key clears it. An unknown provider raises -10000 and lists the valid names.
+### `fm server`
+`fm server ["start"|"stop"|"restart"|"status"]` → boolean — the Server row's Start / Stop / Restart / refresh buttons for the Apple fm serve provider in Settings. Waits for the action, then returns whether the server is running (`status`, the default, only checks). Start and Restart also refresh the provider's model list. An unknown action, a missing `fm` binary (macOS 27 required), a busy server, or a start failure (such as the fm license not accepted) raises -10000.
 ### `start auto pilot`
 `start auto pilot ["goal"] [hours N] [isolated bool] [in tab t]` → boolean
 Starts an auto-pilot session (same as `/auto`): the tab works in cycles until the goal is reached, the time runs out, or it is stopped. Omit the goal to have Agent! review the project and ask for one. `isolated true` works in a separate git worktree; `false` uses the shared checkout (default: isolate only when another auto-pilot tab is on the same project). Errors if auto-pilot is already running in that tab or the tab has no project folder.

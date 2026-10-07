@@ -1225,6 +1225,56 @@ final class AgentStoreAPIKeyCommand: NSScriptCommand {
         return ScriptingTab.report(error, self)
     }
 }
+/// `fm server "start"|"stop"|"restart"|"status"` — the Server row's buttons in Settings
+/// (Apple fm serve). Waits for the action, then returns whether the server is running.
+@objc(AgentFMServerCommand)
+final class AgentFMServerCommand: NSScriptCommand {
+    private struct Unchecked<T>: @unchecked Sendable { let value: T }
+
+    override func performDefaultImplementation() -> Any? {
+        let action = (directParameter as? String ?? "status").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard ["start", "stop", "restart", "status"].contains(action) else {
+            scriptErrorNumber = -10000
+            scriptErrorString = "Unknown action \"\(action)\". Use start, stop, restart or status."
+            return nil
+        }
+        suspendExecution()
+        let command = Unchecked(value: self)
+        Task { @MainActor in
+            let fm = FMServeService.shared
+            if action != "status" && !fm.isAvailable {
+                command.value.scriptErrorNumber = -10000
+                command.value.scriptErrorString = "fm not found (macOS 27 required)."
+                return command.value.resumeExecution(withResult: false)
+            }
+            if fm.isBusy && action != "status" {
+                command.value.scriptErrorNumber = -10000
+                command.value.scriptErrorString = "The fm server is busy. Try again in a moment."
+                return command.value.resumeExecution(withResult: fm.isRunning)
+            }
+            switch action {
+            case "start":
+                await fm.start()
+                AgentViewModel.current?.fetchModelsIfNeeded(for: .fmServe, force: true)
+            case "stop":
+                await fm.stop()
+            case "restart":
+                await fm.restart()
+                AgentViewModel.current?.fetchModelsIfNeeded(for: .fmServe, force: true)
+            default:
+                await fm.checkHealth()
+            }
+            if action != "status", let error = fm.lastError {
+                command.value.scriptErrorNumber = -10000
+                command.value.scriptErrorString = error
+            }
+            command.value.resumeExecution(withResult: fm.isRunning)
+        }
+        return nil
+    }
+}
+
+
 
 /// `clear log [in tab tab 2]` — clears the Main tab log unless a tab is given.
 @objc(AgentClearLogCommand)

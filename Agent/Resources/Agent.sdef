@@ -532,6 +532,11 @@
                 <cocoa key="provider"/>
             </parameter>
         </command>
+        <command name="fm server" code="AgntFMsv" description="Start, stop, restart or check the Apple fm serve server (the Server row in Settings). Waits for the action and returns whether the server is running.">
+            <cocoa class="AgentFMServerCommand"/>
+            <direct-parameter type="text" optional="yes" description="start, stop, restart or status (default: status)."/>
+            <result type="boolean" description="True when the server is running."/>
+        </command>
         <command name="clear llm output" code="AgntClrO" description="Clear a tab's LLM Output pane (Shortcuts &gt; Clear LLM Output).">
             <cocoa class="AgentClearLLMOutputCommand"/>
             <direct-parameter type="tab" optional="yes" description="Tab to clear, e.g. clear llm output tab 2 (default: the Main tab)."/>
