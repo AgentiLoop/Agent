@@ -226,7 +226,7 @@ struct GroupRowView: View {
                         .foregroundColor(groupEnabled ? (highContrast ? .primary : .gray) : offStyle(0.4))
                 }
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("\(groupName) group, \(groupTools.count) tools")
+                .accessibilityLabel("\(groupName) group, \(groupTools.count) \(groupTools.count == 1 ? "tool" : "tools")")
                 .accessibilityValue(groupEnabled ? (isCollapsed ? "Collapsed" : "Expanded") : "Disabled")
                 .accessibilityAddTraits(.isButton)
                 .accessibilityAction { if groupEnabled { toggleCollapse() } }

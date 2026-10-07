@@ -231,7 +231,7 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(captionStyle)
 
-                Picker("AI", selection: $viewModel.selectedProvider) {
+                Picker("AI Provider", selection: $viewModel.selectedProvider) {
                     ForEach(APIProvider.selectableProviders, id: \.self) { provider in
                         Text(provider.displayName).tag(provider)
                     }
