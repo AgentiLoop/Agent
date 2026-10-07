@@ -409,6 +409,11 @@ extension AgentViewModel {
             return ax.readFocusedElement(appBundleId: app)
         case "read_text":
             return ax.readText(role: role, title: title, value: value, appBundleId: app)
+        case "select_option":
+            guard let option = (input["text"] as? String) ?? (input["option"] as? String) else {
+                return "{\"success\":false,\"error\":\"select_option needs text: option name, on/off, or a number\"}"
+            }
+            return ax.selectOption(role: role, title: title, value: value, appBundleId: app, option: option)
         case "set_properties":
             return ax.setProperties(
                 role: role, title: title, value: value,
