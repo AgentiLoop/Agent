@@ -309,7 +309,7 @@ struct ContentView: View {
                 if event.modifierFlags.contains(.command),
                    event.charactersIgnoringModifiers == "b"
                 {
-                    withAnimation(.easeInOut(duration: 0.2)) {
+                    withAnimation(NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : .easeInOut(duration: 0.2)) {
                         if let selId = viewModel.selectedTabId, let tab = viewModel.tab(for: selId) {
                             tab.thinkingDismissed.toggle()
                         } else {
@@ -375,7 +375,7 @@ struct ContentView: View {
                    !event.modifierFlags.contains(.shift),
                    event.charactersIgnoringModifiers == "b"
                 {
-                    withAnimation(.easeInOut(duration: 0.2)) {
+                    withAnimation(NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : .easeInOut(duration: 0.2)) {
                         if let selId = viewModel.selectedTabId,
                            let tab = viewModel.tab(for: selId)
                         {
@@ -392,7 +392,7 @@ struct ContentView: View {
                    !event.modifierFlags.contains(.shift),
                    event.charactersIgnoringModifiers == "d"
                 {
-                    withAnimation(.easeInOut(duration: 0.25)) {
+                    withAnimation(NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : .easeInOut(duration: 0.25)) {
                         if let selId = viewModel.selectedTabId,
                            let tab = viewModel.tab(for: selId)
                         {
@@ -596,7 +596,7 @@ struct ContentView: View {
     func handleMenuCommand(_ name: Notification.Name) {
         switch name {
         case .menuToggleChevrons:
-            withAnimation(.easeInOut(duration: 0.25)) {
+            withAnimation(NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : .easeInOut(duration: 0.25)) {
                 if let selId = viewModel.selectedTabId, let tab = viewModel.tab(for: selId) {
                     let expand = !tab.thinkingExpanded
                     tab.thinkingExpanded = expand; tab.thinkingOutputExpanded = expand
@@ -606,7 +606,7 @@ struct ContentView: View {
                 }
             }
         case .menuToggleOverlay:
-            withAnimation(.easeInOut(duration: 0.2)) {
+            withAnimation(NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : .easeInOut(duration: 0.2)) {
                 if let selId = viewModel.selectedTabId, let tab = viewModel.tab(for: selId) {
                     tab.thinkingDismissed.toggle()
                 } else { viewModel.thinkingDismissed.toggle() }

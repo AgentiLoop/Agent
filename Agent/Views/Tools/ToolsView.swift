@@ -6,6 +6,7 @@ struct ToolsView: View {
     @Bindable var viewModel: AgentViewModel
     @Bindable var prefs = ToolPreferencesService.shared
     @State private var collapsedGroups: Set<String> = []
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     // Group definitions — use actual consolidated tool names from AgentTools.Name. Sub-agents (spawn_agent +
     // tell_agent) live in their own group; previously spawn was in Work and tell was in Core, which split a coherent feature across two toggles for no reason.
@@ -73,7 +74,7 @@ struct ToolsView: View {
                                     isCollapsed: collapsedGroups.contains(groupName),
                                     toggleCollapse: { toggleGroup(groupName) },
                                     onGroupToggled: { enabled in
-                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.15)) {
                                             if enabled {
                                                 collapsedGroups.remove(groupName)
                                             } else {
@@ -170,7 +171,7 @@ struct ToolsView: View {
     }
 
     private func toggleGroup(_ groupName: String) {
-        withAnimation(.easeInOut(duration: 0.15)) {
+        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.15)) {
             if collapsedGroups.contains(groupName) {
                 collapsedGroups.remove(groupName)
             } else {
