@@ -3,6 +3,9 @@ import SwiftUI
 struct AgentOptionsView: View {
     @Bindable var viewModel: AgentViewModel
     @AppStorage(AppConstants.shellCommandTimeoutKey) private var shellTimeoutSeconds: Double = AppConstants.shellCommandTimeoutDefault
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -13,7 +16,7 @@ struct AgentOptionsView: View {
 
                 Text("Configure agent behavior and limits.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
             }
             .padding(.bottom, 8)
 
@@ -21,7 +24,7 @@ struct AgentOptionsView: View {
                 Text("Iterations").font(.subheadline)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("Max per task").font(.caption).foregroundStyle(.secondary)
+                    Text("Max per task").font(.caption).foregroundStyle(captionStyle)
                     Stepper(
                         "\(viewModel.maxIterations)",
                         onIncrement: {
@@ -46,7 +49,7 @@ struct AgentOptionsView: View {
                 Text("Retries").font(.subheadline)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("On server/timeout errors").font(.caption).foregroundStyle(.secondary)
+                    Text("On server/timeout errors").font(.caption).foregroundStyle(captionStyle)
                     Stepper(
                         "\(viewModel.maxRetries)",
                         onIncrement: {
@@ -71,7 +74,7 @@ struct AgentOptionsView: View {
                 Text("Network Retry").font(.subheadline)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("Seconds between retries").font(.caption).foregroundStyle(.secondary)
+                    Text("Seconds between retries").font(.caption).foregroundStyle(captionStyle)
                     Picker("", selection: $viewModel.networkRetryDelay) {
                         ForEach([10, 20, 30, 40, 50, 60], id: \.self) { sec in
                             Text("\(sec)s").tag(sec)
@@ -87,7 +90,7 @@ struct AgentOptionsView: View {
                 Text("Output").font(.subheadline)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("Lines before truncated").font(.caption).foregroundStyle(.secondary)
+                    Text("Lines before truncated").font(.caption).foregroundStyle(captionStyle)
                     Stepper(
                         "\(viewModel.maxOutputLines)",
                         onIncrement: {
@@ -112,7 +115,7 @@ struct AgentOptionsView: View {
                 Text("Read File").font(.subheadline)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("Preview lines").font(.caption).foregroundStyle(.secondary)
+                    Text("Preview lines").font(.caption).foregroundStyle(captionStyle)
                     Stepper(
                         "\(viewModel.readFilePreviewLines)",
                         onIncrement: {
@@ -156,7 +159,7 @@ struct AgentOptionsView: View {
                 Text("History").font(.subheadline)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("Summarize after").font(.caption).foregroundStyle(.secondary)
+                    Text("Summarize after").font(.caption).foregroundStyle(captionStyle)
                     Stepper(
                         "\(viewModel.maxHistoryBeforeSummary) tasks",
                         onIncrement: { if viewModel.maxHistoryBeforeSummary > 5 { viewModel.maxHistoryBeforeSummary -= 5 } },
@@ -167,7 +170,7 @@ struct AgentOptionsView: View {
                 }
                 Spacer().frame(width: 12)
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("Visible in chat").font(.caption).foregroundStyle(.secondary)
+                    Text("Visible in chat").font(.caption).foregroundStyle(captionStyle)
                     Stepper(
                         "\(viewModel.visibleTaskCount)",
                         onIncrement: { if viewModel.visibleTaskCount > 1 { viewModel.visibleTaskCount -= 1 } },
@@ -183,7 +186,7 @@ struct AgentOptionsView: View {
                     Text("Shell").font(.subheadline)
                     Text("In-process + Launch Agent + Launch Daemon")
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(captionStyle)
                 }
                 Spacer()
                 Picker("", selection: Binding(
@@ -203,7 +206,7 @@ struct AgentOptionsView: View {
                     Text("Shell timeout").font(.subheadline)
                     Text("Kills a hung / looping command and returns partial output + [TIMEOUT] to the LLM")
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(captionStyle)
                 }
                 Spacer()
                 HStack(spacing: 8) {
@@ -275,7 +278,7 @@ struct AgentOptionsView: View {
                     } else {
                         Text("Unlimited")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(captionStyle)
                     }
                 }
             }
