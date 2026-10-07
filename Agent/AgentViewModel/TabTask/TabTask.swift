@@ -153,6 +153,7 @@ extension AgentViewModel {
     func executeTabTask(tab: ScriptTab, prompt: String) async {
         tab.isLLMRunning = true
         tab.lastTaskCompletionSummary = ""
+        tab.lastTaskError = ""
         tab.llmMessages = [] // Fresh conversation for each task
         tab.tabInputTokens = 0
         tab.tabOutputTokens = 0

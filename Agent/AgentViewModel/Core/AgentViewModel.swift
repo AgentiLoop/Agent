@@ -60,7 +60,7 @@ final class AgentViewModel {
             guard oldValue && !isRunning else { return }
             announceForAccessibility(isCancelled || Task.isCancelled
                 ? "Task cancelled"
-                : spokenTaskFinished("Task", summary: lastTaskCompletionSummary))
+                : spokenTaskFinished("Task", summary: lastTaskCompletionSummary, error: lastTaskError))
         }
     }
     var isThinking = false
@@ -577,6 +577,8 @@ final class AgentViewModel {
     }
     /// Summary the last main task ended with ("" when it was cancelled/incomplete). Read by auto-pilot between cycles.
     var lastTaskCompletionSummary: String = ""
+    /// Error that stopped the last main task ("" when none). Spoken by VoiceOver when the task ends.
+    var lastTaskError: String = ""
     var currentTaskPrompt: String = ""
     var currentAppleAIPrompt: String = ""
     /// Commands run during current task — used by history, mediator, and tool handlers.

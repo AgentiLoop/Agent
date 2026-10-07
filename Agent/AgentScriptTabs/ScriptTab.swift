@@ -32,12 +32,16 @@ func announceForAccessibility(_ message: String) {
 
 /// "<title> finished" plus the start of the completion summary (markdown stripped, ~300 chars)
 /// so VoiceOver users hear the result without navigating into the activity log.
-func spokenTaskFinished(_ title: String, summary: String) -> String {
+/// With no summary but a recorded error, says the task stopped with that error instead.
+func spokenTaskFinished(_ title: String, summary: String, error: String = "") -> String {
     let plain = summary
         .replacingOccurrences(of: "[*`#]", with: "", options: .regularExpression)
         .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
         .trimmingCharacters(in: .whitespaces)
-    guard !plain.isEmpty else { return "\(title) finished" }
+    guard !plain.isEmpty else {
+        guard !error.isEmpty else { return "\(title) finished" }
+        return "\(title) stopped with an error. " + (error.count > 200 ? String(error.prefix(200)) + "…" : error)
+    }
     return "\(title) finished. " + (plain.count > 300 ? String(plain.prefix(300)) + "…" : plain)
 }
 
@@ -105,12 +109,14 @@ final class ScriptTab: Identifiable {
     var autoPilot: AutoPilotSession?
     /// Summary the last tab task ended with ("" when cancelled/incomplete). Read by auto-pilot between cycles.
     var lastTaskCompletionSummary: String = ""
+    /// Error that stopped the last tab task ("" when none). Spoken by VoiceOver when the task ends.
+    var lastTaskError: String = ""
     var isLLMRunning: Bool = false {
         didSet {
             guard oldValue && !isLLMRunning else { return }
             announceForAccessibility(runningLLMTask?.isCancelled == true
                 ? "\(displayTitle) task cancelled"
-                : spokenTaskFinished("\(displayTitle) task", summary: lastTaskCompletionSummary))
+                : spokenTaskFinished("\(displayTitle) task", summary: lastTaskCompletionSummary, error: lastTaskError))
         }
     }
     var isLLMThinking: Bool = false

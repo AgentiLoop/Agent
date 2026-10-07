@@ -61,6 +61,9 @@ extension AgentViewModel {
         if let tab = TabLogRouter.current {
             let timestamp = Self.timestampFormatter.string(from: Date())
             tab.tabErrors.append("[\(timestamp)] \(errorType): \(fullMessage.truncate(to: 100))")
+            tab.lastTaskError = fullMessage
+        } else {
+            lastTaskError = fullMessage
         }
     }
 
