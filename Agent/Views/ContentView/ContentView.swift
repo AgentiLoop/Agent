@@ -364,7 +364,7 @@ struct ContentView: View {
 
                 // Cmd+Shift+M: Toggle Messages Monitor
                 if event.modifierFlags.contains([.command, .shift]),
-                   event.charactersIgnoringModifiers == "m"
+                   event.charactersIgnoringModifiers?.lowercased() == "m"
                 {
                     viewModel.messagesMonitorEnabled.toggle()
                     return nil
