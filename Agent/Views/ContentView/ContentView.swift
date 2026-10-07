@@ -582,9 +582,12 @@ struct ContentView: View {
         alert.alertStyle = .informational
         let input = NSTextField(frame: NSRect(x: 0, y: 0, width: 300, height: 24))
         input.placeholderString = "Your answer"
+        input.setAccessibilityLabel("Your answer")
         alert.accessoryView = input
         alert.addButton(withTitle: "Send")
         alert.addButton(withTitle: "Skip")
+        // Start keyboard/VoiceOver focus in the answer field, not the Send button
+        alert.window.initialFirstResponder = input
         let response = alert.runModal()
         let answer: String = response == .alertFirstButtonReturn
             ? (input.stringValue.isEmpty ? "(no answer)" : input.stringValue)
