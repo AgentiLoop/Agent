@@ -14,7 +14,8 @@ extension AppDelegate {
         "mcpServers", "enabledMCPServers", "connectedMCPServers", "mcpTools", "disabledMCPTools",
         "llmOutput", "inputTokens", "outputTokens", "sessionInputTokens", "sessionOutputTokens",
         "accessibilityAutomation", "showHUD", "smoothStreaming", "terminalSpeed", "scanLines", "hudLogBelow",
-        "activityLogTextSize", "shellTimeout"]
+        "activityLogTextSize", "shellTimeout",
+        "fallbackEnabled", "fallbackChain", "disabledFallbackEntries", "activeFallback"]
 
     func application(_ sender: NSApplication, delegateHandlesKey key: String) -> Bool {
         Self.scriptingKeys.contains(key)
@@ -243,6 +244,58 @@ extension AppDelegate {
             UserDefaults.standard.set(Double(newValue * 60), forKey: AppConstants.shellCommandTimeoutKey)
         }
     }
+
+    // MARK: - Fallback Chain (Settings > Fallback Chain; entries are "Provider / model", as in the window)
+
+    @objc var fallbackEnabled: Bool {
+        get { FallbackChainService.shared.enabled }
+        set { FallbackChainService.shared.enabled = newValue }
+    }
+
+    @objc var fallbackChain: [String] {
+        get { FallbackChainService.shared.chain.map(\.displayName) }
+        set {
+            let service = FallbackChainService.shared
+            var entries: [FallbackEntry] = []
+            for text in newValue {
+                let parts = text.components(separatedBy: "/")
+                let name = parts[0].trimmingCharacters(in: .whitespaces)
+                let model = parts.dropFirst().joined(separator: "/").trimmingCharacters(in: .whitespaces)
+                guard let provider = APIProvider.selectableProviders.first(where: {
+                    $0.displayName.caseInsensitiveCompare(name) == .orderedSame
+                        || $0.rawValue.caseInsensitiveCompare(name) == .orderedSame
+                }) else {
+                    let names = APIProvider.selectableProviders.map(\.displayName).joined(separator: ", ")
+                    return ScriptingTab.scriptError("Unknown provider \"\(name)\" in \"\(text)\". Entries are \"Provider / model\"; providers: \(names).")
+                }
+                guard !model.isEmpty else { return ScriptingTab.scriptError("No model in \"\(text)\". Entries are \"Provider / model\".") }
+                // An entry already in the chain keeps its on/off switch.
+                let existing = service.chain.first { $0.provider == provider.rawValue && $0.model == model }
+                entries.append(existing ?? FallbackEntry(provider: provider.rawValue, model: model))
+            }
+            service.replace(with: entries)
+        }
+    }
+
+    /// Entries whose switch is off in the window; each must be in the fallback chain.
+    @objc var disabledFallbackEntries: [String] {
+        get { FallbackChainService.shared.chain.filter { !$0.enabled }.map(\.displayName) }
+        set {
+            let service = FallbackChainService.shared
+            let names = Set(newValue.map { $0.lowercased() })
+            let known = Set(service.chain.map { $0.displayName.lowercased() })
+            let unknown = newValue.filter { !known.contains($0.lowercased()) }
+            guard unknown.isEmpty else {
+                return ScriptingTab.scriptError("Not in the fallback chain: \(unknown.joined(separator: ", ")). See fallback chain.")
+            }
+            for entry in service.chain where entry.enabled == names.contains(entry.displayName.lowercased()) {
+                service.toggle(id: entry.id)
+            }
+        }
+    }
+
+    /// The entry in use after the primary failed, or "" while on the primary.
+    @objc var activeFallback: String { FallbackChainService.shared.activeFallback?.displayName ?? "" }
 
     // MARK: - Tools window (same toggles as Tools; groups are global, tools are per Main-tab provider)
 

@@ -157,6 +157,24 @@
                       description="Minutes before a hung shell command is killed, 1 to 120; 0 turns the timeout off.">
                 <cocoa key="shellTimeout"/>
             </property>
+            <property name="fallback enabled" code="AgB1" type="boolean"
+                      description="Settings &gt; Fallback Chain: switch to the next provider when the current one keeps failing.">
+                <cocoa key="fallbackEnabled"/>
+            </property>
+            <property name="fallback chain" code="AgB2"
+                      description="Fallback providers in order, each &quot;Provider / model&quot; (e.g. &quot;Claude / claude-sonnet-4&quot;). Setting it replaces the chain; entries already in it keep their on/off switch.">
+                <type type="text" list="yes"/>
+                <cocoa key="fallbackChain"/>
+            </property>
+            <property name="disabled fallback entries" code="AgB3"
+                      description="Fallback chain entries switched off (skipped); each must be in the fallback chain.">
+                <type type="text" list="yes"/>
+                <cocoa key="disabledFallbackEntries"/>
+            </property>
+            <property name="active fallback" code="AgB4" type="text" access="r"
+                      description="The fallback entry in use after the primary provider failed, or empty while on the primary.">
+                <cocoa key="activeFallback"/>
+            </property>
             <property name="tool groups" code="AgG1" access="r"
                       description="Every tool group name, as in the Tools window.">
                 <type type="text" list="yes"/>

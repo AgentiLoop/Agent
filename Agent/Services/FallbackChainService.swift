@@ -74,6 +74,12 @@ final class FallbackChainService {
         chain.move(fromOffsets: from, toOffset: to)
     }
 
+    /// Replace the whole chain (AppleScript `fallback chain`).
+    func replace(with entries: [FallbackEntry]) {
+        chain = entries
+        reset()
+    }
+
     func clear() {
         chain.removeAll()
         currentIndex = -1
