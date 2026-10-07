@@ -66,7 +66,14 @@ struct MCPServersView: View {
                             }
                         }
                     } label: {
-                        Image(systemName: "sparkles")
+                        // .accessibilityLabel doesn't reach the AXMenuButton: its AXTitle comes from the Label text and its
+                        // AXDescription from the NSImage's accessibilityDescription (else VoiceOver reads the symbol name "sparkle")
+                        Label {
+                            Text("Add Preset MCP Server")
+                        } icon: {
+                            Image(nsImage: NSImage(systemSymbolName: "sparkles", accessibilityDescription: "Add Preset MCP Server") ?? NSImage())
+                        }
+                        .labelStyle(.iconOnly)
                     }
                     .menuStyle(.borderlessButton)
                     .menuIndicator(.hidden)
