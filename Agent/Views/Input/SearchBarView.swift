@@ -83,6 +83,13 @@ struct SearchBarView: View {
             }
             .padding(.horizontal)
             .padding(.vertical, 6)
+            // VoiceOver: speak the match position after typing pauses or Next/Previous moves it — the counter alone is silent.
+            .task(id: "\(searchText)|\(caseSensitive)|\(currentMatchIndex)|\(totalMatches)") {
+                guard !searchText.isEmpty else { return }
+                try? await Task.sleep(for: .milliseconds(400))
+                guard !Task.isCancelled else { return }
+                announceForAccessibility(totalMatches > 0 ? "Match \(currentMatchIndex + 1) of \(totalMatches)" : "No results")
+            }
             Divider()
         }
     }
