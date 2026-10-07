@@ -29,6 +29,7 @@ struct ThinkingIndicatorView: View {
     @State private var outputHeight: CGFloat = 80
     @State private var dots = ""
     @State private var tick = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// Elapsed time — stored on the tab to survive tab switches
     private var elapsed: TimeInterval {
         get { tab?.taskElapsed ?? viewModel.mainTaskElapsed }
@@ -435,6 +436,8 @@ struct ThinkingIndicatorView: View {
         .onReceive(refreshTimer) { _ in
             guard isActive else { return }
             tick += 1 // Just refresh UI — elapsed is computed from taskStartDate
+            // Reduce Motion: show static "..." instead of cycling dots
+            if reduceMotion { dots = "..."; return }
             switch dots.count {
             case 0: dots = "."
             case 1: dots = ".."
@@ -448,6 +451,7 @@ struct ThinkingIndicatorView: View {
 /// Resizable LLM output box — neo-retro terminal look, adapts to dark/light mode.
 private struct LLMOutputBox: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let text: String
     var rawText: String = ""
     @Binding var height: CGFloat
@@ -799,6 +803,8 @@ private struct LLMOutputBox: View {
             // Blink cursor at ~2Hz — always running, seamless streaming→idle
             while !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(500))
+                // Reduce Motion: keep the cursor solid instead of blinking
+                if reduceMotion { cursorVisible = true; continue }
                 cursorVisible.toggle()
             }
         }
