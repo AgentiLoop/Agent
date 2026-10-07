@@ -8,6 +8,11 @@ struct InputSectionView: View {
     @State private var showSuggestions = false
     @State private var selectedSuggestionIndex = 0
     @State private var hoveredSuggestionIndex = -1
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var highContrast: Bool { contrast == .increased }
+    // Increase Contrast: solid, thicker field border so the task field's edges are clearly visible.
+    private var fieldBorderColor: Color { highContrast ? Color.primary.opacity(0.8) : Color.gray.opacity(0.4) }
+    private var fieldBorderWidth: CGFloat { highContrast ? 1.5 : 1 }
 
     var body: some View {
         if let tab = selectedTab {
@@ -110,7 +115,7 @@ struct InputSectionView: View {
                 .padding(.horizontal, 7)
                 .background(Color(nsColor: .controlBackgroundColor))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.4), lineWidth: 1))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(fieldBorderColor, lineWidth: fieldBorderWidth))
                 .lineLimit(2...16)
                 .accessibilityLabel(tab.isMainTab ? "Task" : tab.isMessagesTab ? "Messages task" : "Question about \(tab.scriptName)")
                 .accessibilityHint("Press Return to run. Press Tab to accept a suggestion.")
@@ -207,7 +212,7 @@ struct InputSectionView: View {
                     .padding(.horizontal, 7)
                     .background(Color(nsColor: .controlBackgroundColor))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.4), lineWidth: 1))
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(fieldBorderColor, lineWidth: fieldBorderWidth))
                     .lineLimit(2...16)
                     .accessibilityLabel("Task")
                     .accessibilityHint("Press Return to run. Press Tab to accept a suggestion.")
@@ -292,7 +297,7 @@ struct InputSectionView: View {
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
                                     .font(.caption2)
-                                    .foregroundStyle(.red.opacity(0.7))
+                                    .foregroundStyle(.red.opacity(highContrast ? 1 : 0.7))
                             }
                             .buttonStyle(.plain)
                             .help("Dismiss suggestions")
@@ -306,7 +311,7 @@ struct InputSectionView: View {
                             if idx == selectedSuggestionIndex {
                                 Text("Tab")
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(highContrast ? AnyShapeStyle(.primary) : AnyShapeStyle(.tertiary))
                                     .padding(.horizontal, 4)
                                     .padding(.vertical, 1)
                                     .background(Color.secondary.opacity(0.15))
@@ -332,7 +337,7 @@ struct InputSectionView: View {
             }
             .background(Color(nsColor: .controlBackgroundColor))
             .cornerRadius(8)
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(highContrast ? Color.primary.opacity(0.8) : Color.gray.opacity(0.3), lineWidth: highContrast ? 1.5 : 1))
             .shadow(radius: 4)
             .padding(.horizontal, 50)
             .transition(.opacity.combined(with: .move(edge: .bottom)))
