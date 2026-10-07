@@ -11,32 +11,10 @@ extension AgentViewModel {
         tab: ScriptTab, name: String, input: [String: Any], toolId: String
     ) async -> TabToolResult {
 
-        // Block accessibility ONLY when the call actually targets Safari — either
-        // explicitly, or implicitly (no app given while Safari is frontmost).
-        // A frontmost Safari must NOT veto calls aimed at other apps.
-        let requestedApp = input["appBundleId"] as? String ?? input["app"] as? String ?? input["name"] as? String
-        let targetsSafari: Bool = {
-            if let requested = requestedApp, !requested.isEmpty {
-                return requested.lowercased().contains("safari")
-            }
-            let front = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
-            return front == "com.apple.Safari"
-        }()
-        if targetsSafari {
-            let msg =
-                "Error: Safari is active. Use the web tool: "
-                + "web(action: \"scan\"), web(action: \"open\", url: \"...\"), "
-                + "web(action: \"type\", selector: \"...\", text: \"...\"), "
-                + "web(action: \"click\", selector: \"...\"), "
-                + "web(action: \"read_content\")."
-            tab.appendLog(msg)
-            tab.flush()
-            return TabToolResult(
-                toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": msg],
-                isComplete: false
-            )
-        }
-
+        // No Safari veto here: AgentAccess already falls back to the web-tool hint
+        // only when Accessibility isn't granted (AccessibilityService.isBrowser),
+        // same as the main tab. Browser chrome (toolbar, menus, tabs, <select>
+        // pop-ups, quit/activate) must stay reachable from tab tasks too.
         switch name {
         case "ax_check_permission":
             let hasPermission = AccessibilityService.hasAccessibilityPermission()
