@@ -12,6 +12,8 @@ struct TokenBadge: View {
     var budgetUsedFraction: Double = 0
 
     @State private var showDetail: Bool = false
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var highContrast: Bool { contrast == .increased }
 
     var body: some View {
         Button {
@@ -21,16 +23,17 @@ struct TokenBadge: View {
             HStack(spacing: 4) {
                 Text(formatTokens(total))
                     .font(.caption2.monospacedDigit())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(highContrast ? .primary : .secondary)
                 if budgetUsedFraction > 0 {
                     Text("\(Int(budgetUsedFraction * 100))%")
                         .font(.caption2.monospacedDigit())
-                        .foregroundStyle(budgetUsedFraction >= 0.9 ? .red : budgetUsedFraction >= 0.7 ? .orange : .secondary)
+                        .foregroundStyle(budgetUsedFraction >= 0.9 ? .red : budgetUsedFraction >= 0.7 ? .orange : highContrast ? .primary : .secondary)
                 }
             }
             .padding(.horizontal, 5)
             .padding(.vertical, 2)
             .background(Color.secondary.opacity(0.1))
+            .overlay(Capsule().stroke(highContrast ? Color.primary.opacity(0.8) : Color.clear, lineWidth: 1))
             .clipShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -74,6 +77,8 @@ private struct TokenDetailView: View {
     let sessionOut: Int
     let providerName: String
     let modelName: String
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var highContrast: Bool { contrast == .increased }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -292,18 +297,18 @@ private struct TokenDetailView: View {
         HStack(spacing: 6) {
             Text(label)
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(highContrast ? AnyShapeStyle(.primary) : AnyShapeStyle(.tertiary))
                 .frame(width: 24, alignment: .trailing)
             GeometryReader { geo in
                 let fraction: CGFloat = max > 0 ? CGFloat(value) / CGFloat(max) : 0
                 RoundedRectangle(cornerRadius: 3)
-                    .fill(color.opacity(0.5))
+                    .fill(color.opacity(highContrast ? 1 : 0.5))
                     .frame(width: geo.size.width * fraction)
             }
             .frame(width: 80, height: 8)
             Text(fmt(value))
                 .font(.caption2.monospacedDigit())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(highContrast ? .primary : .secondary)
                 .frame(width: 50, alignment: .trailing)
         }
         .accessibilityElement(children: .ignore)
