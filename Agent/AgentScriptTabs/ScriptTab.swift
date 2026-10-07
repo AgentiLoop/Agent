@@ -20,6 +20,16 @@ final class AtomicFlag: @unchecked Sendable {
     func set() { lock.lock(); _value = true; lock.unlock() }
 }
 
+/// Speaks a message through VoiceOver (no-op when VoiceOver is off).
+@MainActor
+func announceForAccessibility(_ message: String) {
+    guard let app = NSApp else { return }
+    NSAccessibility.post(element: app, notification: .announcementRequested, userInfo: [
+        .announcement: message,
+        .priority: NSAccessibilityPriorityLevel.high.rawValue
+    ])
+}
+
 @MainActor @Observable
 final class ScriptTab: Identifiable {
     let id: UUID
@@ -34,6 +44,9 @@ final class ScriptTab: Identifiable {
                 tabInputTokens = 0
                 tabOutputTokens = 0
                 thinkingDismissed = true
+            }
+            if oldValue && !isRunning {
+                announceForAccessibility(isCancelled ? "\(displayTitle) cancelled" : "\(displayTitle) finished")
             }
         }
     }
@@ -81,7 +94,9 @@ final class ScriptTab: Identifiable {
     var autoPilot: AutoPilotSession?
     /// Summary the last tab task ended with ("" when cancelled/incomplete). Read by auto-pilot between cycles.
     var lastTaskCompletionSummary: String = ""
-    var isLLMRunning: Bool = false
+    var isLLMRunning: Bool = false {
+        didSet { if oldValue && !isLLMRunning { announceForAccessibility("\(displayTitle) task finished") } }
+    }
     var isLLMThinking: Bool = false
     var thinkingDismissed: Bool = true
     var thinkingExpanded: Bool = false
