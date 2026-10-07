@@ -32,6 +32,7 @@ struct ToolsView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Tools")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
 
                 Text("Toggle tool availability per LLM provider.")
                     .font(.caption)

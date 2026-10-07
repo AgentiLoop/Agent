@@ -19,6 +19,7 @@ struct LLMCommonSettingsView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Web Search")
                 .font(.headline)
+                .accessibilityAddTraits(.isHeader)
             Text("Exa or Tavily provides web search for all LLM providers. DuckDuckGo is used when neither key is set.")
                 .font(.caption)
                 .foregroundStyle(captionStyle)
@@ -44,6 +45,7 @@ struct LLMCommonSettingsView: View {
             HStack(spacing: 6) {
                 Text("Jev (TypeSafe)")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
                 Text("Decision layer")
                     .font(.caption2).bold()
                     .padding(.horizontal, 6).padding(.vertical, 1)
@@ -147,6 +149,7 @@ struct LLMCommonSettingsView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("LLM Common Settings")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
                 Text("Applies to every provider, whichever one is selected.")
                     .font(.caption)
                     .foregroundStyle(captionStyle)

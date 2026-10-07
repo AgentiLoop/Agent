@@ -13,6 +13,7 @@ struct AgentOptionsView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Options")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
 
                 Text("Configure agent behavior and limits.")
                     .font(.caption)

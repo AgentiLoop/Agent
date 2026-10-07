@@ -45,6 +45,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(provider.displayName)
                 .font(.headline)
+                .accessibilityAddTraits(.isHeader)
 
             if provider == .openRouter {
                 VStack(alignment: .leading, spacing: 4) {
@@ -132,6 +133,7 @@ struct SettingsView: View {
             HStack(spacing: 6) {
                 Text("Apple fm serve")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
                 Text("Experimental")
                     .font(.caption2).bold()
                     .padding(.horizontal, 6).padding(.vertical, 1)
@@ -222,6 +224,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("LLM Provider")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
 
                 Text("Configure your AI provider and API keys.")
                     .font(.caption)
@@ -246,6 +249,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Claude API")
                         .font(.headline)
+                        .accessibilityAddTraits(.isHeader)
 
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 6) {
@@ -302,6 +306,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Ollama Cloud")
                         .font(.headline)
+                        .accessibilityAddTraits(.isHeader)
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Key").font(.caption).foregroundStyle(captionStyle)
@@ -355,6 +360,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("LM Studio")
                         .font(.headline)
+                        .accessibilityAddTraits(.isHeader)
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Protocol").font(.caption).foregroundStyle(captionStyle)
@@ -417,6 +423,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("vLLM")
                         .font(.headline)
+                        .accessibilityAddTraits(.isHeader)
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Endpoint").font(.caption).foregroundStyle(captionStyle)
@@ -468,6 +475,7 @@ struct SettingsView: View {
                     HStack(spacing: 6) {
                         Text("Muse Code")
                             .font(.headline)
+                            .accessibilityAddTraits(.isHeader)
                         Text("Muse Code subscription")
                             .font(.caption2).bold()
                             .padding(.horizontal, 6).padding(.vertical, 1)
@@ -540,6 +548,7 @@ struct SettingsView: View {
                     HStack(spacing: 6) {
                         Text("Codex")
                             .font(.headline)
+                            .accessibilityAddTraits(.isHeader)
                         Text("OAuth (ChatGPT subscription)")
                             .font(.caption2).bold()
                             .padding(.horizontal, 6).padding(.vertical, 1)
@@ -626,6 +635,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Local Ollama")
                         .font(.headline)
+                        .accessibilityAddTraits(.isHeader)
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Endpoint").font(.caption).foregroundStyle(captionStyle)
