@@ -28,6 +28,7 @@ struct HistoryView: View {
             // Header
             Text("History")
                 .font(.headline)
+                .accessibilityAddTraits(.isHeader)
 
             Text("View past prompts, errors, and task summaries.")
                 .font(.caption)
@@ -38,8 +39,9 @@ struct HistoryView: View {
                     Text(type.rawValue).tag(type)
                 }
             } label: {
-                EmptyView()
+                Text("History Type")
             }
+            .labelsHidden()
             .pickerStyle(.segmented)
 
             // Content — fixed height so all tabs are the same size
@@ -49,6 +51,7 @@ struct HistoryView: View {
                         Image(systemName: emptyIcon)
                             .font(.system(size: 32))
                             .foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                         Text("No \(selectedTaskType.rawValue.lowercased()) yet.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
@@ -78,6 +81,7 @@ struct HistoryView: View {
                     .buttonStyle(.bordered)
                     .controlSize(.small)
                     .disabled(currentItems.isEmpty)
+                    .accessibilityLabel("Clear All \(selectedTaskType.rawValue)")
             }
         }
         .padding(16)
@@ -102,6 +106,7 @@ struct HistoryView: View {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundColor(.orange)
                                 .font(.caption2)
+                                .accessibilityHidden(true)
                             Text("Error")
                                 .font(.caption2)
                                 .foregroundColor(.orange)
@@ -113,6 +118,7 @@ struct HistoryView: View {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(.green)
                                 .font(.caption2)
+                                .accessibilityHidden(true)
                             Text("Completed")
                                 .font(.caption2)
                                 .foregroundColor(.green)
@@ -132,6 +138,8 @@ struct HistoryView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Rerun this prompt")
+                    .accessibilityLabel("Rerun Prompt")
+                    .accessibilityHint(item)
                 }
             }
             .padding(.vertical, 8)
