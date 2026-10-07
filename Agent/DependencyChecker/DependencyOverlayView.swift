@@ -34,6 +34,7 @@ struct DependencyOverlay: View {
                         .shadow(color: .blue.opacity(0.6), radius: 16)
                         .opacity(showIcon ? 1 : 0)
                         .scaleEffect(showIcon ? 1.0 : 0.8)
+                        .accessibilityHidden(true)
 
                     Text("Agent!")
                         .font(.system(size: 22, weight: .black, design: .monospaced))
@@ -43,6 +44,8 @@ struct DependencyOverlay: View {
                         .font(.system(size: 11, design: .monospaced))
                         .foregroundColor(.secondary)
                         .opacity(showIcon ? 1 : 0)
+                        // Private-use Apple logo glyph isn't speakable
+                        .accessibilityLabel("Agentic AI for your Mac Desktop")
 
                     Text(appVersion)
                         .font(.system(size: 10, design: .monospaced))
@@ -142,6 +145,10 @@ struct DependencyOverlay: View {
             }
             Spacer()
         }
+        // Check/cross icon is color-only — speak the result: "Clang Compiler, Installed"
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(name)
+        .accessibilityValue(ok ? "Installed" : "Missing. \(hint)")
         .opacity(show ? 1 : 0)
         .offset(y: show ? 0 : 8)
     }
@@ -162,6 +169,9 @@ struct DependencyOverlay: View {
             }
             Spacer()
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(name)
+        .accessibilityValue("\(ok ? "Available" : "Unavailable"). \(status)")
         .opacity(show ? 1 : 0)
         .offset(y: show ? 0 : 8)
     }

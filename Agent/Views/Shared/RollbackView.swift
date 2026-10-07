@@ -48,37 +48,46 @@ struct RollbackView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 4) {
                         ForEach(groupedBackups, id: \.name) { group in
-                            // File header row
-                            Button {
-                                withAnimation(.easeInOut(duration: 0.15)) {
-                                    expandedFile = expandedFile == group.name ? nil : group.name
-                                }
-                            } label: {
-                                HStack {
-                                    Image(systemName: expandedFile == group.name ? "chevron.down" : "chevron.right")
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                        .frame(width: 12)
-                                    Text(group.name)
-                                        .font(.caption.monospaced().bold())
-                                        .lineLimit(1)
-                                    Text("(\(group.versions.count))")
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                    Spacer()
-                                    Text(formatDate(group.versions.first?.date ?? Date()))
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                    Button("Restore") {
-                                        if let latest = group.versions.first {
-                                            restore(original: group.name, backupPath: latest.backup)
-                                        }
+                            // File header row — Restore sits beside (not inside) the expand button so VoiceOver can reach it
+                            HStack {
+                                Button {
+                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                        expandedFile = expandedFile == group.name ? nil : group.name
                                     }
-                                    .buttonStyle(.bordered)
-                                    .controlSize(.mini)
+                                } label: {
+                                    HStack {
+                                        Image(systemName: expandedFile == group.name ? "chevron.down" : "chevron.right")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                            .frame(width: 12)
+                                        Text(group.name)
+                                            .font(.caption.monospaced().bold())
+                                            .lineLimit(1)
+                                        Text("(\(group.versions.count))")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                        Spacer()
+                                        Text(formatDate(group.versions.first?.date ?? Date()))
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .contentShape(Rectangle())
                                 }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(
+                                    "\(group.name), \(group.versions.count) version\(group.versions.count == 1 ? "" : "s"), "
+                                        + "latest \(formatDate(group.versions.first?.date ?? Date()))"
+                                )
+                                .accessibilityValue(expandedFile == group.name ? "Expanded" : "Collapsed")
+                                Button("Restore") {
+                                    if let latest = group.versions.first {
+                                        restore(original: group.name, backupPath: latest.backup)
+                                    }
+                                }
+                                .buttonStyle(.bordered)
+                                .controlSize(.mini)
+                                .accessibilityLabel("Restore latest \(group.name)")
                             }
-                            .buttonStyle(.plain)
                             .padding(.vertical, 3)
                             .padding(.horizontal, 4)
 
@@ -96,6 +105,7 @@ struct RollbackView: View {
                                         }
                                         .buttonStyle(.bordered)
                                         .controlSize(.mini)
+                                        .accessibilityLabel("Restore \(group.name) from \(formatTimestamp(version.date))")
                                     }
                                     .padding(.vertical, 1)
                                     .padding(.horizontal, 4)
@@ -113,6 +123,8 @@ struct RollbackView: View {
                 Text(result)
                     .font(.caption)
                     .foregroundStyle(result.hasPrefix("Error") ? .red : .green)
+                    // Announce restore/clear outcome so VoiceOver users hear it without hunting for it
+                    .task(id: result) { AccessibilityNotification.Announcement(result).post() }
             }
 
             HStack {

@@ -28,12 +28,15 @@ struct TaskBannerView: View {
                 }
                 .buttonStyle(.plain)
                 .help("User prompt")
+                .accessibilityLabel("User prompt")
+                .accessibilityHint(appleAIPrompt != nil ? "Shows or hides the Apple Intelligence prompt" : "")
 
                 Text(prompt)
                     .font(.caption)
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .foregroundStyle(.white)
+                    .accessibilityLabel("Current task: \(prompt)")
 
                 Spacer()
 
@@ -71,6 +74,9 @@ struct TaskBannerView: View {
                         .foregroundStyle(.white.opacity(0.9))
                     Spacer()
                 }
+                // Private-use Apple logo glyph reads as gibberish — speak a single labeled element
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Apple Intelligence prompt: \(aiPrompt)")
                 .padding(.horizontal, 12)
                 .padding(.vertical, 4)
                 .background(Color.blue.opacity(0.6))

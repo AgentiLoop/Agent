@@ -21,6 +21,7 @@ struct ScreenshotPreviewView: View {
                                 RoundedRectangle(cornerRadius: 6)
                                     .stroke(.secondary.opacity(0.3))
                             )
+                            .accessibilityLabel("Attached image \(index + 1) of \(images.count)")
                         Button {
                             onRemove(index)
                         } label: {
@@ -31,6 +32,7 @@ struct ScreenshotPreviewView: View {
                         .buttonStyle(.plain)
                         .offset(x: 4, y: -4)
                         .help("Remove Image")
+                        .accessibilityLabel("Remove image \(index + 1)")
                     }
                 }
                 Text("\(images.count) image(s)")
@@ -39,6 +41,7 @@ struct ScreenshotPreviewView: View {
                 Button("Clear All") { onRemoveAll() }
                     .buttonStyle(.bordered)
                     .controlSize(.mini)
+                    .accessibilityLabel("Remove all images")
             }
             .padding(.horizontal)
             .padding(.vertical, 6)

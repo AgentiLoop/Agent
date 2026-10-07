@@ -323,6 +323,7 @@ struct ThinkingIndicatorView: View {
                                     .font(.system(size: 9, design: .monospaced))
                                     .foregroundStyle(barColor)
                             }
+                            .accessibilityElement(children: .ignore)
                             .accessibilityLabel("Context usage")
                             .accessibilityValue(
                                 "\(Int(fraction * 100)) percent, \(Self.fmtTokens(used)) of \(Self.fmtTokens(contextWindow))"
@@ -679,6 +680,9 @@ private struct LLMOutputBox: View {
                         .padding(10)
                         Spacer(minLength: 0)
                     }
+                    // Idle prompt + blinking block cursor would be read as "AGENT! >, █"
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("LLM output, empty")
                     .overlay {
                         if showScanlines {
                             ScanlineOverlay(spacing: 2, color: .black, opacity: 0.375, blurRadius: 0.005)
