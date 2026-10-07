@@ -4,6 +4,7 @@ struct DependencyOverlay: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.colorSchemeContrast) private var contrast
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     let status: DependencyStatus?
     @Binding var isVisible: Bool
     @State private var showIcon = false
@@ -107,7 +108,7 @@ struct DependencyOverlay: View {
                 .padding(24)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(nsColor: .windowBackgroundColor).opacity(0.95))
+                        .fill(Color(nsColor: .windowBackgroundColor).opacity(reduceTransparency ? 1 : 0.95))
                         .shadow(radius: 20)
                 )
                 .frame(width: 320)

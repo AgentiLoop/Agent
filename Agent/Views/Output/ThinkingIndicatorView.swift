@@ -31,6 +31,7 @@ struct ThinkingIndicatorView: View {
     @State private var tick = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     private var highContrast: Bool { contrast == .increased }
     /// Elapsed time — stored on the tab to survive tab switches
     private var elapsed: TimeInterval {
@@ -403,6 +404,8 @@ struct ThinkingIndicatorView: View {
         }
         .background(colorScheme == .dark ? Color.clear : Color.white.opacity(0.53))
         .background(.ultraThinMaterial.opacity(colorScheme == .dark ? 0.95 : 0.97))
+        // Reduce Transparency: solid backing so log text never shows through
+        .background(reduceTransparency ? Color(nsColor: .windowBackgroundColor) : Color.clear)
         .onAppear {
             // Restore persisted height for the active context (tab or main viewModel)
             outputHeight = CGFloat(tab?.llmOutputHeight ?? viewModel.llmOutputHeight)
