@@ -774,12 +774,21 @@ private struct LLMOutputBox: View {
                 .accessibilityElement()
                 .accessibilityLabel("LLM output height")
                 .accessibilityValue("\(Int(height)) points")
-                .accessibilityHint("Swipe up or down to resize")
+                .accessibilityHint("Swipe up or down, or press the Up and Down arrow keys, to resize")
                 .accessibilityAdjustableAction { direction in
                     switch direction {
                     case .increment: height = min(height + 40, maxHeight)
                     case .decrement: height = max(40, height - 40)
                     @unknown default: break
+                    }
+                }
+                // Keyboard resize: Tab to the handle, then Up/Down arrows
+                .focusable()
+                .onMoveCommand { direction in
+                    switch direction {
+                    case .down: height = min(height + 40, maxHeight)
+                    case .up: height = max(40, height - 40)
+                    default: break
                     }
                 }
         }
@@ -965,12 +974,21 @@ struct ToolStepsView: View {
                     .accessibilityElement()
                     .accessibilityLabel("Steps list height")
                     .accessibilityValue("\(Int(effectiveHeight)) points")
-                    .accessibilityHint("Swipe up or down to resize")
+                    .accessibilityHint("Swipe up or down, or press the Up and Down arrow keys, to resize")
                     .accessibilityAdjustableAction { direction in
                         switch direction {
                         case .increment: listHeight = min(listHeight + 40, Self.maxHeight)
                         case .decrement: listHeight = max(listHeight - 40, Self.minHeight)
                         @unknown default: break
+                        }
+                    }
+                    // Keyboard resize: Tab to the handle, then Up/Down arrows
+                    .focusable()
+                    .onMoveCommand { direction in
+                        switch direction {
+                        case .down: listHeight = min(listHeight + 40, Self.maxHeight)
+                        case .up: listHeight = max(listHeight - 40, Self.minHeight)
+                        default: break
                         }
                     }
             }
