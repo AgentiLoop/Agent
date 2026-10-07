@@ -34,6 +34,9 @@ struct TokenBadge: View {
             .clipShape(Capsule())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Token usage today")
+        .accessibilityValue(accessibilityValueText)
+        .accessibilityHint("Shows token usage details")
         .popover(isPresented: $showDetail) {
             TokenDetailView(
                 taskIn: taskIn, taskOut: taskOut,
@@ -41,6 +44,15 @@ struct TokenBadge: View {
                 providerName: providerName, modelName: modelName
             )
         }
+    }
+
+    private var accessibilityValueText: String {
+        let total = TokenUsageStore.shared.todayInput + TokenUsageStore.shared.todayOutput
+        var text = "\(formatTokens(total)) tokens"
+        if budgetUsedFraction > 0 {
+            text += ", \(Int(budgetUsedFraction * 100))% of task budget used"
+        }
+        return text
     }
 
     private func formatTokens(_ count: Int) -> String {
@@ -69,6 +81,7 @@ private struct TokenDetailView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Token Usage")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
 
                 Text("Current session breakdown.")
                     .font(.caption)
@@ -131,9 +144,11 @@ private struct TokenDetailView: View {
                     Text("↑ \(fmt(store.todayInput))")
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(.blue)
+                        .accessibilityLabel("Sent \(fmt(store.todayInput))")
                     Text("↓ \(fmt(store.todayOutput))")
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(.green)
+                        .accessibilityLabel("Received \(fmt(store.todayOutput))")
                     Text("Total: \(fmt(store.todayInput + store.todayOutput))")
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(.secondary)
@@ -141,6 +156,7 @@ private struct TokenDetailView: View {
                         Text("⚡︎ Cache: \(fmt(store.todayCacheRead))")
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(.cyan)
+                            .accessibilityLabel("Cache \(fmt(store.todayCacheRead))")
                     }
                 }
             }
@@ -226,6 +242,9 @@ private struct TokenDetailView: View {
                         }
                     }
                     .chartLegend(.hidden)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Daily usage chart, last 7 days")
+                    .accessibilityValue(recent.map { "\(shortDate($0.date)): sent \(fmt($0.inputTokens)), received \(fmt($0.outputTokens)), cache \(fmt($0.cacheReadTokens))" }.joined(separator: "; "))
                     .frame(height: 120)
                     .padding(.horizontal)
                     .padding(.bottom, 8)
@@ -247,6 +266,7 @@ private struct TokenDetailView: View {
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 8)
+                    .accessibilityHidden(true)
                 }
             }
         }
@@ -263,6 +283,7 @@ private struct TokenDetailView: View {
             HStack { content() }
                 .padding(.vertical, 8)
                 .padding(.horizontal)
+                .accessibilityElement(children: .combine)
         }
     }
 
@@ -285,6 +306,8 @@ private struct TokenDetailView: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 50, alignment: .trailing)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(label == "↑" ? "Sent" : "Received") \(fmt(value))")
     }
 
     private func fmt(_ count: Int) -> String {
