@@ -10,6 +10,10 @@ struct AvatarPaneView: View {
     var body: some View {
         VStack(spacing: 0) {
             AvatarWebView(webView: avatar.webView)
+                .accessibilityElement()
+                .accessibilityLabel("Avatar")
+                .accessibilityValue(avatar.speaking ? "Speaking" : "")
+                .accessibilityAddTraits(.isImage)
             HStack(spacing: 8) {
                 Button {
                     if avatar.speaking {
@@ -22,6 +26,7 @@ struct AvatarPaneView: View {
                     Image(systemName: avatar.speaking ? "stop.fill" : "speaker.wave.2.fill")
                 }
                 .help(avatar.speaking ? "Stop Speaking" : "Speak Last Reply")
+                .accessibilityLabel(avatar.speaking ? "Stop Speaking" : "Speak Last Reply")
 
                 Button {
                     if avatar.speaking { avatar.stop() } // don't let the mic hear the avatar
@@ -31,12 +36,14 @@ struct AvatarPaneView: View {
                         .foregroundStyle(viewModel.isListening ? .red : .primary)
                 }
                 .help(viewModel.isListening ? "Stop Listening" : "Listen")
+                .accessibilityLabel(viewModel.isListening ? "Stop Listening" : "Listen")
 
                 Toggle(isOn: $avatar.muted) {
                     Image(systemName: avatar.muted ? "speaker.slash.fill" : "speaker.fill")
                 }
                 .toggleStyle(.button)
                 .help(avatar.muted ? "Unmute — speak replies aloud" : "Mute — facial expressions only, no voice")
+                .accessibilityLabel("Mute Avatar Voice")
 
                 Spacer()
                 Picker("Voice", selection: $avatar.voiceID) {
@@ -47,6 +54,7 @@ struct AvatarPaneView: View {
                 .labelsHidden()
                 .frame(minWidth: 70, maxWidth: 120)
                 .help("Avatar Voice")
+                .accessibilityLabel("Avatar Voice")
             }
             .padding(8)
         }

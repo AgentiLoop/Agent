@@ -9,6 +9,7 @@ struct MessagesView: View {
             // Header
             Text("Messages Monitor")
                 .font(.headline)
+                .accessibilityAddTraits(.isHeader)
 
             Text("Monitor iMessage for \"Agent!\" commands.")
                 .font(.caption)
@@ -21,6 +22,7 @@ struct MessagesView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .accessibilityLabel("Recipient Filter")
 
                 Spacer()
 
@@ -29,6 +31,7 @@ struct MessagesView: View {
                     .controlSize(.mini)
                     .tint(.blue)
                     .labelsHidden()
+                    .accessibilityLabel("Enable Messages Monitor")
             }
 
             Divider()
@@ -38,6 +41,7 @@ struct MessagesView: View {
                     Image(systemName: "message")
                         .font(.system(size: 32))
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                     Text("No recipients yet")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -58,11 +62,13 @@ struct MessagesView: View {
                         viewModel.enabledHandleIds.formUnion(filtered)
                     }
                     .buttonStyle(.bordered).controlSize(.mini)
+                    .accessibilityLabel("Enable All Recipients")
                     Button("None") {
                         let filtered = Set(viewModel.filteredRecipients.map(\.id))
                         viewModel.enabledHandleIds.subtract(filtered)
                     }
                     .buttonStyle(.bordered).controlSize(.mini)
+                    .accessibilityLabel("Disable All Recipients")
                     Button("Clear") {
                         viewModel.messageRecipients.removeAll()
                         viewModel.enabledHandleIds.removeAll()
@@ -71,6 +77,7 @@ struct MessagesView: View {
                         UserDefaults.standard.removeObject(forKey: "agentDiscoveredFromMe")
                     }
                     .buttonStyle(.bordered).controlSize(.mini)
+                    .accessibilityLabel("Clear Recipient List")
                 }
 
                 ScrollView {
@@ -99,9 +106,11 @@ struct MessagesView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.yellow)
+                        .accessibilityHidden(true)
                     Text("Full Disk Access required to read Messages.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .accessibilityLabel("Warning: Full Disk Access required to read Messages.")
                     Spacer()
                     Button("Open Settings") {
                         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!)
@@ -141,17 +150,21 @@ struct MessagesView: View {
             .toggleStyle(.switch)
             .controlSize(.mini)
             .tint(.blue)
+            .labelsHidden()
+            .accessibilityLabel("Act on commands from \(recipient.id), \(recipient.service)")
 
             Text(recipient.id)
                 .font(.subheadline)
                 .foregroundStyle(isEnabled ? .primary : .secondary)
                 .lineLimit(1)
+                .accessibilityHidden(true)
 
             Spacer()
 
             Text(recipient.service)
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
+                .accessibilityHidden(true)
         }
         .padding(.vertical, 4)
         .padding(.horizontal, 8)
