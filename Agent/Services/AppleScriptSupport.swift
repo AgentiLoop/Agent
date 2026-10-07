@@ -10,7 +10,8 @@ extension AppDelegate {
         "maxIterations", "maxRetries", "maxTokens", "tokenBudget", "temperature", "reasoningEffort",
         "autoVerify", "criticReview", "visualTests", "autoPR", "autoScaffold", "autoScreenshot", "forceVision",
         "messagesMonitor", "taskAutoComplete", "userAgentEnabled", "launchDaemonEnabled",
-        "toolGroups", "toolNames", "disabledToolGroups", "disabledTools"]
+        "toolGroups", "toolNames", "disabledToolGroups", "disabledTools",
+        "mcpServers", "enabledMCPServers", "connectedMCPServers", "mcpTools", "disabledMCPTools"]
 
     func application(_ sender: NSApplication, delegateHandlesKey key: String) -> Bool {
         Self.scriptingKeys.contains(key)
@@ -204,6 +205,59 @@ extension AppDelegate {
                 return ScriptingTab.scriptError("Unknown tool \(unknown.sorted().joined(separator: ", ")). See tool names.")
             }
             ToolPreferencesService.shared.setDisabledToolNames(names, for: vm.mainTabProvider)
+        }
+    }
+
+    // MARK: - MCP Servers window (same switches; servers are named as in the window, tools as server.tool)
+
+    @objc var mcpServers: [String] { MCPServerRegistry.shared.servers.map(\.name) }
+
+    /// Setting this switches servers on or off and connects or disconnects them, like the window's switches.
+    @objc var enabledMCPServers: [String] {
+        get { MCPServerRegistry.shared.servers.filter(\.enabled).map(\.name) }
+        set {
+            let registry = MCPServerRegistry.shared
+            let names = Set(newValue)
+            let unknown = names.subtracting(registry.servers.map(\.name))
+            guard unknown.isEmpty else {
+                return ScriptingTab.scriptError("Unknown MCP server \(unknown.sorted().joined(separator: ", ")). See mcp servers.")
+            }
+            let service = MCPService.shared
+            for server in registry.servers where server.enabled != names.contains(server.name) {
+                let enable = !server.enabled
+                registry.setEnabled(server.id, enable)
+                Task {
+                    guard enable else { return await service.disconnect(serverId: server.id) }
+                    // Connect with the updated (enabled) config, as the window does.
+                    guard let server = registry.servers.first(where: { $0.id == server.id }) else { return }
+                    do { try await service.connect(to: server) } catch {
+                        service.connectionErrors[server.id] = error.localizedDescription
+                    }
+                }
+            }
+        }
+    }
+
+    @objc var connectedMCPServers: [String] {
+        let connected = MCPService.shared.connectedServerIds
+        return MCPServerRegistry.shared.servers.filter { connected.contains($0.id) }.map(\.name)
+    }
+
+    @objc var mcpTools: [String] {
+        MCPService.shared.discoveredTools.map { MCPService.toolKey(serverName: $0.serverName, toolName: $0.name) }.sorted()
+    }
+
+    /// Names of tools on disconnected servers are kept as they are; new names must be tools of a connected server.
+    @objc var disabledMCPTools: [String] {
+        get { MCPService.shared.disabledTools.sorted() }
+        set {
+            let service = MCPService.shared
+            let names = Set(newValue)
+            let unknown = names.subtracting(mcpTools).subtracting(service.disabledTools)
+            guard unknown.isEmpty else {
+                return ScriptingTab.scriptError("Unknown MCP tool \(unknown.sorted().joined(separator: ", ")). See mcp tools.")
+            }
+            service.disabledTools = names
         }
     }
 

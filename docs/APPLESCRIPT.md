@@ -64,8 +64,13 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `tool names` | list of text | r | Every built-in tool name, as in the Tools window. |
 | `disabled tool groups` | list of text | rw | Groups switched off for every provider (the Tools window's group switches). Turning `User` or `Root` off or on also turns the Launch Agent or Launch Daemon off or on. |
 | `disabled tools` | list of text | rw | Tools switched off for the Main tab's provider (the Tools window's tool buttons). |
+| `mcp servers` | list of text | r | Every MCP server name, as in the MCP Servers window. |
+| `enabled mcp servers` | list of text | rw | MCP servers switched on (the MCP Servers window's switches). Switching one on connects it; switching it off disconnects it. Connecting takes a moment — check `connected mcp servers`. |
+| `connected mcp servers` | list of text | r | MCP servers connected right now. |
+| `mcp tools` | list of text | r | Every tool of the connected MCP servers, as `server.tool`. |
+| `disabled mcp tools` | list of text | rw | MCP tools switched off (the MCP Servers window's tool buttons), as `server.tool`. |
 
-Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", or a negative count) and unknown tool or group names give an error and change nothing.
+Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", or a negative count) and unknown tool, group or MCP server names give an error and change nothing.
 
 ```applescript
 tell application "Agent!"
@@ -219,6 +224,18 @@ tell application "Agent!"
     set disabled tools to saved & {"xcode", "git"}
     set disabled tool groups to {"Experimental", "Sub-agents"}
     {tool groups, disabled tools}
+end tell
+```
+
+**Switch MCP servers and their tools**
+```applescript
+tell application "Agent!"
+    set enabled mcp servers to {"xcode"}
+    repeat until connected mcp servers contains "xcode"
+        delay 1
+    end repeat
+    set disabled mcp tools to {"xcode.BuildProject"}
+    {mcp tools, disabled mcp tools}
 end tell
 ```
 

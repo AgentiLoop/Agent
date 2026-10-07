@@ -144,6 +144,31 @@
                 <type type="text" list="yes"/>
                 <cocoa key="disabledTools"/>
             </property>
+            <property name="mcp servers" code="AgX1" access="r"
+                      description="Every MCP server name, as in the MCP Servers window.">
+                <type type="text" list="yes"/>
+                <cocoa key="mcpServers"/>
+            </property>
+            <property name="enabled mcp servers" code="AgX2"
+                      description="MCP servers switched on (the MCP Servers window's switches). Switching one on connects it; switching it off disconnects it.">
+                <type type="text" list="yes"/>
+                <cocoa key="enabledMCPServers"/>
+            </property>
+            <property name="connected mcp servers" code="AgX3" access="r"
+                      description="MCP servers connected right now.">
+                <type type="text" list="yes"/>
+                <cocoa key="connectedMCPServers"/>
+            </property>
+            <property name="mcp tools" code="AgX4" access="r"
+                      description="Every tool of the connected MCP servers, as server.tool.">
+                <type type="text" list="yes"/>
+                <cocoa key="mcpTools"/>
+            </property>
+            <property name="disabled mcp tools" code="AgX5"
+                      description="MCP tools switched off (the MCP Servers window's tool buttons), as server.tool.">
+                <type type="text" list="yes"/>
+                <cocoa key="disabledMCPTools"/>
+            </property>
             <element type="tab" description="Tabs in tab-bar order. tab 1 is always the Main tab.">
                 <cocoa key="scriptingTabs"/>
             </element>
