@@ -159,6 +159,7 @@ struct ToolsView: View {
                             Image(systemName: "eye")
                                 .foregroundStyle(.blue)
                                 .font(.caption2)
+                                .accessibilityLabel("Vision")
                         }
                     }.tag(option.id)
                 }
@@ -199,23 +200,30 @@ struct GroupRowView: View {
         VStack(alignment: .leading, spacing: 4) {
             // Group header with collapse toggle and group toggle
             HStack(spacing: 6) {
-                // Collapse arrow
-                Image(systemName: (isCollapsed || !groupEnabled) ? "chevron.right" : "chevron.down")
-                    .font(.caption2)
-                    .foregroundColor(groupEnabled ? .secondary : offColor.opacity(0.5))
+                HStack(spacing: 6) {
+                    // Collapse arrow
+                    Image(systemName: (isCollapsed || !groupEnabled) ? "chevron.right" : "chevron.down")
+                        .font(.caption2)
+                        .foregroundColor(groupEnabled ? .secondary : offColor.opacity(0.5))
 
-                // Group icon and name
-                Image(systemName: icon)
-                    .font(.caption)
-                    .foregroundColor(groupEnabled ? (isServiceGroup ? .green : .primary) : offColor.opacity(0.6))
-                Text(groupName)
-                    .font(.caption).bold()
-                    .foregroundColor(groupEnabled ? .secondary : offColor.opacity(0.6))
+                    // Group icon and name
+                    Image(systemName: icon)
+                        .font(.caption)
+                        .foregroundColor(groupEnabled ? (isServiceGroup ? .green : .primary) : offColor.opacity(0.6))
+                    Text(groupName)
+                        .font(.caption).bold()
+                        .foregroundColor(groupEnabled ? .secondary : offColor.opacity(0.6))
 
-                // Tool count
-                Text("\(groupTools.count)")
-                    .font(.caption2)
-                    .foregroundColor(groupEnabled ? .gray : offColor.opacity(0.4))
+                    // Tool count
+                    Text("\(groupTools.count)")
+                        .font(.caption2)
+                        .foregroundColor(groupEnabled ? .gray : offColor.opacity(0.4))
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(groupName) group, \(groupTools.count) tools")
+                .accessibilityValue(groupEnabled ? (isCollapsed ? "Collapsed" : "Expanded") : "Disabled")
+                .accessibilityAddTraits(.isButton)
+                .accessibilityAction { if groupEnabled { toggleCollapse() } }
 
                 Spacer()
 
@@ -230,6 +238,7 @@ struct GroupRowView: View {
                 .toggleStyle(.switch)
                 .controlSize(.mini)
                 .labelsHidden()
+                .accessibilityLabel("Enable \(groupName) group")
             }
             .padding(.leading, 4)
             .padding(.top, 8)
@@ -257,6 +266,8 @@ struct GroupRowView: View {
                         }
                         .buttonStyle(.plain)
                         .help(tool.description.components(separatedBy: ". ").first ?? tool.description)
+                        .accessibilityValue(enabled ? "Enabled" : "Disabled")
+                        .accessibilityHint("Toggles this tool")
                     }
                 }
             }
