@@ -168,4 +168,21 @@ final class ToolPreferencesService {
         disabledTools = disabledTools.filter { !$0.hasPrefix("\(provider.rawValue).") }
     }
 
+    /// Globally disabled group names (AppleScript `disabled tool groups`).
+    var disabledGroupNames: Set<String> {
+        get { disabledGroups }
+        set { disabledGroups = newValue }
+    }
+
+    /// Tools switched off for one provider (AppleScript `disabled tools`).
+    func disabledToolNames(for provider: APIProvider) -> Set<String> {
+        let prefix = "\(provider.rawValue)."
+        return Set(disabledTools.filter { $0.hasPrefix(prefix) }.map { String($0.dropFirst(prefix.count)) })
+    }
+
+    func setDisabledToolNames(_ names: Set<String>, for provider: APIProvider) {
+        disabledTools = disabledTools.filter { !$0.hasPrefix("\(provider.rawValue).") }
+            .union(names.map { toolKey(provider, $0) })
+    }
+
 }

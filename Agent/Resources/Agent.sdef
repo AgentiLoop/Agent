@@ -124,6 +124,26 @@
                       description="Whether the root Launch Daemon is enabled. Setting false shuts it down.">
                 <cocoa key="launchDaemonEnabled"/>
             </property>
+            <property name="tool groups" code="AgG1" access="r"
+                      description="Every tool group name, as in the Tools window.">
+                <type type="text" list="yes"/>
+                <cocoa key="toolGroups"/>
+            </property>
+            <property name="tool names" code="AgG2" access="r"
+                      description="Every built-in tool name, as in the Tools window.">
+                <type type="text" list="yes"/>
+                <cocoa key="toolNames"/>
+            </property>
+            <property name="disabled tool groups" code="AgG3"
+                      description="Tool groups switched off for every provider (the Tools window's group switches). Turning User or Root off or on also turns the Launch Agent or Launch Daemon off or on.">
+                <type type="text" list="yes"/>
+                <cocoa key="disabledToolGroups"/>
+            </property>
+            <property name="disabled tools" code="AgG4"
+                      description="Tools switched off for the Main tab's provider (the Tools window's tool buttons).">
+                <type type="text" list="yes"/>
+                <cocoa key="disabledTools"/>
+            </property>
             <element type="tab" description="Tabs in tab-bar order. tab 1 is always the Main tab.">
                 <cocoa key="scriptingTabs"/>
             </element>

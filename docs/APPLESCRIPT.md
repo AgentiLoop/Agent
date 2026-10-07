@@ -60,8 +60,12 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `task auto complete` | boolean | rw | Show prompt-history suggestions while typing in the task field. |
 | `user agent enabled` | boolean | rw | Whether the user Launch Agent is enabled. Setting false shuts it down. |
 | `launch daemon enabled` | boolean | rw | Whether the root Launch Daemon is enabled. Setting false shuts it down. |
+| `tool groups` | list of text | r | Every tool group name, as in the Tools window. |
+| `tool names` | list of text | r | Every built-in tool name, as in the Tools window. |
+| `disabled tool groups` | list of text | rw | Groups switched off for every provider (the Tools window's group switches). Turning `User` or `Root` off or on also turns the Launch Agent or Launch Daemon off or on. |
+| `disabled tools` | list of text | rw | Tools switched off for the Main tab's provider (the Tools window's tool buttons). |
 
-Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", or a negative count) give an error and change nothing.
+Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", or a negative count) and unknown tool or group names give an error and change nothing.
 
 ```applescript
 tell application "Agent!"
@@ -207,6 +211,17 @@ tell application "Agent!"
     call tool "git" with input "{\"action\":\"status\"}"
 end tell
 ```
+
+**Turn tools off and back on**
+```applescript
+tell application "Agent!"
+    set saved to disabled tools
+    set disabled tools to saved & {"xcode", "git"}
+    set disabled tool groups to {"Experimental", "Sub-agents"}
+    {tool groups, disabled tools}
+end tell
+```
+
 **Auto-pilot for two hours, then check on it**
 
 ```applescript

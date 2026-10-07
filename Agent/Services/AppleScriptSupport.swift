@@ -1,4 +1,5 @@
 import AppKit
+import AgentTools
 
 /// AppleScript (Cocoa Scripting) support. Terminology is in Resources/Agent.sdef,
 /// enabled by NSAppleScriptEnabled + OSAScriptingDefinition in Info.plist.
@@ -8,7 +9,8 @@ extension AppDelegate {
     private static let scriptingKeys: Set<String> = ["taskRunning", "activityLog", "lastResult", "lastError", "promptHistory", "taskHistory", "errorHistory", "projectFolder", "taskInput", "providerName", "modelName", "scriptingTabs",
         "maxIterations", "maxRetries", "maxTokens", "tokenBudget", "temperature", "reasoningEffort",
         "autoVerify", "criticReview", "visualTests", "autoPR", "autoScaffold", "autoScreenshot", "forceVision",
-        "messagesMonitor", "taskAutoComplete", "userAgentEnabled", "launchDaemonEnabled"]
+        "messagesMonitor", "taskAutoComplete", "userAgentEnabled", "launchDaemonEnabled",
+        "toolGroups", "toolNames", "disabledToolGroups", "disabledTools"]
 
     func application(_ sender: NSApplication, delegateHandlesKey key: String) -> Bool {
         Self.scriptingKeys.contains(key)
@@ -162,6 +164,47 @@ extension AppDelegate {
     @objc var launchDaemonEnabled: Bool {
         get { setting(\.rootEnabled, true) }
         set { setSetting(\.rootEnabled, newValue) }
+    }
+
+    // MARK: - Tools window (same toggles as Tools; groups are global, tools are per Main-tab provider)
+
+    @objc var toolGroups: [String] { ToolPreferencesService.allGroupNames }
+
+    @objc var toolNames: [String] { AgentTools.tools().map(\.name).sorted() }
+
+    /// Setting this also syncs the User/Root groups with the Launch Agent/Daemon, like the Tools window's switches.
+    @objc var disabledToolGroups: [String] {
+        get { ToolPreferencesService.shared.disabledGroupNames.sorted() }
+        set {
+            let names = Set(newValue)
+            let unknown = names.subtracting(ToolPreferencesService.allGroupNames)
+            guard unknown.isEmpty else {
+                return ScriptingTab.scriptError("Unknown tool group \(unknown.sorted().joined(separator: ", ")). See tool groups.")
+            }
+            let prefs = ToolPreferencesService.shared
+            let old = prefs.disabledGroupNames
+            prefs.disabledGroupNames = names
+            for (group, keyPath) in [(Tool.Group.user, \AgentViewModel.userEnabled), (Tool.Group.root, \AgentViewModel.rootEnabled)]
+                where old.contains(group) != names.contains(group) {
+                setSetting(keyPath, !names.contains(group))
+            }
+        }
+    }
+
+    @objc var disabledTools: [String] {
+        get {
+            guard let vm = AgentViewModel.current else { return [] }
+            return ToolPreferencesService.shared.disabledToolNames(for: vm.mainTabProvider).sorted()
+        }
+        set {
+            guard let vm = AgentViewModel.current else { return }
+            let names = Set(newValue)
+            let unknown = names.subtracting(AgentTools.tools().map(\.name))
+            guard unknown.isEmpty else {
+                return ScriptingTab.scriptError("Unknown tool \(unknown.sorted().joined(separator: ", ")). See tool names.")
+            }
+            ToolPreferencesService.shared.setDisabledToolNames(names, for: vm.mainTabProvider)
+        }
     }
 
     // MARK: - tab elements (Main tab first, then every other tab in tab-bar order)
