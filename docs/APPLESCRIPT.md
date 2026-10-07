@@ -72,6 +72,12 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `output lines` | integer | rw | Settings > Agent Options: tool output lines kept before truncating — 10, 50, 75, 100, 150, 200, 250, 500, 750, 1000 or 1500. |
 | `read file preview lines` | integer | rw | Settings > Agent Options: lines shown when a file is read — 3, 10, 50, 100, 250, 500, 750 or 1000. |
 | `capture script stderr` | boolean | rw | Settings > Agent Options: AgentScript runs capture stderr. |
+| `exa api key` | text | w | LLM Common Settings > Web Search: Exa API key. Write-only, so scripts can't read the secret; empty clears it. |
+| `tavily api key` | text | w | LLM Common Settings > Web Search: Tavily API key. Write-only; empty clears it. DuckDuckGo is used when neither key is set. |
+| `jev api key` | text | w | LLM Common Settings > Jev (TypeSafe): API key. Write-only; empty clears it. |
+| `jev model` | text | rw | LLM Common Settings > Jev: model name; empty raises -10000. |
+| `jev advisory` | boolean | rw | LLM Common Settings: Consult Jev before tools. Turning it on without a `jev api key` raises -10000. |
+| `jev reject percent` | integer | rw | LLM Common Settings: Jev blocks a command it rates at least this % destructive — 0 to 100 in steps of 10, else -10000. |
 | `apple ai mediator` | boolean | rw | Apple Intelligence popover: Enable Mediator, the master switch for on-device Apple AI. |
 | `apple ai triage` | boolean | rw | Apple Intelligence popover: answer greetings on-device before the cloud LLM. |
 | `apple ai annotations` | boolean | rw | Apple Intelligence popover: show task summaries and error explanations in the activity log. |

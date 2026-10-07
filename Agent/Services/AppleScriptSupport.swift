@@ -15,6 +15,7 @@ extension AppDelegate {
         "llmOutput", "inputTokens", "outputTokens", "sessionInputTokens", "sessionOutputTokens",
         "accessibilityAutomation", "showHUD", "smoothStreaming", "terminalSpeed", "scanLines", "hudLogBelow",
         "activityLogTextSize", "shellTimeout", "networkRetryDelay", "outputLines", "readFilePreviewLines", "captureScriptStderr",
+        "exaAPIKey", "tavilyAPIKey", "jevAPIKey", "jevModel", "jevAdvisory", "jevRejectPercent",
         "appleAIMediator", "appleAITriage", "appleAIAnnotations", "appleAITokenCompression",
         "fallbackEnabled", "fallbackChain", "disabledFallbackEntries", "activeFallback",
         "systemPrompt", "compactSystemPrompt"]
@@ -273,6 +274,54 @@ extension AppDelegate {
     @objc var captureScriptStderr: Bool {
         get { setting(\.scriptCaptureStderr, false) }
         set { setSetting(\.scriptCaptureStderr, newValue) }
+    }
+
+    // MARK: - LLM Common Settings (web search keys, Jev). Keys are write-only so scripts can't read secrets.
+
+    @objc var exaAPIKey: String {
+        get { "" }
+        set { setSetting(\.exaAPIKey, newValue.trimmingCharacters(in: .whitespacesAndNewlines)) }
+    }
+
+    @objc var tavilyAPIKey: String {
+        get { "" }
+        set { setSetting(\.tavilyAPIKey, newValue.trimmingCharacters(in: .whitespacesAndNewlines)) }
+    }
+
+    @objc var jevAPIKey: String {
+        get { "" }
+        set { setSetting(\.jevAPIKey, newValue.trimmingCharacters(in: .whitespacesAndNewlines)) }
+    }
+
+    @objc var jevModel: String {
+        get { setting(\.jevModel, JevConfiguration.defaultModel) }
+        set {
+            let model = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !model.isEmpty else { return ScriptingTab.scriptError("Jev model can't be empty.") }
+            setSetting(\.jevModel, model)
+        }
+    }
+
+    /// "Consult Jev before tools" — the switch is disabled in the window until a Jev key is set.
+    @objc var jevAdvisory: Bool {
+        get { setting(\.jevAdvisoryEnabled, false) }
+        set {
+            guard !newValue || !setting(\.jevAPIKey, "").isEmpty else {
+                return ScriptingTab.scriptError("Set a jev api key before turning on jev advisory.")
+            }
+            setSetting(\.jevAdvisoryEnabled, newValue)
+        }
+    }
+
+    /// "Reject at N% destructive" slider: 0 to 100 in steps of 10.
+    @objc var jevRejectPercent: Int {
+        get { Int(setting(\.jevBlockPercent, JevConfiguration.blockThreshold * 100)) }
+        set {
+            guard (0...100).contains(newValue), newValue % 10 == 0 else {
+                return ScriptingTab.scriptError("Jev reject percent must be 0 to 100 in steps of 10.")
+            }
+            setSetting(\.jevBlockPercent, Double(newValue))
+        }
     }
 
     // MARK: - Apple Intelligence popover (on-device mediator switches)

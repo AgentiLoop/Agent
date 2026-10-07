@@ -173,6 +173,30 @@
                       description="Settings &gt; Agent Options: AgentScript runs capture stderr.">
                 <cocoa key="captureScriptStderr"/>
             </property>
+            <property name="exa api key" code="AgJ1" type="text" access="w"
+                      description="LLM Common Settings &gt; Web Search: Exa API key (write-only; empty clears it).">
+                <cocoa key="exaAPIKey"/>
+            </property>
+            <property name="tavily api key" code="AgJ2" type="text" access="w"
+                      description="LLM Common Settings &gt; Web Search: Tavily API key (write-only; empty clears it). DuckDuckGo is used when neither key is set.">
+                <cocoa key="tavilyAPIKey"/>
+            </property>
+            <property name="jev api key" code="AgJ3" type="text" access="w"
+                      description="LLM Common Settings &gt; Jev (TypeSafe): API key (write-only; empty clears it).">
+                <cocoa key="jevAPIKey"/>
+            </property>
+            <property name="jev model" code="AgJ4" type="text"
+                      description="LLM Common Settings &gt; Jev (TypeSafe): model name. Empty raises an error.">
+                <cocoa key="jevModel"/>
+            </property>
+            <property name="jev advisory" code="AgJ5" type="boolean"
+                      description="LLM Common Settings: Consult Jev before tools. Turning it on needs a jev api key.">
+                <cocoa key="jevAdvisory"/>
+            </property>
+            <property name="jev reject percent" code="AgJ6" type="integer"
+                      description="LLM Common Settings: Jev blocks a command it rates at least this % destructive — 0 to 100 in steps of 10.">
+                <cocoa key="jevRejectPercent"/>
+            </property>
             <property name="apple ai mediator" code="AgZ1" type="boolean"
                       description="Apple Intelligence popover: Enable Mediator (master switch for on-device Apple AI).">
                 <cocoa key="appleAIMediator"/>
