@@ -169,6 +169,26 @@
                 <type type="text" list="yes"/>
                 <cocoa key="disabledMCPTools"/>
             </property>
+            <property name="llm output" code="AgLO" type="text" access="r"
+                      description="Text of the Main tab's LLM Output pane (the LLM's latest response).">
+                <cocoa key="llmOutput"/>
+            </property>
+            <property name="input tokens" code="AgKI" type="integer" access="r"
+                      description="Input tokens of the Main tab's current or last task.">
+                <cocoa key="inputTokens"/>
+            </property>
+            <property name="output tokens" code="AgKO" type="integer" access="r"
+                      description="Output tokens of the Main tab's current or last task.">
+                <cocoa key="outputTokens"/>
+            </property>
+            <property name="session input tokens" code="AgKi" type="integer" access="r"
+                      description="Input tokens used since Agent! launched (or since clear tokens).">
+                <cocoa key="sessionInputTokens"/>
+            </property>
+            <property name="session output tokens" code="AgKo" type="integer" access="r"
+                      description="Output tokens used since Agent! launched (or since clear tokens).">
+                <cocoa key="sessionOutputTokens"/>
+            </property>
             <element type="tab" description="Tabs in tab-bar order. tab 1 is always the Main tab.">
                 <cocoa key="scriptingTabs"/>
             </element>
@@ -253,6 +273,24 @@
                 <type type="text" list="yes"/>
                 <cocoa key="queuedTasks"/>
             </property>
+            <property name="llm output" code="AgLO" type="text" access="r"
+                      description="Text of the tab's LLM Output pane (the LLM's latest response).">
+                <cocoa key="llmOutput"/>
+            </property>
+            <property name="input tokens" code="AgKI" type="integer" access="r"
+                      description="Input tokens of the tab's current or last task (Main), or of the tab since its log was last cleared.">
+                <cocoa key="inputTokens"/>
+            </property>
+            <property name="output tokens" code="AgKO" type="integer" access="r"
+                      description="Output tokens, counted like input tokens.">
+                <cocoa key="outputTokens"/>
+            </property>
+            <responds-to command="clear llm output">
+                <cocoa method="handleClearLLMOutputScriptCommand:"/>
+            </responds-to>
+            <responds-to command="clear tokens">
+                <cocoa method="handleClearTokensScriptCommand:"/>
+            </responds-to>
             <responds-to command="close">
                 <cocoa method="handleCloseScriptCommand:"/>
             </responds-to>
@@ -335,6 +373,24 @@
             <direct-parameter type="tab" optional="yes" description="Tab to clear, e.g. clear log tab 2 (default: the Main tab)."/>
             <parameter name="in tab" code="AgTt" type="tab" optional="yes"
                        description="Tab to clear (default: the Main tab).">
+                <cocoa key="tab"/>
+            </parameter>
+        </command>
+
+        <command name="clear llm output" code="AgntClrO" description="Clear a tab's LLM Output pane (Shortcuts &gt; Clear LLM Output).">
+            <cocoa class="AgentClearLLMOutputCommand"/>
+            <direct-parameter type="tab" optional="yes" description="Tab to clear, e.g. clear llm output tab 2 (default: the Main tab)."/>
+            <parameter name="in tab" code="AgTt" type="tab" optional="yes"
+                       description="Tab to clear (default: the Main tab).">
+                <cocoa key="tab"/>
+            </parameter>
+        </command>
+
+        <command name="clear tokens" code="AgntClrK" description="Reset token counts (Shortcuts &gt; Clear Tokens). For the Main tab this resets the task and session counts.">
+            <cocoa class="AgentClearTokensCommand"/>
+            <direct-parameter type="tab" optional="yes" description="Tab to reset, e.g. clear tokens tab 2 (default: the Main tab)."/>
+            <parameter name="in tab" code="AgTt" type="tab" optional="yes"
+                       description="Tab to reset (default: the Main tab).">
                 <cocoa key="tab"/>
             </parameter>
         </command>

@@ -69,6 +69,9 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `connected mcp servers` | list of text | r | MCP servers connected right now. |
 | `mcp tools` | list of text | r | Every tool of the connected MCP servers, as `server.tool`. |
 | `disabled mcp tools` | list of text | rw | MCP tools switched off (the MCP Servers window's tool buttons), as `server.tool`. |
+| `llm output` | text | r | Text of the Main tab's LLM Output pane (the LLM's latest response). |
+| `input tokens` / `output tokens` | integer | r | Tokens of the Main tab's current or last task. |
+| `session input tokens` / `session output tokens` | integer | r | Tokens used since Agent! launched (or since `clear tokens`). |
 
 Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", or a negative count) and unknown tool, group or MCP server names give an error and change nothing.
 
@@ -107,8 +110,10 @@ end tell
 | `auto pilot goal` | text | r | The session goal (empty when none). |
 | `auto pilot cycle` | integer | r | Current cycle number (0 when no session). |
 | `auto pilot status` | text | r | One-line status: cycle, elapsed, time left, branch, goal. |
+| `llm output` | text | r | Text of the tab's LLM Output pane. |
+| `input tokens` / `output tokens` | integer | r | The tab's token counts (Main: current or last task; other tabs: since the tab's log was last cleared). |
 
-Tabs respond to `close`, `select`, `clear log`, `stop task`, `clear queue` and `stop auto pilot`. Use `clear history … in tab t` for a tab's history.
+Tabs respond to `close`, `select`, `clear log`, `clear llm output`, `clear tokens`, `stop task`, `clear queue` and `stop auto pilot`. Use `clear history … in tab t` for a tab's history.
 
 ```applescript
 tell application "Agent!"
@@ -157,6 +162,14 @@ Stops the running task.
 ### `clear log`
 `clear log [t]` or `clear log [in tab t]`
 Clears the tab's activity log.
+
+### `clear llm output`
+`clear llm output [t]` or `clear llm output [in tab t]`
+Clears the tab's LLM Output pane, like Shortcuts > Clear LLM Output.
+
+### `clear tokens`
+`clear tokens [t]` or `clear tokens [in tab t]`
+Resets token counts, like Shortcuts > Clear Tokens. For the Main tab it resets the task and session counts; for another tab, that tab's counts.
 
 ### `start auto pilot`
 `start auto pilot ["goal"] [hours N] [isolated bool] [in tab t]` → boolean

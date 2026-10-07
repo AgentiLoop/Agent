@@ -11,7 +11,8 @@ extension AppDelegate {
         "autoVerify", "criticReview", "visualTests", "autoPR", "autoScaffold", "autoScreenshot", "forceVision",
         "messagesMonitor", "taskAutoComplete", "userAgentEnabled", "launchDaemonEnabled",
         "toolGroups", "toolNames", "disabledToolGroups", "disabledTools",
-        "mcpServers", "enabledMCPServers", "connectedMCPServers", "mcpTools", "disabledMCPTools"]
+        "mcpServers", "enabledMCPServers", "connectedMCPServers", "mcpTools", "disabledMCPTools",
+        "llmOutput", "inputTokens", "outputTokens", "sessionInputTokens", "sessionOutputTokens"]
 
     func application(_ sender: NSApplication, delegateHandlesKey key: String) -> Bool {
         Self.scriptingKeys.contains(key)
@@ -30,6 +31,16 @@ extension AppDelegate {
     @objc var taskHistory: [String] { ScriptingTab(tabId: nil).taskHistory }
 
     @objc var errorHistory: [String] { ScriptingTab(tabId: nil).errorHistory }
+
+    @objc var llmOutput: String { ScriptingTab(tabId: nil).llmOutput }
+
+    @objc var inputTokens: Int { ScriptingTab(tabId: nil).inputTokens }
+
+    @objc var outputTokens: Int { ScriptingTab(tabId: nil).outputTokens }
+
+    @objc var sessionInputTokens: Int { AgentViewModel.current?.sessionInputTokens ?? 0 }
+
+    @objc var sessionOutputTokens: Int { AgentViewModel.current?.sessionOutputTokens ?? 0 }
 
     @objc var projectFolder: String {
         get { AgentViewModel.current?.projectFolder ?? "" }
@@ -501,6 +512,65 @@ final class ScriptingTab: NSObject {
         }
     }
 
+    // MARK: LLM output and tokens (the LLM Output pane and the header's token counts)
+
+    @objc var llmOutput: String {
+        guard tabId != nil else { return vm?.rawLLMOutput ?? "" }
+        return tab?.rawLLMOutput ?? ""
+    }
+
+    /// Input tokens of the current/last task (Main), or of the tab.
+    @objc var inputTokens: Int {
+        guard tabId != nil else { return vm?.taskInputTokens ?? 0 }
+        return tab?.tabInputTokens ?? 0
+    }
+
+    @objc var outputTokens: Int {
+        guard tabId != nil else { return vm?.taskOutputTokens ?? 0 }
+        return tab?.tabOutputTokens ?? 0
+    }
+
+    /// Clears the LLM Output pane, like Shortcuts > Clear LLM Output. Returns an error message, or nil.
+    func clearLLMOutput() -> String? {
+        guard let vm else { return "Agent! is not ready." }
+        if tabId == nil { vm.rawLLMOutput = ""; return nil }
+        guard let tab else { return "That tab no longer exists." }
+        tab.rawLLMOutput = ""
+        return nil
+    }
+
+    /// Resets token counts, like Shortcuts > Clear Tokens (Main: task and session counts). Returns an error message, or nil.
+    func clearTokens() -> String? {
+        guard let vm else { return "Agent! is not ready." }
+        if tabId == nil {
+            vm.taskInputTokens = 0; vm.taskOutputTokens = 0
+            vm.sessionInputTokens = 0; vm.sessionOutputTokens = 0
+            return nil
+        }
+        guard let tab else { return "That tab no longer exists." }
+        tab.tabInputTokens = 0; tab.tabOutputTokens = 0
+        return nil
+    }
+
+    /// `clear llm output tab 2`.
+    @objc func handleClearLLMOutputScriptCommand(_ command: NSScriptCommand) -> Any? {
+        Self.report(clearLLMOutput(), command)
+    }
+
+    /// `clear tokens tab 2`.
+    @objc func handleClearTokensScriptCommand(_ command: NSScriptCommand) -> Any? {
+        Self.report(clearTokens(), command)
+    }
+
+    /// Turns an error message into a script error; returns nil (no result).
+    nonisolated static func report(_ error: String?, _ command: NSScriptCommand) -> Any? {
+        if let error {
+            command.scriptErrorNumber = -10000
+            command.scriptErrorString = error
+        }
+        return nil
+    }
+
     /// Clears this tab's activity log. Returns an error message, or nil when cleared.
     func clearLog() -> String? {
         guard let vm else { return "Agent! is not ready." }
@@ -799,6 +869,24 @@ final class AgentStopAutoPilotCommand: NSScriptCommand {
             scriptErrorString = error
         }
         return nil
+    }
+}
+
+/// `clear llm output [in tab tab 2]` — Main tab unless a tab is given.
+@objc(AgentClearLLMOutputCommand)
+final class AgentClearLLMOutputCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        let target = scriptingTarget(self)
+        return ScriptingTab.report(MainActor.assumeIsolated { target.clearLLMOutput() }, self)
+    }
+}
+
+/// `clear tokens [in tab tab 2]` — Main tab unless a tab is given.
+@objc(AgentClearTokensCommand)
+final class AgentClearTokensCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        let target = scriptingTarget(self)
+        return ScriptingTab.report(MainActor.assumeIsolated { target.clearTokens() }, self)
     }
 }
 
