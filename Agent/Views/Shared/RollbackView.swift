@@ -7,6 +7,10 @@ struct RollbackView: View {
     @State private var restoreResult: String?
     @State private var showClearConfirmation = false
     @State private var expandedFile: String?
+    @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
 
     private var tabID: UUID {
         viewModel.selectedTabId ?? AgentViewModel.mainTabID
@@ -30,19 +34,20 @@ struct RollbackView: View {
             HStack {
                 Text("File Backups")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
                 Spacer()
                 Text(
                     "\(groupedBackups.count) file\(groupedBackups.count == 1 ? "" : "s"), "
                         + "\(totalVersions) version\(totalVersions == 1 ? "" : "s")"
                 )
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(captionStyle)
             }
 
             if backups.isEmpty {
                 Text("No backups yet. Files are backed up automatically before edits.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
                     .padding(.vertical, 20)
             } else {
                 ScrollView {
@@ -51,25 +56,25 @@ struct RollbackView: View {
                             // File header row — Restore sits beside (not inside) the expand button so VoiceOver can reach it
                             HStack {
                                 Button {
-                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.15)) {
                                         expandedFile = expandedFile == group.name ? nil : group.name
                                     }
                                 } label: {
                                     HStack {
                                         Image(systemName: expandedFile == group.name ? "chevron.down" : "chevron.right")
                                             .font(.caption2)
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(captionStyle)
                                             .frame(width: 12)
                                         Text(group.name)
                                             .font(.caption.monospaced().bold())
                                             .lineLimit(1)
                                         Text("(\(group.versions.count))")
                                             .font(.caption2)
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(captionStyle)
                                         Spacer()
                                         Text(formatDate(group.versions.first?.date ?? Date()))
                                             .font(.caption2)
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(captionStyle)
                                     }
                                     .contentShape(Rectangle())
                                 }
@@ -97,7 +102,7 @@ struct RollbackView: View {
                                     HStack {
                                         Text(formatTimestamp(version.date))
                                             .font(.caption2.monospaced())
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(captionStyle)
                                             .padding(.leading, 20)
                                         Spacer()
                                         Button("Restore") {
