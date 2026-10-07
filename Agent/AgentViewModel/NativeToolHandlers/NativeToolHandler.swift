@@ -108,7 +108,8 @@ extension AgentViewModel {
         requestedTitle: String,
         appBundleId: String,
         text: String,
-        verify: Bool
+        verify: Bool,
+        submit: Bool = false
     ) -> String? {
         let roles = role.map { [$0] } ?? ["AXTextField", "AXTextArea", "AXSearchField", "AXComboBox"]
         for r in roles {
@@ -122,7 +123,7 @@ extension AgentViewModel {
                 continue
             }
             let retry = ax.typeTextIntoElement(role: r, title: bestTitle, text: text,
-                                               appBundleId: appBundleId, verify: verify)
+                                               appBundleId: appBundleId, verify: verify, submit: submit)
             if axResultIsNotFound(retry) { continue }
             let escReq = requestedTitle.replacingOccurrences(of: "\"", with: "\\\"")
             let escMatch = bestTitle.replacingOccurrences(of: "\"", with: "\\\"")
@@ -245,16 +246,17 @@ extension AgentViewModel {
             // current focus" path — find the text field by role/title first.
             let text = input["text"] as? String ?? ""
             let verify = input["verify"] as? Bool ?? true
+            let submit = input["submit"] as? Bool ?? false
             let first = ax.typeTextIntoElement(
                 role: role, title: title,
                 text: text,
                 appBundleId: app,
-                verify: verify)
+                verify: verify, submit: submit)
             if Self.axResultIsNotFound(first), let requested = title, let app = app {
                 if let rescued = Self.rescueType(ax: ax, role: role,
                                                  requestedTitle: requested,
                                                  appBundleId: app, text: text,
-                                                 verify: verify) {
+                                                 verify: verify, submit: submit) {
                     return rescued
                 }
             }

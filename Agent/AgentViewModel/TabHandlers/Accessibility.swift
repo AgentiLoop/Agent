@@ -130,13 +130,15 @@ extension AgentViewModel {
                 title: title,
                 text: text,
                 appBundleId: appBundleId,
-                verify: input["verify"] as? Bool ?? true
+                verify: input["verify"] as? Bool ?? true,
+                submit: input["submit"] as? Bool ?? false
             )
             // Fuzzy rescue parity with the native path.
             if Self.axResultIsNotFound(output), let requested = title, let app = appBundleId,
                let rescued = Self.rescueType(ax: AccessibilityService.shared, role: role,
                                              requestedTitle: requested, appBundleId: app, text: text,
-                                             verify: input["verify"] as? Bool ?? true) {
+                                             verify: input["verify"] as? Bool ?? true,
+                                             submit: input["submit"] as? Bool ?? false) {
                 output = rescued
             }
             tab.appendLog(output)
@@ -426,18 +428,19 @@ extension AgentViewModel {
             let text = input["text"] as? String ?? ""
             let appBundleId = input["appBundleId"] as? String
             let verify = input["verify"] as? Bool ?? true
+            let submit = input["submit"] as? Bool ?? false
             tab.appendLog("⌨️ \(text.count) chars into element...")
             tab.flush()
             var output = await MainActor.run {
                 AccessibilityService.shared.typeTextIntoElement(
-                    role: role, title: title, text: text, appBundleId: appBundleId, verify: verify
+                    role: role, title: title, text: text, appBundleId: appBundleId, verify: verify, submit: submit
                 )
             }
             // Fuzzy rescue parity with the native path.
             if Self.axResultIsNotFound(output), let requested = title, let app = appBundleId {
                 let rescued = await MainActor.run {
                     Self.rescueType(ax: AccessibilityService.shared, role: role,
-                                    requestedTitle: requested, appBundleId: app, text: text, verify: verify)
+                                    requestedTitle: requested, appBundleId: app, text: text, verify: verify, submit: submit)
                 }
                 if let rescued { output = rescued }
             }

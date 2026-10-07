@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentAccess.git",
       "state" : {
-        "revision" : "8d240bde2880de2a61ffedbde85c504ffe8edf4c",
-        "version" : "2.10.39"
+        "revision" : "e0997427a9e46f80956fa8da66b29fc152a62be7",
+        "version" : "2.10.40"
       }
     },
     {
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AgentTools.git",
       "state" : {
-        "revision" : "0ebac77c1d764378cb7dccb615683bfc7116246f",
-        "version" : "2.53.32"
+        "revision" : "9a7fb4199e687ce4c114ee3b0a96b906d453c97f",
+        "version" : "2.53.33"
       }
     },
     {
