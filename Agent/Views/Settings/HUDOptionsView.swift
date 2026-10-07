@@ -9,6 +9,7 @@ struct HUDOptionsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("HUD")
                 .font(.headline)
+                .accessibilityAddTraits(.isHeader)
             Text("Heads-Up Display for LLM Output. Press ⌘B to show/hide during a task.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -23,6 +24,7 @@ struct HUDOptionsView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .tint(.green)
+                    .accessibilityLabel("Show HUD")
             }
 
             HStack {
@@ -32,12 +34,14 @@ struct HUDOptionsView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .tint(.green)
+                    .accessibilityLabel("Smooth Streaming")
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("Terminal Speed")
                     .font(.caption)
                     .foregroundStyle(.green)
+                    .accessibilityHidden(true)
                 Picker("", selection: $viewModel.terminalSpeed) {
                     ForEach(AgentViewModel.TerminalSpeed.allCases, id: \.self) { speed in
                         Text(speed.label).tag(speed)
@@ -48,6 +52,7 @@ struct HUDOptionsView: View {
                 .labelsHidden()
                 .frame(maxWidth: .infinity)
                 .tint(.green)
+                .accessibilityLabel("Terminal Speed")
             }
 
             HStack {
@@ -57,6 +62,7 @@ struct HUDOptionsView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .tint(.green)
+                    .accessibilityLabel("Scan Lines")
             }
 
             HStack {
@@ -66,6 +72,7 @@ struct HUDOptionsView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .tint(.green)
+                    .accessibilityLabel("Activity Log Below HUD")
             }
         }
         .padding(16)
