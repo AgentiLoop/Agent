@@ -198,23 +198,23 @@ struct ThinkingIndicatorView: View {
                         if isScriptOnly {
                             HStack(spacing: 3) {
                                 Image(systemName: "play.fill").font(.caption).foregroundStyle(.green)
-                                ShimmerText("Running\(dots)", color: .green)
+                                ShimmerText("Running\(dots)", color: .readableGreen)
                             }
                         } else if isExecuting {
                             if viewModel.rootServiceActive {
                                 HStack(spacing: 3) {
                                     Image(systemName: "lock.shield").font(.caption).foregroundStyle(.red)
-                                    ShimmerText("Root\(dots)", color: .red)
+                                    ShimmerText("Root\(dots)", color: .readableRed)
                                 }
                             } else if viewModel.userServiceActive {
                                 HStack(spacing: 3) {
                                     Image(systemName: "terminal").font(.caption).foregroundStyle(.orange)
-                                    ShimmerText("Executing\(dots)", color: .orange)
+                                    ShimmerText("Executing\(dots)", color: .readableOrange)
                                 }
                             } else {
                                 HStack(spacing: 3) {
                                     Image(systemName: "terminal").font(.caption).foregroundStyle(.orange)
-                                    ShimmerText("Executing\(dots)", color: .orange)
+                                    ShimmerText("Executing\(dots)", color: .readableOrange)
                                 }
                             }
                         } else if let t = tab, t.isLLMThinking {
@@ -230,13 +230,13 @@ struct ThinkingIndicatorView: View {
                         } else {
                             HStack(spacing: 3) {
                                 Image(systemName: "play.fill").font(.caption).foregroundStyle(.green)
-                                ShimmerText("Running\(dots)", color: .green)
+                                ShimmerText("Running\(dots)", color: .readableGreen)
                             }
                         }
                     } else {
                         Text("Done")
                             .font(.caption.bold())
-                            .foregroundStyle(highContrast ? Color.primary : Color.green)
+                            .foregroundStyle(highContrast ? Color.primary : Color.readableGreen)
                     }
 
                     // Queue count
@@ -304,7 +304,7 @@ struct ThinkingIndicatorView: View {
                         HStack(spacing: 2) {
                             Text("↑").font(.caption).foregroundStyle(.blue)
                             Text(Self.fmtTokens(inputTokens)).font(.caption).foregroundStyle(highContrast ? .primary : .secondary)
-                            Text("↓").font(.caption).foregroundStyle(.green)
+                            Text("↓").font(.caption).foregroundStyle(Color.readableGreen)
                             Text(Self.fmtTokens(outputTokens)).font(.caption).foregroundStyle(highContrast ? .primary : .secondary)
                         }
                         .accessibilityElement(children: .ignore)

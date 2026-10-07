@@ -6,6 +6,7 @@ struct ShimmerText: View {
     let color: Color
     @State private var dimmed = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorSchemeContrast) private var contrast
 
     init(_ text: String, color: Color = .blue) {
         self.text = text
@@ -13,10 +14,12 @@ struct ShimmerText: View {
     }
 
     var body: some View {
+        // Increase Contrast: primary text at full opacity (the pulse dims to 0.65)
+        let highContrast = contrast == .increased
         Text(text)
             .font(.caption)
-            .foregroundStyle(color)
-            .opacity(dimmed ? 0.65 : 1.0)
+            .foregroundStyle(highContrast ? Color.primary : color)
+            .opacity(dimmed && !highContrast ? 0.65 : 1.0)
             .onAppear {
                 // Skip the endless pulse when Reduce Motion is on
                 guard !reduceMotion else { return }
