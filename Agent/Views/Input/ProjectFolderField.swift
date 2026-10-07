@@ -36,6 +36,7 @@ private struct PathTextField: NSViewRepresentable {
     var placeholder: String
     var onSubmit: () -> Void
     var onFocusChange: (Bool) -> Void
+    var onBeginEditing: () -> Void = {}
 
     func makeNSView(context: Context) -> FocusAwareTextField {
         // Kill system text completion app-wide (SwiftUI TextFields are unaffected)
@@ -68,6 +69,10 @@ private struct PathTextField: NSViewRepresentable {
     class Coordinator: NSObject, NSTextFieldDelegate {
         let parent: PathTextField
         init(_ parent: PathTextField) { self.parent = parent }
+
+        func controlTextDidBeginEditing(_ obj: Notification) {
+            parent.onBeginEditing()
+        }
 
         func controlTextDidChange(_ obj: Notification) {
             guard let tf = obj.object as? NSTextField else { return }
@@ -119,6 +124,8 @@ struct ProjectFolderField: View {
     @State private var showRecentFolders = false
     @State private var isFieldFocused = false
     @State private var canRestoreRecent = RecentFoldersService.shared.canRestore
+    /// Folder value when the user started typing — set only after an actual edit, so Return/blur announces real changes once.
+    @State private var folderBeforeEdit: String?
 
     private var recentFolders: [String] {
         RecentFoldersService.shared.recentFolders
@@ -259,6 +266,10 @@ struct ProjectFolderField: View {
                         }
                         showRecentFolders = false
                         onFolderSelected?()
+                        if let before = folderBeforeEdit {
+                            folderBeforeEdit = nil
+                            if projectFolder != before { announceFolder() }
+                        }
                     },
                     onFocusChange: { clicked in
                         if clicked {
@@ -278,7 +289,8 @@ struct ProjectFolderField: View {
                                 }
                             }
                         }
-                    }
+                    },
+                    onBeginEditing: { folderBeforeEdit = projectFolder }
                 )
                 .padding(.leading, 10)
                 .padding(.trailing, 5)
