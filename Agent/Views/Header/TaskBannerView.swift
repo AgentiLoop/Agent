@@ -5,6 +5,8 @@ import SwiftUI
 /// Green banner showing current task with cancel button and optional Apple AI prompt
 struct TaskBannerView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    private var highContrast: Bool { colorSchemeContrast == .increased }
     let prompt: String
     let appleAIPrompt: String?
     @Binding var showAppleAIBanner: Bool
@@ -60,7 +62,7 @@ struct TaskBannerView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 5)
-            .background(Color.green.opacity(0.7))
+            .background(highContrast ? Color(red: 0, green: 0.4, blue: 0) : Color.green.opacity(0.7))
 
             // Apple AI prompt row (toggled by tapping person icon)
             if showAppleAIBanner, let aiPrompt = appleAIPrompt {
@@ -68,11 +70,11 @@ struct TaskBannerView: View {
                     Text("\u{F8FF}")
                         .font(.caption2)
                         .frame(width: 14)
-                        .foregroundStyle(.white.opacity(0.8))
+                        .foregroundStyle(.white.opacity(highContrast ? 1 : 0.8))
                     Text(aiPrompt)
                         .font(.caption)
                         .lineLimit(4)
-                        .foregroundStyle(.white.opacity(0.9))
+                        .foregroundStyle(.white.opacity(highContrast ? 1 : 0.9))
                     Spacer()
                 }
                 // Private-use Apple logo glyph reads as gibberish — speak a single labeled element
@@ -80,7 +82,7 @@ struct TaskBannerView: View {
                 .accessibilityLabel("Apple Intelligence prompt: \(aiPrompt)")
                 .padding(.horizontal, 12)
                 .padding(.vertical, 4)
-                .background(Color.blue.opacity(0.6))
+                .background(highContrast ? Color(red: 0, green: 0.25, blue: 0.6) : Color.blue.opacity(0.6))
                 .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
             }
         }
