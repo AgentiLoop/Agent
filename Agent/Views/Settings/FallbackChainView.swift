@@ -22,6 +22,7 @@ struct FallbackChainView: View {
                 HStack {
                     Text("Fallback Chain")
                         .font(.headline)
+                        .accessibilityAddTraits(.isHeader)
                     Spacer()
                     Toggle("", isOn: Binding(
                         get: { service.enabled },
@@ -30,6 +31,7 @@ struct FallbackChainView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .labelsHidden()
+                    .accessibilityLabel("Enable Fallback Chain")
                 }
                 Text("When the primary LLM fails 3 times, auto-switch to the next provider. Drag to reorder.")
                     .font(.caption)
@@ -72,6 +74,7 @@ struct FallbackChainView: View {
                                         Image(systemName: "eye")
                                             .foregroundStyle(.blue)
                                             .font(.caption2)
+                                            .accessibilityLabel("Vision")
                                     }
                                 }
                             }
@@ -96,6 +99,7 @@ struct FallbackChainView: View {
                             .toggleStyle(.switch)
                             .controlSize(.mini)
                             .labelsHidden()
+                            .accessibilityLabel("Enable \(APIProvider(rawValue: entry.provider)?.displayName ?? entry.provider) \(shortModel(entry.model))")
 
                             Button {
                                 service.remove(id: entry.id)
@@ -105,6 +109,7 @@ struct FallbackChainView: View {
                             }
                             .buttonStyle(.plain)
                             .help("Remove from Fallback Chain")
+                            .accessibilityLabel("Remove \(APIProvider(rawValue: entry.provider)?.displayName ?? entry.provider) \(shortModel(entry.model))")
                         }
                         .padding(.vertical, 6)
                         .padding(.horizontal)
@@ -122,6 +127,7 @@ struct FallbackChainView: View {
                         }
                     }
                     .labelsHidden()
+                    .accessibilityLabel("Provider")
                     .frame(width: 110)
                     .onAppear { viewModel.fetchModelsIfNeeded(for: selectedProvider) }
                     .onChange(of: selectedProvider) { _, newP in
@@ -142,12 +148,14 @@ struct FallbackChainView: View {
                                         Image(systemName: "eye")
                                             .foregroundStyle(.blue)
                                             .font(.caption2)
+                                            .accessibilityLabel("Vision")
                                     }
                                 }.tag(model.id)
                             }
                         }
                     }
                     .labelsHidden()
+                    .accessibilityLabel("Model")
                     .frame(width: 160)
                     .onAppear {
                         if selectedModel
@@ -163,6 +171,7 @@ struct FallbackChainView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Add to Fallback Chain")
+                    .accessibilityLabel("Add to Fallback Chain")
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal)
@@ -183,6 +192,7 @@ struct FallbackChainView: View {
                         .font(.caption)
                         .buttonStyle(.plain)
                         .foregroundStyle(.red.opacity(0.7))
+                        .accessibilityLabel("Clear All Fallback Providers")
                     }
                     .padding(.vertical, 6)
                     .padding(.horizontal)
