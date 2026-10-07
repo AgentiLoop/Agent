@@ -265,23 +265,41 @@ struct LoopReplayScenarioTests {
         let store = ToolOutcomeStore.shared
         store.startTask(projectFolder: dir.path)
 
-        for _ in 0..<2 { store.record(tool: "selenium", output: "Error: no session", isFailure: true) }
-        #expect(store.advisory(for: "selenium") == nil) // below threshold
-        store.record(tool: "selenium", output: "Error: no session", isFailure: true)
-        let advisory = store.advisory(for: "selenium")
-        #expect(advisory?.contains("selenium has failed 3x") == true)
-        #expect(store.advisory(for: "selenium") == nil) // one-shot per task
+        for _ in 0..<2 { store.record(tool: "git", output: "Error: no session", isFailure: true) }
+        #expect(store.advisory(for: "git") == nil) // below threshold
+        store.record(tool: "git", output: "Error: no session", isFailure: true)
+        let advisory = store.advisory(for: "git")
+        #expect(advisory?.contains("git has failed 3x") == true)
+        #expect(store.advisory(for: "git") == nil) // one-shot per task
 
         // Push to chronic and verify the frozen prompt block on next task start.
-        for _ in 0..<3 { store.record(tool: "selenium", output: "Error: no session", isFailure: true) }
+        for _ in 0..<3 { store.record(tool: "git", output: "Error: no session", isFailure: true) }
         store.startTask(projectFolder: dir.path)
-        #expect(store.promptBlock.contains("selenium"))
-        #expect(store.advisory(for: "selenium") == nil) // task counters reset
+        #expect(store.promptBlock.contains("git"))
+        #expect(store.advisory(for: "git") == nil) // task counters reset
 
         // A success clears chronic status.
-        store.record(tool: "selenium", output: "OK", isFailure: false)
+        store.record(tool: "git", output: "OK", isFailure: false)
         store.startTask(projectFolder: dir.path)
         #expect(store.promptBlock.isEmpty)
+        try? FileManager.default.removeItem(at: dir)
+    }
+
+    @Test("UI-scripting tools steer to accessibility after 2 failures so the 3rd try works")
+    func accessibilityFallbackAdvisory() {
+        let dir = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("AgentOutcomeTests-\(UUID().uuidString)", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let store = ToolOutcomeStore.shared
+        store.startTask(projectFolder: dir.path)
+        store.record(tool: "applescript", output: "Error: -1728", isFailure: true)
+        #expect(store.advisory(for: "applescript") == nil)
+        store.record(tool: "applescript", output: "Error: -1728", isFailure: true)
+        let advisory = store.advisory(for: "applescript")
+        #expect(advisory?.contains("applescript has failed 2x") == true)
+        #expect(advisory?.contains("accessibility(action:") == true)
+        for _ in 0..<3 { store.record(tool: "accessibility", output: "Error: Element not found", isFailure: true) }
+        #expect(store.advisory(for: "accessibility")?.contains("read_text") == true)
         try? FileManager.default.removeItem(at: dir)
     }
 

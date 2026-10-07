@@ -82,14 +82,37 @@ final class ToolOutcomeStore {
         save()
     }
 
+    /// App-automation tools whose failures have an accessibility fallback. After
+    /// two failures the third try should be accessibility, so a UI task works
+    /// within three tries instead of retrying scripting until the budget runs out.
+    static let accessibilityFallbackTools: Set<String> = [
+        "applescript", "run_applescript", "run_osascript", "run_apple_script",
+        "javascript", "execute_javascript", "run_javascript",
+        "agent_script", "run_agent",
+        "safari", "selenium", "web_open", "web_find", "web_click", "web_type",
+    ]
+    static let accessibilityFallbackThreshold = 2
+
     /// One-shot advisory once a tool crosses the in-task failure threshold.
     /// Returns nil when below threshold or already advised this task.
     func advisory(for tool: String) -> String? {
+        let fallback = Self.accessibilityFallbackTools.contains(tool)
         guard let failures = taskFailures[tool],
-              failures >= Self.advisoryThreshold,
+              failures >= (fallback ? Self.accessibilityFallbackThreshold : Self.advisoryThreshold),
               !advisedTools.contains(tool) else { return nil }
         advisedTools.insert(tool)
         let lastError = taskLastError[tool] ?? ""
+        if fallback {
+            return "⚠️ \(tool) has failed \(failures)x this task (last: \(lastError)). "
+                + "Do NOT try it a third time — do it with accessibility instead, which works on any app's UI: "
+                + "accessibility(action:\"click_element\"|\"type_into_element\"|\"select_option\"|\"select_row\"|\"click_menu_item\"|\"press_key\"|\"read_text\", appBundleId:\"<app>\", title:\"<visible name>\"). "
+                + "Not sure of the name? accessibility(action:\"read_text\", appBundleId:\"<app>\") lists what the window shows."
+        }
+        if tool == "accessibility" {
+            return "⚠️ accessibility has failed \(failures)x this task (last: \(lastError)). "
+                + "Do NOT repeat the same call — read the window first (action:\"read_text\" or \"get_children\") and address the element by the exact name "
+                + "or the AppleScript-style reference it returns (title:\"button 2 of toolbar 1 of window 1\"), or use the app's AppleScript dictionary."
+        }
         return "⚠️ \(tool) has failed \(failures)x this task (last: \(lastError)). "
             + "Do NOT repeat the same call — follow the error's recovery hint, "
             + "use a different tool, or tell the user why it cannot be done."
