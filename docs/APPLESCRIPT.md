@@ -60,6 +60,12 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `task auto complete` | boolean | rw | Show prompt-history suggestions while typing in the task field. |
 | `user agent enabled` | boolean | rw | Whether the user Launch Agent is enabled. Setting false shuts it down. |
 | `launch daemon enabled` | boolean | rw | Whether the root Launch Daemon is enabled. Setting false shuts it down. |
+| `accessibility automation` | boolean | rw | The Accessibility Automation switch (Settings > Accessibility). Off blocks every accessibility action. |
+| `show hud` | boolean | rw | HUD popover: show the LLM Output HUD during a task (⌘B). |
+| `smooth streaming` | boolean | rw | HUD popover: type LLM output out gradually; off shows it at once. |
+| `terminal speed` | text | rw | HUD popover: `Normal`, `Fast`, `Faster`, `Blazing` or `Ludicrous` (any capitalization). |
+| `scan lines` | boolean | rw | HUD popover: draw scan lines over the HUD. |
+| `activity log below hud` | boolean | rw | HUD popover: start the activity log below the HUD instead of behind it. |
 | `tool groups` | list of text | r | Every tool group name, as in the Tools window. |
 | `tool names` | list of text | r | Every built-in tool name, as in the Tools window. |
 | `disabled tool groups` | list of text | rw | Groups switched off for every provider (the Tools window's group switches). Turning `User` or `Root` off or on also turns the Launch Agent or Launch Daemon off or on. |
@@ -73,7 +79,7 @@ Unless noted, these act on the **Main** tab. Settings are the same values as the
 | `input tokens` / `output tokens` | integer | r | Tokens of the Main tab's current or last task. |
 | `session input tokens` / `session output tokens` | integer | r | Tokens used since Agent! launched (or since `clear tokens`). |
 
-Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", or a negative count) and unknown tool, group or MCP server names give an error and change nothing.
+Out-of-range values (for example `max iterations` 0, `temperature` 5, `reasoning effort` "extreme", `terminal speed` "warp", or a negative count) and unknown tool, group or MCP server names give an error and change nothing.
 
 ```applescript
 tell application "Agent!"

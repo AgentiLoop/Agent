@@ -12,7 +12,8 @@ extension AppDelegate {
         "messagesMonitor", "taskAutoComplete", "userAgentEnabled", "launchDaemonEnabled",
         "toolGroups", "toolNames", "disabledToolGroups", "disabledTools",
         "mcpServers", "enabledMCPServers", "connectedMCPServers", "mcpTools", "disabledMCPTools",
-        "llmOutput", "inputTokens", "outputTokens", "sessionInputTokens", "sessionOutputTokens"]
+        "llmOutput", "inputTokens", "outputTokens", "sessionInputTokens", "sessionOutputTokens",
+        "accessibilityAutomation", "showHUD", "smoothStreaming", "terminalSpeed", "scanLines", "hudLogBelow"]
 
     func application(_ sender: NSApplication, delegateHandlesKey key: String) -> Bool {
         Self.scriptingKeys.contains(key)
@@ -176,6 +177,47 @@ extension AppDelegate {
     @objc var launchDaemonEnabled: Bool {
         get { setting(\.rootEnabled, true) }
         set { setSetting(\.rootEnabled, newValue) }
+    }
+
+    @objc var accessibilityAutomation: Bool {
+        get { AccessibilityEnabled.shared.accessibilityGlobalEnabled }
+        set { AccessibilityEnabled.shared.accessibilityGlobalEnabled = newValue }
+    }
+
+    // MARK: - HUD options (the toolbar's HUD popover)
+
+    @objc var showHUD: Bool {
+        get { setting(\.showThinkingIndicator, true) }
+        set { setSetting(\.showThinkingIndicator, newValue) }
+    }
+
+    @objc var smoothStreaming: Bool {
+        get { setting(\.dripEnabled, true) }
+        set { setSetting(\.dripEnabled, newValue) }
+    }
+
+    /// Terminal Speed by its label: Normal, Fast, Faster, Blazing or Ludicrous.
+    @objc var terminalSpeed: String {
+        get { setting(\.terminalSpeed, .current).label }
+        set {
+            guard let speed = AgentViewModel.TerminalSpeed.allCases.first(where: {
+                $0.label.caseInsensitiveCompare(newValue) == .orderedSame
+            }) else {
+                let labels = AgentViewModel.TerminalSpeed.allCases.map(\.label).joined(separator: ", ")
+                return ScriptingTab.scriptError("Terminal speed must be one of \(labels).")
+            }
+            setSetting(\.terminalSpeed, speed)
+        }
+    }
+
+    @objc var scanLines: Bool {
+        get { setting(\.scanLinesEnabled, true) }
+        set { setSetting(\.scanLinesEnabled, newValue) }
+    }
+
+    @objc var hudLogBelow: Bool {
+        get { setting(\.hudLogBelow, false) }
+        set { setSetting(\.hudLogBelow, newValue) }
     }
 
     // MARK: - Tools window (same toggles as Tools; groups are global, tools are per Main-tab provider)

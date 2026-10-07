@@ -124,6 +124,31 @@
                       description="Whether the root Launch Daemon is enabled. Setting false shuts it down.">
                 <cocoa key="launchDaemonEnabled"/>
             </property>
+            <property name="accessibility automation" code="AgAx" type="boolean"
+                      description="Accessibility Automation switch (Settings &gt; Accessibility). Off blocks every accessibility action.">
+                <cocoa key="accessibilityAutomation"/>
+            </property>
+            <!-- HUD options (the toolbar's HUD popover) -->
+            <property name="show hud" code="AgV1" type="boolean"
+                      description="Show the LLM Output HUD during a task (⌘B).">
+                <cocoa key="showHUD"/>
+            </property>
+            <property name="smooth streaming" code="AgV2" type="boolean"
+                      description="Type LLM output out gradually; off shows it at once.">
+                <cocoa key="smoothStreaming"/>
+            </property>
+            <property name="terminal speed" code="AgV3" type="text"
+                      description="HUD typing speed: Normal, Fast, Faster, Blazing or Ludicrous.">
+                <cocoa key="terminalSpeed"/>
+            </property>
+            <property name="scan lines" code="AgV4" type="boolean"
+                      description="Draw scan lines over the HUD.">
+                <cocoa key="scanLines"/>
+            </property>
+            <property name="activity log below hud" code="AgV5" type="boolean"
+                      description="Start the activity log below the HUD instead of behind it.">
+                <cocoa key="hudLogBelow"/>
+            </property>
             <property name="tool groups" code="AgG1" access="r"
                       description="Every tool group name, as in the Tools window.">
                 <type type="text" list="yes"/>
