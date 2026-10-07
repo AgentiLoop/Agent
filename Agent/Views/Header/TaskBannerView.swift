@@ -17,7 +17,7 @@ struct TaskBannerView: View {
             HStack(spacing: 6) {
                 Button {
                     if appleAIPrompt != nil {
-                        withAnimation(.easeInOut(duration: 0.2)) {
+                        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                             showAppleAIBanner.toggle()
                         }
                     }

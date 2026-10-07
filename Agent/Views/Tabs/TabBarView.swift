@@ -64,7 +64,7 @@ struct TabBarView: View {
                                 }
                             }
                             .onEnded { _ in
-                                withAnimation(.easeInOut(duration: 0.2)) {
+                                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                                     dragOffset = 0
                                     draggingTabId = nil
                                 }

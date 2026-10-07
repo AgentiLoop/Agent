@@ -110,6 +110,7 @@ private struct PathTextField: NSViewRepresentable {
 /// A text field with a dropdown of recent project folders
 struct ProjectFolderField: View {
     @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
     @Binding var projectFolder: String
     var onFolderSelected: (() -> Void)? = nil
@@ -247,7 +248,7 @@ struct ProjectFolderField: View {
                     onFocusChange: { clicked in
                         if clicked {
                             isFieldFocused = true
-                            withAnimation(.easeInOut(duration: 0.2)) {
+                            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                                 if recentFolders.isEmpty {
                                     showRecentFolders = false
                                 } else {
@@ -258,7 +259,7 @@ struct ProjectFolderField: View {
                             isFieldFocused = false
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                 if !isFieldFocused {
-                                    withAnimation(.easeInOut(duration: 0.2)) { showRecentFolders = false }
+                                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) { showRecentFolders = false }
                                 }
                             }
                         }

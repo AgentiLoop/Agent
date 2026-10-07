@@ -148,7 +148,7 @@ struct InputSectionView: View {
                         if showSuggestions { showSuggestions = false }
                         return
                     }
-                    withAnimation(.easeInOut(duration: 0.15)) {
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.15)) {
                         showSuggestions = viewModel.taskAutoComplete && !newValue.isEmpty && !suggestions.isEmpty
                     }
                 }
@@ -244,7 +244,7 @@ struct InputSectionView: View {
                             if showSuggestions { showSuggestions = false }
                             return
                         }
-                        withAnimation(.easeInOut(duration: 0.15)) {
+                        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.15)) {
                             showSuggestions = viewModel.taskAutoComplete && !newValue.isEmpty && !suggestions.isEmpty
                         }
                     }
