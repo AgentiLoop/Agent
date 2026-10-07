@@ -508,8 +508,7 @@ struct MCPServerEditView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("JSON").font(.caption).foregroundStyle(.secondary)
-                PlainTextEditor(text: $jsonText)
-                    .accessibilityLabel("Server JSON")
+                PlainTextEditor(text: $jsonText, label: "Server JSON")
                     .frame(height: 120)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
                     .onChange(of: jsonText) {
@@ -715,6 +714,8 @@ struct MCPServerEditView: View {
 
 private struct PlainTextEditor: NSViewRepresentable {
     @Binding var text: String
+    /// VoiceOver name — SwiftUI's .accessibilityLabel doesn't reach the wrapped NSTextView
+    let label: String
 
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSTextView.scrollableTextView()
@@ -729,6 +730,8 @@ private struct PlainTextEditor: NSViewRepresentable {
         textView.textContainerInset = NSSize(width: 4, height: 4)
         textView.delegate = context.coordinator
         textView.string = text
+        textView.setAccessibilityLabel(label)
+        scrollView.setAccessibilityLabel(label)
         scrollView.hasVerticalScroller = true
         scrollView.drawsBackground = false
         return scrollView
@@ -767,8 +770,7 @@ struct MCPImportView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            PlainTextEditor(text: $jsonText)
-                .accessibilityLabel("MCP Server JSON")
+            PlainTextEditor(text: $jsonText, label: "MCP Server JSON")
                 .frame(height: 200)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
 
