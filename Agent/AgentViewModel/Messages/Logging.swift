@@ -544,9 +544,12 @@ extension AgentViewModel {
 
     /// Clear the selected tab's log, or main log if no tab selected.
     func clearSelectedLog() {
-        if let selectedId = selectedTabId,
-           let tab = tab(for: selectedId)
-        {
+        clearLog(of: selectedTabId.flatMap { tab(for: $0) })
+    }
+
+    /// Clear `tab`'s log, or the main log when `tab` is nil.
+    func clearLog(of tab: ScriptTab?) {
+        if let tab {
             tab.logFlushTask?.cancel()
             tab.logFlushTask = nil
             tab.llmStreamFlushTask?.cancel()

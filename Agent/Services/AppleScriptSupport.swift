@@ -5,7 +5,7 @@ import AppKit
 /// Application properties are KVC keys handled by AppDelegate; commands are NSScriptCommand subclasses.
 @MainActor
 extension AppDelegate {
-    private static let scriptingKeys: Set<String> = ["taskRunning", "activityLog", "projectFolder", "taskInput", "providerName", "scriptingTabs"]
+    private static let scriptingKeys: Set<String> = ["taskRunning", "activityLog", "projectFolder", "taskInput", "providerName", "modelName", "scriptingTabs"]
 
     func application(_ sender: NSApplication, delegateHandlesKey key: String) -> Bool {
         Self.scriptingKeys.contains(key)
@@ -25,7 +25,15 @@ extension AppDelegate {
         set { AgentViewModel.current?.taskInput = newValue }
     }
 
-    @objc var providerName: String { AgentViewModel.current?.selectedProvider.displayName ?? "" }
+    @objc var providerName: String {
+        get { ScriptingTab(tabId: nil).providerName }
+        set { ScriptingTab(tabId: nil).providerName = newValue }
+    }
+
+    @objc var modelName: String {
+        get { ScriptingTab(tabId: nil).modelName }
+        set { ScriptingTab(tabId: nil).modelName = newValue }
+    }
 
     // MARK: - tab elements (Main tab first, then every other tab in tab-bar order)
 
@@ -34,7 +42,8 @@ extension AppDelegate {
         return [ScriptingTab(tabId: nil)] + vm.scriptTabs.map { ScriptingTab(tabId: $0.id) }
     }
 
-    /// `make new tab` — a new LLM tab using the Main tab's provider and model.
+    /// `make new tab [with properties {provider:…, model:…, project folder:…, task input:…}]` —
+    /// a new LLM tab; provider and model default to the Main tab's.
     @objc(insertObject:inScriptingTabsAtIndex:)
     func insertScriptingTab(_ tab: ScriptingTab, at index: Int) {
         insertInScriptingTabs(tab)
@@ -42,18 +51,26 @@ extension AppDelegate {
 
     @objc(insertInScriptingTabs:)
     func insertInScriptingTabs(_ tab: ScriptingTab) {
-        guard let vm = AgentViewModel.current else { return }
-        let provider = vm.mainTabProvider
-        let model = vm.globalModelForProvider(provider)
+        guard let vm = AgentViewModel.current, let pending = tab.pending else { return }
+        let provider = pending.provider ?? vm.mainTabProvider
+        let model = pending.model ?? vm.globalModelForProvider(provider)
         let config = LLMConfig(provider: provider, model: model, displayName: model.isEmpty ? provider.displayName : model)
-        tab.tabId = vm.createMainTab(config: config).id
+        let newTab = vm.createMainTab(config: config)
+        if let folder = pending.folder { newTab.projectFolder = folder }
+        if let input = pending.input { newTab.taskInput = input }
+        tab.pending = nil
+        tab.tabId = newTab.id
     }
 }
 
-/// Scripting proxy for one tab. `tabId == nil` is the Main tab.
+/// Scripting proxy for one tab. `tabId == nil` is the Main tab, unless `pending` is set
+/// (a `make new tab` proxy not inserted yet — property sets are held until insertion).
 @MainActor @objc(ScriptingTab)
 final class ScriptingTab: NSObject {
+    struct Pending { var provider: APIProvider?, model: String?, folder: String?, input: String? }
+
     nonisolated(unsafe) var tabId: UUID?
+    var pending: Pending?
 
     init(tabId: UUID?) {
         self.tabId = tabId
@@ -62,6 +79,7 @@ final class ScriptingTab: NSObject {
     /// Used by `make new tab` before the tab exists.
     override init() {
         tabId = nil
+        pending = Pending()
         super.init()
     }
 
@@ -83,28 +101,67 @@ final class ScriptingTab: NSObject {
     }
 
     @objc var taskInput: String {
-        get { tabId == nil ? (vm?.taskInput ?? "") : (tab?.taskInput ?? "") }
-        set { if tabId == nil { vm?.taskInput = newValue } else { tab?.taskInput = newValue } }
+        get { pending?.input ?? (tabId == nil ? (vm?.taskInput ?? "") : (tab?.taskInput ?? "")) }
+        set {
+            if pending != nil { pending?.input = newValue } else if tabId == nil { vm?.taskInput = newValue } else { tab?.taskInput = newValue }
+        }
     }
 
     @objc var projectFolder: String {
-        get { tabId == nil ? (vm?.projectFolder ?? "") : (tab?.projectFolder ?? "") }
+        get { pending?.folder ?? (tabId == nil ? (vm?.projectFolder ?? "") : (tab?.projectFolder ?? "")) }
         set {
             let path = (newValue as NSString).expandingTildeInPath
-            if tabId == nil { vm?.projectFolder = path } else { tab?.projectFolder = path }
+            if pending != nil { pending?.folder = path } else if tabId == nil { vm?.projectFolder = path } else { tab?.projectFolder = path }
         }
     }
 
     @objc var providerName: String {
-        guard let vm else { return "" }
-        guard let tab else { return vm.mainTabProvider.displayName }
-        return vm.resolvedLLMConfig(for: tab).provider.displayName
+        get {
+            guard let vm else { return "" }
+            if let provider = pending?.provider { return provider.displayName }
+            guard let tab else { return vm.mainTabProvider.displayName }
+            return vm.resolvedLLMConfig(for: tab).provider.displayName
+        }
+        set {
+            guard let vm else { return }
+            guard let provider = APIProvider.selectableProviders.first(where: {
+                $0.displayName.caseInsensitiveCompare(newValue) == .orderedSame
+                    || $0.rawValue.caseInsensitiveCompare(newValue) == .orderedSame
+            }) else {
+                let names = APIProvider.selectableProviders.map(\.displayName).joined(separator: ", ")
+                return Self.scriptError("Unknown provider \"\(newValue)\". Available: \(names).")
+            }
+            if pending != nil { pending?.provider = provider; return }
+            guard tabId == nil else { return Self.scriptError("Only the Main tab's provider can be changed; other tabs keep the provider they were created with.") }
+            vm.mainTabProvider = provider
+            if vm.selectedTabId == nil { vm.selectedProvider = provider } else { vm.fetchModelsIfNeeded(for: provider) }
+        }
     }
 
     @objc var modelName: String {
-        guard let vm else { return "" }
-        guard let tab else { return vm.globalModelForProvider(vm.mainTabProvider) }
-        return vm.resolvedLLMConfig(for: tab).model
+        get {
+            guard let vm else { return "" }
+            if let pending {
+                return pending.model ?? vm.globalModelForProvider(pending.provider ?? vm.mainTabProvider)
+            }
+            guard let tab else { return vm.globalModelForProvider(vm.mainTabProvider) }
+            return vm.resolvedLLMConfig(for: tab).model
+        }
+        set {
+            guard let vm else { return }
+            let model = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !model.isEmpty else { return Self.scriptError("Model is empty.") }
+            if pending != nil { pending?.model = model; return }
+            guard tabId == nil else { return Self.scriptError("Only the Main tab's model can be changed; other tabs keep the model they were created with.") }
+            vm.models[vm.mainTabProvider] = model
+        }
+    }
+
+    /// Reports an error from a property setter back to the running script.
+    private static func scriptError(_ message: String) {
+        guard let command = NSScriptCommand.current() else { return }
+        command.scriptErrorNumber = -10000
+        command.scriptErrorString = message
     }
 
     @objc var selected: Bool {
@@ -148,6 +205,15 @@ final class ScriptingTab: NSObject {
         }
     }
 
+    /// Clears this tab's activity log. Returns an error message, or nil when cleared.
+    func clearLog() -> String? {
+        guard let vm else { return "Agent! is not ready." }
+        if tabId == nil { vm.clearLog(of: nil); return nil }
+        guard let tab else { return "That tab no longer exists." }
+        vm.clearLog(of: tab)
+        return nil
+    }
+
     /// Closes this tab. Returns an error message, or nil when closed.
     func close() -> String? {
         guard let tabId else { return "The Main tab can't be closed." }
@@ -162,6 +228,21 @@ final class ScriptingTab: NSObject {
             command.scriptErrorNumber = -10000
             command.scriptErrorString = error
         }
+        return nil
+    }
+
+    /// `clear log tab 2` / `clear log of tab 2`.
+    @objc func handleClearLogScriptCommand(_ command: NSScriptCommand) -> Any? {
+        if let error = clearLog() {
+            command.scriptErrorNumber = -10000
+            command.scriptErrorString = error
+        }
+        return nil
+    }
+
+    /// `stop task tab 2`.
+    @objc func handleStopTaskScriptCommand(_ command: NSScriptCommand) -> Any? {
+        stop()
         return nil
     }
 
@@ -201,6 +282,19 @@ final class AgentStopTaskCommand: NSScriptCommand {
     override func performDefaultImplementation() -> Any? {
         let target = scriptingTarget(self)
         MainActor.assumeIsolated { target.stop() }
+        return nil
+    }
+}
+
+/// `clear log [in tab tab 2]` — clears the Main tab log unless a tab is given.
+@objc(AgentClearLogCommand)
+final class AgentClearLogCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        let target = scriptingTarget(self)
+        if let error = MainActor.assumeIsolated({ target.clearLog() }) {
+            scriptErrorNumber = -10000
+            scriptErrorString = error
+        }
         return nil
     }
 }
