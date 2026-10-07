@@ -30,6 +30,11 @@ extension ActivityLogView.Coordinator {
 
     /// Smooth animated scroll to end
     func smoothScrollToEnd(_ textView: NSTextView) {
+        // Reduce Motion: jump to the end instead of a constant gliding scroll while text streams
+        if NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+            snapToEnd(textView)
+            return
+        }
         guard let scrollView = textView.enclosingScrollView,
               let textContainer = textView.textContainer else
         {
