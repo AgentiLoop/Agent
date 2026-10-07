@@ -220,7 +220,8 @@ struct MCPServersView: View {
                     switch status {
                     case .connected:
                         Circle().fill(.green).frame(width: 6, height: 6).accessibilityHidden(true)
-                        Text("Connected").font(.caption2).foregroundStyle(.green)
+                        Text("Connected").font(.caption2)
+                            .foregroundStyle(contrast == .increased ? AnyShapeStyle(.primary) : AnyShapeStyle(.green))
                     case .connecting:
                         ProgressView().controlSize(.mini)
                         Text("Connecting...").font(.caption2).foregroundStyle(captionStyle)
@@ -229,7 +230,9 @@ struct MCPServersView: View {
                         Text("Disconnected").font(.caption2).foregroundStyle(captionStyle)
                     case .error(let message):
                         Circle().fill(.red).frame(width: 6, height: 6).accessibilityHidden(true)
-                        Text(message).font(.caption2).foregroundStyle(.red).lineLimit(1)
+                        Text(message).font(.caption2)
+                            .foregroundStyle(contrast == .increased ? AnyShapeStyle(.primary) : AnyShapeStyle(.red))
+                            .lineLimit(1)
                             .accessibilityLabel("Error: \(message)")
                     }
                 }
@@ -241,7 +244,9 @@ struct MCPServersView: View {
                     if server.autoStart {
                         Text("auto").font(.caption2).foregroundStyle(.white)
                             .padding(.horizontal, 4).padding(.vertical, 1)
-                            .background(.blue).clipShape(Capsule())
+                            .background(contrast == .increased ? Color(red: 0, green: 0.25, blue: 0.6) : Color.blue)
+                            .clipShape(Capsule())
+                            .accessibilityLabel("Auto-starts")
                     }
                 }
                 Text(server.displayAddress).font(.caption).foregroundStyle(captionStyle)
