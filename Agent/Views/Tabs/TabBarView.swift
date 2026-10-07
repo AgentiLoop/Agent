@@ -98,6 +98,9 @@ private struct TabItem: View {
     var onMoveRight: (() -> Void)? = nil
 
     @State private var isHovering = false
+    // Increase Contrast: darker text and solid borders so low-vision users can tell tabs apart
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var highContrast: Bool { contrast == .increased }
 
     var body: some View {
         HStack(spacing: 4) {
@@ -122,7 +125,7 @@ private struct TabItem: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 4)
-        .foregroundStyle(isSelected ? tint : .secondary)
+        .foregroundStyle(isSelected ? tint : (highContrast ? .primary : .secondary))
         .background(
             Capsule()
                 .fill(
@@ -133,7 +136,12 @@ private struct TabItem: View {
         )
         .overlay(
             Capsule()
-                .strokeBorder(isSelected ? tint.opacity(0.5) : Color(nsColor: .separatorColor).opacity(0.3), lineWidth: 0.5)
+                .strokeBorder(
+                    highContrast
+                        ? (isSelected ? tint : Color.primary.opacity(0.6))
+                        : (isSelected ? tint.opacity(0.5) : Color(nsColor: .separatorColor).opacity(0.3)),
+                    lineWidth: highContrast ? (isSelected ? 2 : 1) : 0.5
+                )
         )
         .contentShape(Capsule())
         .onTapGesture(perform: onSelect)
