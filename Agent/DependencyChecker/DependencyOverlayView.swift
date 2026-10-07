@@ -2,6 +2,8 @@ import SwiftUI
 
 struct DependencyOverlay: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let status: DependencyStatus?
     @Binding var isVisible: Bool
     @State private var showIcon = false
@@ -15,6 +17,8 @@ struct DependencyOverlay: View {
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
         return "v\(version) (build \(build))"
     }
+
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
 
     private var isTesting: Bool {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
@@ -33,7 +37,7 @@ struct DependencyOverlay: View {
                         .frame(width: 80, height: 80)
                         .shadow(color: .blue.opacity(0.6), radius: 16)
                         .opacity(showIcon ? 1 : 0)
-                        .scaleEffect(showIcon ? 1.0 : 0.8)
+                        .scaleEffect(showIcon || reduceMotion ? 1.0 : 0.8)
                         .accessibilityHidden(true)
 
                     Text("Agent!")
@@ -42,19 +46,19 @@ struct DependencyOverlay: View {
 
                     Text("Agentic AI for your \u{F8FF} Mac Desktop")
                         .font(.system(size: 11, design: .monospaced))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(captionStyle)
                         .opacity(showIcon ? 1 : 0)
                         // Private-use Apple logo glyph isn't speakable
                         .accessibilityLabel("Agentic AI for your Mac Desktop")
 
                     Text(appVersion)
                         .font(.system(size: 10, design: .monospaced))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(captionStyle)
                         .opacity(showIcon ? 1 : 0)
 
                     Text("System Check")
                         .font(.system(.caption, design: .monospaced))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(captionStyle)
                         .padding(.top, 4)
 
                     row(
@@ -95,7 +99,7 @@ struct DependencyOverlay: View {
                             }
                             .buttonStyle(.plain)
                             .font(.system(.caption, design: .monospaced))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(captionStyle)
                         }
                         .padding(.top, 4)
                     }
@@ -108,7 +112,7 @@ struct DependencyOverlay: View {
                 )
                 .frame(width: 320)
                 .padding(.top, 80)
-                .scaleEffect(dismissing ? 0.8 : 1.0)
+                .scaleEffect(dismissing && !reduceMotion ? 0.8 : 1.0)
                 .opacity(dismissing ? 0 : 1)
             }
             .onAppear {
@@ -140,7 +144,7 @@ struct DependencyOverlay: View {
                 if !ok {
                     Text(hint)
                         .font(.system(size: 9, design: .monospaced))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(captionStyle)
                 }
             }
             Spacer()
@@ -150,7 +154,7 @@ struct DependencyOverlay: View {
         .accessibilityLabel(name)
         .accessibilityValue(ok ? "Installed" : "Missing. \(hint)")
         .opacity(show ? 1 : 0)
-        .offset(y: show ? 0 : 8)
+        .offset(y: show || reduceMotion ? 0 : 8)
     }
 
     @ViewBuilder
@@ -165,7 +169,7 @@ struct DependencyOverlay: View {
                     .foregroundColor(.primary)
                 Text(status)
                     .font(.system(size: 9, design: .monospaced))
-                    .foregroundColor(ok ? .secondary : .orange)
+                    .foregroundStyle(ok ? AnyShapeStyle(captionStyle) : AnyShapeStyle(.orange))
             }
             Spacer()
         }
@@ -173,7 +177,7 @@ struct DependencyOverlay: View {
         .accessibilityLabel(name)
         .accessibilityValue("\(ok ? "Available" : "Unavailable"). \(status)")
         .opacity(show ? 1 : 0)
-        .offset(y: show ? 0 : 8)
+        .offset(y: show || reduceMotion ? 0 : 8)
     }
 
     private func dismiss() {
