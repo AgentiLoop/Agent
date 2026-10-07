@@ -5,6 +5,7 @@ struct ShimmerText: View {
     let text: String
     let color: Color
     @State private var dimmed = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(_ text: String, color: Color = .blue) {
         self.text = text
@@ -17,6 +18,8 @@ struct ShimmerText: View {
             .foregroundStyle(color)
             .opacity(dimmed ? 0.65 : 1.0)
             .onAppear {
+                // Skip the endless pulse when Reduce Motion is on
+                guard !reduceMotion else { return }
                 withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
                     dimmed = true
                 }
