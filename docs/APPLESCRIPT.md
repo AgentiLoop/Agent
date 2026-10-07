@@ -161,6 +161,9 @@ Ends the session now and stops the running task (Stop All). With `after cycle tr
 `memory "view"|"create"|"str_replace"|"insert"|"delete"|"rename" [path "/memories/…"] [content "…"] [find text "…"] [replacement "…"] [line number N] [destination "/memories/…"] [project scope bool]` → text
 Reads or edits Agent!'s memory: the same `/memories` files the agent's `memory` tool uses. Global memory (shared by every project) is the default; `project scope true` uses the Main tab's project folder. Returns the tool's result text (`view` returns a file's text, or the file list for a folder). `view` defaults `path` to `/memories`; `create` takes the whole file as `content`; `str_replace` needs `find text` and `replacement`; `insert` puts `content` before 0-based `line number`; `rename` moves `path` to `destination`. Failures, such as a path outside `/memories` or `find text` that isn't found exactly once, raise an AppleScript error.
 
+### `call tool`
+`call tool "name" [with input "{…JSON…}"]` → text
+Runs one of the agent's tools directly on the Main tab, without the LLM, and returns its result text. It takes the same tool names and arguments the agent uses (`git`, `file`, `user_shell`, `xcode`, `agent_script`, `accessibility`, `plan`, …); `call tool "list_tools"` lists the enabled ones. `with input` is a JSON object of the tool's arguments; omit it for tools that need none. Bad JSON, an empty name or an unknown tool raise an AppleScript error; a tool's own failure comes back as its result text. `root_shell` is refused unless `launch daemon enabled` is true. The command waits for the tool to finish, so long tools may need `with timeout of … seconds`.
 ### Standard Suite
 `select`, `close`, `count`, `exists`, `make`, `get`/`set`, `quit` and the `window` class work as in other Cocoa apps.
 
@@ -197,6 +200,13 @@ tell application "Agent!"
 end tell
 ```
 
+**Run a tool without the LLM**
+```applescript
+tell application "Agent!"
+    call tool "user_shell" with input "{\"command\":\"sw_vers\"}"
+    call tool "git" with input "{\"action\":\"status\"}"
+end tell
+```
 **Auto-pilot for two hours, then check on it**
 
 ```applescript

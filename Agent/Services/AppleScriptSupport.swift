@@ -598,6 +598,62 @@ final class AgentMemoryCommand: NSScriptCommand {
     }
 }
 
+/// `call tool "git" [with input "{\"action\":\"status\"}"]` — runs one of the agent's tools directly on the
+/// Main tab (no LLM) and returns its result text. Root shell is refused unless Launch Daemon is enabled.
+@objc(AgentCallToolCommand)
+final class AgentCallToolCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        let name = (directParameter as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let json = (evaluatedArguments?["input"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        func fail(_ message: String) -> String {
+            scriptErrorNumber = -10000
+            scriptErrorString = message
+            return ""
+        }
+        guard !name.isEmpty else { return fail("Give a tool name, e.g. call tool \"git\" with input \"{\\\"action\\\":\\\"status\\\"}\".") }
+        var input: [String: Any] = [:]
+        if !json.isEmpty {
+            guard let data = json.data(using: .utf8),
+                  let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+            else { return fail("The input must be a JSON object, e.g. {\"action\":\"status\"}.") }
+            input = object
+        }
+        let raw = Unchecked(value: input)
+        let expansion = MainActor.assumeIsolated { Unchecked(value: AgentViewModel.expandConsolidatedTool(name: name, input: raw.value)) }
+        let (expanded, expandedInput) = expansion.value
+        let refusal: String? = MainActor.assumeIsolated {
+            guard let vm = AgentViewModel.current else { return "Agent! is not ready." }
+            if expanded == "execute_daemon_command" && !vm.rootEnabled {
+                return "Root shell is off. Set launch daemon enabled to true first."
+            }
+            return nil
+        }
+        if let refusal { return fail(refusal) }
+        if expanded == "task_complete" { return expandedInput["summary"] as? String ?? "" }
+        suspendExecution()
+        let command = Unchecked(value: self)
+        let sendable = Unchecked(value: expandedInput)
+        // Same path as an LLM tool call (hooks, MCP, file guards, native handlers), like SubAgent's loop.
+        Task { @MainActor in
+            guard let vm = AgentViewModel.current else { return command.value.resumeExecution(withResult: "Agent! is not ready.") }
+            let ctx = ToolContext(toolId: "applescript-\(UUID().uuidString)", projectFolder: vm.projectFolder,
+                                  selectedProvider: vm.selectedProvider, tavilyAPIKey: vm.tavilyAPIKey)
+            var results: [[String: Any]] = []
+            _ = await vm.dispatchTool(name: expanded, input: sendable.value, ctx: ctx, toolResults: &results)
+            let result = results.compactMap { $0["content"] as? String }.joined(separator: "\n")
+            if result.hasPrefix("⚠️ Tool '") && result.contains("not handled") {
+                command.value.scriptErrorNumber = -10000
+                command.value.scriptErrorString = "Unknown tool \"\(name)\". call tool \"list_tools\" lists them."
+            }
+            command.value.resumeExecution(withResult: result)
+        }
+        return nil
+    }
+
+    /// Carries the non-Sendable input and command to the main-actor task; both are only touched there.
+    private struct Unchecked<T>: @unchecked Sendable { let value: T }
+}
+
 /// `stop task [in tab tab 2]` — stops the Main tab task unless a tab is given.
 @objc(AgentStopTaskCommand)
 final class AgentStopTaskCommand: NSScriptCommand {

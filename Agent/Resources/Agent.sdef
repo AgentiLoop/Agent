@@ -356,6 +356,15 @@
             </parameter>
             <result type="text"/>
         </command>
+        <command name="call tool" code="AgntCalT" description="Run one of the agent's tools directly on the Main tab, without the LLM, and return its result text. Same tool names and arguments the agent uses (call tool &quot;list_tools&quot; lists them). Root shell needs launch daemon enabled.">
+            <cocoa class="AgentCallToolCommand"/>
+            <direct-parameter type="text" description="Tool name, e.g. git, file, user_shell, xcode, list_tools."/>
+            <parameter name="with input" code="AgCi" type="text" optional="yes"
+                       description="The tool's arguments as a JSON object, e.g. {&quot;action&quot;:&quot;status&quot;}.">
+                <cocoa key="input"/>
+            </parameter>
+            <result type="text"/>
+        </command>
         <command name="select" code="miscslct" description="Make a tab the selected tab.">
             <cocoa class="NSScriptCommand"/>
             <direct-parameter type="tab" description="The tab to select."/>
