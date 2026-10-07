@@ -203,22 +203,6 @@ extension AgentViewModel {
 
         case "ax_scroll":
             // AXorcist-only: scroll TO an element by role/title (the AXScrollArea is found and scrolled until the
-            // target is visible). Coordinate-based scroll wheel events are no longer supported.
-            let role = input["role"] as? String
-            let title = input["title"] as? String
-            let appBundleId = AccessibilityService.shared
-                .resolveBundleId(input["appBundleId"] as? String ?? input["app"] as? String ?? input["name"] as? String)
-            tab.appendLog("♿️ Scroll to \(title ?? role ?? "?") in \(appBundleId ?? "frontmost")")
-            tab.flush()
-            let output = AccessibilityService.shared.scrollToElement(role: role, title: title, appBundleId: appBundleId)
-            tab.appendLog(output)
-            tab.flush()
-            return TabToolResult(
-                toolResult: ["type": "tool_result", "tool_use_id": toolId, "content": output],
-                isComplete: false
-            )
-
-        case "ax_press_key":
             // press_key removed — AXorcist doesn't drive raw key events. Use ax_click_element on the relevant button or
             // ax_click_menu_item for keyboard-shortcut menu commands.
             let msg =

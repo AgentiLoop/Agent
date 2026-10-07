@@ -281,15 +281,10 @@ extension AgentViewModel {
             return ax.scrollToElement(
                 role: role, title: title, appBundleId: app)
         case "press_key":
-            // press_key is no longer supported — AXorcist doesn't drive raw key events and the InputDriver path was
-            // removed. Use clickElement for buttons or clickMenuItem for keyboard-shortcut menu commands.
-            return """
-                Error: press_key is removed. Find the relevant button \
-                via accessibility(action:"click_element", \
-                role:"AXButton", title:..., appBundleId:...) or invoke \
-                the menu command via accessibility(action:"click_menu_item", \
-                appBundleId:..., menuPath:"File > Save").
-                """
+            // AX equivalent of System Events keystroke / key code: keys "cmd+s", "down*3 return"; optional text typed first.
+            let keys = input["keys"] as? String ?? input["key"] as? String ?? ""
+            return ax.pressKey(keys: keys, text: input["text"] as? String,
+                               role: role, title: title, appBundleId: app)
         case "drag":
             // drag is no longer supported — see the AccessibilityService+Interaction
             // comment for the removal rationale and AXorcist-based alternatives.
