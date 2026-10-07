@@ -19,6 +19,11 @@ struct MCPServersView: View {
     @State private var connectingIds: Set<UUID> = []
     @State private var renderKey = false
     @State private var addError: String?
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
+    private var faintStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .tertiary }
+    private var disabledTagStyle: HierarchicalShapeStyle { contrast == .increased ? .secondary : .tertiary }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -29,7 +34,7 @@ struct MCPServersView: View {
 
             Text("Connect external tools via Model Context Protocol.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(captionStyle)
 
             HStack {
                 Spacer()
@@ -85,14 +90,14 @@ struct MCPServersView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "server.rack")
                         .font(.system(size: 32))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(captionStyle)
                         .accessibilityHidden(true)
                     Text("No MCP servers configured")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(captionStyle)
                     Text("Add servers to expose tools to Agent!")
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(faintStyle)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 20)
@@ -112,10 +117,10 @@ struct MCPServersView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("MCP (Model Context Protocol) servers provide tools to Agent!")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
                 Text("Supports stdio and HTTP/HTTPS transport.")
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(faintStyle)
             }
         }
         .padding(16)
@@ -218,10 +223,10 @@ struct MCPServersView: View {
                         Text("Connected").font(.caption2).foregroundStyle(.green)
                     case .connecting:
                         ProgressView().controlSize(.mini)
-                        Text("Connecting...").font(.caption2).foregroundStyle(.secondary)
+                        Text("Connecting...").font(.caption2).foregroundStyle(captionStyle)
                     case .disconnected:
                         Circle().fill(.secondary).frame(width: 6, height: 6).accessibilityHidden(true)
-                        Text("Disconnected").font(.caption2).foregroundStyle(.secondary)
+                        Text("Disconnected").font(.caption2).foregroundStyle(captionStyle)
                     case .error(let message):
                         Circle().fill(.red).frame(width: 6, height: 6).accessibilityHidden(true)
                         Text(message).font(.caption2).foregroundStyle(.red).lineLimit(1)
@@ -239,7 +244,7 @@ struct MCPServersView: View {
                             .background(.blue).clipShape(Capsule())
                     }
                 }
-                Text(server.displayAddress).font(.caption).foregroundStyle(.secondary)
+                Text(server.displayAddress).font(.caption).foregroundStyle(captionStyle)
                     .lineLimit(1).truncationMode(.middle)
                 // Show discovered tools as toggleable tags
                 let tools = mcpService.discoveredTools.filter { $0.serverId == server.id }
@@ -255,7 +260,7 @@ struct MCPServersView: View {
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
                                     .background(enabled ? Color.accentColor.opacity(0.2) : Color.secondary.opacity(0.1))
-                                    .foregroundStyle(enabled ? .primary : .tertiary)
+                                    .foregroundStyle(enabled ? .primary : disabledTagStyle)
                                     .clipShape(Capsule())
                                     .overlay(Capsule().stroke(enabled ? Color.accentColor.opacity(0.5) : Color.clear, lineWidth: 0.5))
                             }
@@ -334,6 +339,9 @@ struct MCPServerEditView: View {
     }
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
 
     init(server: MCPServerConfig?, onSave: @escaping (MCPServerConfig) -> Void) {
         self.server = server
@@ -416,7 +424,7 @@ struct MCPServerEditView: View {
 
             VStack(alignment: .leading, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Name").font(.caption).foregroundStyle(.secondary)
+                    Text("Name").font(.caption).foregroundStyle(captionStyle)
                         .accessibilityHidden(true)
                     TextField("My MCP Server", text: $name).textFieldStyle(.roundedBorder)
                         .accessibilityLabel("Name")
@@ -432,25 +440,25 @@ struct MCPServerEditView: View {
                 if useHTTP {
                     // HTTP fields
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("URL").font(.caption).foregroundStyle(.secondary)
+                        Text("URL").font(.caption).foregroundStyle(captionStyle)
                             .accessibilityHidden(true)
                         TextField("https://example.com/mcp", text: $urlText).textFieldStyle(.roundedBorder)
                             .accessibilityLabel("URL")
                     }
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("SSE Endpoint (optional)").font(.caption).foregroundStyle(.secondary)
+                        Text("SSE Endpoint (optional)").font(.caption).foregroundStyle(captionStyle)
                             .accessibilityHidden(true)
                         TextField("/sse", text: $sseEndpointText).textFieldStyle(.roundedBorder)
                             .accessibilityLabel("SSE Endpoint (optional)")
                     }
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("HTTP Endpoint (optional)").font(.caption).foregroundStyle(.secondary)
+                        Text("HTTP Endpoint (optional)").font(.caption).foregroundStyle(captionStyle)
                             .accessibilityHidden(true)
                         TextField("/message", text: $httpEndpointText).textFieldStyle(.roundedBorder)
                             .accessibilityLabel("HTTP Endpoint (optional)")
                     }
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Headers (Name: Value, one per line)").font(.caption).foregroundStyle(.secondary)
+                        Text("Headers (Name: Value, one per line)").font(.caption).foregroundStyle(captionStyle)
                             .accessibilityHidden(true)
                         TextField("Authorization: Bearer ...", text: $headersText, axis: .vertical)
                             .accessibilityLabel("Headers (Name: Value, one per line)")
@@ -461,13 +469,13 @@ struct MCPServerEditView: View {
                 } else {
                     // Stdio fields
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Command").font(.caption).foregroundStyle(.secondary)
+                        Text("Command").font(.caption).foregroundStyle(captionStyle)
                             .accessibilityHidden(true)
                         TextField("/usr/local/bin/my-mcp-server", text: $command).textFieldStyle(.roundedBorder)
                             .accessibilityLabel("Command")
                     }
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Arguments (one per line)").font(.caption).foregroundStyle(.secondary)
+                        Text("Arguments (one per line)").font(.caption).foregroundStyle(captionStyle)
                             .accessibilityHidden(true)
                         TextField("arg1", text: $argumentsText, axis: .vertical)
                             .accessibilityLabel("Arguments (one per line)")
@@ -476,7 +484,7 @@ struct MCPServerEditView: View {
                             .lineLimit(3...6)
                     }
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Environment Variables (KEY=value, one per line)").font(.caption).foregroundStyle(.secondary)
+                        Text("Environment Variables (KEY=value, one per line)").font(.caption).foregroundStyle(captionStyle)
                             .accessibilityHidden(true)
                         TextField("API_KEY=abc123", text: $environmentText, axis: .vertical)
                             .accessibilityLabel("Environment Variables (KEY=value, one per line)")
@@ -507,7 +515,7 @@ struct MCPServerEditView: View {
             Divider()
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("JSON").font(.caption).foregroundStyle(.secondary)
+                Text("JSON").font(.caption).foregroundStyle(captionStyle)
                 PlainTextEditor(text: $jsonText, label: "Server JSON")
                     .frame(height: 120)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
@@ -760,6 +768,9 @@ struct MCPImportView: View {
     @Binding var isPresented: Bool
     @State private var jsonText = ""
     @State private var errorText: String?
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -768,7 +779,7 @@ struct MCPImportView: View {
                 .accessibilityAddTraits(.isHeader)
             Text("Paste standard MCP JSON configuration:")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(captionStyle)
 
             PlainTextEditor(text: $jsonText, label: "MCP Server JSON")
                 .frame(height: 200)
