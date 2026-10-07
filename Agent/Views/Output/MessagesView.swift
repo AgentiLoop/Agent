@@ -3,6 +3,8 @@ import SwiftUI
 struct MessagesView: View {
     @Bindable var viewModel: AgentViewModel
     @State private var renderKey = false
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var highContrast: Bool { contrast == .increased }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -13,7 +15,7 @@ struct MessagesView: View {
 
             Text("Monitor iMessage for \"Agent!\" commands.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(highContrast ? .primary : .secondary)
 
             HStack {
                 Picker("Active", selection: $viewModel.messageFilter) {
@@ -40,14 +42,14 @@ struct MessagesView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "message")
                         .font(.system(size: 32))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(highContrast ? .primary : .secondary)
                         .accessibilityHidden(true)
                     Text("No recipients yet")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(highContrast ? .primary : .secondary)
                     Text("Recipients appear here as messages arrive.")
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(highContrast ? .primary : .tertiary)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 20)
@@ -55,7 +57,7 @@ struct MessagesView: View {
                 HStack {
                     Text("Check recipients to act on \"Agent!\" commands:")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(highContrast ? .primary : .secondary)
                     Spacer()
                     Button("All") {
                         let filtered = Set(viewModel.filteredRecipients.map(\.id))
@@ -95,10 +97,10 @@ struct MessagesView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Send \"Agent! <prompt>\" from a checked recipient to trigger a task.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(highContrast ? .primary : .secondary)
                 Text("Unchecked recipients are logged but not acted on. Each recipient must be approved.")
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(highContrast ? .primary : .tertiary)
             }
 
             if !AgentViewModel.checkFullDiskAccess() {
@@ -109,7 +111,7 @@ struct MessagesView: View {
                         .accessibilityHidden(true)
                     Text("Full Disk Access required to read Messages.")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(highContrast ? .primary : .secondary)
                         .accessibilityLabel("Warning: Full Disk Access required to read Messages.")
                     Spacer()
                     Button("Open Settings") {
@@ -155,7 +157,7 @@ struct MessagesView: View {
 
             Text(recipient.id)
                 .font(.subheadline)
-                .foregroundStyle(isEnabled ? .primary : .secondary)
+                .foregroundStyle(isEnabled || highContrast ? .primary : .secondary)
                 .lineLimit(1)
                 .accessibilityHidden(true)
 
@@ -163,12 +165,17 @@ struct MessagesView: View {
 
             Text(recipient.service)
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(highContrast ? .primary : .tertiary)
                 .accessibilityHidden(true)
         }
         .padding(.vertical, 4)
         .padding(.horizontal, 8)
-        .background(isEnabled ? Color.blue.opacity(0.05) : .clear)
+        .background(isEnabled ? Color.blue.opacity(highContrast ? 0.2 : 0.05) : .clear)
         .clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay {
+            if highContrast && isEnabled {
+                RoundedRectangle(cornerRadius: 6).stroke(Color.blue, lineWidth: 2)
+            }
+        }
     }
 }
