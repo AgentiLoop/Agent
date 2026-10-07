@@ -181,6 +181,7 @@ extension AgentViewModel {
         "find_element",
         "get_children",
         "get_focused_element",
+        "read_text",
         "get_window_frame",
         "screenshot",
         "wait_for_element",
@@ -406,6 +407,8 @@ extension AgentViewModel {
                 appBundleId: app, x: x, y: y)
         case "read_focused":
             return ax.readFocusedElement(appBundleId: app)
+        case "read_text":
+            return ax.readText(role: role, title: title, value: value, appBundleId: app)
         case "set_properties":
             return ax.setProperties(
                 role: role, title: title, value: value,

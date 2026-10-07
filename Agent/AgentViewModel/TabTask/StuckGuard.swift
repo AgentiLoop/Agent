@@ -103,6 +103,7 @@ extension AgentViewModel {
         "find_element",
         "get_focused_element",
         "read_focused",
+        "read_text",
         "get_children",
         "list_windows",
         "screenshot",
