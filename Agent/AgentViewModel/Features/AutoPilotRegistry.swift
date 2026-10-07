@@ -90,6 +90,12 @@ enum AutoPilotRegistry {
         return r.ok && !r.out.isEmpty ? r.out : nil
     }
 
+    /// Current HEAD commit of the repo containing `folder`, or nil.
+    static func head(_ folder: String) -> String? {
+        let r = git(["-C", folder, "rev-parse", "HEAD"])
+        return r.ok && !r.out.isEmpty ? r.out : nil
+    }
+
     /// Create (or reuse) this tab's worktree. Returns the folder matching
     /// `folder` inside the worktree (same subpath), and the branch.
     static func worktree(for folder: String, key: String) -> (folder: String, branch: String)? {

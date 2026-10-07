@@ -7,7 +7,9 @@ import Foundation
 // There is NO cycle limit and NO per-cycle iteration cap while a session is
 // active: whenever a cycle's task ends (done, error, stall) and the goal is not
 // reached, the next cycle starts automatically — only after the previous task
-// has fully ended. Works on the main tab and on any LLM tab (session is per tab).
+// has fully ended. The session also ends when the LLM reports "AUTOPILOT: BLOCKED"
+// or after `autoPilotMaxStalledCycles` completed cycles in a row with no new
+// git commit, so it never loops forever on "nothing to do". Works on the main tab and on any LLM tab (session is per tab).
 // Between cycles the summary is appended to this tab's `.agent/tabs/<key>/progress.md`
 // in the project folder and fed back into the next cycle's prompt. Several tabs
 // can run Auto-Pilot on the same project — see AutoPilotRegistry.swift.
@@ -36,6 +38,11 @@ struct AutoPilotSession: Codable {
     var idleCycles: Int = 0
     /// Set by `/auto stop` — finishes the running cycle, then ends.
     var stopRequested = false
+    /// HEAD commit when the last cycle started, and how many consecutive cycles
+    /// in a row ended without a new commit. Optional so sessions persisted by
+    /// older builds still decode.
+    var lastHead: String?
+    var stalledCycles: Int?
     /// Project folder the session was started in. Shared state (registry,
     /// progress log, memory) lives here even when working in a worktree.
     var projectRoot: String?
@@ -52,6 +59,10 @@ extension AgentViewModel {
     /// Marker the LLM puts at the start of its done/task_complete summary when
     /// it judges the goal fully reached. Case-insensitive.
     static let autoPilotGoalReachedMarker = "AUTOPILOT: GOAL REACHED"
+    /// Marker for "nothing more can be done without the user" — ends the session.
+    static let autoPilotBlockedMarker = "AUTOPILOT: BLOCKED"
+    /// Consecutive cycles without a new git commit before the session ends as stalled.
+    static let autoPilotMaxStalledCycles = 3
     private static let autoPilotGoalHistoryKey = "autoPilotGoalHistory"
     /// Active sessions persisted across app restarts: [tab UUID string or "main": JSON].
     private static let autoPilotSessionsKey = "autoPilotSessions"
@@ -354,6 +365,7 @@ extension AgentViewModel {
         let summary = (tab?.lastTaskCompletionSummary ?? lastTaskCompletionSummary)
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let reached = summary.uppercased().hasPrefix(Self.autoPilotGoalReachedMarker)
+            || summary.uppercased().hasPrefix(Self.autoPilotBlockedMarker)
         if !reached, !session.stopRequested, session.cycle > 0 {
             // Idle cycles back off 15s, 30s, 60s… capped at 5 min; otherwise a short settle.
             let idle = summary.isEmpty ? session.idleCycles + 1 : 0
@@ -383,10 +395,24 @@ extension AgentViewModel {
                 endAutoPilot(reason: "goal reached after \(session.cycle) cycle(s)", tab: tab)
                 return nil
             }
+            if summary.uppercased().hasPrefix(Self.autoPilotBlockedMarker) {
+                endAutoPilot(reason: "blocked — needs the user after \(session.cycle) cycle(s)", tab: tab)
+                return nil
+            }
             session.idleCycles = summary.isEmpty ? session.idleCycles + 1 : 0
             if session.stopRequested {
                 endAutoPilot(reason: "stopped by /auto stop after \(session.cycle) cycle(s)", tab: tab)
                 return nil
+            }
+            // Completed cycles that commit nothing are stalls; end after a few in a row
+            // instead of looping forever on "nothing to do".
+            if !summary.isEmpty, let before = session.lastHead {
+                let stalled = AutoPilotRegistry.head(autoPilotFolder(tab)) == before ? (session.stalledCycles ?? 0) + 1 : 0
+                session.stalledCycles = stalled
+                if stalled >= Self.autoPilotMaxStalledCycles {
+                    endAutoPilot(reason: "no new commits in \(stalled) cycles in a row — stalled after \(session.cycle) cycle(s)", tab: tab)
+                    return nil
+                }
             }
         }
         if let deadline = session.deadline, Date() >= deadline {
@@ -394,6 +420,7 @@ extension AgentViewModel {
             return nil
         }
 
+        session.lastHead = AutoPilotRegistry.head(autoPilotFolder(tab))
         session.cycle += 1
         setAutoPilotSession(session, tab)
         registerAutoPilot(session, tab)
@@ -497,6 +524,7 @@ extension AgentViewModel {
         4. Do not ask the user questions — decide and proceed; note assumptions in your summary.
         5. When this cycle's step is done and committed, call done with: what you did, what remains, and any blockers. A new cycle starts automatically.
         6. If the GOAL is fully reached and verified (build green, criteria checked with tool evidence), start your done summary with the exact text "\(Self.autoPilotGoalReachedMarker)". Never write that text otherwise.
+        7. If nothing useful is left that you can do without the user (blocked on their input, a hands-on test, or their uncommitted changes), start your done summary with the exact text "\(Self.autoPilotBlockedMarker)" and explain what you need — the session then ends. Do not run empty cycles. The session also ends after \(Self.autoPilotMaxStalledCycles) cycles in a row with no new commit.
         """
         return p
     }
