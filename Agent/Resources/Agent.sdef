@@ -72,6 +72,22 @@
                       description="Whether this is the selected tab. Set to true to select it.">
                 <cocoa key="selected"/>
             </property>
+            <property name="auto pilot running" code="AgAR" type="boolean" access="r"
+                      description="Whether an auto-pilot session is active in the tab.">
+                <cocoa key="autoPilotRunning"/>
+            </property>
+            <property name="auto pilot goal" code="AgAG" type="text" access="r"
+                      description="Goal of the tab's auto-pilot session (empty when none, or while the goal is still being asked).">
+                <cocoa key="autoPilotGoal"/>
+            </property>
+            <property name="auto pilot cycle" code="AgAC" type="integer" access="r"
+                      description="Current auto-pilot cycle number (0 when no session).">
+                <cocoa key="autoPilotCycle"/>
+            </property>
+            <property name="auto pilot status" code="AgAS" type="text" access="r"
+                      description="One-line auto-pilot status: cycle, elapsed, time left, branch, goal.">
+                <cocoa key="autoPilotStatus"/>
+            </property>
             <responds-to command="close">
                 <cocoa method="handleCloseScriptCommand:"/>
             </responds-to>
@@ -83,6 +99,9 @@
             </responds-to>
             <responds-to command="stop task">
                 <cocoa method="handleStopTaskScriptCommand:"/>
+            </responds-to>
+            <responds-to command="stop auto pilot">
+                <cocoa method="handleStopAutoPilotScriptCommand:"/>
             </responds-to>
         </class>
 
@@ -118,6 +137,35 @@
             </parameter>
         </command>
 
+        <command name="start auto pilot" code="AgntStAP" description="Start an auto-pilot session: the tab works in cycles until the goal is reached, the time limit runs out, or it is stopped. Same as /auto. Returns true if it started.">
+            <cocoa class="AgentStartAutoPilotCommand"/>
+            <direct-parameter type="text" optional="yes" description="The goal. Omit to have Agent! review the project and ask for one."/>
+            <parameter name="hours" code="AgHr" type="real" optional="yes"
+                       description="Time limit in hours (default: no limit).">
+                <cocoa key="hours"/>
+            </parameter>
+            <parameter name="isolated" code="AgIs" type="boolean" optional="yes"
+                       description="true: work in an isolated git worktree; false: the shared checkout (default: isolate only when another auto-pilot tab is on the project).">
+                <cocoa key="isolated"/>
+            </parameter>
+            <parameter name="in tab" code="AgTt" type="tab" optional="yes"
+                       description="Tab to run in (default: the Main tab).">
+                <cocoa key="tab"/>
+            </parameter>
+            <result type="boolean"/>
+        </command>
+        <command name="stop auto pilot" code="AgntSpAP" description="End a tab's auto-pilot session. By default it ends now and stops the running task (Stop All); with after cycle true it ends when the current cycle finishes (/auto stop).">
+            <cocoa class="AgentStopAutoPilotCommand"/>
+            <direct-parameter type="tab" optional="yes" description="Tab to stop, e.g. stop auto pilot tab 2 (default: the Main tab)."/>
+            <parameter name="in tab" code="AgTt" type="tab" optional="yes"
+                       description="Tab to stop (default: the Main tab).">
+                <cocoa key="tab"/>
+            </parameter>
+            <parameter name="after cycle" code="AgAf" type="boolean" optional="yes"
+                       description="true: let the running cycle finish first.">
+                <cocoa key="afterCycle"/>
+            </parameter>
+        </command>
         <command name="select" code="miscslct" description="Make a tab the selected tab.">
             <cocoa class="NSScriptCommand"/>
             <direct-parameter type="tab" description="The tab to select."/>

@@ -193,18 +193,7 @@ extension AgentViewModel {
             return true
         }
         if lower == "stop" {
-            if autoPilotSession(tab) == nil {
-                apLog("🛩️ Auto-pilot is not running.", tab)
-            } else if autoPilotTaskIsRunning(tab) {
-                var s = autoPilotSession(tab)
-                s?.stopRequested = true
-                setAutoPilotSession(s, tab)
-                apLog("🛩️ Auto-pilot will stop after the current cycle.", tab)
-            } else {
-                // Between cycles (pause/backoff) — end now and drop the pending cycle.
-                endAutoPilot(reason: "stopped by /auto stop", tab: tab)
-                if let tab { tab.runningLLMTask?.cancel() } else { runningTask?.cancel() }
-            }
+            requestAutoPilotStop(tab)
             return true
         }
         if lower == "status" {
@@ -283,6 +272,22 @@ extension AgentViewModel {
         recordAutoPilotGoal(goal)
         startAutoPilot(goal: goal, hours: hours, tab: tab, isolate: isolate)
         return true
+    }
+
+    /// `/auto stop` — end the session after the running cycle, or now when between cycles.
+    func requestAutoPilotStop(_ tab: ScriptTab?) {
+        if autoPilotSession(tab) == nil {
+            apLog("🛩️ Auto-pilot is not running.", tab)
+        } else if autoPilotTaskIsRunning(tab) {
+            var s = autoPilotSession(tab)
+            s?.stopRequested = true
+            setAutoPilotSession(s, tab)
+            apLog("🛩️ Auto-pilot will stop after the current cycle.", tab)
+        } else {
+            // Between cycles (pause/backoff) — end now and drop the pending cycle.
+            endAutoPilot(reason: "stopped by /auto stop", tab: tab)
+            if let tab { tab.runningLLMTask?.cancel() } else { runningTask?.cancel() }
+        }
     }
 
     /// Split a leading duration token (`4h`, `30m`, `1.5h`, `--hours 4`) from the goal text.

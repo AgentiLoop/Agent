@@ -214,6 +214,48 @@ final class ScriptingTab: NSObject {
         return nil
     }
 
+    // MARK: Auto-pilot
+
+    @objc var autoPilotRunning: Bool { tabExists && vm?.autoPilotSession(tab) != nil }
+    @objc var autoPilotGoal: String { tabExists ? (vm?.autoPilotSession(tab)?.goal ?? "") : "" }
+    @objc var autoPilotCycle: Int { tabExists ? (vm?.autoPilotSession(tab)?.cycle ?? 0) : 0 }
+    @objc var autoPilotStatus: String { tabExists ? (vm?.autoPilotStatusLine(tab) ?? "") : "" }
+
+    /// Main tab, or a tab that still exists (so a closed tab never falls back to Main).
+    private var tabExists: Bool { tabId == nil || tab != nil }
+
+    /// Starts an auto-pilot session in this tab. Returns an error message, or nil when started.
+    func startAutoPilot(goal: String, hours: Double?, isolate: Bool?) -> String? {
+        guard let vm else { return "Agent! is not ready." }
+        guard tabExists else { return "That tab no longer exists." }
+        guard vm.autoPilotSession(tab) == nil else { return "Auto-pilot is already running in the \(name) tab — \(vm.autoPilotStatusLine(tab))" }
+        guard !projectFolder.isEmpty else { return "Set the \(name) tab's project folder before starting auto-pilot." }
+        if let hours, hours <= 0 { return "hours must be greater than 0." }
+        vm.recordAutoPilotGoal(goal)
+        vm.startAutoPilot(goal: goal, hours: hours, tab: tab, isolate: isolate)
+        return nil
+    }
+
+    /// Ends this tab's auto-pilot session: after the running cycle (`/auto stop`), or now and
+    /// stopping the task (Stop All). Returns an error message, or nil.
+    func stopAutoPilot(afterCycle: Bool) -> String? {
+        guard let vm else { return "Agent! is not ready." }
+        guard tabExists else { return "That tab no longer exists." }
+        guard vm.autoPilotSession(tab) != nil else { return "Auto-pilot is not running in the \(name) tab." }
+        if afterCycle { vm.requestAutoPilotStop(tab) } else { vm.stopAutoPilotTab(tab) }
+        return nil
+    }
+
+    /// `stop auto pilot tab 2`.
+    @objc func handleStopAutoPilotScriptCommand(_ command: NSScriptCommand) -> Any? {
+        let afterCycle = (command.evaluatedArguments?["afterCycle"] as? Bool) ?? false
+        if let error = stopAutoPilot(afterCycle: afterCycle) {
+            command.scriptErrorNumber = -10000
+            command.scriptErrorString = error
+        }
+        return nil
+    }
+
     /// Closes this tab. Returns an error message, or nil when closed.
     func close() -> String? {
         guard let tabId else { return "The Main tab can't be closed." }
@@ -282,6 +324,37 @@ final class AgentStopTaskCommand: NSScriptCommand {
     override func performDefaultImplementation() -> Any? {
         let target = scriptingTarget(self)
         MainActor.assumeIsolated { target.stop() }
+        return nil
+    }
+}
+
+/// `start auto pilot ["goal"] [hours 2] [isolated true] [in tab tab 2]` — Main tab unless a tab is given.
+@objc(AgentStartAutoPilotCommand)
+final class AgentStartAutoPilotCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        let goal = (directParameter as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let hours = (evaluatedArguments?["hours"] as? NSNumber)?.doubleValue
+        let isolate = evaluatedArguments?["isolated"] as? Bool
+        let target = scriptingTarget(self)
+        if let error = MainActor.assumeIsolated({ target.startAutoPilot(goal: goal, hours: hours, isolate: isolate) }) {
+            scriptErrorNumber = -10000
+            scriptErrorString = error
+            return false
+        }
+        return true
+    }
+}
+
+/// `stop auto pilot [in tab tab 2] [after cycle true]` — Main tab unless a tab is given.
+@objc(AgentStopAutoPilotCommand)
+final class AgentStopAutoPilotCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        let afterCycle = (evaluatedArguments?["afterCycle"] as? Bool) ?? false
+        let target = scriptingTarget(self)
+        if let error = MainActor.assumeIsolated({ target.stopAutoPilot(afterCycle: afterCycle) }) {
+            scriptErrorNumber = -10000
+            scriptErrorString = error
+        }
         return nil
     }
 }
