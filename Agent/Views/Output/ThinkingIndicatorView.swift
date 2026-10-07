@@ -766,6 +766,18 @@ private struct LLMOutputBox: View {
                         }
                         .onEnded { _ in dragStartHeight = 0 }
                 )
+                // Drag-only resize is unreachable for VoiceOver — expose as an adjustable control
+                .accessibilityElement()
+                .accessibilityLabel("LLM output height")
+                .accessibilityValue("\(Int(height)) points")
+                .accessibilityHint("Swipe up or down to resize")
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: height = min(height + 40, maxHeight)
+                    case .decrement: height = max(40, height - 40)
+                    @unknown default: break
+                    }
+                }
         }
         .background(termBg)
         .cornerRadius(6)
@@ -946,6 +958,17 @@ struct ToolStepsView: View {
                             }
                     )
                     .help("Drag to resize the Steps list")
+                    .accessibilityElement()
+                    .accessibilityLabel("Steps list height")
+                    .accessibilityValue("\(Int(effectiveHeight)) points")
+                    .accessibilityHint("Swipe up or down to resize")
+                    .accessibilityAdjustableAction { direction in
+                        switch direction {
+                        case .increment: listHeight = min(listHeight + 40, Self.maxHeight)
+                        case .decrement: listHeight = max(listHeight - 40, Self.minHeight)
+                        @unknown default: break
+                        }
+                    }
             }
         }
         .padding(.vertical, 4)
