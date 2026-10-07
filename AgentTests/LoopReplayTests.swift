@@ -285,6 +285,22 @@ struct LoopReplayScenarioTests {
         try? FileManager.default.removeItem(at: dir)
     }
 
+    @Test("a failure streak recorded by an older app build is not flagged chronic")
+    func chronicExpiresAcrossBuilds() throws {
+        let dir = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("AgentOutcomeTests-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: dir.appendingPathComponent(".agent"), withIntermediateDirectories: true)
+        let stale = #"{"web_navigate":{"successes":0,"failures":5,"lastError":"unknown action"}}"#
+        try stale.write(to: dir.appendingPathComponent(".agent/tool_outcomes.json"), atomically: true, encoding: .utf8)
+        let store = ToolOutcomeStore.shared
+        store.startTask(projectFolder: dir.path)
+        #expect(store.promptBlock.isEmpty) // no build recorded → older build
+        for _ in 0..<5 { store.record(tool: "web_navigate", output: "Error: x", isFailure: true) }
+        store.startTask(projectFolder: dir.path)
+        #expect(store.promptBlock.contains("web_navigate: failed 5x")) // streak restarted on this build
+        try? FileManager.default.removeItem(at: dir)
+    }
+
     @Test("UI-scripting tools steer to accessibility after 2 failures so the 3rd try works")
     func accessibilityFallbackAdvisory() {
         let dir = URL(fileURLWithPath: NSTemporaryDirectory())

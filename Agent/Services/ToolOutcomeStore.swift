@@ -14,6 +14,15 @@ final class ToolOutcomeStore {
         var successes: Int = 0
         var failures: Int = 0
         var lastError: String = ""
+        /// App build that recorded the failure streak (nil in older files).
+        var build: String?
+    }
+
+    /// The running app's build number. A failure streak from an older build
+    /// isn't chronic: the update may have fixed the tool, and the warning would
+    /// otherwise steer the model away from it forever (no success can reset it).
+    nonisolated static var currentBuild: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""
     }
 
     /// Failures of one tool within the current task before an advisory fires.
@@ -52,6 +61,7 @@ final class ToolOutcomeStore {
         }
         let chronic = persisted.filter {
             $0.value.failures >= Self.chronicThreshold && $0.value.successes == 0
+                && $0.value.build == Self.currentBuild
         }
         if chronic.isEmpty {
             promptBlock = ""
@@ -68,6 +78,8 @@ final class ToolOutcomeStore {
     func record(tool: String, output: String, isFailure: Bool) {
         var entry = persisted[tool] ?? Outcome()
         if isFailure {
+            // A streak from an older build starts over on this one.
+            if entry.build != Self.currentBuild { entry.failures = 0; entry.build = Self.currentBuild }
             taskFailures[tool, default: 0] += 1
             taskLastError[tool] = String(output.prefix(300))
             entry.failures += 1
