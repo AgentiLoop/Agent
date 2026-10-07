@@ -110,6 +110,7 @@ struct FallbackChainView: View {
 
                             Button {
                                 service.remove(id: entry.id)
+                                announceForAccessibility("\(APIProvider(rawValue: entry.provider)?.displayName ?? entry.provider) \(shortModel(entry.model)) removed")
                             } label: {
                                 Image(systemName: "minus.circle.fill")
                                     .foregroundStyle(removeColor)

@@ -312,8 +312,10 @@ struct ContentView: View {
                     withAnimation(NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : .easeInOut(duration: 0.2)) {
                         if let selId = viewModel.selectedTabId, let tab = viewModel.tab(for: selId) {
                             tab.thinkingDismissed.toggle()
+                            announceForAccessibility(tab.thinkingDismissed ? "LLM Output hidden" : "LLM Output shown")
                         } else {
                             viewModel.thinkingDismissed.toggle()
+                            announceForAccessibility(viewModel.thinkingDismissed ? "LLM Output hidden" : "LLM Output shown")
                         }
                     }
                     return nil
@@ -367,6 +369,7 @@ struct ContentView: View {
                    event.charactersIgnoringModifiers?.lowercased() == "m"
                 {
                     viewModel.messagesMonitorEnabled.toggle()
+                    announceForAccessibility(viewModel.messagesMonitorEnabled ? "Messages Monitor on" : "Messages Monitor off")
                     return nil
                 }
 
@@ -380,8 +383,10 @@ struct ContentView: View {
                            let tab = viewModel.tab(for: selId)
                         {
                             tab.thinkingDismissed.toggle()
+                            announceForAccessibility(tab.thinkingDismissed ? "LLM Output hidden" : "LLM Output shown")
                         } else {
                             viewModel.thinkingDismissed.toggle()
+                            announceForAccessibility(viewModel.thinkingDismissed ? "LLM Output hidden" : "LLM Output shown")
                         }
                     }
                     return nil
@@ -434,6 +439,7 @@ struct ContentView: View {
                     if let selId = viewModel.selectedTabId, let tab = viewModel.tab(for: selId) {
                         tab.rawLLMOutput = ""
                     }
+                    announceForAccessibility("LLM output cleared")
                     return nil
                 }
 
@@ -446,6 +452,7 @@ struct ContentView: View {
                     if let selId = viewModel.selectedTabId, let tab = viewModel.tab(for: selId) {
                         tab.promptHistory.removeAll()
                     }
+                    announceForAccessibility("Prompt history cleared")
                     return nil
                 }
 
@@ -454,6 +461,7 @@ struct ContentView: View {
                    event.charactersIgnoringModifiers == "j"
                 {
                     viewModel.history.clearAll()
+                    announceForAccessibility("Task history cleared")
                     return nil
                 }
 
@@ -463,6 +471,7 @@ struct ContentView: View {
                 {
                     viewModel.taskInputTokens = 0; viewModel.taskOutputTokens = 0
                     viewModel.sessionInputTokens = 0; viewModel.sessionOutputTokens = 0
+                    announceForAccessibility("Token counts cleared")
                     return nil
                 }
 
@@ -614,7 +623,11 @@ struct ContentView: View {
             withAnimation(NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : .easeInOut(duration: 0.2)) {
                 if let selId = viewModel.selectedTabId, let tab = viewModel.tab(for: selId) {
                     tab.thinkingDismissed.toggle()
-                } else { viewModel.thinkingDismissed.toggle() }
+                    announceForAccessibility(tab.thinkingDismissed ? "LLM Output hidden" : "LLM Output shown")
+                } else {
+                    viewModel.thinkingDismissed.toggle()
+                    announceForAccessibility(viewModel.thinkingDismissed ? "LLM Output hidden" : "LLM Output shown")
+                }
             }
         case .menuRunTask:
             if let selId = viewModel.selectedTabId, let tab = viewModel.tab(for: selId) {
@@ -651,7 +664,9 @@ struct ContentView: View {
             viewModel.taskInputTokens = 0; viewModel.taskOutputTokens = 0
             viewModel.sessionInputTokens = 0; viewModel.sessionOutputTokens = 0
             announceForAccessibility("Token counts cleared")
-        case .menuToggleMessagesMonitor: viewModel.messagesMonitorEnabled.toggle()
+        case .menuToggleMessagesMonitor:
+            viewModel.messagesMonitorEnabled.toggle()
+            announceForAccessibility(viewModel.messagesMonitorEnabled ? "Messages Monitor on" : "Messages Monitor off")
         case .menuFocusLog: focusActivityLog()
         case .menuFocusTaskField: isTaskFieldFocused = true
         default: break

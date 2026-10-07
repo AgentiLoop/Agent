@@ -427,6 +427,7 @@ struct InputSectionView: View {
                     } else {
                         viewModel.pastedTexts.removeAll { $0.id == item.id }
                     }
+                    announceForAccessibility("Pasted text removed")
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 11))
