@@ -98,6 +98,9 @@ struct LLMOutputTextView: NSViewRepresentable {
         textView.isEditable = false
         // Selection enabled — click+drag to select, Cmd+C to copy. Arrow cursor forced via FollowTextView overrides.
         textView.isSelectable = true
+        // Unnamed text views read as just "text" in VoiceOver — name the output
+        textView.setAccessibilityLabel("LLM output")
+        scrollView.setAccessibilityLabel("LLM output")
         textView.backgroundColor = .clear
         textView.drawsBackground = false
         textView.textContainerInset = NSSize(width: 10, height: 10)

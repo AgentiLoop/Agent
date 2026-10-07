@@ -87,6 +87,9 @@ struct ActivityLogView: NSViewRepresentable {
         scrollView.documentView = textView
         textView.isEditable = false
         textView.isSelectable = true
+        // Unnamed text views read as just "text" in VoiceOver — name the log
+        textView.setAccessibilityLabel("Activity log")
+        scrollView.setAccessibilityLabel("Activity log")
         textView.font = .monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
         textView.backgroundColor = .clear
         textView.textContainerInset = NSSize(width: 12, height: 12)
