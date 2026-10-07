@@ -255,6 +255,8 @@
 		5B493B361E9291FA27F8496B /* AvatarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B56C841E197D78556C4620 /* AvatarController.swift */; };
 		AAAB78FFAB5CB1D752D58DD6 /* AvatarPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E8E39436A1C0932057F0F9 /* AvatarPaneView.swift */; };
 		D1A7A7A7A7A7A7A7A7A7A701 /* avatar.html in Resources */ = {isa = PBXBuildFile; fileRef = BF80D97BF0588E5E478E70AE /* avatar.html */; };
+		EA55ACA64CAA0B9833CE8362 /* AppleScriptSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F9F95DAFAA1C94D082DF82 /* AppleScriptSupport.swift */; };
+		5DEF0000000000000000A001 /* Agent.sdef in Resources */ = {isa = PBXBuildFile; fileRef = 981C2A8BFC45C8BCD6C7000C /* Agent.sdef */; };
 		33D52D2CE01A775259C27580 /* AvatarControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F1EA9AEA14A0CC1B69CD575 /* AvatarControllerTests.swift */; };
 		E09A4851FAEBEBC6CDAB2156 /* AutoPilotRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66787BD46E097C69BC10C8E /* AutoPilotRegistry.swift */; };
 		133436F0824C64E5C82F9C0B /* ReadableStatusColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07033EE1AF34D90014629F02 /* ReadableStatusColor.swift */; };
@@ -546,6 +548,8 @@
 		08B56C841E197D78556C4620 /* AvatarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Avatar/AvatarController.swift; sourceTree = "<group>"; };
 		C6E8E39436A1C0932057F0F9 /* AvatarPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Avatar/AvatarPaneView.swift; sourceTree = "<group>"; };
 		BF80D97BF0588E5E478E70AE /* avatar.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = Resources/avatar.html; sourceTree = "<group>"; };
+		C2F9F95DAFAA1C94D082DF82 /* AppleScriptSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptSupport.swift; sourceTree = "<group>"; };
+		981C2A8BFC45C8BCD6C7000C /* Agent.sdef */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Resources/Agent.sdef; sourceTree = "<group>"; };
 		6F1EA9AEA14A0CC1B69CD575 /* AvatarControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AvatarControllerTests.swift"; sourceTree = "<group>"; };
 		E66787BD46E097C69BC10C8E /* AutoPilotRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoPilotRegistry.swift"; sourceTree = "<group>"; };
 		07033EE1AF34D90014629F02 /* ReadableStatusColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReadableStatusColor.swift"; sourceTree = "<group>"; };
@@ -632,6 +636,7 @@
 				AA10000000000000000022 /* Agent.entitlements */,
 				EAHELP0000000000000002 /* Resources/Agent.help */,
 				BF80D97BF0588E5E478E70AE /* avatar.html */,
+				981C2A8BFC45C8BCD6C7000C /* Agent.sdef */,
 				6B5DB4F91516155F9841BE6E /* AvatarSpeaker.swift */,
 				08B56C841E197D78556C4620 /* AvatarController.swift */,
 				C6E8E39436A1C0932057F0F9 /* AvatarPaneView.swift */,
@@ -1036,6 +1041,7 @@
 				B73CC1C22C23AAC6CD8E7BD5 /* ToolErrorClassifier.swift */,
 				8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */,
 				34C10699E27F443F76A01246 /* MuseCodeAuth.swift */,
+				C2F9F95DAFAA1C94D082DF82 /* AppleScriptSupport.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -1298,6 +1304,7 @@
 				EA60000000000000000001 /* SDEFs in Resources */,
 				EAHELP0000000000000001 /* Resources/Agent.help in Resources */,
 				D1A7A7A7A7A7A7A7A7A7A701 /* avatar.html in Resources */,
+				5DEF0000000000000000A001 /* Agent.sdef in Resources */,
 				F4EDE7E05ED9DA2FF7BFEDD1 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1545,6 +1552,7 @@
 				AAAB78FFAB5CB1D752D58DD6 /* AvatarPaneView.swift in Sources */,
 				E09A4851FAEBEBC6CDAB2156 /* AutoPilotRegistry.swift in Sources */,
 				133436F0824C64E5C82F9C0B /* ReadableStatusColor.swift in Sources */,
+				EA55ACA64CAA0B9833CE8362 /* AppleScriptSupport.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -803,9 +803,13 @@ final class AgentViewModel {
     /// Prevents duplicate startup work when @State evaluates AgentViewModel() multiple times
     private static var _started = false
 
+    /// The live (first-started) view model — used by AppleScript support (AppleScriptSupport.swift).
+    private(set) static var current: AgentViewModel?
+
     init() {
         guard !Self._started else { return }
         Self._started = true
+        Self.current = self
 
         // Register all LLM providers with AgentLLM framework
         LLMProviderSetup.registerAllProviders()

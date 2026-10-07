@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dictionary SYSTEM "file://localhost/System/Library/DTDs/sdef.dtd">
+<dictionary title="Agent! Terminology" xmlns:xi="http://www.w3.org/2003/XInclude">
+
+    <!-- Standard Suite (open, close, quit, count, exists, get/set, windows …) -->
+    <xi:include href="file:///System/Library/ScriptingDefinitions/CocoaStandard.sdef" xpointer="xpointer(/dictionary/suite)"/>
+
+    <suite name="Agent! Suite" code="Agnt" description="Control Agent! — run and stop tasks, read the activity log, set the project folder.">
+
+        <class-extension extends="application" description="Agent! application.">
+            <property name="task running" code="AgRn" type="boolean" access="r"
+                      description="Whether the Main tab is currently running a task.">
+                <cocoa key="taskRunning"/>
+            </property>
+            <property name="activity log" code="AgLg" type="text" access="r"
+                      description="Full text of the Main tab activity log.">
+                <cocoa key="activityLog"/>
+            </property>
+            <property name="project folder" code="AgPF" type="text"
+                      description="The Main tab project folder (absolute path).">
+                <cocoa key="projectFolder"/>
+            </property>
+            <property name="task input" code="AgTI" type="text"
+                      description="The Main tab task field text.">
+                <cocoa key="taskInput"/>
+            </property>
+            <property name="provider" code="AgPv" type="text" access="r"
+                      description="Display name of the Main tab LLM provider.">
+                <cocoa key="providerName"/>
+            </property>
+        </class-extension>
+
+        <command name="run task" code="AgntRunT" description="Run a task in the Main tab. Returns true if the task started.">
+            <cocoa class="AgentRunTaskCommand"/>
+            <direct-parameter type="text" description="The task prompt."/>
+            <parameter name="in folder" code="AgFd" type="text" optional="yes"
+                       description="Project folder to set before running.">
+                <cocoa key="folder"/>
+            </parameter>
+            <result type="boolean"/>
+        </command>
+
+        <command name="stop task" code="AgntStpT" description="Stop the task running in the Main tab.">
+            <cocoa class="AgentStopTaskCommand"/>
+        </command>
+
+    </suite>
+</dictionary>
