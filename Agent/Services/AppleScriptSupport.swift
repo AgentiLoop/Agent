@@ -564,6 +564,40 @@ final class AgentClearHistoryCommand: NSScriptCommand {
     }
 }
 
+/// `memory "view" [path "/memories/x.md"] [project scope true]` — runs the agent's memory tool
+/// (view|create|str_replace|insert|delete|rename) against the Main tab. Returns its result text.
+@objc(AgentMemoryCommand)
+final class AgentMemoryCommand: NSScriptCommand {
+    override func performDefaultImplementation() -> Any? {
+        let args = evaluatedArguments ?? [:]
+        var text: [String: String] = ["command": directParameter as? String ?? ""]
+        if let path = args["path"] as? String { text["path"] = path }
+        if let content = args["content"] as? String {
+            text["file_text"] = content
+            text["insert_text"] = content
+        }
+        if let find = args["findText"] as? String { text["old_str"] = find }
+        if let replacement = args["replacement"] as? String { text["new_str"] = replacement }
+        if let destination = args["destination"] as? String {
+            text["old_path"] = text["path"]
+            text["new_path"] = destination
+        }
+        if (args["projectScope"] as? Bool) == true { text["scope"] = "project" }
+        let line = (args["lineNumber"] as? NSNumber)?.intValue
+        let result: String = MainActor.assumeIsolated {
+            guard let vm = AgentViewModel.current else { return "❌ Agent! is not ready." }
+            var input: [String: Any] = text
+            if let line { input["insert_line"] = line }
+            return vm.handleMemoryTool(input: input)
+        }
+        if result.hasPrefix("❌") {
+            scriptErrorNumber = -10000
+            scriptErrorString = String(result.dropFirst()).trimmingCharacters(in: .whitespaces)
+        }
+        return result
+    }
+}
+
 /// `stop task [in tab tab 2]` — stops the Main tab task unless a tab is given.
 @objc(AgentStopTaskCommand)
 final class AgentStopTaskCommand: NSScriptCommand {

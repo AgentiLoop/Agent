@@ -157,6 +157,10 @@ Starts an auto-pilot session (same as `/auto`): the tab works in cycles until th
 `stop auto pilot [t] [in tab t] [after cycle bool]`
 Ends the session now and stops the running task (Stop All). With `after cycle true` it ends when the current cycle finishes (`/auto stop`). Errors if auto-pilot isn't running.
 
+### `memory`
+`memory "view"|"create"|"str_replace"|"insert"|"delete"|"rename" [path "/memories/…"] [content "…"] [find text "…"] [replacement "…"] [line number N] [destination "/memories/…"] [project scope bool]` → text
+Reads or edits Agent!'s memory: the same `/memories` files the agent's `memory` tool uses. Global memory (shared by every project) is the default; `project scope true` uses the Main tab's project folder. Returns the tool's result text (`view` returns a file's text, or the file list for a folder). `view` defaults `path` to `/memories`; `create` takes the whole file as `content`; `str_replace` needs `find text` and `replacement`; `insert` puts `content` before 0-based `line number`; `rename` moves `path` to `destination`. Failures, such as a path outside `/memories` or `find text` that isn't found exactly once, raise an AppleScript error.
+
 ### Standard Suite
 `select`, `close`, `count`, `exists`, `make`, `get`/`set`, `quit` and the `window` class work as in other Cocoa apps.
 
@@ -180,6 +184,16 @@ tell application "Agent!"
     set n to count of (error history)
     clear history prompts in tab 1
     {n, recent}
+end tell
+```
+
+**Edit memory**
+
+```applescript
+tell application "Agent!"
+    memory "create" path "/memories/notes.md" content "Prefers tabs over spaces."
+    memory "str_replace" path "/memories/notes.md" find text "tabs" replacement "spaces"
+    memory "view" path "/memories/notes.md"
 end tell
 ```
 

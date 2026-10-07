@@ -323,6 +323,39 @@
                 <cocoa key="afterCycle"/>
             </parameter>
         </command>
+        <command name="memory" code="AgntMemo" description="Read or edit Agent!'s memory, the same /memories files the agent's memory tool uses. Returns the result text; failures raise an error.">
+            <cocoa class="AgentMemoryCommand"/>
+            <direct-parameter type="text" description="view, create, str_replace, insert, delete or rename."/>
+            <parameter name="path" code="AgYp" type="text" optional="yes"
+                       description="A path under /memories, e.g. &quot;/memories/notes.md&quot; (default: /memories).">
+                <cocoa key="path"/>
+            </parameter>
+            <parameter name="content" code="AgYc" type="text" optional="yes"
+                       description="create: the whole file; insert: the lines to insert.">
+                <cocoa key="content"/>
+            </parameter>
+            <parameter name="find text" code="AgYf" type="text" optional="yes"
+                       description="str_replace: the exact text to replace (must appear once).">
+                <cocoa key="findText"/>
+            </parameter>
+            <parameter name="replacement" code="AgYr" type="text" optional="yes"
+                       description="str_replace: the new text.">
+                <cocoa key="replacement"/>
+            </parameter>
+            <parameter name="line number" code="AgYl" type="integer" optional="yes"
+                       description="insert: insert before this 0-based line (0 = top).">
+                <cocoa key="lineNumber"/>
+            </parameter>
+            <parameter name="destination" code="AgYd" type="text" optional="yes"
+                       description="rename: the new path under /memories.">
+                <cocoa key="destination"/>
+            </parameter>
+            <parameter name="project scope" code="AgYs" type="boolean" optional="yes"
+                       description="true: the Main tab's project memory; false: global memory shared by every project (default).">
+                <cocoa key="projectScope"/>
+            </parameter>
+            <result type="text"/>
+        </command>
         <command name="select" code="miscslct" description="Make a tab the selected tab.">
             <cocoa class="NSScriptCommand"/>
             <direct-parameter type="tab" description="The tab to select."/>
