@@ -28,20 +28,77 @@
                       description="Display name of the Main tab LLM provider.">
                 <cocoa key="providerName"/>
             </property>
+            <element type="tab" description="Tabs in tab-bar order. tab 1 is always the Main tab.">
+                <cocoa key="scriptingTabs"/>
+            </element>
         </class-extension>
 
-        <command name="run task" code="AgntRunT" description="Run a task in the Main tab. Returns true if the task started.">
+        <class name="tab" plural="tabs" code="AgTb" description="A tab. Use make new tab to open an LLM tab with the Main tab's provider and model.">
+            <cocoa class="ScriptingTab"/>
+            <property name="id" code="ID  " type="text" access="r"
+                      description="Unique identifier (&quot;main&quot; for the Main tab).">
+                <cocoa key="uniqueID"/>
+            </property>
+            <property name="name" code="pnam" type="text" access="r" description="Tab title.">
+                <cocoa key="name"/>
+            </property>
+            <property name="task running" code="AgRn" type="boolean" access="r"
+                      description="Whether the tab is running a task.">
+                <cocoa key="taskRunning"/>
+            </property>
+            <property name="activity log" code="AgLg" type="text" access="r"
+                      description="Full text of the tab's activity log.">
+                <cocoa key="activityLog"/>
+            </property>
+            <property name="task input" code="AgTI" type="text" description="The tab's task field text.">
+                <cocoa key="taskInput"/>
+            </property>
+            <property name="project folder" code="AgPF" type="text" description="The tab's project folder (absolute path).">
+                <cocoa key="projectFolder"/>
+            </property>
+            <property name="provider" code="AgPv" type="text" access="r" description="Display name of the tab's LLM provider.">
+                <cocoa key="providerName"/>
+            </property>
+            <property name="model" code="AgMd" type="text" access="r" description="The tab's LLM model ID.">
+                <cocoa key="modelName"/>
+            </property>
+            <property name="selected" code="AgSl" type="boolean"
+                      description="Whether this is the selected tab. Set to true to select it.">
+                <cocoa key="selected"/>
+            </property>
+            <responds-to command="close">
+                <cocoa method="handleCloseScriptCommand:"/>
+            </responds-to>
+            <responds-to command="select">
+                <cocoa method="handleSelectScriptCommand:"/>
+            </responds-to>
+        </class>
+
+        <command name="run task" code="AgntRunT" description="Run a task. Returns true if the task started.">
             <cocoa class="AgentRunTaskCommand"/>
             <direct-parameter type="text" description="The task prompt."/>
             <parameter name="in folder" code="AgFd" type="text" optional="yes"
                        description="Project folder to set before running.">
                 <cocoa key="folder"/>
             </parameter>
+            <parameter name="in tab" code="AgTt" type="tab" optional="yes"
+                       description="Tab to run in (default: the Main tab).">
+                <cocoa key="tab"/>
+            </parameter>
             <result type="boolean"/>
         </command>
 
-        <command name="stop task" code="AgntStpT" description="Stop the task running in the Main tab.">
+        <command name="stop task" code="AgntStpT" description="Stop a running task.">
             <cocoa class="AgentStopTaskCommand"/>
+            <parameter name="in tab" code="AgTt" type="tab" optional="yes"
+                       description="Tab to stop (default: the Main tab).">
+                <cocoa key="tab"/>
+            </parameter>
+        </command>
+
+        <command name="select" code="miscslct" description="Make a tab the selected tab.">
+            <cocoa class="NSScriptCommand"/>
+            <direct-parameter type="tab" description="The tab to select."/>
         </command>
 
     </suite>
