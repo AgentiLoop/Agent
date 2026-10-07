@@ -8,6 +8,9 @@ import AgentLLM
 /// they read as if they belonged to the selected provider. They don't.
 struct LLMCommonSettingsView: View {
     @Bindable var viewModel: AgentViewModel
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
 
     /// Web Search — available for all providers. Exa is preferred when
     /// configured, then Tavily, with DuckDuckGo as the keyless fallback.
@@ -18,14 +21,14 @@ struct LLMCommonSettingsView: View {
                 .font(.headline)
             Text("Exa or Tavily provides web search for all LLM providers. DuckDuckGo is used when neither key is set.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(captionStyle)
                 .fixedSize(horizontal: false, vertical: true)
             VStack(alignment: .leading, spacing: 4) {
-                Text("Exa API Key").font(.caption).foregroundStyle(.secondary).accessibilityHidden(true)
+                Text("Exa API Key").font(.caption).foregroundStyle(captionStyle).accessibilityHidden(true)
                 LockedSecureField(text: $viewModel.exaAPIKey, placeholder: "exa-...", lockKey: "lock.exaAPIKey", label: "Exa API Key")
             }
             VStack(alignment: .leading, spacing: 4) {
-                Text("Tavily API Key").font(.caption).foregroundStyle(.secondary).accessibilityHidden(true)
+                Text("Tavily API Key").font(.caption).foregroundStyle(captionStyle).accessibilityHidden(true)
                 LockedSecureField(text: $viewModel.tavilyAPIKey, placeholder: "tvly-...", lockKey: "lock.tavilyAPIKey", label: "Tavily API Key")
             }
         }
@@ -50,16 +53,16 @@ struct LLMCommonSettingsView: View {
 
             Text("Jev is a System One model: it answers typed yes/no, choice and rating questions about the current state instead of generating text. It advises Agent!'s tool loop — it does not replace your LLM provider.")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(captionStyle)
                 .fixedSize(horizontal: false, vertical: true)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("API Key").font(.caption).foregroundStyle(.secondary)
+                Text("API Key").font(.caption).foregroundStyle(captionStyle)
                 LockedSecureField(text: $viewModel.jevAPIKey, placeholder: "TypeSafe API key", lockKey: "lock.jevAPIKey", label: "Jev API Key")
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Model").font(.caption).foregroundStyle(.secondary)
+                Text("Model").font(.caption).foregroundStyle(captionStyle)
                 HStack {
                     if viewModel.jevModels.isEmpty {
                         TextField("e.g. \(JevConfiguration.defaultModel)", text: $viewModel.jevModel)
@@ -118,7 +121,7 @@ struct LLMCommonSettingsView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text("Reject at").font(.caption).foregroundStyle(.secondary)
+                    Text("Reject at").font(.caption).foregroundStyle(captionStyle)
                     Spacer()
                     Text("\(Int(viewModel.jevBlockPercent))% destructive")
                         .font(.caption).monospacedDigit()
@@ -131,7 +134,7 @@ struct LLMCommonSettingsView: View {
                     .accessibilityValue("\(Int(viewModel.jevBlockPercent))% destructive")
                 Text("Jev blocks a command it rates this likely — or more — to irreversibly destroy data. 0% rejects everything Jev is asked about; 100% only certainties.")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .disabled(viewModel.jevAPIKey.isEmpty || !viewModel.jevAdvisoryEnabled)
@@ -146,7 +149,7 @@ struct LLMCommonSettingsView: View {
                     .font(.headline)
                 Text("Applies to every provider, whichever one is selected.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(captionStyle)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
