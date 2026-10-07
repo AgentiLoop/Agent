@@ -638,14 +638,19 @@ struct ContentView: View {
         case .menuClearLLM:
             viewModel.rawLLMOutput = ""
             if let selId = viewModel.selectedTabId, let tab = viewModel.tab(for: selId) { tab.rawLLMOutput = "" }
+            announceForAccessibility("LLM output cleared")
         case .menuClearHistory:
             viewModel.promptHistory.removeAll()
             UserDefaults.standard.removeObject(forKey: "agentPromptHistory")
             if let selId = viewModel.selectedTabId, let tab = viewModel.tab(for: selId) { tab.promptHistory.removeAll() }
-        case .menuClearTasks: viewModel.history.clearAll()
+            announceForAccessibility("Prompt history cleared")
+        case .menuClearTasks:
+            viewModel.history.clearAll()
+            announceForAccessibility("Task history cleared")
         case .menuClearTokens:
             viewModel.taskInputTokens = 0; viewModel.taskOutputTokens = 0
             viewModel.sessionInputTokens = 0; viewModel.sessionOutputTokens = 0
+            announceForAccessibility("Token counts cleared")
         case .menuToggleMessagesMonitor: viewModel.messagesMonitorEnabled.toggle()
         case .menuFocusLog: focusActivityLog()
         case .menuFocusTaskField: isTaskFieldFocused = true

@@ -616,6 +616,7 @@ extension AgentViewModel {
             appendLog("🧹 All cleared.")
             flushLog()
         }
+        announceForAccessibility("All cleared")
     }
 
     // MARK: - LLM Streaming
