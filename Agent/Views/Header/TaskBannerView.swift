@@ -13,6 +13,8 @@ struct TaskBannerView: View {
     let onCancel: () -> Void
     /// Non-nil only while Auto-Pilot is active — ends the session and stops all tasks.
     var onStopAll: (() -> Void)? = nil
+    /// Non-nil only while Auto-Pilot is active — shown in a blue bar below the green one.
+    var autoPilotGoal: String? = nil
 
     var body: some View {
         VStack(spacing: 0) {
@@ -63,6 +65,28 @@ struct TaskBannerView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 5)
             .background(highContrast ? Color(red: 0, green: 0.4, blue: 0) : Color.green.opacity(0.7))
+
+            if let goal = autoPilotGoal {
+                let text = goal.isEmpty ? "(pending)" : goal
+                HStack(spacing: 6) {
+                    Image(systemName: "scope")
+                        .font(.caption2)
+                        .frame(width: 14)
+                        .foregroundStyle(.white)
+                        .accessibilityHidden(true)
+                    Text("Goal: \(text)")
+                        .font(.caption)
+                        .lineLimit(2)
+                        .truncationMode(.tail)
+                        .foregroundStyle(.white)
+                    Spacer()
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Auto-Pilot goal: \(text)")
+                .padding(.horizontal, 12)
+                .padding(.vertical, 4)
+                .background(highContrast ? Color(red: 0, green: 0.25, blue: 0.6) : Color.blue.opacity(0.7))
+            }
 
             // Apple AI prompt row (toggled by tapping person icon)
             if showAppleAIBanner, let aiPrompt = appleAIPrompt {
