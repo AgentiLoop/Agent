@@ -64,6 +64,9 @@ extension AgentViewModel {
                 .filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
             guard !commands.isEmpty else { return "(no commands)" }
             appendLog("🔧 batch_commands (\(commands.count) steps)")
+            for (idx, cmd) in commands.enumerated() {
+                appendLog("├ [\(idx + 1)/\(commands.count)] \(cmd)")
+            }
             flushLog()
             let script = commands.joined(separator: "\n")
             let fullCmd = Self.prependWorkingDirectory(script, projectFolder: pf)

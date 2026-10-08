@@ -47,6 +47,9 @@ extension AgentViewModel {
             }
 
             tab.appendLog("🔧 batch_commands (\(commands.count) steps)")
+            for (idx, cmd) in commands.enumerated() {
+                tab.appendLog("├ [\(idx + 1)/\(commands.count)] \(cmd)")
+            }
             tab.flush()
 
             guard !Task.isCancelled else { return TabToolResult(toolResult: nil, isComplete: false) }

@@ -259,7 +259,7 @@ extension AgentViewModel {
     static func formatToolCallForLog(rawName: String, rawInput: [String: Any]) -> String {
         let action = rawInput["action"] as? String
         let interestingKeys = ["app", "appBundleId", "name", "title", "role", "text",
-                               "file_path", "path", "url", "command", "menuPath"]
+                               "file_path", "path", "url", "command", "commands", "menuPath"]
         var parts: [String] = []
         for key in interestingKeys {
             guard let raw = rawInput[key] else { continue }
