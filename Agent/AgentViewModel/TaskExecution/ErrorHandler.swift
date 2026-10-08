@@ -345,6 +345,26 @@ extension AgentViewModel {
             try? await Task.sleep(for: .seconds(retryDelay))
             if Task.isCancelled { return .breakLoop }
             return .continueLoop
+        } else if provider.apiProtocol == .ollama, let missing = Self.parseOllamaMissingModel(errMsg) {
+            // Ollama 404 `{"error": "model 'X' not found"}` — the model isn't
+            // pulled on that server (or the name is misspelled). Retrying can't
+            // help: name the installed models and how to get this one, then
+            // fall back or stop, instead of dumping the raw JSON body.
+            let installed = (provider == .localOllama ? localOllamaModels : ollamaModels).map(\.name)
+            let installedHint = installed.isEmpty ? "" : "\nInstalled models: \(installed.joined(separator: ", "))"
+            appendLog(
+                """
+                ⚠️ \(errorSource): model '\(missing)' is not installed on the Ollama server.\(installedHint)
+                Run `ollama pull \(missing)` or pick an installed model in Settings.
+                """
+            )
+            flushLog()
+            if let fallback = await tryFallbackChain(reason: "\(errorSource) model '\(missing)' not found") {
+                timeoutRetryCount = 0
+                return fallback
+            }
+            recordError(AgentError.notFound(item: "Ollama model '\(missing)' (not installed — `ollama pull \(missing)`)"), context: errorSource)
+            return .breakLoop
         } else if errMsg.lowercased().contains("network")
             || errMsg.lowercased().contains("connection")
             || errMsg.lowercased().contains("internet")
@@ -506,6 +526,14 @@ extension AgentViewModel {
             return (t - b, b, c)
         }
         return nil
+    }
+
+    /// Model name from an Ollama "model not found" error, or nil.
+    /// - `/api/chat` 404: `{"error": "model 'llama3:8b' not found"}`
+    /// - older servers: `model "llama3:8b" not found, try pulling it first`
+    nonisolated static func parseOllamaMissingModel(_ message: String) -> String? {
+        guard message.lowercased().contains("not found") else { return nil }
+        return firstCapture(#"model\s+['"]([^'"]+)['"]\s+not found"#, in: message)
     }
 
     /// Output budget that fits next to `input` inside `limit`, with a 1K

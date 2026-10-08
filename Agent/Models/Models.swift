@@ -206,6 +206,9 @@ final class ErrorHistory {
     }
 
     private func save() {
+        // Unit tests drive real error paths (fake overflows, bogus models) —
+        // keep them in memory so they never land in the user's Error History.
+        guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
         // Capture data synchronously on main actor, then write async
         let data: Data?
         do {
