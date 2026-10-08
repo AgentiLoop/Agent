@@ -309,6 +309,29 @@ final class TokenUsageStore {
         saveSession()
     }
 
+    /// Clear one tab's usage (called when that tab's log is cleared) so its
+    /// popover bars only reflect what's currently in the tab.
+    func resetTabUsage(_ tabId: UUID) {
+        guard tabModelUsage.removeValue(forKey: tabId) != nil else { return }
+        saveSession()
+    }
+
+    /// Usage summed across the tabs that currently hold usage (open tabs + Main).
+    /// Cleared and closed tabs drop out, unlike the cumulative `modelUsage`.
+    var liveTabsModelUsage: [String: ModelUsage] {
+        var result: [String: ModelUsage] = [:]
+        for tabMap in tabModelUsage.values {
+            for (model, u) in tabMap {
+                var acc = result[model, default: ModelUsage()]
+                acc.inputTokens += u.inputTokens
+                acc.outputTokens += u.outputTokens
+                acc.callCount += u.callCount
+                result[model] = acc
+            }
+        }
+        return result
+    }
+
     /// Reset session-level model usage — clears the popover AND the persisted
     /// snapshot so the next app launch starts fresh.
     func resetModelUsage() {

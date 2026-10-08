@@ -560,6 +560,7 @@ extension AgentViewModel {
             tab.lastElapsed = 0
             tab.tabInputTokens = 0
             tab.tabOutputTokens = 0
+            TokenUsageStore.shared.resetTabUsage(tab.id)
             tab.thinkingDismissed = true
             tab.thinkingExpanded = false
             tab.thinkingOutputExpanded = false
@@ -573,6 +574,7 @@ extension AgentViewModel {
             thinkingOutputExpanded = false
             taskInputTokens = 0
             taskOutputTokens = 0
+            TokenUsageStore.shared.resetTabUsage(TokenUsageStore.mainTabKey)
             clearLog()
         }
         announceForAccessibility("Log cleared")

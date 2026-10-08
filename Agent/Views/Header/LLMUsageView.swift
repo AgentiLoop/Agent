@@ -23,7 +23,7 @@ struct LLMUsageView: View {
     private var scopedUsage: [String: TokenUsageStore.ModelUsage] {
         switch scope {
         case .all:
-            return store.modelUsage
+            return store.liveTabsModelUsage
         case .current:
             let key = viewModel.selectedTabId ?? TokenUsageStore.mainTabKey
             return store.tabModelUsage[key] ?? [:]
