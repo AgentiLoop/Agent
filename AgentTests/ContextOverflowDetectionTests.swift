@@ -63,4 +63,13 @@ struct ContextOverflowDetectionTests {
             "max_tokens is too large: 100000. This model supports at most 16384 completion tokens, whereas you provided 100000.")
         #expect(openAI?.requested == 100000 && openAI?.limit == 16384 && openAI?.model == "")
     }
+
+    @Test func parsesOllamaMissingModel() {
+        #expect(AgentViewModel.parseOllamaMissingModel(
+            "API error (404): {\"error\": \"model 'nonexistent-model-xyz' not found\"}") == "nonexistent-model-xyz")
+        #expect(AgentViewModel.parseOllamaMissingModel(
+            "model \"llama3:8b\" not found, try pulling it first") == "llama3:8b")
+        #expect(AgentViewModel.parseOllamaMissingModel("API error (404): page not found") == nil)
+        #expect(AgentViewModel.parseOllamaMissingModel("model 'x' is loading") == nil)
+    }
 }
