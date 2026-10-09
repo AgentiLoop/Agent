@@ -55,8 +55,8 @@
   <rect x="40" y="289" width="419" height="44" rx="10" fill="#0f1218"/>
   <text x="250" y="317" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="800" fill="#ffffff">Regístrate y recibe $3 en créditos de API →</text>
   <text x="40" y="355" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#4b5260">Código promocional</text>
-  <rect x="177" y="340" width="106" height="20" rx="5" fill="#ffffff" fill-opacity=".8" stroke="#8d95a1" stroke-width="1" stroke-dasharray="3 2"/>
-  <text x="230.5" y="354" text-anchor="middle" font-family="'SF Mono', ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="800" letter-spacing=".3" fill="#0f1218">SDRAGENTLOOP</text>
+  <rect x="185" y="337" width="116" height="26" rx="13" fill="#ffffff" fill-opacity=".92" stroke="#b4bbc6" stroke-width="1"/>
+  <text x="243" y="354.5" text-anchor="middle" font-family="'SF Mono', ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="800" letter-spacing=".6" fill="#0f1218">SDRAGENTLOOP</text>
 
   <!-- credits orb -->
   <circle cx="872" cy="192" r="182" fill="url(#orbGlow)"/>
