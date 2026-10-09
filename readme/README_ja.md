@@ -125,7 +125,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Apple Intelligence** | | 無料、オンデバイス | トリアージ、要約、トークン圧縮（脳アイコン、プロバイダーピッカーにはなし） |
 | **Claude** | | トークン単位（API キー）またはサブスクリプション（OAuth） | 長い自律タスク、拡張思考、プロンプトキャッシング |
 | **Codex** | | ChatGPT サブスクリプション | ChatGPT OAuth 経由の OpenAI モデル — API キー不要、トークン課金なし |
-| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logomark-white.svg"><img src="../docs/sponsors/sidrune-logomark.svg" width="20" height="20" alt="" /></picture>&nbsp;<b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 有料（API クレジット） | GPT、Claude などの主要 AI モデルをひとつの API で。プロモコード `SDRAGENTLOOP` で $3 クレジット |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 有料（API クレジット） | GPT、Claude などの主要 AI モデルをひとつの API で。プロモコード `SDRAGENTLOOP` で $3 クレジット |
 | **DeepSeek** | | 安価 | 低予算コーディング、キャッシュヒット報告 |
 | **Google Gemini** | | 有料（無料枠あり） | 長いコンテキスト、ビジョン |
 | **Grok**（xAI） | | 有料 | リアルタイム情報 |

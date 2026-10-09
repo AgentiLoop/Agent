@@ -125,7 +125,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Apple Intelligence** | | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，提供商选择器中不可用） |
 | **Claude** | | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
 | **Codex** | | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
-| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logomark-white.svg"><img src="../docs/sponsors/sidrune-logomark.svg" width="20" height="20" alt="" /></picture>&nbsp;<b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 付费（API 额度） | 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型；使用优惠码 `SDRAGENTLOOP` 获得 $3 额度 |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 付费（API 额度） | 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型；使用优惠码 `SDRAGENTLOOP` 获得 $3 额度 |
 | **DeepSeek** | | 便宜 | 低成本编码、缓存命中报告 |
 | **Google Gemini** | | 付费（有免费额度） | 长上下文、视觉 |
 | **Grok** (xAI) | | 付费 | 实时信息 |
