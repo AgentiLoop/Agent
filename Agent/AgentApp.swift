@@ -71,15 +71,52 @@ private func post(_ name: Notification.Name) {
     NotificationCenter.default.post(name: name, object: nil)
 }
 
+/// Intercepts the main window's close button. While any agent tab is running the window is hidden
+/// (orderOut) instead of closed so its exact state survives; a Dock click brings it back.
+/// Every other delegate call is forwarded to SwiftUI's own window delegate.
+final class MainWindowDelegateProxy: NSObject, NSWindowDelegate {
+    nonisolated(unsafe) weak var original: NSWindowDelegate?
+
+    @MainActor static var anyAgentRunning: Bool {
+        guard let vm = AgentsMenuDelegate.shared.viewModel else { return false }
+        return vm.isRunning || vm.scriptTabs.contains { $0.isBusy }
+    }
+
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        MainActor.assumeIsolated {
+            guard Self.anyAgentRunning else {
+                return original?.windowShouldClose?(sender) ?? true
+            }
+            sender.orderOut(nil)
+            return false
+        }
+    }
+
+    override func responds(to aSelector: Selector!) -> Bool {
+        super.responds(to: aSelector) || (original?.responds(to: aSelector) ?? false)
+    }
+
+    override func forwardingTarget(for aSelector: Selector!) -> Any? {
+        if original?.responds(to: aSelector) == true { return original }
+        return super.forwardingTarget(for: aSelector)
+    }
+}
+
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private let windowDelegateProxy = MainWindowDelegateProxy()
+    private weak var mainWindow: NSWindow?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Initialize accessibility defaults so UserDefaults keys exist before isRestricted() checks
         _ = AccessibilityEnabled.shared
 
-        // Persist window frame across launches and tiling
+        // Persist window frame across launches and tiling; hook close button while agents run
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if let window = NSApplication.shared.windows.first {
                 window.setFrameAutosaveName("AgentMainWindow")
+                self.mainWindow = window
+                self.windowDelegateProxy.original = window.delegate
+                window.delegate = self.windowDelegateProxy
             }
         }
 
@@ -120,7 +157,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         mainMenu.insertItem(agentsItem, at: insertIdx)
     }
 
+    /// Dock click / reopen: bring back the hidden main window (exact state preserved) instead of
+    /// letting SwiftUI create a fresh one.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag, let window = mainWindow {
+            window.makeKeyAndOrderFront(nil)
+            return false
+        }
+        return true
+    }
+
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        // Cmd-Q guard: confirm before killing running agents
+        if MainWindowDelegateProxy.anyAgentRunning {
+            let alert = NSAlert()
+            alert.messageText = "Agents are still running"
+            alert.informativeText = "Quitting will stop every running agent tab. Quit anyway?"
+            alert.alertStyle = .warning
+            alert.addButton(withTitle: "Quit")
+            alert.addButton(withTitle: "Cancel")
+            mainWindow?.makeKeyAndOrderFront(nil)
+            if alert.runModal() != .alertFirstButtonReturn {
+                return .terminateCancel
+            }
+        }
         // Tell the view model to stop all running tasks, MCP servers, etc.
         NotificationCenter.default.post(name: .appWillQuit, object: nil)
         // Drain compilation queue before exit to prevent stdout deadlock with C++ static destructors.
