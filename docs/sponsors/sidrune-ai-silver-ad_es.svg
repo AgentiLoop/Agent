@@ -6,7 +6,7 @@
     <linearGradient id="stripe" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0b0d12"/><stop offset=".45" stop-color="#8b919c"/><stop offset="1" stop-color="#e5e7eb"/></linearGradient>
     <radialGradient id="orbHl" cx=".12" cy=".3" r=".75"><stop offset="0" stop-color="#eef0f3"/><stop offset=".45" stop-color="#eef0f3" stop-opacity=".7"/><stop offset="1" stop-color="#eef0f3" stop-opacity="0"/></radialGradient>
     <linearGradient id="orb" x1="0" y1=".2" x2="1" y2=".8"><stop offset="0" stop-color="#c9cdd4"/><stop offset=".55" stop-color="#9aa2ae"/><stop offset="1" stop-color="#626a79"/></linearGradient>
-    <radialGradient id="orbGlow" cx=".5" cy=".5" r=".5"><stop offset=".82" stop-color="#ffffff" stop-opacity=".75"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="orbGlow" cx=".5" cy=".5" r=".5"><stop offset=".88" stop-color="#ffffff" stop-opacity=".35"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
     <clipPath id="card"><rect width="1100" height="380" rx="22"/></clipPath>
   </defs>
   <g clip-path="url(#card)">
@@ -55,11 +55,11 @@
   <rect x="40" y="289" width="419" height="44" rx="10" fill="#0f1218"/>
   <text x="250" y="317" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="800" fill="#ffffff">Regístrate y recibe $3 en créditos de API →</text>
   <text x="40" y="355" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#4b5260">Código promocional</text>
-  <rect x="177" y="339" width="124" height="22" rx="6" fill="#ffffff" fill-opacity=".65" stroke="#9aa1ab" stroke-dasharray="3 2"/>
-  <text x="239" y="354" text-anchor="middle" font-family="'SF Mono', ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="700" fill="#0f1218">SDRAGENTLOOP</text>
+  <rect x="177" y="340" width="106" height="20" rx="5" fill="#ffffff" fill-opacity=".8" stroke="#8d95a1" stroke-width="1" stroke-dasharray="3 2"/>
+  <text x="230.5" y="354" text-anchor="middle" font-family="'SF Mono', ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="800" letter-spacing=".3" fill="#0f1218">SDRAGENTLOOP</text>
 
   <!-- credits orb -->
-  <circle cx="872" cy="192" r="196" fill="url(#orbGlow)"/>
+  <circle cx="872" cy="192" r="182" fill="url(#orbGlow)"/>
   <circle cx="872" cy="192" r="160" fill="url(#orb)"/>
   <circle cx="872" cy="192" r="160" fill="url(#orbHl)"/>
   <circle cx="872" cy="192" r="159" fill="none" stroke="#ffffff" stroke-opacity=".6" stroke-width="1.5"/>
