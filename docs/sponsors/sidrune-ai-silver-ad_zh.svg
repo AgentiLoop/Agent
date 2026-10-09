@@ -54,7 +54,7 @@
   <rect x="40" y="267" width="226" height="44" rx="10" fill="#0f1218"/>
   <text x="153" y="295" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="800" fill="#ffffff">注册即得 $3 API 额度 →</text>
   <text x="290" y="295" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#4b5260">优惠码</text>
-  <rect x="352" y="278" width="110" height="24" rx="13" fill="#ffffff" fill-opacity=".92" stroke="#b4bbc6" stroke-width="1"/>
+  <rect x="343" y="278" width="128" height="24" rx="13" fill="#ffffff" fill-opacity=".92" stroke="#b4bbc6" stroke-width="1"/>
   <text x="407" y="294.5" text-anchor="middle" font-family="'SF Mono', ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="800" letter-spacing=".2" fill="#0f1218">SDRAGENTLOOP</text>
 
   <!-- credits orb -->
