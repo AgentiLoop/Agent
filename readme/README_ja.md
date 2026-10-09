@@ -1,4 +1,4 @@
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ja.svg" width="900" alt="Fluxion AI（シルバースポンサー）：GPT、Claude などの主要 AI モデルをひとつの統合 API で。公式 API 価格と比べて最大 70% お得、さらに $3 分の API クレジット。" /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a>
 
 <img src="../docs/table-video.gif" width="900" alt="Agent! demo" />
 
@@ -107,11 +107,11 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ### スポンサー
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ja.svg" width="900" alt="Fluxion AI（シルバースポンサー）：GPT、Claude などの主要 AI モデルをひとつの統合 API で。公式 API 価格と比べて最大 70% お得、さらに $3 分の API クレジット。" /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a>
 
 | Logo | スポンサー | &nbsp;&nbsp;&nbsp;レベル&nbsp;&nbsp;&nbsp; | |
 |:---:|---|:---:|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-logo.png" width="128" height="128" alt="Fluxion AI logo" /></a> | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | GPT、Claude をはじめとする主要な AI モデルに、ひとつの統合 API で信頼性が高く低コストにアクセスできます。公式 API 価格と比べて最大 70% 節約でき、[こちらのリンク](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)から登録すると $3 分の API クレジットがもらえます（プロモコード `AIAGENT`）。 |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | GPT、Claude などの主要 AI モデルをひとつの API で。[登録して $3 分の API クレジットを獲得](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP)（プロモコード `SDRAGENTLOOP`）。 |
 
 ## スポンサーシップ
 
@@ -125,7 +125,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Apple Intelligence** | | 無料、オンデバイス | トリアージ、要約、トークン圧縮（脳アイコン、プロバイダーピッカーにはなし） |
 | **Claude** | | トークン単位（API キー）またはサブスクリプション（OAuth） | 長い自律タスク、拡張思考、プロンプトキャッシング |
 | **Codex** | | ChatGPT サブスクリプション | ChatGPT OAuth 経由の OpenAI モデル — API キー不要、トークン課金なし |
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 公式価格から最大 70% オフ | GPT、Claude、Grok、DeepSeek、Gemini、GLM、Kimi をひとつのキーで。キーグループごとに OpenAI または Anthropic プロトコル。プロモコード `AIAGENT` で $3 クレジット |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logomark-white.svg"><img src="../docs/sponsors/sidrune-logomark.svg" width="20" height="20" alt="" /></picture>&nbsp;<b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 有料（API クレジット） | GPT、Claude などの主要 AI モデルをひとつの API で。プロモコード `SDRAGENTLOOP` で $3 クレジット |
 | **DeepSeek** | | 安価 | 低予算コーディング、キャッシュヒット報告 |
 | **Google Gemini** | | 有料（無料枠あり） | 長いコンテキスト、ビジョン |
 | **Grok**（xAI） | | 有料 | リアルタイム情報 |
@@ -411,4 +411,4 @@ Star History
 
 ---
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ja.svg" width="900" alt="Fluxion AI（シルバースポンサー）：GPT、Claude などの主要 AI モデルをひとつの統合 API で。公式 API 価格と比べて最大 70% お得、さらに $3 分の API クレジット。" /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a>

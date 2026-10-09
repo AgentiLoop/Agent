@@ -6,11 +6,11 @@ Agent! is a free-for-noncommercial-use (PolyForm Noncommercial 1.0.0), 100% nati
 
 ## Current sponsors
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="sponsors/fluxion-ai-silver-ad.svg" width="900" alt="Fluxion AI, Silver Sponsor: one unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing and get $3 in API credits." /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="sponsors/sidrune-ai-silver-ad.svg" width="900" alt="Sidrune AI, Silver Sponsor: One API for GPT, Claude and other leading AI models. Sign up and get $3 in API credits." /></a>
 
 | Logo | Sponsor | &nbsp;&nbsp;&nbsp;Level&nbsp;&nbsp;&nbsp; | |
 |:---:|---|:---:|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="sponsors/fluxion-ai-logo.png" width="128" height="128" alt="Fluxion AI logo" /></a> | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | One unified API for GPT, Claude and other leading AI models. Save up to 70% compared with official API pricing, and get $3 in API credits when you sign up through the link (promo code `AIAGENT`). |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="sponsors/sidrune-logo-white.svg"><img src="sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | One API for GPT, Claude and other leading AI models. [Sign up and get $3 in API credits](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP) (Promo code `SDRAGENTLOOP`). |
 
 ## Badges
 

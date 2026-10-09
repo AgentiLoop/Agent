@@ -1,4 +1,4 @@
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_es.svg" width="900" alt="Fluxion AI, patrocinador Silver: una API unificada para GPT, Claude y otros modelos de IA líderes. Ahorra hasta un 70 % frente a los precios oficiales de la API y consigue $3 en créditos API." /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_es.svg" width="900" alt="Sidrune AI, patrocinador Silver: Una API para GPT, Claude y otros modelos de IA líderes. Regístrate y recibe $3 en créditos de API." /></a>
 
 <img src="../docs/table-video.gif" width="900" alt="Agent! demo" />
 
@@ -107,11 +107,11 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 
 ### Patrocinadores
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_es.svg" width="900" alt="Fluxion AI, patrocinador Silver: una API unificada para GPT, Claude y otros modelos de IA líderes. Ahorra hasta un 70 % frente a los precios oficiales de la API y consigue $3 en créditos API." /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_es.svg" width="900" alt="Sidrune AI, patrocinador Silver: Una API para GPT, Claude y otros modelos de IA líderes. Regístrate y recibe $3 en créditos de API." /></a>
 
 | Logo | Patrocinador | &nbsp;&nbsp;&nbsp;Nivel&nbsp;&nbsp;&nbsp; | |
 |:---:|---|:---:|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-logo.png" width="128" height="128" alt="Fluxion AI logo" /></a> | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Acceso fiable y económico a GPT, Claude y otros modelos de IA líderes a través de una API unificada. Ahorra hasta un 70 % frente a los precios oficiales de la API y recibe $3 en créditos de API al registrarte a través de [este enlace](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) (código promocional `AIAGENT`). |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Una API para GPT, Claude y otros modelos de IA líderes. [Regístrate y recibe $3 en créditos de API](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP) (Código promocional `SDRAGENTLOOP`). |
 
 ## Patrocinio
 
@@ -125,7 +125,7 @@ Empresas y proveedores de LLM que quieran apoyar el proyecto: consulta [docs/SPO
 | **Apple Intelligence** | | Gratis, en el dispositivo | Triaje, resúmenes, compresión de tokens (icono del cerebro, no disponible en el selector de proveedor) |
 | **Claude** | | Por token (clave API) o suscripción (OAuth) | Tareas autónomas largas, pensamiento extendido, caché de prompts |
 | **Codex** | | Suscripción ChatGPT | Modelos de OpenAI vía OAuth de ChatGPT — sin clave API, sin cobro por token |
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Hasta un 70 % menos que el precio oficial | GPT, Claude, Grok, DeepSeek, Gemini, GLM y Kimi con una sola clave; protocolo OpenAI o Anthropic por grupo de claves; $3 de crédito con el código `AIAGENT` |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logomark-white.svg"><img src="../docs/sponsors/sidrune-logomark.svg" width="20" height="20" alt="" /></picture>&nbsp;<b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | De pago (créditos de API) | Una API para GPT, Claude y otros modelos de IA líderes; $3 de crédito con el código `SDRAGENTLOOP` |
 | **DeepSeek** | | Barato | Programación económica, informe de aciertos de caché |
 | **Google Gemini** | | De pago (nivel gratuito) | Contexto largo, visión |
 | **Grok** (xAI) | | De pago | Información en tiempo real |
@@ -411,4 +411,4 @@ Consulta [CONTRIBUTING.md](../CONTRIBUTING.md) — compila desde el código fuen
 
 ---
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_es.svg" width="900" alt="Fluxion AI, patrocinador Silver: una API unificada para GPT, Claude y otros modelos de IA líderes. Ahorra hasta un 70 % frente a los precios oficiales de la API y consigue $3 en créditos API." /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_es.svg" width="900" alt="Sidrune AI, patrocinador Silver: Una API para GPT, Claude y otros modelos de IA líderes. Regístrate y recibe $3 en créditos de API." /></a>

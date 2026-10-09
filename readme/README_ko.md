@@ -1,4 +1,4 @@
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ko.svg" width="900" alt="Sidrune AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 하나의 API로. 가입하고 $3 API 크레딧 받기." /></a>
 
 <img src="../docs/table-video.gif" width="900" alt="Agent! demo" />
 
@@ -107,11 +107,11 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ### 스폰서
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ko.svg" width="900" alt="Sidrune AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 하나의 API로. 가입하고 $3 API 크레딧 받기." /></a>
 
 | Logo | 스폰서 | &nbsp;&nbsp;&nbsp;등급&nbsp;&nbsp;&nbsp; | |
 |:---:|---|:---:|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-logo.png" width="128" height="128" alt="Fluxion AI logo" /></a> | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 하나의 통합 API로 GPT, Claude 및 기타 주요 AI 모델에 안정적이고 비용 효율적으로 접근할 수 있습니다. 공식 API 가격 대비 최대 70% 절약하고, [이 링크](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)로 가입하면 $3의 API 크레딧을 받을 수 있습니다(프로모션 코드 `AIAGENT`). |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | GPT, Claude 및 기타 주요 AI 모델을 하나의 API로. [가입하고 $3 API 크레딧 받기](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP) (프로모션 코드 `SDRAGENTLOOP`). |
 
 ## 후원
 
@@ -125,7 +125,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Apple Intelligence** | | 무료, 온디바이스 | 분류, 요약, 토큰 압축(두뇌 아이콘, 제공자 선택기에는 없음) |
 | **Claude** | | 토큰당(API 키) 또는 구독(OAuth) | 긴 자율 작업, 확장 사고, 프롬프트 캐싱 |
 | **Codex** | | ChatGPT 구독 | ChatGPT OAuth를 통한 OpenAI 모델 — API 키 없음, 토큰당 요금 없음 |
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 공식 가격 대비 최대 70% 할인 | 하나의 키로 GPT, Claude, Grok, DeepSeek, Gemini, GLM, Kimi 사용; 키 그룹별 OpenAI 또는 Anthropic 프로토콜; 프로모 코드 `AIAGENT`로 $3 크레딧 |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logomark-white.svg"><img src="../docs/sponsors/sidrune-logomark.svg" width="20" height="20" alt="" /></picture>&nbsp;<b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 유료(API 크레딧) | GPT, Claude 및 기타 주요 AI 모델을 하나의 API로; 프로모 코드 `SDRAGENTLOOP`로 $3 크레딧 |
 | **DeepSeek** | | 저렴 | 저예산 코딩, 캐시 히트 보고 |
 | **Google Gemini** | | 유료(무료 티어 있음) | 긴 컨텍스트, 비전 |
 | **Grok** (xAI) | | 유료 | 실시간 정보 |
@@ -409,4 +409,4 @@ Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game C
 
 ---
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ko.svg" width="900" alt="Fluxion AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 위한 하나의 통합 API. 공식 API 가격 대비 최대 70% 절약하고 $3 API 크레딧을 받으세요." /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ko.svg" width="900" alt="Sidrune AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 하나의 API로. 가입하고 $3 API 크레딧 받기." /></a>

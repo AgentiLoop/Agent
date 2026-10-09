@@ -1,4 +1,4 @@
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ru.svg" width="900" alt="Fluxion AI, серебряный спонсор: единый API для GPT, Claude и других ведущих моделей ИИ. Экономия до 70 % по сравнению с официальными ценами API и $3 кредитов на API." /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ru.svg" width="900" alt="Sidrune AI, серебряный спонсор: Один API для GPT, Claude и других ведущих моделей ИИ. Зарегистрируйтесь и получите $3 в API-кредитах." /></a>
 
 <img src="../docs/table-video.gif" width="900" alt="Agent! demo" />
 
@@ -107,11 +107,11 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ### Спонсоры
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ru.svg" width="900" alt="Fluxion AI, серебряный спонсор: единый API для GPT, Claude и других ведущих моделей ИИ. Экономия до 70 % по сравнению с официальными ценами API и $3 кредитов на API." /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ru.svg" width="900" alt="Sidrune AI, серебряный спонсор: Один API для GPT, Claude и других ведущих моделей ИИ. Зарегистрируйтесь и получите $3 в API-кредитах." /></a>
 
 | Logo | Спонсор | &nbsp;&nbsp;&nbsp;Уровень&nbsp;&nbsp;&nbsp; | |
 |:---:|---|:---:|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-logo.png" width="128" height="128" alt="Fluxion AI logo" /></a> | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Надёжный и экономичный доступ к GPT, Claude и другим ведущим моделям ИИ через единый API. Экономьте до 70 % по сравнению с официальными ценами API и получите $3 в виде API-кредитов при регистрации по [этой ссылке](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT) (промокод `AIAGENT`). |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Один API для GPT, Claude и других ведущих моделей ИИ. [Зарегистрируйтесь и получите $3 в API-кредитах](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP) (Промокод `SDRAGENTLOOP`). |
 
 ## Спонсорство
 
@@ -125,7 +125,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Apple Intelligence** | | Бесплатно, на устройстве | Триаж, резюме, сжатие токенов (иконка мозга, нет в списке провайдеров) |
 | **Claude** | | За токены (API-ключ) или подписка (OAuth) | Длинные автономные задачи, расширенное мышление, кэширование промптов |
 | **Codex** | | Подписка ChatGPT | Модели OpenAI через ChatGPT OAuth — без API-ключа, без оплаты за токены |
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | До 70 % дешевле официальных цен | GPT, Claude, Grok, DeepSeek, Gemini, GLM и Kimi по одному ключу; протокол OpenAI или Anthropic для каждой группы ключей; $3 кредита по промокоду `AIAGENT` |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logomark-white.svg"><img src="../docs/sponsors/sidrune-logomark.svg" width="20" height="20" alt="" /></picture>&nbsp;<b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Платно (API-кредиты) | Один API для GPT, Claude и других ведущих моделей ИИ; $3 кредита по промокоду `SDRAGENTLOOP` |
 | **DeepSeek** | | Дёшево | Бюджетное программирование, отчёт о cache-hit |
 | **Google Gemini** | | Платно (есть бесплатный уровень) | Длинный контекст, зрение |
 | **Grok** (xAI) | | Платно | Информация в реальном времени |
@@ -411,4 +411,4 @@ Star History
 
 ---
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_ru.svg" width="900" alt="Fluxion AI, серебряный спонсор: единый API для GPT, Claude и других ведущих моделей ИИ. Экономия до 70 % по сравнению с официальными ценами API и $3 кредитов на API." /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ru.svg" width="900" alt="Sidrune AI, серебряный спонсор: Один API для GPT, Claude и других ведущих моделей ИИ. Зарегистрируйтесь и получите $3 в API-кредитах." /></a>

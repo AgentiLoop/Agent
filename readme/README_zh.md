@@ -1,4 +1,4 @@
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a>
 
 <img src="../docs/table-video.gif" width="900" alt="Agent! demo" />
 
@@ -107,11 +107,11 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ### 赞助商
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a>
 
 | Logo | 赞助商 | &nbsp;&nbsp;&nbsp;等级&nbsp;&nbsp;&nbsp; | |
 |:---:|---|:---:|---|
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-logo.png" width="128" height="128" alt="Fluxion AI logo" /></a> | <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 通过一个统一的 API，稳定且经济地访问 GPT、Claude 及其他领先的 AI 模型。与官方 API 价格相比最多可节省 70%，通过[此链接](https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT)注册即可获得 $3 API 额度（优惠码 `AIAGENT`）。 |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。[注册即得 $3 API 额度](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP)（优惠码 `SDRAGENTLOOP`）。 |
 
 ## 赞助
 
@@ -125,7 +125,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Apple Intelligence** | | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，提供商选择器中不可用） |
 | **Claude** | | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
 | **Codex** | | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
-| <a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-icon.png" width="20" height="20" alt="" />&nbsp;<b>Fluxion&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 比官方价格最多低 70% | 一把密钥即可使用 GPT、Claude、Grok、DeepSeek、Gemini、GLM 和 Kimi；每个密钥组可选 OpenAI 或 Anthropic 协议；使用优惠码 `AIAGENT` 获得 $3 额度 |
+| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logomark-white.svg"><img src="../docs/sponsors/sidrune-logomark.svg" width="20" height="20" alt="" /></picture>&nbsp;<b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 付费（API 额度） | 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型；使用优惠码 `SDRAGENTLOOP` 获得 $3 额度 |
 | **DeepSeek** | | 便宜 | 低成本编码、缓存命中报告 |
 | **Google Gemini** | | 付费（有免费额度） | 长上下文、视觉 |
 | **Grok** (xAI) | | 付费 | 实时信息 |
@@ -410,4 +410,4 @@ Star History
 
 ---
 
-<a href="https://fluxionai.world/register?source=github&campaign=aiagent&promo=AIAGENT"><img src="../docs/sponsors/fluxion-ai-silver-ad_zh.svg" width="900" alt="Fluxion AI，银牌赞助商：一个统一的 API 访问 GPT、Claude 及其他领先的 AI 模型。相比官方 API 价格最高节省 70%，并获得 $3 API 额度。" /></a>
+<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a>
