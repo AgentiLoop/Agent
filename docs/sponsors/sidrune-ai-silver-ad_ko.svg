@@ -55,7 +55,7 @@
   <rect x="40" y="289" width="314" height="44" rx="10" fill="#0f1218"/>
   <text x="197" y="317" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="800" fill="#ffffff">가입하고 $3 API 크레딧 받기 →</text>
   <text x="378" y="317" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#4b5260">프로모션 코드</text>
-  <rect x="496" y="300" width="110" height="24" rx="13" fill="#ffffff" fill-opacity=".92" stroke="#b4bbc6" stroke-width="1"/>
+  <rect x="493" y="300" width="110" height="24" rx="13" fill="#ffffff" fill-opacity=".92" stroke="#b4bbc6" stroke-width="1"/>
   <text x="548" y="316.5" text-anchor="middle" font-family="'SF Mono', ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="800" letter-spacing=".2" fill="#0f1218">SDRAGENTLOOP</text>
 
   <!-- credits orb -->
