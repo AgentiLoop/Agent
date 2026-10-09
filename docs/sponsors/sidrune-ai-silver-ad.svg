@@ -54,7 +54,7 @@
   <rect x="40" y="267" width="331" height="44" rx="10" fill="#0f1218"/>
   <text x="205" y="295" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="800" fill="#ffffff">Sign up and get $3 in API credits →</text>
   <text x="395" y="295" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#4b5260">Promo code</text>
-  <rect x="490" y="278" width="104" height="24" rx="13" fill="#ffffff" fill-opacity=".92" stroke="#b4bbc6" stroke-width="1"/>
+  <rect x="487" y="278" width="110" height="24" rx="13" fill="#ffffff" fill-opacity=".92" stroke="#b4bbc6" stroke-width="1"/>
   <text x="542" y="294.5" text-anchor="middle" font-family="'SF Mono', ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="800" letter-spacing=".2" fill="#0f1218">SDRAGENTLOOP</text>
 
   <!-- credits orb -->
