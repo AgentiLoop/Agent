@@ -149,7 +149,9 @@ extension ScriptService {
         // Stream output as it arrives
         stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
-            guard !data.isEmpty, let chunk = String(data: data, encoding: .utf8) else { return }
+            // EOF: unregister, or GCD re-fires this handler in a tight loop.
+            if data.isEmpty { handle.readabilityHandler = nil; return }
+            guard let chunk = String(data: data, encoding: .utf8) else { return }
             collected.append(chunk)
             onOutput?(chunk)
         }

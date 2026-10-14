@@ -108,7 +108,8 @@ enum DaemonCore {
 
         pipe.fileHandleForReading.readabilityHandler = { [ctx] handle in
             let data = handle.availableData
-            guard !data.isEmpty else { return }
+            // EOF: unregister, or GCD re-fires this handler in a tight loop.
+            guard !data.isEmpty else { handle.readabilityHandler = nil; return }
             ctx.outputLock.lock()
             ctx.pendingBytes.append(data)
             let chunk = OutputContext.takeDecodablePrefix(&ctx.pendingBytes)
