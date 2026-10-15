@@ -16,6 +16,8 @@
 
 <a href="https://launchnest.io/p/agentiloop-agent" target="_blank"><img src="https://launchnest.io/badge/agentiloop-agent.svg?variant=featured" alt="AgentiLoop Agent! on LaunchNest" width="220" height="56" /></a>
 
+> ⭐ **If Agent! saves you time, please [star the repo](https://github.com/AgentiLoop/Agent/stargazers).** Stars help other Mac users find a free, native, open-source AI agent — and keep the project going.
+
 ## 🆕 New Kid on the Block: AgentiLoop CLI ⚡️
 
 **The agentic loop, unleashed in your terminal. Mac. Windows. Linux. Your call.**
