@@ -54,6 +54,7 @@ Look for the [`good first issue`](https://github.com/AgentiLoop/Agent/issues?q=i
 - **New app bridges / SDEFs** — add scripting support for another Mac app
 - **UI polish** — small SwiftUI improvements to views in `Agent/Views/`
 - **Bug reports** — even without a fix, a clear reproduction is valuable
+- **Spreading the word** — honest posts and curated-list submissions; see [docs/GROWTH.md](./docs/GROWTH.md) for vetted lists, their rules, and ready-to-review drafts
 
 ## Questions?
 
