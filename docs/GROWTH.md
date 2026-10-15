@@ -59,8 +59,10 @@ opens with a sponsor banner.
       proof that compounds.
 - [ ] **Non-pre-release cadence.** 4 of the last 5 releases are pre-releases;
       `releases/latest` (the badge target) still points at v1.1.87 from 2026-10-01.
-      Promote a stable release every 1–2 weeks so "Download" is never stale, and use
-      the release-notes template in §4.7 so each release links back and asks for a star.
+      Promote a stable release every 1–2 weeks so "Download" is never stale. The §4.7
+      footer (install, links, star ask) is now appended **automatically** by the last
+      step of `.github/workflows/release.yml` to every published release and
+      pre-release, so hand-written notes only need to cover what changed.
 - [ ] **Homebrew discoverability.** `formulae.brew.sh` already sends traffic; make sure
       the cask description matches the GitHub description.
 - [ ] **Google is the #1 referrer.** The repo description and the first paragraph of

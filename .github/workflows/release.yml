@@ -217,6 +217,45 @@ jobs:
             "$RUNNER_TEMP/artifacts/Agent-$TAG-macOS.dmg" \
             --clobber
 
+      # Every release (and pre-release) ends with the same install + resources + star
+      # footer, so hand-written notes only need to cover what changed. Idempotent: the
+      # HTML-comment marker stops it from being appended twice on re-runs.
+      - name: Append install & resources footer to release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          set -euo pipefail
+          TAG="${{ github.event.release.tag_name || github.event.inputs.tag }}"
+          MARKER="<!-- agent-release-footer -->"
+          BODY="$(gh release view "$TAG" --json body -q .body)"
+          if printf '%s' "$BODY" | grep -qF "$MARKER"; then
+            echo "Footer already present — skipping"; exit 0
+          fi
+          if [ "${PRERELEASE:-$(gh release view "$TAG" --json isPrerelease -q .isPrerelease)}" = "true" ]; then
+            INSTALL="Download \`Agent-$TAG-macOS.dmg\` (or the \`.zip\`) from the assets below and drag **Agent!.app** to \`/Applications\`. Pre-releases are signed, notarized and stapled like stable releases; Homebrew (\`brew install --cask agentiloop-agent\`) tracks the latest **stable** release."
+          else
+            INSTALL="Install or upgrade the signed, Apple-notarized binary with Homebrew:
+          \`\`\`sh
+          brew update && brew install --cask agentiloop-agent
+          \`\`\`
+          Or download \`Agent-$TAG-macOS.dmg\` (or the \`.zip\`) from the assets below and drag **Agent!.app** to \`/Applications\`. The official signed build keeps the \`SMAppService\` Launch Agent and Launch Daemon helpers registered."
+          fi
+          {
+            printf '%s\n\n' "$BODY"
+            printf '%s\n' "$MARKER"
+            printf '%s\n' "### 📥 Install"
+            printf '%s\n\n' "$INSTALL"
+            printf '%s\n' "### 🔗 Resources & Support"
+            printf '%s\n' "- **Repository**: https://github.com/AgentiLoop/Agent"
+            printf '%s\n' "- **Website & Docs**: https://agentiloop.ai"
+            printf '%s\n' "- **Cross-platform CLIs**: [AgentiLoopCLI (Rust)](https://github.com/AgentiLoop/AgentiLoopCLI) · [AgentiLoopGo (Go)](https://github.com/AgentiLoop/AgentiLoopGo)"
+            printf '%s\n\n' "- **Bugs & ideas**: [Issues](https://github.com/AgentiLoop/Agent/issues) · [Discussions](https://github.com/AgentiLoop/Agent/discussions)"
+            printf '%s\n' "⭐ **Enjoying Agent!?** If it saves you time on your Mac, please [star the repository](https://github.com/AgentiLoop/Agent) — it helps other macOS developers and power users discover the project."
+          } > "$RUNNER_TEMP/release-notes.md"
+          gh release edit "$TAG" --notes-file "$RUNNER_TEMP/release-notes.md"
+          echo "Footer appended to $TAG"
+
       - name: Clean up keychain
         if: always()
         run: |
