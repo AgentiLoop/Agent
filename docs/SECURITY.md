@@ -1,4 +1,4 @@
-[< Back to README](../README.md)
+[< Back to README](../README.md) · [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=social)](https://github.com/AgentiLoop/Agent/stargazers)
 
 # Security Architecture
 
@@ -122,5 +122,11 @@ All tool execution flows through the app's `dispatchTool()` layer — the LLM ne
 2. Agent!'s dispatch layer executes the tool via XPC, shell, or in-process
 3. The real output goes back as `tool_result`
 4. The LLM summarizes the real result
+
+
+
+---
+
+⭐ **Auditing or building with Agent!?** [Star **AgentiLoop/Agent** on GitHub](https://github.com/AgentiLoop/Agent/stargazers) and join the [GitHub Discussions](https://github.com/AgentiLoop/Agent/discussions).
 
 The LLM cannot fabricate tool outputs because it never controls what `tool_result` contains — the app does.

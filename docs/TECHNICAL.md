@@ -4,7 +4,7 @@
 
 # Agent! for macOS
 
-[![Swift 6.2](https://img.shields.io/badge/Swift-6.2-blue.svg)](https://swift.org)
+[![Swift 6.4](https://img.shields.io/badge/Swift-6.4-blue.svg)](https://swift.org)
 [![Website](https://img.shields.io/badge/website-agentiloop.ai-blue.svg)](https://agentiloop.ai)
 [![Version](https://img.shields.io/badge/version-latest-blue.svg)](https://github.com/AgentiLoop/Agent)
 [![GitHub downloads](https://img.shields.io/github/downloads/AgentiLoop/Agent/total.svg)](https://github.com/AgentiLoop/Agent/releases)
@@ -643,3 +643,7 @@ Both tools have their strengths. If you want a personal assistant across every m
 ## License
 
 PolyForm Noncommercial 1.0.0 — see [LICENSE](../LICENSE). Free for noncommercial and personal use; commercial use and commercial versions are reserved to AgentiLoop.ai, a Logos InkPen LLC company.
+
+---
+
+⭐ **If Agent! or its architecture is useful to you, please [star AgentiLoop/Agent on GitHub](https://github.com/AgentiLoop/Agent/stargazers)!**

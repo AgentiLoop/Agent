@@ -320,6 +320,49 @@ struct AgentApp: App {
                 Button("Toggle Messages Monitor") { post(.menuToggleMessagesMonitor) }
                     .keyboardShortcut("m", modifiers: [.command, .shift])
             }
+            CommandGroup(replacing: .help) {
+                Button {
+                    if let url = URL(string: "https://agentiloop.ai") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    Label("Agent! Documentation & Website", systemImage: "book")
+                        .labelStyle(.titleAndIcon)
+                }
+                Button {
+                    if let url = URL(string: "https://github.com/AgentiLoop/Agent") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    Label("GitHub Repository", systemImage: "chevron.left.forwardslash.chevron.right")
+                        .labelStyle(.titleAndIcon)
+                }
+                Button {
+                    if let url = URL(string: "https://github.com/AgentiLoop/Agent/stargazers") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    Label("Star Agent! on GitHub…", systemImage: "star.fill")
+                        .labelStyle(.titleAndIcon)
+                }
+                Divider()
+                Button {
+                    if let url = URL(string: "https://github.com/AgentiLoop/Agent/discussions") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    Label("Discussions & Community", systemImage: "bubble.left.and.bubble.right")
+                        .labelStyle(.titleAndIcon)
+                }
+                Button {
+                    if let url = URL(string: "https://github.com/AgentiLoop/Agent/issues") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    Label("Report an Issue…", systemImage: "exclamationmark.bubble")
+                        .labelStyle(.titleAndIcon)
+                }
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-[< Back to README](../README.md)
+[< Back to README](../README.md) · [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=social)](https://github.com/AgentiLoop/Agent/stargazers)
 
 # Agent! -- How It Compares
 
@@ -103,5 +103,17 @@
 | **System Access** | Full access with TCC | Sandboxed Docker containers |
 | **Privacy** | Local processing available | Local-first design |
 | **Source License** | PolyForm Noncommercial 1.0.0 | MIT License |
+
+
+
+---
+
+## Try Agent! & Support the Project
+
+Install the Apple-notarized release via Homebrew:
+```bash
+brew install --cask agentiloop-agent
+```
+⭐ **Found this comparison helpful?** [Star **AgentiLoop/Agent** on GitHub](https://github.com/AgentiLoop/Agent/stargazers) to help more Mac developers discover native macOS AI automation!
 
 **Verdict**: OpenClaw excels at privacy-focused automation with local LLM support and sandboxed security. Agent! provides deeper macOS integration with native ScriptingBridge, Xcode project management, and Accessibility API control. Choose OpenClaw for privacy-first workflows; choose Agent! for deep macOS automation and Xcode development.

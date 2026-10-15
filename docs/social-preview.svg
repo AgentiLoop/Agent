@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-label="AgentiLoop Agent! — Native Swift macOS autonomous AI agent for coding, Xcode, Accessibility, AppleScript, and root shell execution.">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="55%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#172554"/>
+    </linearGradient>
+    <linearGradient id="stripe" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f97316"/>
+      <stop offset=".25" stop-color="#ec4899"/>
+      <stop offset=".5" stop-color="#8b5cf6"/>
+      <stop offset=".75" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <radialGradient id="iconCircle" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#5b9cf0"/>
+      <stop offset="100%" stop-color="#25549c"/>
+    </radialGradient>
+    <linearGradient id="accentText" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#f472b6"/>
+    </linearGradient>
+    <style>
+      .s { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Helvetica, Arial, sans-serif; }
+      .m { font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="640" fill="url(#bgGrad)"/>
+  <rect width="1280" height="8" fill="url(#stripe)"/>
+
+  <!-- Subtle glowing grid accents -->
+  <circle cx="1080" cy="140" r="240" fill="#3b82f6" opacity="0.10"/>
+  <circle cx="220" cy="520" r="220" fill="#8b5cf6" opacity="0.10"/>
+
+  <!-- Top Pill Badge -->
+  <rect x="64" y="54" width="356" height="36" rx="18" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+  <circle cx="86" cy="72" r="5" fill="#22d3ee"/>
+  <text x="102" y="77" class="s" font-size="13" font-weight="700" letter-spacing="1.2" fill="#bae6fd">100% NATIVE SWIFT 6.4 · MACOS 14.6+</text>
+
+  <!-- Official Agent! App Icon (scaled from 497.99x497.99 viewBox) -->
+  <g transform="translate(64, 114) scale(0.185)">
+    <circle cx="249" cy="249" r="249" fill="url(#iconCircle)"/>
+    <g stroke="#FFFFFF" stroke-width="6" opacity="0.9">
+      <line x1="121.35" y1="81.88" x2="54.17" y2="199.45"/>
+      <line x1="121.35" y1="81.88" x2="248.99" y2="165.86"/>
+      <line x1="248.99" y1="31.49" x2="54.17" y2="199.45"/>
+      <line x1="248.99" y1="31.49" x2="248.99" y2="165.86"/>
+      <line x1="248.99" y1="31.49" x2="443.82" y2="199.45"/>
+      <line x1="376.64" y1="81.88" x2="248.99" y2="165.86"/>
+      <line x1="376.64" y1="81.88" x2="443.82" y2="199.45"/>
+      <line x1="54.17" y1="199.45" x2="121.35" y2="317.02"/>
+      <line x1="248.99" y1="165.86" x2="121.35" y2="317.02"/>
+      <line x1="248.99" y1="165.86" x2="376.64" y2="317.02"/>
+      <line x1="443.82" y1="199.45" x2="376.64" y2="317.02"/>
+      <line x1="121.35" y1="317.02" x2="154.94" y2="434.59"/>
+      <line x1="121.35" y1="317.02" x2="248.99" y2="468.18"/>
+      <line x1="376.64" y1="317.02" x2="248.99" y2="468.18"/>
+      <line x1="376.64" y1="317.02" x2="343.05" y2="434.59"/>
+    </g>
+    <g fill="#FFFFFF">
+      <circle cx="248.99" cy="248.99" r="30.4"/>
+      <circle cx="248.99" cy="191.99" r="11.4"/>
+      <circle cx="298.40" cy="275.60" r="11.4"/>
+      <circle cx="199.59" cy="275.60" r="11.4"/>
+      <circle cx="248.99" cy="468.18" r="18.5"/>
+      <circle cx="154.94" cy="434.59" r="18.5"/>
+      <circle cx="343.05" cy="434.59" r="18.5"/>
+      <circle cx="121.35" cy="317.02" r="21.8"/>
+      <circle cx="376.64" cy="317.02" r="21.8"/>
+      <circle cx="54.17" cy="199.45" r="23.5"/>
+      <circle cx="443.82" cy="199.45" r="23.5"/>
+      <circle cx="121.35" cy="81.88" r="20.2"/>
+      <circle cx="376.64" cy="81.88" r="20.2"/>
+      <circle cx="248.99" cy="31.49" r="20.2"/>
+    </g>
+  </g>
+
+  <!-- Main Heading -->
+  <text x="176" y="162" class="s" font-size="54" font-weight="800" letter-spacing="-1.2" fill="#f8fafc">AgentiLoop <tspan fill="url(#accentText)">Agent!</tspan></text>
+  <text x="176" y="198" class="s" font-size="22" font-weight="600" fill="#cbd5e1">One app. Any AI. Total command over your Mac.</text>
+
+  <!-- Feature Bullets (Left Column) -->
+  <g class="s" font-size="19" fill="#e2e8f0">
+    <text x="68" y="266"><tspan fill="#38bdf8" font-weight="800">▸</tspan><tspan x="94" font-weight="700" fill="#ffffff">23 LLM Providers + Local AI</tspan><tspan fill="#94a3b8"> — Claude, OpenAI, Gemini, Ollama, Apple AI</tspan></text>
+    <text x="68" y="308"><tspan fill="#a78bfa" font-weight="800">▸</tspan><tspan x="94" font-weight="700" fill="#ffffff">Native Mac Control</tspan><tspan fill="#94a3b8"> — Accessibility API, AppleScript, JXA, 51 App Bridges</tspan></text>
+    <text x="68" y="350"><tspan fill="#f472b6" font-weight="800">▸</tspan><tspan x="94" font-weight="700" fill="#ffffff">Xcode &amp; Swift Dylibs</tspan><tspan fill="#94a3b8"> — Build/fix Xcode projects &amp; compile Swift scripts</tspan></text>
+    <text x="68" y="392"><tspan fill="#34d399" font-weight="800">▸</tspan><tspan x="94" font-weight="700" fill="#ffffff">Privileged XPC Daemon</tspan><tspan fill="#94a3b8"> — User &amp; root shell via Apple SMAppService</tspan></text>
+    <text x="68" y="434"><tspan fill="#fbbf24" font-weight="800">▸</tspan><tspan x="94" font-weight="700" fill="#ffffff">MCP + Remote + Voice</tspan><tspan fill="#94a3b8"> — Stdio/HTTP MCP, iMessage control, wake word</tspan></text>
+  </g>
+
+  <!-- Feature Chips -->
+  <g transform="translate(64, 468)" class="s" font-size="14" font-weight="700">
+    <rect x="0" y="0" width="144" height="36" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
+    <text x="72" y="23" fill="#7dd3fc" text-anchor="middle">No Electron</text>
+
+    <rect x="158" y="0" width="164" height="36" rx="10" fill="#1e293b" stroke="#a78bfa" stroke-width="1.2"/>
+    <text x="240" y="23" fill="#c4b5fd" text-anchor="middle">51 App Bridges</text>
+
+    <rect x="336" y="0" width="150" height="36" rx="10" fill="#1e293b" stroke="#f472b6" stroke-width="1.2"/>
+    <text x="411" y="23" fill="#f9a8d4" text-anchor="middle">MCP Client</text>
+
+    <rect x="500" y="0" width="190" height="36" rx="10" fill="#1e293b" stroke="#34d399" stroke-width="1.2"/>
+    <text x="595" y="23" fill="#6ee7b7" text-anchor="middle">100% Auditable</text>
+  </g>
+
+  <!-- Bottom Install Banner -->
+  <rect x="64" y="532" width="690" height="58" rx="14" fill="#090d16" stroke="#334155" stroke-width="1.5"/>
+  <text x="88" y="567" class="m" font-size="18" fill="#e2e8f0"><tspan fill="#f472b6" font-weight="700">$</tspan> brew install --cask <tspan fill="#38bdf8" font-weight="700">agentiloop-agent</tspan></text>
+  <text x="555" y="566" class="s" font-size="15" font-weight="700" fill="#fbbf24">★ github.com/AgentiLoop/Agent</text>
+
+  <!-- Right Card: Live Agent Window Preview -->
+  <g transform="translate(790, 118)">
+    <rect x="0" y="0" width="430" height="472" rx="18" fill="#090d16" stroke="#334155" stroke-width="2"/>
+    <rect x="0" y="0" width="430" height="44" rx="18" fill="#1e293b"/>
+    <rect x="0" y="28" width="430" height="16" fill="#1e293b"/>
+    <circle cx="24" cy="22" r="6.5" fill="#ef4444"/>
+    <circle cx="44" cy="22" r="6.5" fill="#f59e0b"/>
+    <circle cx="64" cy="22" r="6.5" fill="#22c55e"/>
+    <text x="215" y="27" class="s" font-size="14" font-weight="700" fill="#cbd5e1" text-anchor="middle">🦾 Agent! — Autonomous Loop</text>
+
+    <!-- Terminal / Activity Stream -->
+    <g class="m" font-size="14" fill="#cbd5e1">
+      <text x="24" y="80"><tspan fill="#38bdf8" font-weight="700">👤 Task:</tspan> Fix build &amp; automate Safari</text>
+      <line x1="24" y1="96" x2="406" y2="96" stroke="#1e293b" stroke-width="1.5"/>
+
+      <text x="24" y="126"><tspan fill="#a78bfa">●</tspan> file(action: <tspan fill="#fbbf24">"diff_apply"</tspan>)</text>
+      <text x="42" y="148" fill="#64748b" font-size="12">SHA-256 read gate verified · snapshot saved</text>
+
+      <text x="24" y="182"><tspan fill="#38bdf8">●</tspan> xcode(action: <tspan fill="#fbbf24">"build"</tspan>)</text>
+      <text x="42" y="204" fill="#4ade80" font-size="12">✓ BUILD SUCCEEDED (0 errors)</text>
+
+      <text x="24" y="238"><tspan fill="#f472b6">●</tspan> accessibility(action: <tspan fill="#fbbf24">"click_element"</tspan>)</text>
+      <text x="42" y="260" fill="#64748b" font-size="12">AXButton "Run" in Safari · verified</text>
+
+      <text x="24" y="294"><tspan fill="#22d3ee">●</tspan> agent_script(action: <tspan fill="#fbbf24">"run"</tspan>)</text>
+      <text x="42" y="316" fill="#64748b" font-size="12">Compiled Swift .dylib in-process (full TCC)</text>
+
+      <text x="24" y="350"><tspan fill="#34d399">●</tspan> git(action: <tspan fill="#fbbf24">"commit"</tspan>)</text>
+      <text x="42" y="372" fill="#4ade80" font-size="12">✓ Committed cleanly to branch</text>
+
+      <rect x="24" y="400" width="382" height="46" rx="10" fill="#052e16" stroke="#166534" stroke-width="1.2"/>
+      <text x="42" y="428" fill="#4ade80" font-weight="700">✅ Task Complete — All criteria verified</text>
+    </g>
+  </g>
+</svg>

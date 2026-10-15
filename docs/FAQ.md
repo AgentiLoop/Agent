@@ -1,4 +1,4 @@
-[< Back to README](../README.md)
+[< Back to README](../README.md) · [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=social)](https://github.com/AgentiLoop/Agent/stargazers)
 
 # Frequently Asked Questions
 
@@ -234,5 +234,9 @@ No. Agent! does not access your passwords, keychain items, or sensitive authenti
 - [COMPARISON.md](COMPARISON.md) -- Comparisons with similar tools
 
 ---
+
+
+
+⭐ **Enjoying Agent!?** [Star **AgentiLoop/Agent** on GitHub](https://github.com/AgentiLoop/Agent/stargazers) to support the project and help other Mac users find it!
 
 **Agent! -- Not just smart chat. Real action on your Mac.**
