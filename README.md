@@ -16,6 +16,7 @@
 
 <a href="https://launchnest.io/p/agentiloop-agent" target="_blank"><img src="https://launchnest.io/badge/agentiloop-agent.svg?variant=featured" alt="AgentiLoop Agent! on LaunchNest" width="220" height="56" /></a>
 
+> ⭐ **Enjoying Agent!?** Please **[give AgentiLoop/Agent a Star on GitHub](https://github.com/AgentiLoop/Agent)** (top-right **Star** button) — every star helps more Mac users and developers discover 100% native macOS autonomous AI!
 ## 🆕 New Kid on the Block: AgentiLoop CLI ⚡️
 
 **The agentic loop, unleashed in your terminal. Mac. Windows. Linux. Your call.**
@@ -422,7 +423,9 @@ Agent! is built from a set of companion repos under the [AgentiLoop](https://git
 | [AgentColorSyntax](https://github.com/AgentiLoop/AgentColorSyntax) · [AgentTerminalNeo](https://github.com/AgentiLoop/AgentTerminalNeo) | Syntax highlighting · retro terminal markdown |
 | [AgentAudit](https://github.com/AgentiLoop/AgentAudit) | `os.log` audit logging |
 
-Star History
+## ⭐ Star History
+
+If Agent! helps your workflow, please **[star the repository on GitHub](https://github.com/AgentiLoop/Agent)** and share it with fellow Mac developers!
 
 <a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
  <picture>
@@ -431,8 +434,6 @@ Star History
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
  </picture>
 </a>
-
-## 
 
 ## Contributing
 

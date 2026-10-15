@@ -21,6 +21,13 @@ struct SponsorsMenu: View {
         }
         Divider()
         Button {
+            if let url = URL(string: "https://github.com/AgentiLoop/Agent") {
+                NSWorkspace.shared.open(url)
+            }
+        } label: {
+            Label("Star on GitHub…", systemImage: "star.fill")
+        }
+        Button {
             if let url = URL(string: "https://github.com/AgentiLoop/Agent/blob/main/docs/SPONSORSHIP.md") {
                 NSWorkspace.shared.open(url)
             }

@@ -356,7 +356,9 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 Agent! は 3 年間にわたるエージェント型 AI アプリ開発の成果です — ANIE、Game Changer、BattleScript、XCF MCP Server と Client、D1F、そして約 8 つのオリジナル Swift パッケージ。欠けていたピースはインテリジェントな自律ループでした。それが実現すると、これらのプロジェクトの最良の部分が Agent! に結集しました。ビデオゲーム（[Boss-Man](https://github.com/AgentiLoop/bossman)）を書き、アプリを作り、AppleScript で Pages に詩を書き、ディスクイメージを生成して GitHub リリースに添付してきました。Claude Code が約 65 のサードパーティ NPM パッケージに依存するのに対し、Agent! は 100% ネイティブで、RAM をほとんど使わず、Xcode 自動化、Swift Syntax 6.2 解析、アクセシビリティ、AppleScript、AgentScript/ScriptingBridge、Safari 自動化、MCP サポートを標準で備えています。
 
-Star History
+## ⭐ Star History
+
+Agent! が役に立ったら、ぜひ **[GitHub でスター ⭐ を付けて](https://github.com/AgentiLoop/Agent)** 仲間の Mac 開発者にシェアしてください！
 
 <a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
  <picture>
@@ -365,8 +367,6 @@ Star History
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
  </picture>
 </a>
-
-## 
 
 ## コントリビューション
 

@@ -247,6 +247,14 @@ struct AgentApp: App {
                     Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                         .labelStyle(.titleAndIcon)
                 }
+                Button {
+                    if let url = URL(string: "https://github.com/AgentiLoop/Agent/stargazers") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    Label("Star on GitHub…", systemImage: "star.fill")
+                        .labelStyle(.titleAndIcon)
+                }
             }
             // View menu: activity log text size for low-vision users
             CommandGroup(after: .toolbar) {

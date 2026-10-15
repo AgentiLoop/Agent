@@ -356,7 +356,9 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 Agent! — результат трёх лет создания агентных ИИ-приложений: ANIE, Game Changer, BattleScript, XCF MCP Server и Client, D1F и около восьми оригинальных Swift-пакетов. Недостающим звеном был интеллектуальный автономный цикл; как только он появился, лучшее из этих проектов объединилось в Agent!. Он писал видеоигры ([Boss-Man](https://github.com/AgentiLoop/bossman)), создавал приложения, писал стихи в Pages через AppleScript, генерировал образы дисков и прикреплял их к релизам GitHub. Там, где Claude Code опирается на ~65 сторонних NPM-пакетов, Agent! на 100 % нативен, потребляет очень мало ОЗУ и из коробки поставляет автоматизацию Xcode, анализ Swift Syntax 6.2, универсальный доступ, AppleScript, AgentScript/ScriptingBridge, автоматизацию Safari и поддержку MCP.
 
-Star History
+## ⭐ Star History
+
+Если Agent! помогает вам в работе, **[поставьте звезду репозиторию на GitHub ⭐](https://github.com/AgentiLoop/Agent)** и расскажите о нём другим Mac-разработчикам!
 
 <a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
  <picture>
@@ -365,8 +367,6 @@ Star History
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
  </picture>
 </a>
-
-## 
 
 ## Участие в разработке
 

@@ -49,7 +49,8 @@ final class UpdateChecker {
                     promptDownload(latest, currentVersion: current)
                 } else {
                     showAlert(title: "You're up to date!",
-                              message: "Agent! \(current) is the latest version.")
+                              message: "Agent! \(current) is the latest version. Enjoying Agent!? Consider starring us on GitHub!",
+                              offerStar: true)
                 }
             } catch {
                 showAlert(title: "Update Check Failed",
@@ -114,12 +115,19 @@ final class UpdateChecker {
         }
     }
 
-    private func showAlert(title: String, message: String) {
+    private func showAlert(title: String, message: String, offerStar: Bool = false) {
         let alert = NSAlert()
         alert.messageText = title
         alert.informativeText = message
         alert.alertStyle = .informational
         alert.addButton(withTitle: "OK")
-        alert.runModal()
+        if offerStar {
+            alert.addButton(withTitle: "Star on GitHub")
+        }
+        if alert.runModal() == .alertSecondButtonReturn,
+           let url = URL(string: "https://github.com/AgentiLoop/Agent")
+        {
+            NSWorkspace.shared.open(url)
+        }
     }
 }

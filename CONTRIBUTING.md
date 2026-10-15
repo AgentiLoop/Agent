@@ -2,6 +2,7 @@
 
 Thanks for your interest! Agent! is a 100% Swift, native macOS agentic AI app — and contributions of every size are welcome: bug fixes, tests, docs, new bridges, new tools.
 
+> ⭐ **First time here?** Consider **[starring AgentiLoop/Agent on GitHub](https://github.com/AgentiLoop/Agent)** so more Mac developers can find the project!
 ## 5-Minute Setup (no Apple Developer account needed)
 
 ```bash

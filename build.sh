@@ -42,15 +42,23 @@ xcodebuild \
     AD_HOC_CODE_SIGNING_ALLOWED=YES \
     build 2>&1 | tail -20
 
-APP_PATH="$BUILD_DIR/DerivedData/Build/Products/$CONFIG/Agent!.app"
+PRODUCTS_DIR="$BUILD_DIR/DerivedData/Build/Products/$CONFIG"
+APP_PATH="$PRODUCTS_DIR/Agent!.app"
+DEBUG_APP_PATH="$PRODUCTS_DIR/Agent!-debug.app"
 
-if [ -d "$APP_PATH" ]; then
+if [ ! -d "$APP_PATH" ] && [ -d "$DEBUG_APP_PATH" ]; then
+    ln -sfn "Agent!-debug.app" "$APP_PATH"
+fi
+
+if [ -d "$APP_PATH" ] || [ -d "$DEBUG_APP_PATH" ]; then
+    REAL_APP_PATH="$APP_PATH"
+    [ -d "$DEBUG_APP_PATH" ] && REAL_APP_PATH="$DEBUG_APP_PATH"
     echo ""
     echo "BUILD SUCCEEDED"
-    echo "App: $APP_PATH"
+    echo "App: $REAL_APP_PATH"
     echo ""
     echo "To run:  open \"$APP_PATH\""
-    echo "To copy: cp -R \"$APP_PATH\" /Applications/"
+    echo "To copy: cp -R \"$REAL_APP_PATH\" /Applications/"
 else
     echo ""
     echo "BUILD FAILED — check output above for errors."

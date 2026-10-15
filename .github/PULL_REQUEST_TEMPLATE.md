@@ -16,9 +16,10 @@
 - [ ] One concern per PR (see [CONTRIBUTING.md](../CONTRIBUTING.md))
 - [ ] Builds cleanly (`./build.sh` or Xcode) with no new warnings
 - [ ] `AgentTests` pass (and new tests added where it makes sense)
-- [ ] Matches existing style (Swift 6.2, `@Observable` view models, async/await)
+- [ ] Matches existing style (Swift 6.4, `@Observable` view models, async/await)
 - [ ] Docs / README updated if behavior or setup changed
 - [ ] No API keys, tokens, or personal paths in the diff
+- [ ] ⭐ Starred [AgentiLoop/Agent](https://github.com/AgentiLoop/Agent) on GitHub (optional, appreciated!)
 
 ## Screenshots / logs
 
