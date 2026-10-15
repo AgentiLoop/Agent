@@ -40,14 +40,20 @@ opens with a sponsor banner.
       (line 1) and a 1628×1152 screenshot (line 4) before the `# AgentiLoop Agent!`
       heading. Move the heading + the one-liner *"One app. Any AI. Total command over
       your Mac."* to line 1; keep the sponsor banner, but below the badges.
-- [ ] **Turn the demo GIF back on.** `docs/table-video.gif` (4.7 MB) exists but the
-      `<img>` is commented out at README line 3. A moving demo in the first screen is
-      the single most common feature of the comparison READMEs. If 4.7 MB is too
-      heavy, re-encode to ≤2 MB (`gifski`/`ffmpeg -vf "fps=12,scale=900:-1"`).
+- [ ] **Turn the demo GIF back on.** `docs/table-video.gif` (4.7 MB, 900×628, 12 fps,
+      20.7 s) exists but the `<img>` is commented out at README line 3 — deliberately,
+      in commit 1d84d448 (2026-10-01), which swapped it for the current UI screenshot;
+      the 7 translated READMEs still show the GIF. A moving demo in the first screen is
+      the single most common feature of the comparison READMEs. Options: re-record a GIF
+      of the current UI, or re-encode this one to ≤2 MB
+      (`ffmpeg -i docs/table-video.gif -vf "fps=10,scale=800:-1" …`) and un-comment it.
 - [ ] **Set the social-preview image** (Settings → General → Social preview, 1280×640).
       Every link shared on X, Reddit, Slack, Discord and HN uses it; today they show
-      GitHub's default auto-generated card. Suggested: app icon + "Agent! — the native
-      AI agent for Mac" + the demo screenshot.
+      GitHub's default auto-generated card. **Ready to upload:** `docs/social-preview.png`
+      (1280×640, 835 KB — under GitHub's 1 MB limit): app icon, "Agent! — The native AI
+      agent for Mac", one-line pitch, repo URL and the README screenshot as a window card.
+      Regenerate with the `MakeSocialPreview` agent script (reads the installed app's
+      `AppIcon.icns` and `/tmp/agent-shot.png`).
 - [ ] **Star-history chart** near the bottom of README
       (`https://api.star-history.com/svg?repos=AgentiLoop/Agent&type=Date`) — social
       proof that compounds.
