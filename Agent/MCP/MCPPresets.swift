@@ -25,5 +25,11 @@ enum MCPPresets {
                 url: "https://search.parallel.ai/mcp"
             )
         },
+        MCPPreset(id: "cohesivity", menuLabel: "Cohesivity — Postgres, Hosting & Storage") {
+            MCPServerConfig(
+                name: "Cohesivity",
+                url: "https://cohesivity.ai/mcp"
+            )
+        },
     ]
 }
