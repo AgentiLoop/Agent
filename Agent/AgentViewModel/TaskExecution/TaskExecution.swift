@@ -120,11 +120,15 @@ extension AgentViewModel {
 
         let effectivePrompt = Self.newTaskPrefix(projectFolder: projectFolder, prompt: prompt) + prompt
 
-        let hadAttachments = !attachedImagesBase64.isEmpty
-        taskScopeImages = attachedImages
+        // A dequeued task uses the screenshots it was queued with; otherwise the input's attachments.
+        let queued = queuedAttachments
+        queuedAttachments = nil
+        let taskImagesBase64 = queued?.imagesBase64 ?? attachedImagesBase64
+        let hadAttachments = !taskImagesBase64.isEmpty
+        taskScopeImages = queued?.images ?? attachedImages
         if hadAttachments {
-            appendLog("(\(attachedImagesBase64.count) screenshot(s) attached)")
-            var contentBlocks: [[String: Any]] = attachedImagesBase64.map { base64 in
+            appendLog("(\(taskImagesBase64.count) screenshot(s) attached)")
+            var contentBlocks: [[String: Any]] = taskImagesBase64.map { base64 in
                 [
                     "type": "image",
                     "source": [
@@ -136,9 +140,11 @@ extension AgentViewModel {
             }
             contentBlocks.append(["type": "text", "text": effectivePrompt])
             messages.append(["role": "user", "content": contentBlocks])
-            // Clear attachments after use
-            attachedImages.removeAll()
-            attachedImagesBase64.removeAll()
+            // Clear attachments after use (a dequeued task leaves them for the user's next message)
+            if queued == nil {
+                attachedImages.removeAll()
+                attachedImagesBase64.removeAll()
+            }
         } else {
             messages.append(["role": "user", "content": effectivePrompt])
         }

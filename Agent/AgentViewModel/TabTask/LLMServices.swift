@@ -101,14 +101,16 @@ extension AgentViewModel {
             tab.flush()
         }
 
-        // Use tab's own attached images, fall back to global
-        let tabImages = tab.attachedImagesBase64.isEmpty ? attachedImagesBase64 : tab.attachedImagesBase64
+        // A dequeued task uses the screenshots it was queued with; otherwise the tab's own attached images, falling back to global
+        let queued = tab.queuedAttachments
+        tab.queuedAttachments = nil
+        let tabImages = queued?.imagesBase64 ?? (tab.attachedImagesBase64.isEmpty ? attachedImagesBase64 : tab.attachedImagesBase64)
         AuditLog.log(
             .shell,
-            "TabTask images: tab=\(tab.attachedImagesBase64.count) global=\(attachedImagesBase64.count) using=\(tabImages.count)"
+            "TabTask images: queued=\(queued?.imagesBase64.count ?? -1) tab=\(tab.attachedImagesBase64.count) global=\(attachedImagesBase64.count) using=\(tabImages.count)"
         )
         // Snapshot the NSImages for copy_image(source:"chat") before the input buffers are cleared.
-        tab.taskScopeImages = tab.attachedImages.isEmpty ? attachedImages : tab.attachedImages
+        tab.taskScopeImages = queued?.images ?? (tab.attachedImages.isEmpty ? attachedImages : tab.attachedImages)
         if !tabImages.isEmpty {
             tab.appendLog("(\(tabImages.count) screenshot(s) attached, \(tabImages.map(\.count).reduce(0,+)) bytes)")
             tab.flush()
@@ -124,10 +126,13 @@ extension AgentViewModel {
             }
             contentBlocks.append(["type": "text", "text": prompt])
             messages.append(["role": "user", "content": contentBlocks])
-            tab.attachedImages.removeAll()
-            tab.attachedImagesBase64.removeAll()
-            attachedImages.removeAll()
-            attachedImagesBase64.removeAll()
+            // Input attachments now belong to the next message the user sends — leave them for a dequeued task.
+            if queued == nil {
+                tab.attachedImages.removeAll()
+                tab.attachedImagesBase64.removeAll()
+                attachedImages.removeAll()
+                attachedImagesBase64.removeAll()
+            }
         } else {
             messages.append(["role": "user", "content": promptPrefix + prompt])
         }

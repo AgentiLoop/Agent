@@ -341,7 +341,7 @@ extension AgentViewModel {
         if let tab {
             if tab.isLLMRunning {
                 // A normal task is in flight — the cycle chains after it ends.
-                tab.taskQueue.append(next)
+                tab.taskQueue.append(QueuedTask(prompt: next))
             } else {
                 startTabTask(tab: tab, prompt: next)
             }

@@ -151,10 +151,16 @@ extension AgentViewModel {
         savedInput = ""
         taskInput = ""
 
-        // Queue if already running
+        // Queue if already running — the screenshots attached now travel with this message.
         if isRunning {
-            mainTaskQueue.append(task)
-            appendLog("📋 Queued (\(mainTaskQueue.count)): \(task)")
+            var queued = QueuedTask(prompt: task)
+            queued.images = attachedImages
+            queued.imagesBase64 = attachedImagesBase64
+            attachedImages.removeAll()
+            attachedImagesBase64.removeAll()
+            mainTaskQueue.append(queued)
+            let shots = queued.imagesBase64.isEmpty ? "" : " (\(queued.imagesBase64.count) screenshot(s))"
+            appendLog("📋 Queued (\(mainTaskQueue.count)): \(task)\(shots)")
             flushLog()
             return
         }
@@ -164,7 +170,8 @@ extension AgentViewModel {
 
     /// Start executing a task on the main tab. If a previous task is still draining (retry loop or in-flight HTTP),
     /// waits for it to fully terminate first — otherwise both loops write to the same activityLog producing garbled output.
-    func startMainTask(_ task: String) {
+    /// `queued` carries a dequeued task's own screenshots.
+    func startMainTask(_ task: String, queued: QueuedTask? = nil) {
         let previousTask = runningTask
         runningTask = Task {
             // Drain any previous main task before starting this one. cancel() is idempotent (stop() may have already called it). Await the previous task's value so we know it has fully exited, including any in-flight HTTP request and catch-block log lines.
@@ -175,13 +182,14 @@ extension AgentViewModel {
             // Reset cancellation flag AFTER the previous task has fully exited. Setting it before would let the previous task think it's no longer cancelled if it polls vm.isCancelled.
             isCancelled = false
             currentTaskPrompt = task
+            queuedAttachments = queued
             ChatHistoryStore.shared.startNewTask(prompt: task)
 
             await executeTask(task)
             // When done, run next queued task
             if !mainTaskQueue.isEmpty && !isCancelled {
                 let next = mainTaskQueue.removeFirst()
-                startMainTask(next)
+                startMainTask(next.prompt, queued: next)
             } else if let next = await continueAutoPilot(tab: nil) {
                 // Auto-pilot: queued user tasks run first, then the next cycle.
                 startMainTask(next)

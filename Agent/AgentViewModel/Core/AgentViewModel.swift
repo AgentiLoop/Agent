@@ -566,7 +566,9 @@ final class AgentViewModel {
     let history = TaskHistory.shared
     var isCancelled = false
     var runningTask: Task<Void, Never>?
-    var mainTaskQueue: [String] = []
+    var mainTaskQueue: [QueuedTask] = []
+    /// Screenshots captured with the queued main-tab task now starting (nil = a direct task: use the input's attachments).
+    var queuedAttachments: QueuedTask?
     /// Active `/auto` session — nil when auto-pilot is off. See Features/AutoPilot.swift.
     var autoPilot: AutoPilotSession?
     /// Set when the app is quitting so endAutoPilot keeps sessions persisted for the next launch.

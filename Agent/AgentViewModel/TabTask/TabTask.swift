@@ -86,10 +86,24 @@ extension AgentViewModel {
         tab.addToHistory(task)
         tab.taskInput = ""
 
-        // Queue if already running
+        // Queue if already running — the screenshots attached now travel with this message,
+        // so the task running ahead of it (or a later message) can't take them.
         if tab.isLLMRunning {
-            tab.taskQueue.append(task)
-            tab.appendLog("📋 Queued (\(tab.taskQueue.count)): \(task)")
+            var queued = QueuedTask(prompt: task)
+            if !tab.attachedImagesBase64.isEmpty {
+                queued.images = tab.attachedImages
+                queued.imagesBase64 = tab.attachedImagesBase64
+                tab.attachedImages.removeAll()
+                tab.attachedImagesBase64.removeAll()
+            } else if !attachedImagesBase64.isEmpty {
+                queued.images = attachedImages
+                queued.imagesBase64 = attachedImagesBase64
+                attachedImages.removeAll()
+                attachedImagesBase64.removeAll()
+            }
+            tab.taskQueue.append(queued)
+            let shots = queued.imagesBase64.isEmpty ? "" : " (\(queued.imagesBase64.count) screenshot(s))"
+            tab.appendLog("📋 Queued (\(tab.taskQueue.count)): \(task)\(shots)")
             tab.flush()
             return
         }
@@ -97,9 +111,10 @@ extension AgentViewModel {
         startTabTask(tab: tab, prompt: task)
     }
 
-    /// Start executing a task on a tab (not queued).
-    func startTabTask(tab: ScriptTab, prompt: String) {
+    /// Start executing a task on a tab (not queued). `queued` carries a dequeued task's own screenshots.
+    func startTabTask(tab: ScriptTab, prompt: String, queued: QueuedTask? = nil) {
         tab.currentTaskPrompt = prompt
+        tab.queuedAttachments = queued
         // Avatar tabs: the HUD shows the reply word by word as the avatar says it (no fixed-speed drip).
         if tab.isAvatarTab {
             AvatarController.shared.beginReply()
@@ -120,7 +135,7 @@ extension AgentViewModel {
             // When done, run next queued task
             if !tab.taskQueue.isEmpty && !tab.isCancelled {
                 let next = tab.taskQueue.removeFirst()
-                startTabTask(tab: tab, prompt: next)
+                startTabTask(tab: tab, prompt: next.prompt, queued: next)
             } else if let next = await continueAutoPilot(tab: tab) {
                 // Auto-pilot: queued user tasks run first, then the next cycle.
                 startTabTask(tab: tab, prompt: next)

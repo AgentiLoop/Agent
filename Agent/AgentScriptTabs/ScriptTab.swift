@@ -12,6 +12,13 @@ struct PastedText: Identifiable, Equatable {
     }
 }
 
+/// A task waiting in a task queue, with the screenshots that were attached when it was submitted.
+struct QueuedTask {
+    let prompt: String
+    var images: [NSImage] = []
+    var imagesBase64: [String] = []
+}
+
 /// Thread-safe boolean flag for cross-thread cancellation checks.
 final class AtomicFlag: @unchecked Sendable {
     private let lock = NSLock()
@@ -136,7 +143,9 @@ final class ScriptTab: Identifiable {
     var isBusy: Bool { isRunning || isLLMRunning || isLLMThinking }
     var runningLLMTask: Task<Void, Never>?
     var llmMessages: [[String: Any]] = []
-    var taskQueue: [String] = []
+    var taskQueue: [QueuedTask] = []
+    /// Screenshots captured with the queued task now starting (nil = a direct task: use the input's attachments).
+    var queuedAttachments: QueuedTask?
     var currentTaskPrompt: String = ""
     var currentAppleAIPrompt: String = ""
     /// Tool names recorded by the running tab task (mirrors the tab loop's local
