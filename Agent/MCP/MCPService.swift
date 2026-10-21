@@ -68,7 +68,9 @@ final class MCPService: @unchecked Sendable {
     private init() { loadDisabledTools() }
 
     /// Connect to an MCP server (stdio or HTTP)
-    func connect(to config: MCPServerConfig) async throws {
+    func connect(to stored: MCPServerConfig) async throws {
+        // Fill ${keychain:…} placeholders only for the live connection — never persisted.
+        let config = MCPInstaller.resolved(stored)
         let serverConfig: MCPClient.ServerConfig
         if config.isHTTP {
             serverConfig = MCPClient.ServerConfig(

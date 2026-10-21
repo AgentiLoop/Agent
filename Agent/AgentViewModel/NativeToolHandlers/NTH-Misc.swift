@@ -253,6 +253,9 @@ extension AgentViewModel {
         // Persistent goal state — set/read/mark/clear verification criteria
         case "goal_state":
             return handleGoalState(input: input)
+        // One-step MCP install/manage — credentials collected in a native secure prompt, never in chat
+        case "mcp":
+            return await MCPInstaller.handleTool(input: input)
         // Task complete — signal via NativeToolContext so the task loop can detect it
         case "task_complete":
             let summary = input["summary"] as? String ?? "Done"

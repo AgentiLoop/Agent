@@ -24,6 +24,11 @@ final class KeychainService: Sendable {
     func set(_ provider: APIProvider, _ value: String) { set(key: provider.keychainAccount, value: value) }
     func get(_ provider: APIProvider) -> String? { get(key: provider.keychainAccount) }
 
+    /// MCP server credentials, addressed by the account inside a `${keychain:…}` config placeholder.
+    func setMCPSecret(_ account: String, _ value: String) { set(key: account, value: value) }
+    func getMCPSecret(_ account: String) -> String? { get(key: account) }
+    func deleteMCPSecret(_ account: String) { delete(key: account) }
+
 
     private func set(key: String, value: String) {
         guard let data = value.data(using: .utf8) else { return }

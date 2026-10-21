@@ -98,6 +98,7 @@ extension AgentTools {
     /// `goal_state` — view/update the persistent goal + verification criteria.
     @MainActor static func localToolSchemas() -> [[String: Any]] {
         [
+            MCPInstaller.toolSchema,
             [
                 "name": "goal_state",
                 "description": "Read or update the persistent goal state. Set the goal and its verifiable success criteria when starting a non-trivial task; mark criteria done as you verify them; clear when the task is finished.",

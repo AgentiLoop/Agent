@@ -171,6 +171,7 @@ final class OpenAICompatibleService {
         // reads back from the same .agent/toolcache the compactor wrote to.
         ToolResultCache.setProjectFolder(projectFolder)
         let defs = AgentTools.ollamaTools(for: provider, activeGroups: activeGroups, compact: compact, projectFolder: projectFolder)
+            + AgentTools.localOllamaTool().filter { ($0["function"] as? [String: Any])?["name"] as? String == "mcp" }
         // DashScope rejects the reserved function name "search" (400 InvalidParameter:
         // "Tool names are not allowed to be [search]"). Send it as "web_search", which
         // ToolDispatch already handles directly — no reverse mapping needed.

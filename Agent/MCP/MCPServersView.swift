@@ -62,7 +62,12 @@ struct MCPServersView: View {
                     Menu {
                         ForEach(MCPPresets.all) { preset in
                             Button(preset.menuLabel) {
-                                addSheetItem = AddSheetItem(seed: preset.makeConfig())
+                                if preset.secrets.isEmpty {
+                                    addSheetItem = AddSheetItem(seed: preset.makeConfig())
+                                } else {
+                                    // Credentials → secure prompt + Keychain, then connect
+                                    Task { _ = await MCPInstaller.install(config: preset.makeConfig(), secrets: preset.secrets) }
+                                }
                             }
                         }
                     } label: {
