@@ -106,19 +106,30 @@ enum MCPInstaller {
         await install(config: preset.makeConfig(), secrets: preset.secrets, oauthURL: preset.oauthURL)
     }
     /// Install + connect. Returns a model-safe summary (no secret values).
-    static func install(config base: MCPServerConfig, secrets: [MCPSecretField], oauthURL: String? = nil) async -> String {
+    static func install(config base: MCPServerConfig, secrets: [MCPSecretField], oauthURL presetOAuthURL: String? = nil) async -> String {
         let registry = MCPServerRegistry.shared
         if let existing = registry.servers.first(where: { $0.name.caseInsensitiveCompare(base.name) == .orderedSame }) {
             if MCPService.shared.connectedServerIds.contains(existing.id) {
                 return "'\(existing.name)' is already installed and connected. \(toolSummary(existing))"
             }
-            return await connect(existing, verb: "Already installed — reconnected")
+            do {
+                return await connect(try await signInIfNeeded(existing), verb: "Already installed — reconnected")
+            } catch {
+                return "Browser sign-in for '\(existing.name)' failed: \(error.localizedDescription)"
+            }
         }
 
         var config = base
-        if !secrets.isEmpty {
+        // Auto-detect browser sign-in for ANY remote server: 401 + OAuth metadata (MCP auth spec), no preset needed.
+        var oauthURL = presetOAuthURL
+        if oauthURL == nil, config.isHTTP, let url = config.url, !hasAuthorization(config), await MCPOAuth.supportsOAuth(url) {
+            oauthURL = url
+        }
+        if !secrets.isEmpty || oauthURL != nil {
             let values: [String]
-            switch promptSecrets(server: config.name, fields: secrets, oauth: oauthURL != nil) {
+            // No key fields to fill: go straight to the browser.
+            let choice = secrets.isEmpty ? PromptResult.browser : promptSecrets(server: config.name, fields: secrets, oauth: oauthURL != nil)
+            switch choice {
             case .cancelled:
                 return "User cancelled the credential prompt — '\(config.name)' was not installed."
             case .browser:
@@ -157,6 +168,32 @@ enum MCPInstaller {
         AuditLog.log(.mcp, "[MCPInstaller] Installed \(config.name)")
         return await connect(config, verb: "Installed")
     }
+
+    private static func hasAuthorization(_ config: MCPServerConfig) -> Bool {
+        config.headers.keys.contains { $0.caseInsensitiveCompare("Authorization") == .orderedSame }
+    }
+
+    /// Before connecting any HTTP server: refresh an existing browser sign-in, or — when the server has no
+    /// Authorization header and auto-detects as OAuth — run browser sign-in now and save the Keychain-backed header.
+    /// Returns the (possibly updated) config to connect with. Stdio servers and API-key servers pass through.
+    static func signInIfNeeded(_ config: MCPServerConfig) async throws -> MCPServerConfig {
+        guard config.isHTTP, let url = config.url else { return config }
+        if MCPOAuth.isOAuth(config.name) {
+            if await MCPOAuth.refreshIfNeeded(server: config.name) { return config }
+        } else {
+            if hasAuthorization(config) { return config }
+            let detected = await MCPOAuth.supportsOAuth(url)
+            if !detected { return config }
+        }
+        try await MCPOAuth.signIn(server: config.name, mcpURL: url)
+        var updated = config
+        updated.headers["Authorization"] = "Bearer " + placeholderPrefix + MCPOAuth.accessAccount(config.name) + "}"
+        if MCPServerRegistry.shared.servers.contains(where: { $0.id == updated.id }) {
+            MCPServerRegistry.shared.update(updated)
+        }
+        return updated
+    }
+
 
     private static func connect(_ config: MCPServerConfig, verb: String) async -> String {
         do {
@@ -226,13 +263,12 @@ enum MCPInstaller {
                 return "No installed server named '\(server)'. Use action:list."
             }
             await MCPService.shared.disconnect(serverId: s.id)
-            // Browser sign-in whose refresh token is gone or rejected: sign in again before reconnecting.
-            if MCPOAuth.isOAuth(s.name), await !MCPOAuth.refreshIfNeeded(server: s.name), let url = s.url {
-                do { try await MCPOAuth.signIn(server: s.name, mcpURL: url) } catch {
-                    return "Browser sign-in for '\(s.name)' failed: \(error.localizedDescription)"
-                }
+            // Expired browser sign-in, or any HTTP server that auto-detects as OAuth: sign in before reconnecting.
+            do {
+                return await connect(try await signInIfNeeded(s), verb: "Reconnected")
+            } catch {
+                return "Browser sign-in for '\(s.name)' failed: \(error.localizedDescription)"
             }
-            return await connect(s, verb: "Reconnected")
 
         case "remove":
             guard let s = registry.servers.first(where: { $0.name.caseInsensitiveCompare(server) == .orderedSame }) else {
@@ -251,7 +287,7 @@ enum MCPInstaller {
 
     static let toolSchema: [String: Any] = [
         "name": "mcp",
-        "description": "Install and manage MCP servers in one step. add: server:\"sentry\" (or linear, github, notion, stripe, context7, playwright… see catalog) installs the preset, securely prompts the user for any API key/token in a native dialog (stored in Keychain, never shown to you) — Sentry, Linear and Notion also offer Sign in with Browser (OAuth/SSO, built in, no Node.js) — and connects immediately — its mcp_<Server>_* tools are usable on your next turn, no restart. NEVER ask the user to paste keys/tokens into chat; this tool collects them. If the user's message shows \"[… removed — stored in macOS Keychain …]\", the app already captured that token: just call add and it is pre-filled. Custom server: add with server name + url (HTTP) or command + args (stdio), and list credential names in secret_env/secret_headers.",
+        "description": "Install and manage MCP servers in one step. add: server:\"sentry\" (or linear, github, notion, stripe, context7, playwright… see catalog) installs the preset, securely prompts the user for any API key/token in a native dialog (stored in Keychain, never shown to you) — any remote (HTTP) server that supports OAuth is auto-detected and gets Sign in with Browser (OAuth/SSO, built in, no Node.js; a custom url with no secret_headers goes straight to the browser) — and connects immediately — its mcp_<Server>_* tools are usable on your next turn, no restart. NEVER ask the user to paste keys/tokens into chat; this tool collects them. If the user's message shows \"[… removed — stored in macOS Keychain …]\", the app already captured that token: just call add and it is pre-filled. Custom server: add with server name + url (HTTP) or command + args (stdio), and list credential names in secret_env/secret_headers.",
         "input_schema": [
             "type": "object",
             "properties": [

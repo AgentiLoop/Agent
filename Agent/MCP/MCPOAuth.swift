@@ -161,6 +161,33 @@ enum MCPOAuth {
         return try? JSONDecoder().decode(State.self, from: Data(json.utf8))
     }
 
+
+    /// Auto-detect: does this HTTP MCP endpoint require login AND advertise OAuth (MCP auth spec)? True when an
+    /// unauthenticated request gets 401 and the server publishes protected-resource or authorization-server metadata.
+    static func supportsOAuth(_ mcpURL: String) async -> Bool {
+        guard let resource = URL(string: mcpURL), resource.host != nil else { return false }
+        var probe = URLRequest(url: resource, timeoutInterval: 10)
+        probe.httpMethod = "POST"
+        probe.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        probe.setValue("application/json, text/event-stream", forHTTPHeaderField: "Accept")
+        probe.httpBody = Data(#"{"jsonrpc":"2.0","id":0,"method":"ping"}"#.utf8)
+        guard let (_, response) = try? await URLSession.shared.data(for: probe),
+              let http = response as? HTTPURLResponse, http.statusCode == 401 else { return false }
+        if http.value(forHTTPHeaderField: "WWW-Authenticate")?.contains("resource_metadata") == true { return true }
+        let origin = originString(resource)
+        let path = resource.path == "/" ? "" : resource.path
+        for candidate in [
+            "\(origin)/.well-known/oauth-protected-resource\(path)",
+            "\(origin)/.well-known/oauth-protected-resource",
+            "\(origin)/.well-known/oauth-authorization-server",
+        ].compactMap(URL.init(string:)) {
+            if let json = await getJSON(candidate), json["authorization_servers"] != nil || json["authorization_endpoint"] != nil {
+                return true
+            }
+        }
+        return false
+    }
+
     // MARK: - Discovery
 
     /// RFC 9728 protected-resource metadata → RFC 8414 / OIDC authorization-server metadata, falling back to

@@ -146,9 +146,11 @@ struct MCPServersView: View {
                     addError = err
                 } else {
                     addSheetItem = nil
-                    let config = newServer
+                    let added = newServer
                     Task {
-                        connectingIds.insert(config.id)
+                        connectingIds.insert(added.id)
+                        // Any HTTP server that auto-detects as OAuth gets browser sign-in before connecting.
+                        let config = (try? await MCPInstaller.signInIfNeeded(added)) ?? added
                         try? await mcpService.connect(to: config)
                         connectingIds.remove(config.id)
                     }
@@ -195,9 +197,10 @@ struct MCPServersView: View {
     /// Connect or disconnect based on the NEW enabled state (already set by the toggle binding).
     private func connectOrDisconnect(_ serverId: UUID, enable: Bool) async {
         if enable {
-            guard let server = registry.servers.first(where: { $0.id == serverId }) else { return }
+            guard let stored = registry.servers.first(where: { $0.id == serverId }) else { return }
             connectingIds.insert(serverId)
             do {
+                let server = try await MCPInstaller.signInIfNeeded(stored) // auto-detected browser sign-in
                 try await mcpService.connect(to: server)
             } catch {
                 mcpService.connectionErrors[serverId] = error.localizedDescription
