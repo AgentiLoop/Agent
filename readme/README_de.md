@@ -370,7 +370,7 @@ Star History
 
 ## Mitwirken
 
-Siehe [CONTRIBUTING.md](../CONTRIBUTING.md) — in ~5 Minuten mit `./build.sh` aus dem Quellcode bauen, kein Developer-Konto nötig. Pull Requests durchlaufen den CI-Build-&-Test-Workflow. Schau dir die [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) an.
+Siehe [CONTRIBUTING.md](../.github/CONTRIBUTING.md) — in ~5 Minuten mit `./build.sh` aus dem Quellcode bauen, kein Developer-Konto nötig. Pull Requests durchlaufen den CI-Build-&-Test-Workflow. Schau dir die [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) an.
 
 ## Lizenz
 

@@ -61,14 +61,14 @@ Open a [GitHub issue](https://github.com/AgentiLoop/Agent/issues) or a [discussi
 
 ## Contributor License Agreement (CLA)
 
-All contributors must sign the [AgentiLoop Contributor License Agreement](./CLA.md) before a pull request can be merged. It's a one-time step:
+All contributors must sign the [AgentiLoop Contributor License Agreement](../CLA.md) before a pull request can be merged. It's a one-time step:
 
 1. Open your pull request.
 2. The **CLA Assistant** bot comments on the PR.
 3. Reply with exactly: `I have read the CLA Document and I hereby sign the CLA`
 
-The bot records your GitHub username in [`signatures/version1/cla.json`](./signatures/version1/cla.json) and the check turns green. You keep the copyright to your work — the CLA grants AgentiLoop a license to use, relicense, and distribute it. Contributing on behalf of an employer? See the "How to Sign" section in [CLA.md](./CLA.md).
+The bot records your GitHub username in [`signatures/version1/cla.json`](../signatures/version1/cla.json) and the check turns green. You keep the copyright to your work — the CLA grants AgentiLoop a license to use, relicense, and distribute it. Contributing on behalf of an employer? See the "How to Sign" section in [CLA.md](../CLA.md).
 
 ## License
 
-Contributions are distributed under the [PolyForm Noncommercial License 1.0.0](./LICENSE) and licensed to AgentiLoop under the terms of the [CLA](./CLA.md). Note: the "🦾 Agent!" name and logo are trademarks of AgentiLoop.ai and not covered by the PolyForm Noncommercial license (see README Legal Notice).
+Contributions are distributed under the [PolyForm Noncommercial License 1.0.0](../LICENSE) and licensed to AgentiLoop under the terms of the [CLA](../CLA.md). Note: the "🦾 Agent!" name and logo are trademarks of AgentiLoop.ai and not covered by the PolyForm Noncommercial license (see README Legal Notice).

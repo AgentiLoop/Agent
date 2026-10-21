@@ -369,7 +369,7 @@ Star History
 
 ## 参与贡献
 
-见 [CONTRIBUTING.md](../CONTRIBUTING.md)——用 `./build.sh` 约 5 分钟即可从源码构建，无需开发者账户。Pull request 会运行 CI Build & Test 工作流。可查看 [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)。
+见 [CONTRIBUTING.md](../.github/CONTRIBUTING.md)——用 `./build.sh` 约 5 分钟即可从源码构建，无需开发者账户。Pull request 会运行 CI Build & Test 工作流。可查看 [good first issues](https://github.com/AgentiLoop/Agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)。
 
 ## 许可证
 
