@@ -66,7 +66,7 @@ struct MCPServersView: View {
                                     addSheetItem = AddSheetItem(seed: preset.makeConfig())
                                 } else {
                                     // Credentials → secure prompt + Keychain, then connect
-                                    Task { _ = await MCPInstaller.install(preset: preset) }
+                                    Task { _ = await MCPInstaller.install(config: preset.makeConfig(), secrets: preset.secrets) }
                                 }
                             }
                         }
