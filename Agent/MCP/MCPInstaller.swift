@@ -50,9 +50,13 @@ enum MCPInstaller {
 
     /// App-modal prompt with one secure field per credential. Returns nil when cancelled.
     private static func promptSecrets(server: String, fields: [MCPSecretField]) -> [String]? {
+        // A token the user pasted into chat was moved to the Keychain by SecretRedactor — pre-fill it.
+        let pastedAccount = SecretRedactor.pastedAccount(server)
+        let pasted = KeychainService.shared.getMCPSecret(pastedAccount)
         let alert = NSAlert()
         alert.messageText = "Connect \(server)"
         alert.informativeText = "Credentials are saved in your macOS Keychain and are never sent to the AI model or shown in chat."
+            + (pasted == nil ? "" : "\n\nThe token you pasted in chat was filled in for you (it was kept out of the chat).")
         alert.addButton(withTitle: "Connect")
         alert.addButton(withTitle: "Cancel")
 
@@ -66,6 +70,7 @@ enum MCPInstaller {
             label.font = .boldSystemFont(ofSize: NSFont.smallSystemFontSize)
             let input = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 340, height: 24))
             input.placeholderString = field.key
+            if inputs.isEmpty, let pasted { input.stringValue = pasted }
             input.widthAnchor.constraint(equalToConstant: 340).isActive = true
             let help = NSTextField(wrappingLabelWithString: field.help)
             help.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
@@ -83,6 +88,7 @@ enum MCPInstaller {
 
         NSApp.activate(ignoringOtherApps: true)
         guard alert.runModal() == .alertFirstButtonReturn else { return nil }
+        if pasted != nil { KeychainService.shared.deleteMCPSecret(pastedAccount) } // now stored under the server's own account
         return inputs.map { $0.stringValue.trimmingCharacters(in: .whitespacesAndNewlines) }
     }
 
@@ -212,7 +218,7 @@ enum MCPInstaller {
 
     static let toolSchema: [String: Any] = [
         "name": "mcp",
-        "description": "Install and manage MCP servers in one step. add: server:\"sentry\" (or linear, github, notion, stripe, context7, playwright… see catalog) installs the preset, securely prompts the user for any API key/token in a native dialog (stored in Keychain, never shown to you), and connects immediately — its mcp_<Server>_* tools are usable on your next turn, no restart. NEVER ask the user to paste keys/tokens into chat; this tool collects them. Custom server: add with server name + url (HTTP) or command + args (stdio), and list credential names in secret_env/secret_headers.",
+        "description": "Install and manage MCP servers in one step. add: server:\"sentry\" (or linear, github, notion, stripe, context7, playwright… see catalog) installs the preset, securely prompts the user for any API key/token in a native dialog (stored in Keychain, never shown to you), and connects immediately — its mcp_<Server>_* tools are usable on your next turn, no restart. NEVER ask the user to paste keys/tokens into chat; this tool collects them. If the user's message shows \"[… removed — stored in macOS Keychain …]\", the app already captured that token: just call add and it is pre-filled. Custom server: add with server name + url (HTTP) or command + args (stdio), and list credential names in secret_env/secret_headers.",
         "input_schema": [
             "type": "object",
             "properties": [

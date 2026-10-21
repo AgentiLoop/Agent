@@ -61,9 +61,12 @@ extension AgentViewModel {
     func run() {
         let typed = taskInput.trimmingCharacters(in: .whitespaces)
         // Merge long-text attachments (captured via Cmd+V chips) into the prompt.
-        let task = Self.mergePastedTexts(pastedTexts, into: typed)
+        // Pasted API keys/tokens go to the Keychain, never to the LLM, history or log.
+        let redaction = SecretRedactor.redact(Self.mergePastedTexts(pastedTexts, into: typed))
+        let task = redaction.text
         pastedTexts.removeAll()
         guard !task.isEmpty else { return }
+        if !redaction.removed.isEmpty { appendLog(SecretRedactor.notice(redaction.removed)) }
 
         // Handle /clear commands
         if task.lowercased().hasPrefix("/clear") {

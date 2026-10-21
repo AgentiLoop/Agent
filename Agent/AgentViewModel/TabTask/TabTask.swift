@@ -35,9 +35,12 @@ extension AgentViewModel {
     func runTabTask(tab: ScriptTab) {
         let typed = tab.taskInput.trimmingCharacters(in: .whitespaces)
         // Merge long-text attachments (captured via Cmd+V chips) into the prompt.
-        let task = Self.mergePastedTexts(tab.pastedTexts, into: typed)
+        // Pasted API keys/tokens go to the Keychain, never to the LLM, history or log.
+        let redaction = SecretRedactor.redact(Self.mergePastedTexts(tab.pastedTexts, into: typed))
+        let task = redaction.text
         tab.pastedTexts.removeAll()
         guard !task.isEmpty else { return }
+        if !redaction.removed.isEmpty { tab.appendLog(SecretRedactor.notice(redaction.removed)) }
 
         // Avatar tabs: the user replying (typed or spoken) interrupts the avatar.
         if tab.isAvatarTab, AvatarController.shared.speaking { AvatarController.shared.stop() }
