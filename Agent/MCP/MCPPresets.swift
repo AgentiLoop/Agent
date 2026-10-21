@@ -31,5 +31,12 @@ enum MCPPresets {
                 url: "https://cohesivity.ai/mcp"
             )
         },
+        MCPPreset(id: "keenable.search", menuLabel: "Keenable Search — Web Search & Fetch") {
+            MCPServerConfig(
+                name: "Keenable Search",
+                url: "https://api.keenable.ai/mcp",
+                headers: ["X-Keenable-Title": "Agent!"]
+            )
+        },
     ]
 }
