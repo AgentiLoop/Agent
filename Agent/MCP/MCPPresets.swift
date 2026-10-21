@@ -36,6 +36,8 @@ struct MCPPreset: Identifiable {
     var keywords: [String] = []
     /// Credentials collected securely at install time. Empty → no prompt.
     var secrets: [MCPSecretField] = []
+    /// Remote MCP endpoint that supports "Sign in with Browser" (native OAuth, see `MCPOAuth`) instead of a key.
+    var oauthURL: String? = nil
     let makeConfig: () -> MCPServerConfig
 }
 
@@ -85,7 +87,8 @@ enum MCPPresets {
                     help: "Leave blank for sentry.io. Example: sentry.example.com",
                     optional: true
                 ),
-            ]
+            ],
+            oauthURL: "https://mcp.sentry.dev/mcp"
         ) {
             MCPServerConfig(
                 name: "Sentry",
@@ -103,7 +106,8 @@ enum MCPPresets {
                     label: "Linear API Key",
                     help: "linear.app → Settings → Security & access → Personal API keys"
                 ),
-            ]
+            ],
+            oauthURL: "https://mcp.linear.app/mcp"
         ) {
             MCPServerConfig(name: "Linear", url: "https://mcp.linear.app/mcp")
         },
@@ -131,7 +135,8 @@ enum MCPPresets {
                     label: "Notion Integration Token",
                     help: "notion.so/profile/integrations → New integration → Internal Integration Secret (ntn_…)"
                 ),
-            ]
+            ],
+            oauthURL: "https://mcp.notion.com/mcp"
         ) {
             MCPServerConfig(
                 name: "Notion",

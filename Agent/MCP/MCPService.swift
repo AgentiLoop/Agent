@@ -69,6 +69,7 @@ final class MCPService: @unchecked Sendable {
 
     /// Connect to an MCP server (stdio or HTTP)
     func connect(to stored: MCPServerConfig) async throws {
+        await MCPOAuth.refreshIfNeeded(server: stored.name) // browser sign-in servers: keep the access token fresh
         // Fill ${keychain:…} placeholders only for the live connection — never persisted.
         let config = MCPInstaller.resolved(stored)
         let serverConfig: MCPClient.ServerConfig

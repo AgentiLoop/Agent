@@ -48,8 +48,9 @@ enum MCPInstaller {
 
     // MARK: - Secure prompt
 
-    /// App-modal prompt with one secure field per credential. Returns nil when cancelled.
-    private static func promptSecrets(server: String, fields: [MCPSecretField]) -> [String]? {
+    private enum PromptResult { case values([String]), browser, cancelled }
+    /// App-modal prompt with one secure field per credential, plus "Sign in with Browser" when `oauth` is true.
+    private static func promptSecrets(server: String, fields: [MCPSecretField], oauth: Bool) -> PromptResult {
         // A token the user pasted into chat was moved to the Keychain by SecretRedactor — pre-fill it.
         let pastedAccount = SecretRedactor.pastedAccount(server)
         let pasted = KeychainService.shared.getMCPSecret(pastedAccount)
@@ -57,7 +58,9 @@ enum MCPInstaller {
         alert.messageText = "Connect \(server)"
         alert.informativeText = "Credentials are saved in your macOS Keychain and are never sent to the AI model or shown in chat."
             + (pasted == nil ? "" : "\n\nThe token you pasted in chat was filled in for you (it was kept out of the chat).")
+            + (oauth ? "\n\nOr skip the key: Sign in with Browser opens \(server)'s own login page (OAuth, SSO supported)." : "")
         alert.addButton(withTitle: "Connect")
+        if oauth { alert.addButton(withTitle: "Sign in with Browser") }
         alert.addButton(withTitle: "Cancel")
 
         let stack = NSStackView()
@@ -87,15 +90,23 @@ enum MCPInstaller {
         alert.window.initialFirstResponder = inputs.first
 
         NSApp.activate(ignoringOtherApps: true)
-        guard alert.runModal() == .alertFirstButtonReturn else { return nil }
+        let response = alert.runModal()
+        if oauth && response == .alertSecondButtonReturn {
+            if pasted != nil { KeychainService.shared.deleteMCPSecret(pastedAccount) } // not needed with browser sign-in
+            return .browser
+        }
+        guard response == .alertFirstButtonReturn else { return .cancelled }
         if pasted != nil { KeychainService.shared.deleteMCPSecret(pastedAccount) } // now stored under the server's own account
-        return inputs.map { $0.stringValue.trimmingCharacters(in: .whitespacesAndNewlines) }
+        return .values(inputs.map { $0.stringValue.trimmingCharacters(in: .whitespacesAndNewlines) })
     }
 
     // MARK: - Install
 
+    static func install(preset: MCPPreset) async -> String {
+        await install(config: preset.makeConfig(), secrets: preset.secrets, oauthURL: preset.oauthURL)
+    }
     /// Install + connect. Returns a model-safe summary (no secret values).
-    static func install(config base: MCPServerConfig, secrets: [MCPSecretField]) async -> String {
+    static func install(config base: MCPServerConfig, secrets: [MCPSecretField], oauthURL: String? = nil) async -> String {
         let registry = MCPServerRegistry.shared
         if let existing = registry.servers.first(where: { $0.name.caseInsensitiveCompare(base.name) == .orderedSame }) {
             if MCPService.shared.connectedServerIds.contains(existing.id) {
@@ -106,8 +117,23 @@ enum MCPInstaller {
 
         var config = base
         if !secrets.isEmpty {
-            guard let values = promptSecrets(server: config.name, fields: secrets) else {
+            let values: [String]
+            switch promptSecrets(server: config.name, fields: secrets, oauth: oauthURL != nil) {
+            case .cancelled:
                 return "User cancelled the credential prompt — '\(config.name)' was not installed."
+            case .browser:
+                // Native OAuth (MCPOAuth) — the access token lands in the Keychain, the config only references it.
+                let url = oauthURL ?? ""
+                do {
+                    try await MCPOAuth.signIn(server: config.name, mcpURL: url)
+                } catch {
+                    return "Browser sign-in for '\(config.name)' failed: \(error.localizedDescription) — not installed."
+                }
+                let header = "Bearer " + placeholderPrefix + MCPOAuth.accessAccount(config.name) + "}"
+                config = MCPServerConfig(name: config.name, url: url, headers: ["Authorization": header])
+                values = []
+            case .values(let v):
+                values = v
             }
             for (field, value) in zip(secrets, values) {
                 if value.isEmpty {
@@ -160,7 +186,7 @@ enum MCPInstaller {
         case "catalog":
             return MCPPresets.all.map { p in
                 let creds = p.secrets.filter { !$0.optional }.map(\.label)
-                return "\(p.id) — \(p.menuLabel)" + (creds.isEmpty ? " (no credentials)" : " (asks for: \(creds.joined(separator: ", ")))")
+                return "\(p.id) — \(p.menuLabel)" + (creds.isEmpty ? " (no credentials)" : " (asks for: \(creds.joined(separator: ", "))\(p.oauthURL == nil ? "" : " or browser sign-in"))")
             }.joined(separator: "\n")
 
         case "list":
@@ -179,7 +205,7 @@ enum MCPInstaller {
                     return "No preset matches '\(server)'. Presets:\n" + MCPPresets.all.map(\.id).joined(separator: ", ")
                         + "\nFor any other server pass name + url (HTTP) or command + args (stdio), and list credential names in secret_env / secret_headers."
                 }
-                return await install(config: preset.makeConfig(), secrets: preset.secrets)
+                return await install(preset: preset)
             }
             let name = server.isEmpty ? (URL(string: url)?.host ?? command) : server
             let config = url.isEmpty
@@ -200,6 +226,12 @@ enum MCPInstaller {
                 return "No installed server named '\(server)'. Use action:list."
             }
             await MCPService.shared.disconnect(serverId: s.id)
+            // Browser sign-in whose refresh token is gone or rejected: sign in again before reconnecting.
+            if MCPOAuth.isOAuth(s.name), await !MCPOAuth.refreshIfNeeded(server: s.name), let url = s.url {
+                do { try await MCPOAuth.signIn(server: s.name, mcpURL: url) } catch {
+                    return "Browser sign-in for '\(s.name)' failed: \(error.localizedDescription)"
+                }
+            }
             return await connect(s, verb: "Reconnected")
 
         case "remove":
@@ -208,6 +240,7 @@ enum MCPInstaller {
             }
             await MCPService.shared.disconnect(serverId: s.id)
             referencedAccounts(s).forEach { KeychainService.shared.deleteMCPSecret($0) }
+            MCPOAuth.forget(s.name)
             registry.remove(at: s.id)
             return "Removed '\(s.name)' and its stored credentials."
 
@@ -218,7 +251,7 @@ enum MCPInstaller {
 
     static let toolSchema: [String: Any] = [
         "name": "mcp",
-        "description": "Install and manage MCP servers in one step. add: server:\"sentry\" (or linear, github, notion, stripe, context7, playwright… see catalog) installs the preset, securely prompts the user for any API key/token in a native dialog (stored in Keychain, never shown to you), and connects immediately — its mcp_<Server>_* tools are usable on your next turn, no restart. NEVER ask the user to paste keys/tokens into chat; this tool collects them. If the user's message shows \"[… removed — stored in macOS Keychain …]\", the app already captured that token: just call add and it is pre-filled. Custom server: add with server name + url (HTTP) or command + args (stdio), and list credential names in secret_env/secret_headers.",
+        "description": "Install and manage MCP servers in one step. add: server:\"sentry\" (or linear, github, notion, stripe, context7, playwright… see catalog) installs the preset, securely prompts the user for any API key/token in a native dialog (stored in Keychain, never shown to you) — Sentry, Linear and Notion also offer Sign in with Browser (OAuth/SSO, built in, no Node.js) — and connects immediately — its mcp_<Server>_* tools are usable on your next turn, no restart. NEVER ask the user to paste keys/tokens into chat; this tool collects them. If the user's message shows \"[… removed — stored in macOS Keychain …]\", the app already captured that token: just call add and it is pre-filled. Custom server: add with server name + url (HTTP) or command + args (stdio), and list credential names in secret_env/secret_headers.",
         "input_schema": [
             "type": "object",
             "properties": [
