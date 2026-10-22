@@ -33,6 +33,14 @@ final class MCPService: @unchecked Sendable {
         "\(serverName).\(toolName)"
     }
 
+    /// Tool name exactly as the LLM sees it — mirrors AgentTools.sanitizeToolName, which strips everything but
+    /// [A-Za-z0-9_-] (server "127.0.0.1" → "mcp_127001_…"). Dispatch must match on this, not split on "_".
+    nonisolated static func wireName(serverName: String, toolName: String) -> String {
+        String("mcp_\(serverName)_\(toolName)".unicodeScalars.filter {
+            CharacterSet.alphanumerics.contains($0) || $0 == "_" || $0 == "-"
+        }.prefix(128))
+    }
+
     /// Check if a tool is enabled
     func isToolEnabled(serverName: String, toolName: String) -> Bool {
         !disabledTools.contains(Self.toolKey(serverName: serverName, toolName: toolName))

@@ -32,7 +32,7 @@ extension AgentViewModel {
             let mcpTools = mcp.discoveredTools
                 .filter { mcp.isToolEnabled(serverName: $0.serverName, toolName: $0.name) }
                 .sorted { $0.name < $1.name }
-                .map { "mcp_\($0.serverName)_\($0.name)" }
+                .map { MCPService.wireName(serverName: $0.serverName, toolName: $0.name) }
             let all = builtIn + (mcpTools.isEmpty ? [] : ["--- MCP Tools ---"] + mcpTools)
             return all.joined(separator: "\n")
         // Memory tool — Claude-compatible (memory_20250818) filesystem-shaped

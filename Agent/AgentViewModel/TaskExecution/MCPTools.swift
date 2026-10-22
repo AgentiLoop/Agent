@@ -18,9 +18,13 @@ extension AgentViewModel {
     ) async -> Bool {
         guard name.hasPrefix("mcp_") else { return false }
 
+        // Match on the sanitized wire name — server names may contain "." or "_" (e.g. "127.0.0.1", "my_server").
+        let wireMatch = MCPService.shared.discoveredTools.first {
+            MCPService.wireName(serverName: $0.serverName, toolName: $0.name) == name
+        }
         let parts = name.dropFirst(4).split(separator: "_", maxSplits: 1)
-        let serverName = String(parts.first ?? "")
-        let toolName = String(parts.last ?? "")
+        let serverName = wireMatch?.serverName ?? String(parts.first ?? "")
+        let toolName = wireMatch?.name ?? String(parts.last ?? "")
 
         // Snapshot disabled state once to avoid TOCTOU races
         let disabledSnapshot = MCPService.shared.disabledTools

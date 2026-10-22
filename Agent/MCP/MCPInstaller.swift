@@ -206,7 +206,7 @@ enum MCPInstaller {
     }
 
     private static func toolSummary(_ config: MCPServerConfig) -> String {
-        let tools = MCPService.shared.discoveredTools.filter { $0.serverId == config.id }.map { "mcp_\(config.name)_\($0.name)" }
+        let tools = MCPService.shared.discoveredTools.filter { $0.serverId == config.id }.map { MCPService.wireName(serverName: config.name, toolName: $0.name) }
         guard !tools.isEmpty else { return "No tools discovered yet." }
         let shown = tools.prefix(25).joined(separator: ", ")
         return "\(tools.count) tools available now: \(shown)\(tools.count > 25 ? ", …" : "")."
