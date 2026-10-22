@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 
 // MARK: - Auto-Pilot
@@ -51,6 +52,9 @@ struct AutoPilotSession: Codable {
     var branch: String?
     /// Tab/main folder before switching to the worktree — restored when the session ends.
     var originalFolder: String?
+    /// PNG files of the images attached when the session started — re-attached
+    /// to every cycle's first message. Optional so older sessions still decode.
+    var imagePaths: [String]?
 
     var isDiscovery: Bool { goal.isEmpty }
 }
@@ -327,9 +331,13 @@ extension AgentViewModel {
         if !others.isEmpty {
             apLog("🛩️ Other Auto-Pilot tabs on this project: " + others.map { "\($0.title) (\($0.branch ?? "shared checkout"))" }.joined(separator: ", "), tab)
         }
+        session.imagePaths = saveAutoPilotImages(session, tab)
         setAutoPilotSession(session, tab)
         let budget = hours.map { Self.autoPilotFormatHours($0) } ?? "no time limit, unlimited cycles"
         apLog("🛩️ Auto-pilot started — \(budget). Goal: \(goal.isEmpty ? "(will ask you after reviewing the project)" : goal)", tab)
+        if let n = session.imagePaths?.count, n > 0 {
+            apLog("🛩️ \(n) attached image(s) will be sent with every cycle.", tab)
+        }
         if !autoPilotParityFolders.isEmpty {
             apLog("🛩️ Parity folders: \(autoPilotParityFolders.joined(separator: ", "))", tab)
         }
@@ -425,7 +433,60 @@ extension AgentViewModel {
         setAutoPilotSession(session, tab)
         registerAutoPilot(session, tab)
         apLog("🛩️ Auto-pilot cycle \(session.cycle) — \(autoPilotStatusLine(tab))", tab)
+        reattachAutoPilotImages(session, tab)
         return buildAutoPilotPrompt(session, tab: tab)
+    }
+
+    // MARK: Attached images
+
+    /// Images attached when `/auto` was sent are saved as PNGs under this tab's
+    /// `.agent/tabs/<key>/images/` so they survive an app restart and can be
+    /// re-attached to every cycle (the task loop clears the input buffers after
+    /// the first request). Returns the saved paths, or nil when nothing was attached.
+    private func saveAutoPilotImages(_ session: AutoPilotSession, _ tab: ScriptTab?) -> [String]? {
+        let images = tab.map { $0.attachedImagesBase64.isEmpty ? attachedImagesBase64 : $0.attachedImagesBase64 } ?? attachedImagesBase64
+        guard !images.isEmpty else { return nil }
+        let dir = autoPilotImagesDir(session, tab)
+        try? FileManager.default.removeItem(at: dir)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        var paths: [String] = []
+        for (i, base64) in images.enumerated() {
+            guard let data = Data(base64Encoded: base64) else { continue }
+            let url = dir.appendingPathComponent("image-\(i + 1).png")
+            if (try? data.write(to: url, options: .atomic)) != nil { paths.append(url.path) }
+        }
+        return paths.isEmpty ? nil : paths
+    }
+
+    private func autoPilotImagesDir(_ session: AutoPilotSession, _ tab: ScriptTab?) -> URL {
+        AutoPilotRegistry.tabDir(root: session.projectRoot ?? autoPilotFolder(tab), key: autoPilotKey(tab))
+            .appendingPathComponent("images", isDirectory: true)
+    }
+
+    /// Put the session's images back into the attachment buffers so the cycle's
+    /// first user message carries them (TaskExecution / LLMServices send and clear them).
+    private func reattachAutoPilotImages(_ session: AutoPilotSession, _ tab: ScriptTab?) {
+        guard let paths = session.imagePaths, !paths.isEmpty else { return }
+        var base64s: [String] = []
+        var nsImages: [NSImage] = []
+        for path in paths {
+            guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else { continue }
+            base64s.append(data.base64EncodedString())
+            if let image = NSImage(data: data) { nsImages.append(image) }
+        }
+        guard !base64s.isEmpty else { return }
+        if let tab {
+            tab.attachedImages = nsImages
+            tab.attachedImagesBase64 = base64s
+        } else {
+            attachedImages = nsImages
+            attachedImagesBase64 = base64s
+        }
+    }
+
+    private func removeAutoPilotImages(_ session: AutoPilotSession, _ tab: ScriptTab?) {
+        guard session.imagePaths?.isEmpty == false else { return }
+        try? FileManager.default.removeItem(at: autoPilotImagesDir(session, tab))
     }
 
     /// Esc / Stop cancels only the running cycle. Keep the session alive and
@@ -452,6 +513,7 @@ extension AgentViewModel {
         }
         appendAutoPilotProgress("Session ended — \(reason) (\(Self.autoPilotTimestamp()))\n", tab)
         AutoPilotRegistry.remove(root: autoPilotHome(tab), key: autoPilotKey(tab))
+        removeAutoPilotImages(session, tab)
         setAutoPilotSession(nil, tab)
         if let original = session.originalFolder { setAutoPilotWorkFolder(original, tab) }
         let elapsed = Self.autoPilotFormatHours(Date().timeIntervalSince(session.startedAt) / 3600)
@@ -498,6 +560,9 @@ extension AgentViewModel {
             for f in autoPilotParityFolders { p += "  - \(f)\n" }
         }
         p += autoPilotCoordinationBlock(session, tab)
+        if let n = session.imagePaths?.count, n > 0 {
+            p += "ATTACHED IMAGES: the \(n) image(s) on this message were attached by the user when the session started — they are reference material for the goal and are re-sent every cycle.\n"
+        }
         if session.isDiscovery {
             let recent = autoPilotGoalHistory.suffix(5)
             let past = recent.isEmpty ? "" : "\nPrevious auto-pilot goals (offer these as options):\n" + recent.map { "  - \($0)" }.joined(separator: "\n") + "\n"
