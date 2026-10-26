@@ -71,6 +71,12 @@ enum MCPPresets {
                 headers: ["X-Keenable-Title": "Agent!"]
             )
         },
+        MCPPreset(id: "deed.page", menuLabel: "deed.page — Publish Static Sites", keywords: ["deed", "deedpage"]) {
+            MCPServerConfig(
+                name: "deed.page",
+                url: "https://deed.page/mcp"
+            )
+        },
         MCPPreset(
             id: "sentry",
             menuLabel: "Sentry — Issues, Errors & Releases",
