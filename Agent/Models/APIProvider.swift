@@ -30,6 +30,7 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
     case a2Agent = "a2Agent"
     case orcaRouter = "orcaRouter"
     case fluxion = "fluxion"       // Fluxion AI (fluxionai.world) — OpenAI-compatible gateway, sk-fx-… keys
+    case theRouter = "theRouter" // TheRouter.ai (api.therouter.ai/v1) — OpenAI-compatible gateway, vendor/model ids
     case meta = "meta"           // Meta Model API (api.meta.ai) — Muse Spark, OpenAI-compatible, LLM_… keys
     case museCode = "museCode"   // Muse Code subscription — reuses the `muse login` key (MuseCodeAuth)
     case foundationModel = "foundationModel"
@@ -61,6 +62,7 @@ enum APIProvider: String, CaseIterable, Codable, Sendable {
         case .a2Agent: "A2Agent"
         case .orcaRouter: "OrcaRouter"
         case .fluxion: "Fluxion AI"
+        case .theRouter: "TheRouter"
         case .meta: "Meta Muse"
         case .museCode: "Muse Code"
         case .foundationModel: "Apple Intelligence"

@@ -128,6 +128,17 @@ enum LLMProviderSetup {
                 contextSize: 200_000,
                 supportedProtocols: [.openAI, .anthropic])
 
+        // TheRouter.ai — OpenAI-compatible gateway; model ids are vendor/model
+        // (anthropic/claude-sonnet-5-5, openai/gpt-5.5, zai/glm-5.3). /v1/models lists what the key can use.
+        case .theRouter:
+            return make(provider, kind: .cloudAPI, apiProtocol: .openAI,
+                endpoint: LLMEndpoint(
+                    chatURL: "https://api.therouter.ai/v1/chat/completions",
+                    modelsURL: "https://api.therouter.ai/v1/models"
+                ),
+                capabilities: [.streaming, .tools, .vision, .systemPrompt],
+                contextSize: 200_000)
+
         // Meta Model API — Muse Spark (the model behind Muse Code), OpenAI-compatible.
         case .meta:
             return make(provider, kind: .cloudAPI, apiProtocol: .openAI,

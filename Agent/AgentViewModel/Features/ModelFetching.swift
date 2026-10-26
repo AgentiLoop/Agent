@@ -1092,7 +1092,7 @@ extension AgentViewModel {
             // /v1/models also lists image, voice and SAM models — keep only the chat models.
             fetchProviderModels(provider, defaults: [],
                 filter: { $0.filter { $0.id.lowercased().hasPrefix("muse-spark") } })
-        case .openAI, .deepSeek, .gemini, .grok, .mistral, .miniMax, .fmServe, .fluxion:
+        case .openAI, .deepSeek, .gemini, .grok, .mistral, .miniMax, .fmServe, .fluxion, .theRouter:
             fetchProviderModels(provider, defaults: [])
         case .bigModel, .foundationModel: break
         }
