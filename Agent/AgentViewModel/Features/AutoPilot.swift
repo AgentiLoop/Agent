@@ -444,7 +444,7 @@ extension AgentViewModel {
     /// re-attached to every cycle (the task loop clears the input buffers after
     /// the first request). Returns the saved paths, or nil when nothing was attached.
     private func saveAutoPilotImages(_ session: AutoPilotSession, _ tab: ScriptTab?) -> [String]? {
-        let images = tab.map { $0.attachedImagesBase64.isEmpty ? attachedImagesBase64 : $0.attachedImagesBase64 } ?? attachedImagesBase64
+        let images = tab?.attachedImagesBase64 ?? attachedImagesBase64
         guard !images.isEmpty else { return nil }
         let dir = autoPilotImagesDir(session, tab)
         try? FileManager.default.removeItem(at: dir)

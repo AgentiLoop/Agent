@@ -101,14 +101,14 @@ extension AgentViewModel {
             tab.flush()
         }
 
-        // Use tab's own attached images, fall back to global
-        let tabImages = tab.attachedImagesBase64.isEmpty ? attachedImagesBase64 : tab.attachedImagesBase64
+        // Use only this tab's own attached images — the global buffer belongs to the main tab.
+        let tabImages = tab.attachedImagesBase64
         AuditLog.log(
             .shell,
             "TabTask images: tab=\(tab.attachedImagesBase64.count) global=\(attachedImagesBase64.count) using=\(tabImages.count)"
         )
         // Snapshot the NSImages for copy_image(source:"chat") before the input buffers are cleared.
-        tab.taskScopeImages = tab.attachedImages.isEmpty ? attachedImages : tab.attachedImages
+        tab.taskScopeImages = tab.attachedImages
         if !tabImages.isEmpty {
             tab.appendLog("(\(tabImages.count) screenshot(s) attached, \(tabImages.map(\.count).reduce(0,+)) bytes)")
             tab.flush()
@@ -126,8 +126,6 @@ extension AgentViewModel {
             messages.append(["role": "user", "content": contentBlocks])
             tab.attachedImages.removeAll()
             tab.attachedImagesBase64.removeAll()
-            attachedImages.removeAll()
-            attachedImagesBase64.removeAll()
         } else {
             messages.append(["role": "user", "content": promptPrefix + prompt])
         }

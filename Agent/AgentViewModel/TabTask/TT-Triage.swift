@@ -32,7 +32,7 @@ extension AgentViewModel {
         // Models are text-only — with no vision it hallucinates responses from
         // prompt text alone. Screenshots mean the user wants a vision-capable
         // model to look at the image.
-        let hadAttachments = !tab.attachedImagesBase64.isEmpty || !attachedImagesBase64.isEmpty
+        let hadAttachments = !tab.attachedImagesBase64.isEmpty
         if hadAttachments { return .passThrough }
         // Triage: Apple AI answers greetings on-device, or passes through to the cloud LLM.
         let mediator = AppleIntelligenceMediator.shared
