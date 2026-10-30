@@ -47,7 +47,10 @@ struct ServicesPopover: View {
                     Text("Daemon Agent")
                         .font(.caption)
                         .accessibilityValue(statusText(active: viewModel.rootServiceActive, enabled: viewModel.rootEnabled))
-                    Toggle("", isOn: $viewModel.rootEnabled)
+                    Toggle("", isOn: Binding(
+                        get: { viewModel.rootEnabled },
+                        set: { v in UserAuthGate.run("change the Daemon Agent service") { viewModel.rootEnabled = v } }
+                    ))
                         .toggleStyle(.switch)
                         .controlSize(.mini)
                         .tint(.green)
@@ -61,16 +64,20 @@ struct ServicesPopover: View {
             // Action Buttons
             HStack(spacing: 8) {
                 Button("Unregister") {
-                    viewModel.unregisterAgent()
-                    viewModel.unregisterDaemon()
+                    UserAuthGate.run("unregister the background services") {
+                        viewModel.unregisterAgent()
+                        viewModel.unregisterDaemon()
+                    }
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .accessibilityHint("Unregisters the user agent and the daemon")
 
                 Button("Register") {
-                    viewModel.registerAgent()
-                    viewModel.registerDaemon()
+                    UserAuthGate.run("register the background services") {
+                        viewModel.registerAgent()
+                        viewModel.registerDaemon()
+                    }
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
