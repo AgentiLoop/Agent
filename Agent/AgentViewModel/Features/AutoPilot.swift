@@ -225,10 +225,15 @@ extension AgentViewModel {
             }
             return true
         }
-        if lower.hasPrefix("add ") || lower.hasPrefix("remove ") {
-            let isAdd = lower.hasPrefix("add ")
-            let raw = arg.dropFirst(isAdd ? 4 : 7).trimmingCharacters(in: .whitespaces)
-            let folder = (raw as NSString).expandingTildeInPath
+        let isAddCmd = lower.hasPrefix("add ")
+        let pathArg = arg.dropFirst(isAddCmd ? 4 : 7).trimmingCharacters(in: .whitespaces)
+        let folderArg = (pathArg as NSString).expandingTildeInPath
+        // Only a subcommand when the rest is a path — "/auto add the track from …" is a goal.
+        let pathLike = (pathArg.hasPrefix("/") || pathArg.hasPrefix("~"))
+            && (!pathArg.contains(" ") || FileManager.default.fileExists(atPath: folderArg) || autoPilotParityFolders.contains(folderArg))
+        if (isAddCmd || lower.hasPrefix("remove ")) && pathLike {
+            let isAdd = isAddCmd
+            let folder = folderArg
             if isAdd {
                 var isDir: ObjCBool = false
                 guard FileManager.default.fileExists(atPath: folder, isDirectory: &isDir), isDir.boolValue else {
