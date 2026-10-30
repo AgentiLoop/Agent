@@ -29,7 +29,10 @@ struct ServicesPopover: View {
                     Text("User Agent")
                         .font(.caption)
                         .accessibilityValue(statusText(active: viewModel.userServiceActive, enabled: viewModel.userEnabled))
-                    Toggle("", isOn: $viewModel.userEnabled)
+                    Toggle("", isOn: Binding(
+                        get: { viewModel.userEnabled },
+                        set: { v in UserAuthGate.run("change the User Agent service") { viewModel.userEnabled = v } }
+                    ))
                         .toggleStyle(.switch)
                         .controlSize(.mini)
                         .tint(.green)

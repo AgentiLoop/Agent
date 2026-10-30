@@ -114,13 +114,15 @@ struct ToolsView: View {
                     .foregroundStyle(.secondary)
                 Spacer()
                 Button("Enable All") {
-                    prefs.enableAllGroups()
-                    prefs.enableAll(for: selectedProvider)
+                    UserAuthGate.run("enable all tools") {
+                        prefs.enableAllGroups()
+                        prefs.enableAll(for: selectedProvider)
+                    }
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 Button("Disable All") {
-                    prefs.disableAllGroups()
+                    UserAuthGate.run("disable all tools") { prefs.disableAllGroups() }
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
@@ -243,8 +245,10 @@ struct GroupRowView: View {
                 Toggle("", isOn: Binding(
                     get: { groupEnabled },
                     set: { newValue in
-                        prefs.toggleGroup(groupName)
-                        onGroupToggled(newValue)
+                        UserAuthGate.run("change the \(groupName) tool group") {
+                            prefs.toggleGroup(groupName)
+                            onGroupToggled(newValue)
+                        }
                     }
                 ))
                 .toggleStyle(.switch)
@@ -263,9 +267,11 @@ struct GroupRowView: View {
                     ForEach(groupTools, id: \.name) { tool in
                         let enabled = prefs.isEnabled(provider, tool.name)
                         Button {
-                            prefs.toggle(provider, tool.name)
-                            let nowEnabled = prefs.isEnabled(provider, tool.name)
-                            onToolToggled?(tool.name, nowEnabled)
+                            UserAuthGate.run("change the \(tool.name) tool") {
+                                prefs.toggle(provider, tool.name)
+                                let nowEnabled = prefs.isEnabled(provider, tool.name)
+                                onToolToggled?(tool.name, nowEnabled)
+                            }
                         } label: {
                             Text(tool.name)
                                 .font(.caption2)
