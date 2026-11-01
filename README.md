@@ -406,6 +406,22 @@ More: [docs/FAQ.md](docs/FAQ.md) · [Technical Architecture](docs/TECHNICAL.md) 
 
 Agent! is the result of three years of building agentic AI apps — ANIE, Game Changer, BattleScript, XCF MCP Server and Client, D1F, and about eight original Swift packages. The missing piece was an intelligent autonomous loop; once achieved, the best of those projects came together into Agent!. It has written video games ([Boss-Man](https://github.com/AgentiLoop/bossman)), created apps, written poetry into Pages via AppleScript, generated disk images and attached them to GitHub releases. Where Claude Code relies on ~65 third-party NPM packages, Agent! is 100% native, uses very little RAM, and ships Xcode automation, Swift Syntax 6.2 analysis, Accessibility, AppleScript, AgentScript/ScriptingBridge, Safari automation and MCP support out of the box.
 
+## Reverse Engineering with Agent!
+
+![Agent! 1.1.95](docs/agent-1.1.95-screenshot.png)
+
+Agent! is also a reverse-engineering workbench. It reads disc images and ROMs, writes the extraction tools, studies the decompiled code, and rebuilds the game in the browser while checking its work against the original data. Four racing games and one fighting game were built this way:
+
+| Game | What Agent! did | Play |
+|---|---|---|
+| 🚕 [CrazyTaxi](https://github.com/AgentiLoop/CrazyTaxi) | Three.js rebuild of the Sega Dreamcast *Crazy Taxi* (USA). Python tools pull the courses, vehicles, characters, motions and audio from your own disc. Collision code is ported from the decomp and checked against the extracted course data | Bring your own disc |
+| 🍄 [MarioKart64JS](https://github.com/AgentiLoop/MarioKart64JS) | Mario Kart 64 rebuilt in Three.js, not emulated. Courses, karts, music and voices come from the original N64 ROM, with all 16 courses, battle arenas, 15 items, HD textures and online play | [mk64js.gokart.games](https://mk64js.gokart.games/play) |
+| 🏎️ [F1](https://github.com/AgentiLoop/F1) | Open-wheel racer with an AI field on 18 real circuits. Layouts, elevation and banking are rebuilt from real car positions and telemetry from the OpenF1 API | [f1.gokart.games](https://f1.gokart.games) |
+| 🏁 [GoKart](https://github.com/AgentiLoop/GoKart) | Original Godot 4 kart racer that recreates Mario Kart 64's rules (slipstream, engine classes, Grand Prix scoring, menus, music cues) with everything generated from code, plus online multiplayer | [gokart.games](https://gokart.games) |
+| 🦇 [BvS](https://github.com/AgentiLoop/bvs) | Batman v Superman, a Three.js 3D fighting game where every pixel is drawn from code: no model files, textures or audio samples | [bvs.agentiloop.ai](https://bvs.agentiloop.ai/) |
+
+No game assets are in any of these repos. CrazyTaxi and MarioKart64JS need your own copy of the game. All are fan-made for personal and educational use.
+
 ## The Agent! family
 
 Agent! is built from a set of companion repos under the [AgentiLoop](https://github.com/AgentiLoop) org. News, downloads and the press kit are at 🌐 **[agentiloop.ai](https://agentiloop.ai/)** ([site source](https://github.com/AgentiLoop/agent.xcf.ai)).
