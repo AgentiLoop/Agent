@@ -12,7 +12,7 @@
 
 ## Checklist
 
-- [ ] I have signed (or will sign, when the bot asks) the [Contributor License Agreement](../CLA.md)
+- [ ] I have signed (or will sign, when the bot asks) the [Contributor License Agreement](CLA.md)
 - [ ] One concern per PR (see [CONTRIBUTING.md](https://github.com/AgentiLoop/Agent/blob/main/.github/CONTRIBUTING.md))
 - [ ] Builds cleanly (`./build.sh` or Xcode) with no new warnings
 - [ ] `AgentTests` pass (and new tests added where it makes sense)

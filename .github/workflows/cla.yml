@@ -53,7 +53,7 @@ jobs:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.CLA_PAT }}
         with:
           path-to-signatures: 'signatures/version1/cla.json'
-          path-to-document: 'https://github.com/AgentiLoop/Agent/blob/main/CLA.md'
+          path-to-document: 'https://github.com/AgentiLoop/Agent/blob/main/.github/CLA.md'
           # Same repo — set only so the action commits with CLA_PAT (see header).
           remote-organization-name: 'AgentiLoop'
           remote-repository-name: 'Agent'
@@ -64,7 +64,7 @@ jobs:
           custom-notsigned-prcomment: |
             Thank you for your contribution to 🦾 Agent!
 
-            Before we can merge, we need you to sign the [Contributor License Agreement](https://github.com/AgentiLoop/Agent/blob/main/CLA.md). It's a one-time step — reply to this pull request with the exact sentence below and the check will turn green:
+            Before we can merge, we need you to sign the [Contributor License Agreement](https://github.com/AgentiLoop/Agent/blob/main/.github/CLA.md). It's a one-time step — reply to this pull request with the exact sentence below and the check will turn green:
           custom-pr-sign-comment: 'I have read the CLA Document and I hereby sign the CLA'
           custom-allsigned-prcomment: 'All contributors have signed the CLA ✅'
           lock-pullrequest-aftermerge: false
