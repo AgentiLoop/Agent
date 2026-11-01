@@ -1,4 +1,4 @@
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_es.svg" width="900" alt="Sidrune AI, patrocinador Silver: Una API para GPT, Claude y otros modelos de IA líderes. Regístrate y recibe $3 en créditos de API." /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_es.svg" width="900" alt="Sidrune AI, patrocinador Silver: Una API para GPT, Claude y otros modelos de IA líderes. Regístrate y recibe $3 en créditos de API." /></a> -->
 
 <!-- <img src="../docs/table-video.gif" width="900" alt="Agent! demo" /> -->
 <img width="1628" height="1152" alt="image" src="https://github.com/user-attachments/assets/5184c93a-9255-4404-98ce-44a319de109a" />
@@ -138,11 +138,13 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 
 ### Patrocinadores
 
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_es.svg" width="900" alt="Sidrune AI, patrocinador Silver: Una API para GPT, Claude y otros modelos de IA líderes. Regístrate y recibe $3 en créditos de API." /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_es.svg" width="900" alt="Sidrune AI, patrocinador Silver: Una API para GPT, Claude y otros modelos de IA líderes. Regístrate y recibe $3 en créditos de API." /></a> -->
 
+<!--
 | Logo | Patrocinador | &nbsp;&nbsp;&nbsp;Nivel&nbsp;&nbsp;&nbsp; | |
 |:---:|---|:---:|---|
 | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Una API para GPT, Claude y otros modelos de IA líderes. [Regístrate y recibe $3 en créditos de API](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP) (Código promocional `SDRAGENTLOOP`). |
+-->
 
 ## Patrocinio
 
@@ -156,7 +158,6 @@ Empresas y proveedores de LLM que quieran apoyar el proyecto: consulta [docs/SPO
 | **Apple Intelligence** | | Gratis, en el dispositivo | Triaje, resúmenes, compresión de tokens (icono del cerebro, no disponible en el selector de proveedor) |
 | **Claude** | | Por token (clave API) o suscripción (OAuth) | Tareas autónomas largas, pensamiento extendido, caché de prompts |
 | **Codex** | | Suscripción ChatGPT | Modelos de OpenAI vía OAuth de ChatGPT — sin clave API, sin cobro por token |
-| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | De pago (créditos de API) | Una API para GPT, Claude y otros modelos de IA líderes; $3 de crédito con el código `SDRAGENTLOOP` |
 | **DeepSeek** | | Barato | Programación económica, informe de aciertos de caché |
 | **Google Gemini** | | De pago (nivel gratuito) | Contexto largo, visión |
 | **Grok** (xAI) | | De pago | Información en tiempo real |
@@ -174,6 +175,7 @@ Empresas y proveedores de LLM que quieran apoyar el proyecto: consulta [docs/SPO
 | **Qwen Code** | | Suscripción | Alibaba Coding Plan (clave `sk-sp-`): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
 | **Requesty** | | De pago | 300+ modelos con una sola clave compatible con OpenAI; precios y capacidades por modelo |
 | **Z.ai** / **BigModel** | | Barato | GLM-5.3 — punto de partida recomendado |
+<!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | De pago (créditos de API) | Una API para GPT, Claude y otros modelos de IA líderes; $3 de crédito con el código `SDRAGENTLOOP` | -->
 
 > 💡 Los proveedores autoalojados solo son gratis en cuanto a tarifas de API — un modelo de 30B+ usable necesita un Mac Studio M2/M3/M4 Ultra (64–128 GB). Sin ese hardware, las vías de nube baratas de arriba salen muchísimo más económicas.
 
@@ -491,4 +493,4 @@ Consulta [CONTRIBUTING.md](../.github/CONTRIBUTING.md) — compila desde el cód
 
 ---
 
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_es.svg" width="900" alt="Sidrune AI, patrocinador Silver: Una API para GPT, Claude y otros modelos de IA líderes. Regístrate y recibe $3 en créditos de API." /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_es.svg" width="900" alt="Sidrune AI, patrocinador Silver: Una API para GPT, Claude y otros modelos de IA líderes. Regístrate y recibe $3 en créditos de API." /></a> -->

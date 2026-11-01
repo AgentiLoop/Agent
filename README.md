@@ -1,4 +1,4 @@
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="docs/sponsors/sidrune-ai-silver-ad.svg" width="900" alt="Sidrune AI, Silver Sponsor: One API for GPT, Claude and other leading AI models. Sign up and get $3 in API credits." /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="docs/sponsors/sidrune-ai-silver-ad.svg" width="900" alt="Sidrune AI, Silver Sponsor: One API for GPT, Claude and other leading AI models. Sign up and get $3 in API credits." /></a> -->
 
 <!-- <img src="docs/table-video.gif" width="900" alt="Agent! demo" /> -->
 <img width="1628" height="1152" alt="image" src="https://github.com/user-attachments/assets/5184c93a-9255-4404-98ce-44a319de109a" />
@@ -42,7 +42,7 @@ Meet the Agent! family's newest members: two cross-platform CLIs with the **exac
 
 **One app. Any AI. Total command over your Mac.**
 
-Agent! is a 100% native Swift 6.4 / SwiftUI app that wires **23 LLM providers** — Claude, Codex, OpenAI, Sidrune AI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, Meta Muse, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (cloud and local), vLLM, and LM Studio — plus on-device **Apple Intelligence** — into an autonomous task loop that actually *does things*: reads your codebase, fixes the bug, builds the Xcode project, commits the diff, drives any Mac app through the Accessibility API, runs shell commands as you or as root, texts you results over iMessage, and answers to a spoken *"Agent!"*.
+Agent! is a 100% native Swift 6.4 / SwiftUI app that wires **23 LLM providers** — Claude, Codex, OpenAI, <!-- Sidrune AI, -->Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, Meta Muse, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (cloud and local), vLLM, and LM Studio — plus on-device **Apple Intelligence** — into an autonomous task loop that actually *does things*: reads your codebase, fixes the bug, builds the Xcode project, commits the diff, drives any Mac app through the Accessibility API, runs shell commands as you or as root, texts you results over iMessage, and answers to a spoken *"Agent!"*.
 
 No NPM, no Electron, no subscription, no telemetry. Bring your own API key, run fully local, or run free on Apple Intelligence. Every Swift package it depends on was written by the same author. See [Backstory](#backstory) below.
 
@@ -138,11 +138,13 @@ Just type what you want. Agent! figures out how and makes it happen.
 
 ### Sponsors
 
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="docs/sponsors/sidrune-ai-silver-ad.svg" width="900" alt="Sidrune AI, Silver Sponsor: One API for GPT, Claude and other leading AI models. Sign up and get $3 in API credits." /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="docs/sponsors/sidrune-ai-silver-ad.svg" width="900" alt="Sidrune AI, Silver Sponsor: One API for GPT, Claude and other leading AI models. Sign up and get $3 in API credits." /></a> -->
 
+<!--
 | Logo | Sponsor | &nbsp;&nbsp;&nbsp;Level&nbsp;&nbsp;&nbsp; | |
 |:---:|---|:---:|---|
 | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/sponsors/sidrune-logo-white.svg"><img src="docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | One API for GPT, Claude and other leading AI models. [Sign up and get $3 in API credits](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP) (Promo code `SDRAGENTLOOP`). |
+-->
 
 ## Sponsoring
 
@@ -156,7 +158,6 @@ Companies and LLM providers who want to support the project: see [docs/SPONSORSH
 | **Apple Intelligence** | | Free, on-device | Triage, summaries, token compression (brain icon, not available on the provider picker) |
 | **Claude** | | Per-token (API key) or subscription (OAuth) | Long autonomous tasks, extended thinking, prompt caching |
 | **Codex** | | ChatGPT subscription | OpenAI models via ChatGPT OAuth — no API key, no per-token charges |
-| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/sponsors/sidrune-logo-white.svg"><img src="docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | Paid (API credits) | One API for GPT, Claude and other leading AI models; $3 credit with promo `SDRAGENTLOOP` |
 | **DeepSeek** | | Cheap | Budget coding, cache-hit reporting |
 | **Google Gemini** | | Paid (free tier) | Long context, vision |
 | **Grok** (xAI) | | Paid | Real-time info |
@@ -174,6 +175,7 @@ Companies and LLM providers who want to support the project: see [docs/SPONSORSH
 | **Qwen Code** | | Subscription | Alibaba Coding Plan (`sk-sp-` key): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
 | **Requesty** | | Paid | 300+ models via one OpenAI-compatible key; per-model pricing and capability metadata |
 | **Z.ai** / **BigModel** | | Cheap | GLM-5.3 — recommended starting point |
+<!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/sponsors/sidrune-logo-white.svg"><img src="docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | Paid (API credits) | One API for GPT, Claude and other leading AI models; $3 credit with promo `SDRAGENTLOOP` | -->
 
 > 💡 Self-hosted providers are free only in the API-fee sense — a usable 30B+ model needs an M2/M3/M4 Ultra Mac Studio (64–128GB). Without that hardware, the cheap cloud paths above are dramatically cheaper.
 
@@ -491,4 +493,4 @@ See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) — build from source in ~5 min
 
 ---
 
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="docs/sponsors/sidrune-ai-silver-ad.svg" width="900" alt="Sidrune AI, Silver Sponsor: One API for GPT, Claude and other leading AI models. Sign up and get $3 in API credits." /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="docs/sponsors/sidrune-ai-silver-ad.svg" width="900" alt="Sidrune AI, Silver Sponsor: One API for GPT, Claude and other leading AI models. Sign up and get $3 in API credits." /></a> -->

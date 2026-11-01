@@ -1,4 +1,4 @@
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a> -->
 
 <!-- <img src="../docs/table-video.gif" width="900" alt="Agent! demo" /> -->
 <img width="1628" height="1152" alt="image" src="https://github.com/user-attachments/assets/5184c93a-9255-4404-98ce-44a319de109a" />
@@ -138,11 +138,13 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ### 赞助商
 
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a> -->
 
+<!--
 | Logo | 赞助商 | &nbsp;&nbsp;&nbsp;等级&nbsp;&nbsp;&nbsp; | |
 |:---:|---|:---:|---|
 | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。[注册即得 $3 API 额度](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP)（优惠码 `SDRAGENTLOOP`）。 |
+-->
 
 ## 赞助
 
@@ -156,7 +158,6 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Apple Intelligence** | | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，提供商选择器中不可用） |
 | **Claude** | | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
 | **Codex** | | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
-| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 付费（API 额度） | 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型；使用优惠码 `SDRAGENTLOOP` 获得 $3 额度 |
 | **DeepSeek** | | 便宜 | 低成本编码、缓存命中报告 |
 | **Google Gemini** | | 付费（有免费额度） | 长上下文、视觉 |
 | **Grok** (xAI) | | 付费 | 实时信息 |
@@ -173,6 +174,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Qwen Coder** | | 订阅 | 阿里云 Coding Plan（`sk-sp-` 密钥）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
 | **Requesty** | | 付费 | 一把 OpenAI 兼容密钥即可访问 300+ 模型；按模型提供价格与能力信息 |
 | **Z.ai** / **BigModel** | | 便宜 | GLM-5.3 —— 推荐起点 |
+<!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 付费（API 额度） | 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型；使用优惠码 `SDRAGENTLOOP` 获得 $3 额度 | -->
 
 > 💡 自托管提供商只是在 API 费用意义上免费——要以可用速度运行 30B+ 模型，需要 M2/M3/M4 Ultra Mac Studio（64–128GB）。没有这类硬件的话，上面的低价云端方案要便宜得多。
 
@@ -490,4 +492,4 @@ Star History
 
 ---
 
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a> -->

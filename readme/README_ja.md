@@ -1,4 +1,4 @@
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a> -->
 
 <!-- <img src="../docs/table-video.gif" width="900" alt="Agent! demo" /> -->
 <img width="1628" height="1152" alt="image" src="https://github.com/user-attachments/assets/5184c93a-9255-4404-98ce-44a319de109a" />
@@ -138,11 +138,13 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ### スポンサー
 
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a> -->
 
+<!--
 | Logo | スポンサー | &nbsp;&nbsp;&nbsp;レベル&nbsp;&nbsp;&nbsp; | |
 |:---:|---|:---:|---|
 | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | GPT、Claude などの主要 AI モデルをひとつの API で。[登録して $3 分の API クレジットを獲得](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP)（プロモコード `SDRAGENTLOOP`）。 |
+-->
 
 ## スポンサーシップ
 
@@ -156,7 +158,6 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Apple Intelligence** | | 無料、オンデバイス | トリアージ、要約、トークン圧縮（脳アイコン、プロバイダーピッカーにはなし） |
 | **Claude** | | トークン単位（API キー）またはサブスクリプション（OAuth） | 長い自律タスク、拡張思考、プロンプトキャッシング |
 | **Codex** | | ChatGPT サブスクリプション | ChatGPT OAuth 経由の OpenAI モデル — API キー不要、トークン課金なし |
-| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 有料（API クレジット） | GPT、Claude などの主要 AI モデルをひとつの API で。プロモコード `SDRAGENTLOOP` で $3 クレジット |
 | **DeepSeek** | | 安価 | 低予算コーディング、キャッシュヒット報告 |
 | **Google Gemini** | | 有料（無料枠あり） | 長いコンテキスト、ビジョン |
 | **Grok**（xAI） | | 有料 | リアルタイム情報 |
@@ -174,6 +175,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Qwen Code** | | サブスクリプション | Alibaba Coding Plan（`sk-sp-` キー）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
 | **Requesty** | | 有料 | 一つの OpenAI 互換キーで 300 以上のモデル。モデルごとの価格と機能メタデータ |
 | **Z.ai** / **BigModel** | | 安価 | GLM-5.3 — 推奨の出発点 |
+<!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 有料（API クレジット） | GPT、Claude などの主要 AI モデルをひとつの API で。プロモコード `SDRAGENTLOOP` で $3 クレジット | -->
 
 > 💡 セルフホストのプロバイダーは API 料金の意味でのみ無料です — 実用的な 30B+ モデルには M2/M3/M4 Ultra の Mac Studio（64〜128GB）が必要です。そのハードウェアがなければ、上の安価なクラウド経路のほうが圧倒的に安くなります。
 
@@ -491,4 +493,4 @@ Star History
 
 ---
 
-<a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a>
+<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a> -->
