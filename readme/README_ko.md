@@ -1,6 +1,7 @@
 <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ko.svg" width="900" alt="Sidrune AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 하나의 API로. 가입하고 $3 API 크레딧 받기." /></a>
 
-<img src="../docs/table-video.gif" width="900" alt="Agent! demo" />
+<!-- <img src="../docs/table-video.gif" width="900" alt="Agent! demo" /> -->
+<img width="1628" height="1152" alt="image" src="https://github.com/user-attachments/assets/5184c93a-9255-4404-98ce-44a319de109a" />
 
 # 🦾 AgentiLoop Agent!
 
@@ -10,8 +11,12 @@
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 14.6+](https://img.shields.io/badge/macOS-14.6+-green?style=for-the-badge)](https://github.com/apple)
-[![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
+[![Swift 6.4](https://img.shields.io/badge/Swift-6.4-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
+
+<a href="https://launchnest.io/p/agentiloop-agent" target="_blank"><img src="https://launchnest.io/badge/agentiloop-agent.svg?variant=featured" alt="AgentiLoop Agent! on LaunchNest" width="220" height="56" /></a>
+
+> ⭐ **Agent!가 시간을 아껴 준다면 [저장소에 별을 눌러 주세요](https://github.com/AgentiLoop/Agent/stargazers).** 별은 다른 Mac 사용자가 무료 네이티브 오픈 소스 AI 에이전트를 찾는 데 도움이 되고, 프로젝트를 계속 이어가게 합니다.
 
 ## 🆕 새로운 강자 등장: AgentiLoop CLI ⚡️
 
@@ -21,7 +26,7 @@ Agent! 패밀리의 최신 멤버를 ᄆ�
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-cli-ad-v2_ko.svg" width="900" alt="AgentiLoop CLI: Rust와 Go 두 가지 버전, 완전히 동일한 기능. macOS, Windows, Linux." /></a>
 
-*AgentiLoop Agent! for Mac으로 제작. 네, 에이전트가 직접 자기 동생들을 만들었습니다.* 🤖✨ **v0.0.3 출시:** 설정 마법사, Codex, 서명 및 공증된 Mac 바이너리. 지금 다운로드하세요!
+*AgentiLoop Agent! for Mac으로 제작. 네, 에이전트가 직접 자기 동생들을 만들었습니다.* 🤖✨ **v0.0.5 출시:** 더 커진 도구 상자: glob/grep 검색, web_fetch, 할 일 목록, AGENTS.md, /undo, 사용자 정의 슬래시 명령, --json. 지금 다운로드하세요!
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-rust-cli-button_ko.svg" width="238" height="44" alt="GitHub에서 Rust CLI" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="../docs/agentiloop-go-cli-button_ko.svg" width="221" height="44" alt="GitHub에서 Go CLI" /></a>
@@ -101,7 +106,33 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **📱 iMessage 원격 제어** — iPhone에서 `Agent! next song`을 문자로 보내세요; 승인된 발신자만. `chat.db`를 위해 전체 디스크 접근 권한이 필요합니다.
 - **🌐 웹** — 내장 Safari 자동화(JavaScript + AppleScript); 크로스 브라우저를 위한 선택적 Selenium과 [Playwright MCP](https://github.com/microsoft/playwright-mcp).
 - **🤝 서브 에이전트** — 메일박스 메시징과 에이전트별 모델 오버라이드가 있는 최대 3개 동시(읽기 전용 6개) 격리 에이전트.
-- **🧩 MCP** — 설정 → MCP Servers에서 어떤 MCP 서버든 추가; 도구는 `mcp_<server>_<tool>`로 나타납니다. Xcode MCP: `{"mcpServers":{"xcode":{"command":"xcrun","args":["mcpbridge"],"transport":"stdio"}}}`.
+- **🧩 MCP** — 설정 → MCP Servers에서 어떤 MCP 서버든 추가; 도구는 `mcp_<server>_<tool>`로 나타납니다. 예시(stdio 및 HTTP):
+
+  ```json
+  {
+    "mcpServers": {
+      "xcode": {
+        "transport": "stdio",
+        "command": "xcrun",
+        "args": ["mcpbridge"],
+        "env": {}
+      },
+      "HelloWorld": {
+        "transport": "stdio",
+        "command": "/Users/you/bin/mcp-server-hello",
+        "args": [],
+        "env": {}
+      },
+      "DemoHttp": {
+        "transport": "http",
+        "url": "http://localhost:8085/mcp",
+        "headers": {}
+      }
+    }
+  }
+  ```
+
+  `HelloWorld`와 `DemoHttp`는 [AgentMCP](https://github.com/AgentiLoop/AgentMCP)의 데모 서버입니다. `DemoHttp`가 포트 8085에서 응답하도록 먼저 `mcp-server-demo-http`를 실행하세요.
 - **🗂 탭, 기록, 메모리, 계획, 스킬** — 각 탭은 자체 프로젝트 폴더와 로그를 가짐; 영구 사용자 메모리; 모든 프롬프트에 표시되는 다중 계획 체크리스트.
 - **🔄 폴백 체인** — 429/타임아웃/네트워크 실패 시 다음 구성된 제공자로 자동 전환.
 
@@ -341,7 +372,24 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 | `⌘ ⇧ M` / `⌘ ⇧ P` | 메시지 모니터 / 설정 |
 | `⌘ ⇧ K` `L` `H` `J` `U` | 모두 지우기 / LLM 패널 / 프롬프트 기록 / 작업 기록 / 토큰 카운터 |
 
-슬래시 명령은 로컬에서 실행됩니다: `/clear [log|all|llm|history|tasks|tokens]`, `/memory [show|clear|edit|<text>]`.
+슬래시 명령은 로컬에서 실행됩니다: `/clear [log|all|llm|history|tasks|tokens]`, `/memory [show|clear|edit|<text>]`, `/auto …`.
+
+### 자동 조종(`/auto`)
+
+메인 탭이나 아무 LLM 탭에서 작업 루프를 무인 사이클로 실행합니다. 목표에 도달하거나, 시간 예산이 다 되거나, 중지를 누를 때까지 계속됩니다. 사이클 수 제한도, 사이클당 반복 제한도 없습니다. 한 사이클의 작업이 완전히 끝났는데 목표에 도달하지 못했다면 다음 사이클이 자동으로 시작됩니다.
+
+| 명령 | 기능 |
+|---|---|
+| `/auto <goal>` | LLM이 목표 도달을 보고할 때까지 목표를 향해 작업 |
+| `/auto 4h <goal>` | 같지만 4시간 후 중지(`30m`, `1.5h`도 가능) |
+| `/auto` | 먼저 프로젝트를 검토한 뒤 `ask_user`로 목표를 물음 |
+| `/auto history` | 이전 자동 조종 목표 목록 표시 |
+| `/auto last` / `/auto #N` | 기록에서 가장 최근 / N번째 목표를 다시 시작 |
+| `/auto add <folder>` | 동기화 폴더 추가: 프로젝트의 모든 변경 사항이 그곳에 반영됨 |
+| `/auto remove <folder>` | 동기화 폴더 제거 |
+| `/auto status` / `/auto stop` | 세션 표시 / 현재 사이클 후 종료(사이클 사이라면 즉시) |
+
+각 사이클은 일반 작업이며, 그 요약은 `.agent/autopilot/progress.md`에 추가되어 다음 사이클의 프롬프트에 전달됩니다. LLM은 최종 요약을 `AUTOPILOT: GOAL REACHED`로 시작해 세션을 끝냅니다. 요약 없이 끝난 사이클(오류, 취소)은 세션을 끝내지 않으며, 다음 사이클이 더 오래 기다릴 뿐입니다(15초, 30초, 60초… 최대 5분). `/auto` 명령은 프롬프트 기록(위쪽 화살표)에, 목표는 `/auto history` 목록에 저장됩니다. 활성 세션은 앱을 다시 시작해도 유지됩니다. 종료(또는 충돌)하면 일시 중지되고, 다음 실행 때 각 세션이 자기 탭에서 다음 사이클로 재개됩니다.
 
 ## FAQ
 
@@ -356,7 +404,41 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game Changer, BattleScript, XCF MCP Server와 Client, D1F, 그리고 약 8개의 독창적인 Swift 패키지. 빠진 조각은 지능적인 자율 루프였고, 이를 달성하자 그 프로젝트들의 정수가 Agent!로 모였습니다. 비디오 게임([Boss-Man](https://github.com/AgentiLoop/bossman))을 작성하고, 앱을 만들고, AppleScript로 Pages에 시를 쓰고, 디스크 이미지를 생성해 GitHub 릴리스에 첨부했습니다. Claude Code가 ~65개의 서드파티 NPM 패키지에 의존하는 반면, Agent!는 100% 네이티브이고, RAM을 거의 사용하지 않으며, Xcode 자동화, Swift Syntax 6.2 분석, 손쉬운 사용, AppleScript, AgentScript/ScriptingBridge, Safari 자동화, MCP 지원을 기본으로 제공합니다.
 
-## Star History
+## Agent!로 하는 리버스 엔지니어링
+
+![Agent! 1.1.95](../docs/agent-1.1.95-screenshot.png)
+
+Agent!는 리버스 엔지니어링 작업대이기도 합니다. 디스크 이미지와 ROM을 읽고, 추출 도구를 작성하고, 디컴파일된 코드를 연구한 뒤, 원본 데이터와 대조하며 브라우저에서 게임을 다시 만듭니다. 레이싱 게임 네 편과 격투 게임 한 편이 이렇게 만들어졌습니다:
+
+| 게임 | Agent!가 한 일 | 플레이 |
+|---|---|---|
+| 🚕 [CrazyTaxi](https://github.com/AgentiLoop/CrazyTaxi) | 세가 드림캐스트 *크레이지 택시*(북미판)를 Three.js로 재구성. Python 도구가 직접 가진 디스크에서 코스, 차량, 캐릭터, 모션, 오디오를 추출합니다. 충돌 코드는 디컴파일 코드에서 이식해 추출한 코스 데이터와 대조했습니다 | 직접 가진 디스크 필요 |
+| 🍄 [MarioKart64JS](https://github.com/AgentiLoop/MarioKart64JS) | 에뮬레이터가 아닌 Three.js로 다시 만든 마리오 카트 64. 코스, 카트, 음악, 음성은 원본 N64 ROM에서 가져왔으며 16개 코스 전체, 배틀 경기장, 아이템 15종, HD 텍스처, 온라인 플레이를 지원합니다 | [mk64js.gokart.games](https://mk64js.gokart.games/play) |
+| 🏎️ [F1](https://github.com/AgentiLoop/F1) | 실제 서킷 18곳에서 AI 차량들과 겨루는 포뮬러 레이싱. 레이아웃, 고저차, 뱅크 코너를 OpenF1 API의 실제 차량 위치와 텔레메트리로 재구성했습니다 | [f1.gokart.games](https://f1.gokart.games) |
+| 🏁 [GoKart](https://github.com/AgentiLoop/GoKart) | 마리오 카트 64의 규칙(슬립스트림, 배기량 클래스, 그랑프리 점수, 메뉴, 음악)을 재현한 오리지널 Godot 4 카트 레이서. 모든 것이 코드로 생성되며 온라인 멀티플레이를 지원합니다 | [gokart.games](https://gokart.games) |
+| 🦇 [BvS](https://github.com/AgentiLoop/bvs) | 배트맨 대 슈퍼맨, 모든 픽셀을 코드로 그리는 Three.js 3D 격투 게임: 모델 파일, 텍스처, 오디오 샘플이 전혀 없습니다 | [bvs.agentiloop.ai](https://bvs.agentiloop.ai/) |
+
+이 저장소들에는 게임 에셋이 들어 있지 않습니다. CrazyTaxi와 MarioKart64JS는 게임을 직접 소유하고 있어야 합니다. 모두 개인 및 교육용 팬 메이드 프로젝트입니다.
+
+## Agent! 패밀리
+
+Agent!는 [AgentiLoop](https://github.com/AgentiLoop) 조직의 여러 동반 저장소로 구성됩니다. 뉴스, 다운로드, 프레스 키트는 🌐 **[agentiloop.ai](https://agentiloop.ai/)**([사이트 소스](https://github.com/AgentiLoop/agent.xcf.ai))에 있습니다.
+
+| 저장소 | 설명 |
+|---|---|
+| [AgentiLoopCLI](https://github.com/AgentiLoop/AgentiLoopCLI) · [AgentiLoopGo](https://github.com/AgentiLoop/AgentiLoopGo) | macOS, Windows, Linux용 크로스 플랫폼 CLI로 만든 에이전트 루프(Rust · Go) |
+| [AgentScripts](https://github.com/AgentiLoop/AgentScripts) | Agent!가 프로세스 내에서 컴파일하고 실행하는 Swift 스크립트 |
+| [AgentTools](https://github.com/AgentiLoop/AgentTools) | 도구 스키마, 시스템 프롬프트, 제공자 관리 |
+| [AgentLLM](https://github.com/AgentiLoop/AgentLLM) | LLM 제공자 프로토콜, 타입, 레지스트리 |
+| [AgentMCP](https://github.com/AgentiLoop/AgentMCP) | MCP 클라이언트(stdio + HTTP) |
+| [AgentAccess](https://github.com/AgentiLoop/AgentAccess) | 손쉬운 사용(Accessibility) 자동화 |
+| [AgentEventBridges](https://github.com/AgentiLoop/AgentEventBridges) | 50개 이상의 Mac 앱용 ScriptingBridge 프로토콜 |
+| [AgentD1F](https://github.com/AgentiLoop/AgentD1F) | 여러 줄 diff 엔진 |
+| [AgentSwift](https://github.com/AgentiLoop/AgentSwift) | SwiftSyntax 코드 분석 |
+| [AgentColorSyntax](https://github.com/AgentiLoop/AgentColorSyntax) · [AgentTerminalNeo](https://github.com/AgentiLoop/AgentTerminalNeo) | 구문 강조 · 레트로 터미널 마크다운 |
+| [AgentAudit](https://github.com/AgentiLoop/AgentAudit) | `os.log` 감사 로깅 |
+
+Star History
 
 <a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
  <picture>

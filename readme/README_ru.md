@@ -1,6 +1,7 @@
 <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ru.svg" width="900" alt="Sidrune AI, серебряный спонсор: Один API для GPT, Claude и других ведущих моделей ИИ. Зарегистрируйтесь и получите $3 в API-кредитах." /></a>
 
-<img src="../docs/table-video.gif" width="900" alt="Agent! demo" />
+<!-- <img src="../docs/table-video.gif" width="900" alt="Agent! demo" /> -->
+<img width="1628" height="1152" alt="image" src="https://github.com/user-attachments/assets/5184c93a-9255-4404-98ce-44a319de109a" />
 
 # 🦾 AgentiLoop Agent!
 
@@ -10,8 +11,12 @@
 [![GitHub Stars](https://img.shields.io/github/stars/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Stars&color=gold)](https://github.com/AgentiLoop/Agent/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 14.6+](https://img.shields.io/badge/macOS-14.6+-green?style=for-the-badge)](https://github.com/apple)
-[![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge)](https://www.swift.org)
+[![Swift 6.4](https://img.shields.io/badge/Swift-6.4-orange?style=for-the-badge)](https://www.swift.org)
 <a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
+
+<a href="https://launchnest.io/p/agentiloop-agent" target="_blank"><img src="https://launchnest.io/badge/agentiloop-agent.svg?variant=featured" alt="AgentiLoop Agent! on LaunchNest" width="220" height="56" /></a>
+
+> ⭐ **Если Agent! экономит вам время, [поставьте репозиторию звезду](https://github.com/AgentiLoop/Agent/stargazers).** Звёзды помогают другим пользователям Mac найти бесплатного, нативного ИИ-агента с открытым кодом и поддерживают проект.
 
 ## 🆕 Новичок на районе: AgentiLoop CLI ⚡️
 
@@ -21,7 +26,7 @@
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-cli-ad-v2_ru.svg" width="900" alt="AgentiLoop CLI: две версии, Rust и Go, с абсолютно одинаковыми возможностями. macOS, Windows, Linux." /></a>
 
-*Создано с помощью AgentiLoop Agent! для Mac. Да, агент сам написал своих младших братьев.* 🤖✨ **Вышла v0.0.3:** мастер настройки, Codex, подписанные и нотаризованные бинарники для Mac. Скачайте сегодня!
+*Создано с помощью AgentiLoop Agent! для Mac. Да, агент сам написал своих младших братьев.* 🤖✨ **Вышла v0.0.5:** больше инструментов: поиск glob/grep, web_fetch, списки задач, AGENTS.md, /undo, собственные слэш-команды и --json. Скачайте сегодня!
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-rust-cli-button_ru.svg" width="211" height="44" alt="Rust CLI на GitHub" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="../docs/agentiloop-go-cli-button_ru.svg" width="194" height="44" alt="Go CLI на GitHub" /></a>
@@ -101,7 +106,33 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **📱 Удалённое управление через iMessage** — напишите `Agent! next song` с iPhone; только одобренные отправители. Требует Full Disk Access для `chat.db`.
 - **🌐 Веб** — встроенная автоматизация Safari (JavaScript + AppleScript); опционально Selenium и [Playwright MCP](https://github.com/microsoft/playwright-mcp) для кроссбраузерности.
 - **🤝 Суб-агенты** — до 3 параллельных (6 только для чтения) изолированных агентов с почтовыми сообщениями и переопределением модели для каждого.
-- **🧩 MCP** — добавьте любой MCP-сервер в Настройки → MCP Servers; инструменты появляются как `mcp_<server>_<tool>`. Xcode MCP: `{"mcpServers":{"xcode":{"command":"xcrun","args":["mcpbridge"],"transport":"stdio"}}}`.
+- **🧩 MCP** — добавьте любой MCP-сервер в Настройки → MCP Servers; инструменты появляются как `mcp_<server>_<tool>`. Примеры (stdio и HTTP):
+
+  ```json
+  {
+    "mcpServers": {
+      "xcode": {
+        "transport": "stdio",
+        "command": "xcrun",
+        "args": ["mcpbridge"],
+        "env": {}
+      },
+      "HelloWorld": {
+        "transport": "stdio",
+        "command": "/Users/you/bin/mcp-server-hello",
+        "args": [],
+        "env": {}
+      },
+      "DemoHttp": {
+        "transport": "http",
+        "url": "http://localhost:8085/mcp",
+        "headers": {}
+      }
+    }
+  }
+  ```
+
+  `HelloWorld` и `DemoHttp` — демо-серверы из [AgentMCP](https://github.com/AgentiLoop/AgentMCP); сначала запустите `mcp-server-demo-http`, чтобы `DemoHttp` было к чему подключиться на порту 8085.
 - **🗂 Вкладки, история, память, планы, навыки** — у каждой вкладки своя папка проекта и журнал; постоянная память пользователя; чек-листы нескольких планов показываются в каждом промпте.
 - **🔄 Цепочка резервирования** — автопереключение на следующего настроенного провайдера при 429/таймауте/сетевом сбое.
 
@@ -341,7 +372,24 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 | `⌘ ⇧ M` / `⌘ ⇧ P` | Монитор сообщений / Настройки |
 | `⌘ ⇧ K` `L` `H` `J` `U` | Очистить всё / панель LLM / история промптов / история задач / счётчики токенов |
 
-Слэш-команды выполняются локально: `/clear [log|all|llm|history|tasks|tokens]`, `/memory [show|clear|edit|<text>]`.
+Слэш-команды выполняются локально: `/clear [log|all|llm|history|tasks|tokens]`, `/memory [show|clear|edit|<text>]`, `/auto …`.
+
+### Автопилот (`/auto`)
+
+Запускает цикл задач без присмотра (на главной вкладке или любой вкладке LLM), пока не будет достигнута цель, не истечёт лимит времени или вы не нажмёте «Стоп». Нет ни лимита циклов, ни ограничения итераций на цикл: когда задача цикла полностью завершена, а цель не достигнута, следующий цикл начинается автоматически.
+
+| Команда | Что делает |
+|---|---|
+| `/auto <goal>` | Работает над целью, пока LLM не сообщит, что она достигнута |
+| `/auto 4h <goal>` | То же, но остановка через 4 часа (`30m` и `1.5h` тоже работают) |
+| `/auto` | Сначала изучает проект, затем спрашивает цель через `ask_user` |
+| `/auto history` | Показывает прежние цели автопилота |
+| `/auto last` / `/auto #N` | Перезапускает последнюю / N-ю цель из истории |
+| `/auto add <folder>` | Добавляет папку синхронизации: каждое изменение проекта зеркалируется туда |
+| `/auto remove <folder>` | Удаляет папку синхронизации |
+| `/auto status` / `/auto stop` | Показывает сессию / завершает её после текущего цикла (сразу, если между циклами) |
+
+Каждый цикл — обычная задача; её итог добавляется в `.agent/autopilot/progress.md` и передаётся в промпт следующего цикла. LLM завершает сессию, начиная итоговое резюме с `AUTOPILOT: GOAL REACHED`. Циклы, завершившиеся без итога (ошибки, отмены), никогда не завершают сессию: следующий цикл просто ждёт дольше (15 с, 30 с, 60 с… до 5 мин). Команды `/auto` сохраняются в истории промптов (стрелка вверх), а цели — в списке `/auto history`. Активные сессии переживают перезапуск приложения: выход (или сбой) ставит их на паузу, а при следующем запуске каждая продолжается на своей вкладке со следующего цикла.
 
 ## FAQ
 
@@ -356,6 +404,40 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 Agent! — результат трёх лет создания агентных ИИ-приложений: ANIE, Game Changer, BattleScript, XCF MCP Server и Client, D1F и около восьми оригинальных Swift-пакетов. Недостающим звеном был интеллектуальный автономный цикл; как только он появился, лучшее из этих проектов объединилось в Agent!. Он писал видеоигры ([Boss-Man](https://github.com/AgentiLoop/bossman)), создавал приложения, писал стихи в Pages через AppleScript, генерировал образы дисков и прикреплял их к релизам GitHub. Там, где Claude Code опирается на ~65 сторонних NPM-пакетов, Agent! на 100 % нативен, потребляет очень мало ОЗУ и из коробки поставляет автоматизацию Xcode, анализ Swift Syntax 6.2, универсальный доступ, AppleScript, AgentScript/ScriptingBridge, автоматизацию Safari и поддержку MCP.
 
+## Реверс-инжиниринг с Agent!
+
+![Agent! 1.1.95](../docs/agent-1.1.95-screenshot.png)
+
+Agent! — ещё и мастерская для реверс-инжиниринга. Он читает образы дисков и ROM, пишет инструменты извлечения, изучает декомпилированный код и воссоздаёт игру в браузере, сверяя свою работу с исходными данными. Так были созданы четыре гоночные игры и один файтинг:
+
+| Игра | Что сделал Agent! | Играть |
+|---|---|---|
+| 🚕 [CrazyTaxi](https://github.com/AgentiLoop/CrazyTaxi) | Воссоздание *Crazy Taxi* (USA) для Sega Dreamcast на Three.js. Инструменты на Python извлекают трассы, машины, персонажей, анимации и звук с вашего собственного диска. Код столкновений перенесён из декомпиляции и сверен с извлечёнными данными трасс | Нужен свой диск |
+| 🍄 [MarioKart64JS](https://github.com/AgentiLoop/MarioKart64JS) | Mario Kart 64, воссозданный на Three.js, а не эмулятор. Трассы, карты, музыка и голоса взяты из оригинального ROM N64: все 16 трасс, арены для боёв, 15 предметов, HD-текстуры и онлайн-игра | [mk64js.gokart.games](https://mk64js.gokart.games/play) |
+| 🏎️ [F1](https://github.com/AgentiLoop/F1) | Гонки на болидах против ИИ на 18 реальных трассах. Конфигурации, перепады высот и виражи восстановлены по реальным позициям машин и телеметрии из API OpenF1 | [f1.gokart.games](https://f1.gokart.games) |
+| 🏁 [GoKart](https://github.com/AgentiLoop/GoKart) | Оригинальная картинг-гонка на Godot 4, повторяющая правила Mario Kart 64 (слипстрим, классы двигателей, очки Гран-при, меню, музыка), где всё генерируется кодом, плюс онлайн-мультиплеер | [gokart.games](https://gokart.games) |
+| 🦇 [BvS](https://github.com/AgentiLoop/bvs) | Batman v Superman — 3D-файтинг на Three.js, где каждый пиксель рисуется кодом: никаких файлов моделей, текстур или аудиосэмплов | [bvs.agentiloop.ai](https://bvs.agentiloop.ai/) |
+
+Ни в одном из этих репозиториев нет игровых ресурсов. Для CrazyTaxi и MarioKart64JS нужна ваша собственная копия игры. Все проекты фанатские, для личного и образовательного использования.
+
+## Семейство Agent!
+
+Agent! собран из набора сопутствующих репозиториев в организации [AgentiLoop](https://github.com/AgentiLoop). Новости, загрузки и пресс-кит — на 🌐 **[agentiloop.ai](https://agentiloop.ai/)** ([исходный код сайта](https://github.com/AgentiLoop/agent.xcf.ai)).
+
+| Репозиторий | Что это |
+|---|---|
+| [AgentiLoopCLI](https://github.com/AgentiLoop/AgentiLoopCLI) · [AgentiLoopGo](https://github.com/AgentiLoop/AgentiLoopGo) | Цикл агента в виде кроссплатформенных CLI для macOS, Windows и Linux (Rust · Go) |
+| [AgentScripts](https://github.com/AgentiLoop/AgentScripts) | Swift-скрипты, которые Agent! компилирует и запускает внутри процесса |
+| [AgentTools](https://github.com/AgentiLoop/AgentTools) | Схемы инструментов, системные промпты и управление провайдерами |
+| [AgentLLM](https://github.com/AgentiLoop/AgentLLM) | Протоколы, типы и реестр LLM-провайдеров |
+| [AgentMCP](https://github.com/AgentiLoop/AgentMCP) | MCP-клиент (stdio + HTTP) |
+| [AgentAccess](https://github.com/AgentiLoop/AgentAccess) | Автоматизация через Accessibility |
+| [AgentEventBridges](https://github.com/AgentiLoop/AgentEventBridges) | Протоколы ScriptingBridge для 50+ приложений Mac |
+| [AgentD1F](https://github.com/AgentiLoop/AgentD1F) | Движок многострочных диффов |
+| [AgentSwift](https://github.com/AgentiLoop/AgentSwift) | Анализ кода на SwiftSyntax |
+| [AgentColorSyntax](https://github.com/AgentiLoop/AgentColorSyntax) · [AgentTerminalNeo](https://github.com/AgentiLoop/AgentTerminalNeo) | Подсветка синтаксиса · ретро-терминальный markdown |
+| [AgentAudit](https://github.com/AgentiLoop/AgentAudit) | Аудит-журнал через `os.log` |
+
 Star History
 
 <a href="https://www.star-history.com/?repos=agentiloop%2Fagent&type=date&legend=bottom-right">
@@ -365,8 +447,6 @@ Star History
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=agentiloop/agent&type=date&legend=bottom-right" />
  </picture>
 </a>
-
-## 
 
 ## Участие в разработке
 
