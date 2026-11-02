@@ -33,8 +33,7 @@ extension AgentViewModel {
             let formatter = DateFormatter()
             formatter.dateFormat = "HH:mm:ss"
             let time = formatter.string(from: error.timestamp)
-            let message = error.message.truncate(to: 100)
-            return "[\(time)] \(error.errorType): \(message)"
+            return "[\(time)] \(error.errorType): \(error.message)"
         }
     }
 
