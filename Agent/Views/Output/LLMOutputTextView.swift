@@ -30,9 +30,17 @@ final class FollowTextView: NSTextView {
         discardCursorRects()
         addCursorRect(visibleRect, cursor: .arrow)
     }
+
+    /// Light/dark switch — the coordinator rebuilds storage in the new palette.
+    var onAppearanceChange: (() -> Void)?
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        onAppearanceChange?()
+    }
 }
 
-  /// NSScrollView subclass that fires callbacks on scroll/hover. Intercepts scrollWheel directly so auto-follow disables immediately.
+  /// NSScrollView subclass that fires callbacks on scroll/hover.
 final class FollowScrollView: NSScrollView {
     var onUserScroll: (() -> Void)?
     var onHoverChange: ((Bool) -> Void)?
@@ -119,6 +127,7 @@ struct LLMOutputTextView: NSViewRepresentable {
         coord.textView = textView
         coord.onContentHeight = onContentHeight
         coord.startObservingScroll(scrollView)
+        textView.onAppearanceChange = { [weak coord] in coord?.rerenderForAppearanceChange() }
 
         // Hard switch: any user scroll wheel/trackpad event disables auto-follow
         // immediately, before the bounds observer would have a chance to fire.
@@ -158,11 +167,8 @@ struct LLMOutputTextView: NSViewRepresentable {
         let contentNS = contentText as NSString
         let contentLen = contentNS.length
 
-        let isDark = tv.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-        let textColor: NSColor = isDark
-            ? NSColor(red: 0.2, green: 0.9, blue: 0.3, alpha: 1)
-            : NSColor(red: 0.05, green: 0.35, blue: 0.1, alpha: 1)
-        let font = NSFont.monospacedSystemFont(ofSize: 16.5, weight: .regular)
+        let textColor = Self.textColor(for: tv)
+        let font = Self.font
         let cursorAttrs: [NSAttributedString.Key: Any] = [
             .font: font,
             .foregroundColor: cursorVisible ? textColor : NSColor.clear
@@ -291,6 +297,16 @@ struct LLMOutputTextView: NSViewRepresentable {
     /// Characters that can start/close markdown styling, plus newline (line-level syntax like "- " / "#").
     private static let markdownChars = CharacterSet(charactersIn: "*`_#-[]|>~\n")
 
+    static let font = NSFont.monospacedSystemFont(ofSize: 16.5, weight: .regular)
+
+    /// Neo-green body color for the view's current light/dark appearance.
+    static func textColor(for view: NSView) -> NSColor {
+        let isDark = view.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        return isDark
+            ? NSColor(red: 0.2, green: 0.9, blue: 0.3, alpha: 1)
+            : NSColor(red: 0.05, green: 0.35, blue: 0.1, alpha: 1)
+    }
+
     /// NSTextTable owning the paragraph at `index`, or nil if not a table cell / out of range.
     private static func table(in str: NSAttributedString, at index: Int) -> NSTextTable? {
         guard index >= 0, index < str.length,
@@ -352,6 +368,24 @@ struct LLMOutputTextView: NSViewRepresentable {
             if let observer = scrollObserver {
                 NotificationCenter.default.removeObserver(observer)
             }
+        }
+
+        /// Light/dark switch: rebuild the whole storage in the new palette. The append fast path
+        /// only colors NEW text, so without this old lines keep the previous theme's color.
+        func rerenderForAppearanceChange() {
+            guard let tv = textView, let storage = tv.textStorage, !lastContentText.isEmpty else { return }
+            TerminalNeoTheme.updateAppearance()
+            let hadCursor = storage.string.hasSuffix("█")
+            let rendered = NSMutableAttributedString(attributedString: TerminalNeoRenderer.render(lastContentText))
+            if hadCursor {
+                rendered.append(NSAttributedString(string: "█", attributes: [
+                    .font: LLMOutputTextView.font, .foregroundColor: LLMOutputTextView.textColor(for: tv)
+                ]))
+            }
+            storage.beginEditing()
+            storage.setAttributedString(rendered)
+            storage.endEditing()
+            if !autoFollowDisabled { snapToEnd(tv) }
         }
 
         /// True iff the visible bottom is within 5pt of the content end —

@@ -6,7 +6,13 @@ import SwiftUI
 struct TaskBannerView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    @Environment(\.colorScheme) private var colorScheme
     private var highContrast: Bool { colorSchemeContrast == .increased }
+    /// Light mode needs a solid, darker green — systemGreen at 0.7 washes out the white text.
+    private var taskBarColor: Color {
+        if highContrast { return Color(red: 0, green: 0.4, blue: 0) }
+        return colorScheme == .dark ? Color.green.opacity(0.7) : Color(red: 0.13, green: 0.58, blue: 0.24)
+    }
     let prompt: String
     let appleAIPrompt: String?
     @Binding var showAppleAIBanner: Bool
@@ -64,7 +70,7 @@ struct TaskBannerView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 5)
-            .background(highContrast ? Color(red: 0, green: 0.4, blue: 0) : Color.green.opacity(0.7))
+            .background(taskBarColor)
 
             if let goal = autoPilotGoal {
                 let text = goal.isEmpty ? "(pending)" : goal

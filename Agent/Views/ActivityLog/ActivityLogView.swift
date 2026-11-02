@@ -30,9 +30,18 @@ final class ArrowCursorTextView: NSTextView {
         discardCursorRects()
         addCursorRect(visibleRect, cursor: .arrow)
     }
+
+    /// Light/dark switch — the coordinator re-renders with the new palette. Without this the
+    /// log keeps its old colors until the next text change happens to trigger a render.
+    var onAppearanceChange: (() -> Void)?
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        onAppearanceChange?()
+    }
 }
 
-/// Scroll view that keeps the bottom pinned when its own height changes (e.g. the LLM
+/// Scroll view that keeps the bottom pinned
 /// Output HUD above it grows while streaming with "Activity Log Below HUD" on). AppKit keeps
 /// the clip origin fixed on resize, so without this the last lines drop out of view until
 /// the next throttled snap pulls them back — the up/down jump.
@@ -133,6 +142,7 @@ struct ActivityLogView: NSViewRepresentable {
         // Enable link detection and clicking
         textView.isAutomaticLinkDetectionEnabled = false
         textView.delegate = context.coordinator
+        textView.onAppearanceChange = { [weak coord = context.coordinator] in coord?.scheduleRender() }
         context.coordinator.startObservingScroll(scrollView)
         context.coordinator.latestTextView = textView
         context.coordinator.latestScrollView = scrollView
