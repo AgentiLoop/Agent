@@ -159,7 +159,7 @@ struct ContentView: View {
             ToolbarItemGroup(placement: .navigation) {
                 HeaderStatusView(viewModel: viewModel)
             }
-            ToolbarItemGroup(placement: .automatic) {
+            ToolbarItemGroup(placement: .primaryAction) {
                 HeaderToolbarButtons(
                     viewModel: viewModel,
                     showServices: $showServices,
