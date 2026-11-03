@@ -114,6 +114,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if let window = NSApplication.shared.windows.first {
                 window.setFrameAutosaveName("AgentMainWindow")
+                // macOS 27.2: SwiftUI toolbar hosting views swallow titlebar drags, so the
+                // window can't be moved by its titlebar. Letting the window background start
+                // a drag restores moving it (drag any empty area of the window / titlebar).
+                window.isMovableByWindowBackground = true
                 self.mainWindow = window
                 self.windowDelegateProxy.original = window.delegate
                 window.delegate = self.windowDelegateProxy
