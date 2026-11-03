@@ -154,12 +154,22 @@ struct ContentView: View {
         .onTapGesture {
             NSApp.keyWindow?.makeFirstResponder(nil)
         }
-        .toolbarBackground(Color(nsColor: .windowBackgroundColor), for: .windowToolbar)
+        // NOTE: no .toolbarBackground(Color…) here — a ShapeStyle toolbar background
+        // installs a full-width hit-testable hosting view over the titlebar, which
+        // swallows the drag events that move the window.
         .toolbar {
             ToolbarItemGroup(placement: .navigation) {
                 HeaderStatusView(viewModel: viewModel)
             }
+            // Flexible space pushes the action buttons to the trailing edge and
+            // stays draggable (native flexible-space item).
+            if #available(macOS 26.0, *) {
+                ToolbarSpacer(.flexible, placement: .automatic)
+            } else {
+                ToolbarItem(placement: .automatic) { Spacer() }
+            }
             ToolbarItemGroup(placement: .primaryAction) {
+
                 HeaderToolbarButtons(
                     viewModel: viewModel,
                     showServices: $showServices,
