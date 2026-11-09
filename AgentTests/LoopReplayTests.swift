@@ -117,6 +117,23 @@ struct RouteStopReasonTests {
         #expect(route == .proceed)
     }
 
+    @Test("a provider refusal halts the task instead of nudging")
+    func refusalHalts() {
+        let route = AgentViewModel.routeStopReason(
+            stopReason: "refusal", hasToolUse: false, hasPendingTools: false,
+            responseText: "", openCriteria: [], retriesUsed: 0)
+        guard case .halt(let message, _) = route else { Issue.record("expected halt"); return }
+        #expect(message == AgentViewModel.refusalHaltMessage)
+    }
+
+    @Test("a refusal still halts once the retry budget is spent")
+    func refusalHaltsPastRetryCap() {
+        let route = AgentViewModel.routeStopReason(
+            stopReason: "refusal", hasToolUse: false, hasPendingTools: false,
+            responseText: "", openCriteria: ["build succeeds"], retriesUsed: 3)
+        guard case .halt = route else { Issue.record("expected halt"); return }
+    }
+
     @Test("the retry cap prevents an infinite correction loop")
     func retryCap() {
         let route = AgentViewModel.routeStopReason(
