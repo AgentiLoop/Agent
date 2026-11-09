@@ -408,8 +408,6 @@ Agent! is the result of three years of building agentic AI apps — ANIE, Game C
 
 ## Reverse Engineering with Agent!
 
-![Agent! 1.1.95](docs/agent-1.1.95-screenshot.png)
-
 Agent! is also a reverse-engineering workbench. It reads disc images and ROMs, writes the extraction tools, studies the decompiled code, and rebuilds the game in the browser while checking its work against the original data. Four racing games and one fighting game were built this way:
 
 | Game | What Agent! did | Play |
