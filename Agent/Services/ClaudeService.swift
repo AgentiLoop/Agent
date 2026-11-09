@@ -406,7 +406,7 @@ final class ClaudeService {
             // Captured client version/entrypoint only; cch was redacted in the capture.
             blocks.append([
                 "type": "text",
-                "text": "x-anthropic-billing-header: cc_version=2.1.289.391; cc_entrypoint=sdk-cli;"
+                "text": "x-anthropic-billing-header: cc_version=2.1.999.391; cc_entrypoint=sdk-cli;"
             ])
             blocks.append(["type": "text", "text": claudeCodeIdentityPrompt])
         }
@@ -441,7 +441,7 @@ final class ClaudeService {
         if clean.hasPrefix("sk-ant-oat01-") {
             request.setValue("Bearer \(clean)", forHTTPHeaderField: "Authorization")
             // Fixed Claude Code client profile for OAuth compatibility testing.
-            request.setValue("claude-cli/2.1.251 (external, cli)", forHTTPHeaderField: "User-Agent")
+            request.setValue("claude-cli/2.1.999 (external, cli)", forHTTPHeaderField: "User-Agent")
             request.setValue("cli", forHTTPHeaderField: "x-app")
             request.setValue("application/json", forHTTPHeaderField: "Accept")
             request.setValue("true", forHTTPHeaderField: "anthropic-dangerous-direct-browser-access")
