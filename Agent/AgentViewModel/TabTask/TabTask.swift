@@ -502,6 +502,18 @@ extension AgentViewModel {
                         openCriteria: [],
                         retriesUsed: stopRouteRetries
                     )
+                    if case .halt(let message, let logLine) = route {
+                        tab.appendLog(logLine)
+                        // Drop the transcript: the refused turn would otherwise
+                        // be re-sent with every later task on this tab and
+                        // refused again.
+                        messages.removeAll()
+                        tab.llmMessages = []
+                        completionSummary = message
+                        tab.appendLog("\u{2705} Completed: \(message)")
+                        tab.flush()
+                        break mainLoop
+                    }
                     if case .retry(let correction, let logLine) = route {
                         stopRouteRetries += 1
                         tab.appendLog(logLine)

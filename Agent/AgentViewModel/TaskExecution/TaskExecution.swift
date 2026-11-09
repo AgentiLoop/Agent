@@ -459,6 +459,22 @@ extension AgentViewModel {
                     retriesUsed: stopRouteRetries,
                     maxTokensRetriesUsed: maxTokensRetries
                 )
+                if case .halt(let message, let logLine) = route {
+                    streamPrefetch.drain().values.forEach { $0.cancel() }
+                    appendLog(logLine)
+                    // Drop the whole transcript: the refused turn (and the image
+                    // or text that triggered it) would otherwise be re-sent with
+                    // every later task via lastTaskMessages and refused again.
+                    messages.removeAll()
+                    SessionStore.shared.newSession()
+                    completionSummary = message
+                    rawLLMOutput = message
+                    displayedLLMOutput = message
+                    dripDisplayIndex = message.unicodeScalars.count
+                    appendLog("\u{2705} Completed: \(message)")
+                    flushLog()
+                    break taskLoop
+                }
                 if case .retry(let correction, let logLine) = route {
                     streamPrefetch.drain().values.forEach { $0.cancel() }
                     if response.stopReason == "max_tokens" { maxTokensRetries += 1 } else { stopRouteRetries += 1 }

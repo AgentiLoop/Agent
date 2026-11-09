@@ -10,7 +10,15 @@ extension AgentViewModel {
         case proceed
         /// Bounce the turn back to the LLM with a corrective user message.
         case retry(correction: String, log: String)
+        /// End the task now and drop the carried-over transcript.
+        case halt(message: String, log: String)
     }
+
+    /// Message shown (and used as the completion summary) when the provider
+    /// refuses a turn.
+    nonisolated static let refusalHaltMessage =
+        "The model refused this request. The conversation was reset — "
+        + "rephrase or start a new task."
 
     /// Route a turn using the API-reported stop_reason (authoritative) instead
     /// of phrase-matching the text. All provider services normalize to
@@ -28,6 +36,18 @@ extension AgentViewModel {
         retriesUsed: Int,
         maxTokensRetriesUsed: Int? = nil
     ) -> StopRoute {
+        // Provider-level refusal (Anthropic stop_reason "refusal"). The turn
+        // carries no usable content and nudging only earns a second refusal;
+        // worse, the refused turn stays in the carried-over transcript and is
+        // re-sent with every later task, so nothing works again. End the task
+        // and let the caller clear the transcript.
+        if stopReason == "refusal" {
+            return .halt(
+                message: refusalHaltMessage,
+                log: "🛑 Provider refused this turn (stop: refusal) — ending task and clearing the conversation"
+            )
+        }
+
         // Output truncated mid-thought. Treating this as a finished answer is
         // wrong — continue instead of completing. Own cap, own counter.
         if stopReason == "max_tokens" && !hasToolUse {
@@ -39,6 +59,7 @@ extension AgentViewModel {
         }
 
         guard retriesUsed < 3 else { return .proceed }
+
 
         // Model stopped to call a tool but nothing parsable arrived — malformed
         // tool JSON or a block the parser rejected. Ask for a clean re-issue.
