@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		02706156F0F8E91DF8FB4E70 /* TE-Selenium.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8FE3C1065B23B9424ED23C /* TE-Selenium.swift */; };
 		031BAABE48A31A26277EA3C6 /* Accessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7452B670C7ABBF7A1884569F /* Accessibility.swift */; };
+		07869E9EC2F8C304F2BB45E5 /* TheRouterProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0927C13DA4204264570A050E /* TheRouterProviderTests.swift */; };
 		088F38C5D0E90D019E33A0D9 /* Selenium.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DBCE8EADB1BBD7A0E94AD0B /* Selenium.swift */; };
 		094F03A9F6093F2CD32452B2 /* FMServeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */; };
 		0A1EEB47CE2C2A8E1FEC9539 /* ProviderKeyed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9147F16D98DBB40EA90C79 /* ProviderKeyed.swift */; };
@@ -16,6 +17,7 @@
 		133436F0824C64E5C82F9C0B /* ReadableStatusColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07033EE1AF34D90014629F02 /* ReadableStatusColor.swift */; };
 		144AC666CD8BD1964F726B31 /* ServicesPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AF4AB55766B9B0D5CA69DFD /* ServicesPopover.swift */; };
 		16AC65E0831D60B1FBA8C98E /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEB37986AC0DAFF0627F9C3 /* FileManager.swift */; };
+		1A2F23D79108AD66D00CDAF0 /* MCPInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41A33447B37F67A78232C185 /* MCPInstaller.swift */; };
 		1DCD8313ABDDD50E52BDA2E0 /* CriticGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F212F6A04076958DD46FD1E4 /* CriticGate.swift */; };
 		1EBCF4BDAECFE598FEC3B400 /* ActivityLogTabCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186E2C0AE9CAF82B1B1F92A /* ActivityLogTabCacheTests.swift */; };
 		1EF9BFCFF2AAF0C07CE980C5 /* Views/Avatar/AvatarSpeaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5DB4F91516155F9841BE6E /* Views/Avatar/AvatarSpeaker.swift */; };
@@ -49,13 +51,16 @@
 		5BHUDA001FC0A98734393F229 /* HUDOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFHUDA001556805C0F5ABC260 /* HUDOptionsView.swift */; };
 		5BLLMOUT01FC0A98734393F230 /* LLMOutputTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFLLMOUT01556805C0F5ABC261 /* LLMOutputTextView.swift */; };
 		5C2EF53DF60353170D36ACC1 /* SubAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC0549F9001505AC8375592 /* SubAgent.swift */; };
+		66131FE40C785966C1AFB095 /* SecretRedactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E9484326A2618FE04B2B12 /* SecretRedactor.swift */; };
 		741D62A344F93FECB53C8C65 /* ProviderParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245995D0756C349D623788CC /* ProviderParserTests.swift */; };
+		7566283B78B1361784AC0FFE /* MCPOAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F91F429CF5F0CFBF5DF8D9 /* MCPOAuth.swift */; };
 		78EBD1F124AB2D7D38E70E8E /* AboutSelf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878ED6B87793FE4A12844669 /* AboutSelf.swift */; };
 		7FA36E1A9CC0DFA5A3ECB9AD /* NativeToolHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C673DDB50E956B2E5FD610 /* NativeToolHandler.swift */; };
 		8375A8F4BB60859635722350 /* WebTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F1A988F00C4E7050FED023 /* WebTools.swift */; };
 		8694EEF8CDF9D987CE3D1E2A /* PlanStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5A29F2E735D900C78C575E /* PlanStateStore.swift */; };
 		89A5281FFE610EA7450B573B /* ResponseCompletionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A507049182BD42AD200EC6 /* ResponseCompletionTests.swift */; };
 		8B340428F90511F1772B985A /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8C3DA5A80E9774D8FE8E51 /* Shell.swift */; };
+		8BA89B9E806769987A9E3D87 /* UserAuthGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497D797D93109F47164E36AF /* UserAuthGate.swift */; };
 		8D9538B356CEFC7645A2A97E /* Git.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF914BA393B97296A51A534F /* Git.swift */; };
 		9813192DF858B26C6D4135F3 /* ProjectFolderSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF0C04DFB19BC4AA0E4F96EF /* ProjectFolderSectionView.swift */; };
 		9A9C3DD66695959EE70C20DD /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B4573B1D1FB583C85DC43C /* SearchBarView.swift */; };
@@ -169,6 +174,7 @@
 		ALE0000000000000000011 /* MarkdownInline.swift in Sources */ = {isa = PBXBuildFile; fileRef = ALE0000000000000000012 /* MarkdownInline.swift */; };
 		ALE0000000000000000013 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = ALE0000000000000000014 /* Cache.swift */; };
 		APP0000000000000000001 /* AgentProjectPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = APP0000000000000000002 /* AgentProjectPaths.swift */; };
+		AUK0000000000000000000003 /* AutoUpdateKit in Frameworks */ = {isa = PBXBuildFile; productRef = AUK0000000000000000000002 /* AutoUpdateKit */; };
 		B73A9A6EBE2A1C13B66EB81E /* ToolErrorClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B73CC1C22C23AAC6CD8E7BD5 /* ToolErrorClassifier.swift */; };
 		BB10000000000000000015 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB10000000000000000005 /* Helpers.swift */; };
 		BB10000000000000000017 /* AppleIntelligencePopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB10000000000000000007 /* AppleIntelligencePopover.swift */; };
@@ -213,7 +219,6 @@
 		EAE1E7152F7BF6880079432C /* AgentSwift in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7142F7BF6880079432C /* AgentSwift */; };
 		EAE1E7182F7BF6E70079432C /* XcodeScriptingBridge in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7172F7BF6E70079432C /* XcodeScriptingBridge */; };
 		EAE1E71B2F7BF7000079432C /* AgentAudit in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E71A2F7BF7000079432C /* AgentAudit */; };
-		AUK0000000000000000000003 /* AutoUpdateKit in Frameworks */ = {isa = PBXBuildFile; productRef = AUK0000000000000000000002 /* AutoUpdateKit */; };
 		EAE1E7222F7C00000079432C /* AgentLLM in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7212F7C00000079432C /* AgentLLM */; };
 		EAE1E7242F7C01000079432C /* LLMProviderSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE1E7232F7C01000079432C /* LLMProviderSetup.swift */; };
 		EAE1E7262F7C02000079432C /* AgentAccess in Frameworks */ = {isa = PBXBuildFile; productRef = EAE1E7252F7C02000079432C /* AgentAccess */; };
@@ -259,11 +264,6 @@
 		WEB1000000000000000003 /* WebAutomationService+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000004 /* WebAutomationService+Navigation.swift */; };
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
-		1A2F23D79108AD66D00CDAF0 /* MCPInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41A33447B37F67A78232C185 /* MCPInstaller.swift */; };
-		66131FE40C785966C1AFB095 /* SecretRedactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E9484326A2618FE04B2B12 /* SecretRedactor.swift */; };
-		7566283B78B1361784AC0FFE /* MCPOAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F91F429CF5F0CFBF5DF8D9 /* MCPOAuth.swift */; };
-		07869E9EC2F8C304F2BB45E5 /* TheRouterProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0927C13DA4204264570A050E /* TheRouterProviderTests.swift */; };
-		8BA89B9E806769987A9E3D87 /* UserAuthGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497D797D93109F47164E36AF /* UserAuthGate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -319,6 +319,7 @@
 		05EEC654A3A0762D24BE1901 /* Web.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Web.swift; sourceTree = "<group>"; };
 		07033EE1AF34D90014629F02 /* ReadableStatusColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadableStatusColor.swift; sourceTree = "<group>"; };
 		08B56C841E197D78556C4620 /* Views/Avatar/AvatarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Avatar/AvatarController.swift; sourceTree = "<group>"; };
+		0927C13DA4204264570A050E /* TheRouterProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TheRouterProviderTests.swift; sourceTree = "<group>"; };
 		0AEB37986AC0DAFF0627F9C3 /* FileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManager.swift; sourceTree = "<group>"; };
 		0DBCE8EADB1BBD7A0E94AD0B /* Selenium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Selenium.swift; sourceTree = "<group>"; };
 		176D0F01E4553C80C7E38FB2 /* ToolResultCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolResultCache.swift; sourceTree = "<group>"; };
@@ -332,8 +333,11 @@
 		2AFB0612717E44BF8818651B /* FileBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBackupService.swift; sourceTree = "<group>"; };
 		30B5B0A497DFBC0701D649E8 /* GoalStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalStateStore.swift; sourceTree = "<group>"; };
 		34C10699E27F443F76A01246 /* MuseCodeAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseCodeAuth.swift; sourceTree = "<group>"; };
+		36F91F429CF5F0CFBF5DF8D9 /* MCPOAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPOAuth.swift; sourceTree = "<group>"; };
 		39A507049182BD42AD200EC6 /* ResponseCompletionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseCompletionTests.swift; sourceTree = "<group>"; };
 		4186E2C0AE9CAF82B1B1F92A /* ActivityLogTabCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityLogTabCacheTests.swift; sourceTree = "<group>"; };
+		41A33447B37F67A78232C185 /* MCPInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPInstaller.swift; sourceTree = "<group>"; };
+		497D797D93109F47164E36AF /* UserAuthGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAuthGate.swift; sourceTree = "<group>"; };
 		4B0C57073F5C4305AF673454 /* RollbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollbackView.swift; sourceTree = "<group>"; };
 		562DDED208832F41127CBDFA /* CriticGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CriticGateTests.swift; sourceTree = "<group>"; };
 		5D8FE3C1065B23B9424ED23C /* TE-Selenium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TE-Selenium.swift"; sourceTree = "<group>"; };
@@ -496,6 +500,7 @@
 		CS110000000000000000004 /* CodingService+SplitFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CodingService+SplitFile.swift"; sourceTree = "<group>"; };
 		CS110000000000000000006 /* CodingService+Refactoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CodingService+Refactoring.swift"; sourceTree = "<group>"; };
 		D06FF7974D444A53866B44F9 /* ContextOverflowDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextOverflowDetectionTests.swift; sourceTree = "<group>"; };
+		D3E9484326A2618FE04B2B12 /* SecretRedactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretRedactor.swift; sourceTree = "<group>"; };
 		DC10000000000000000000 /* DaemonCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonCore.swift; sourceTree = "<group>"; };
 		DD10000000000000000004 /* AgentTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AgentTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEB9438E8FF14FA5B7264491 /* SkillsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillsService.swift; sourceTree = "<group>"; };
@@ -555,11 +560,6 @@
 		WEB1000000000000000004 /* WebAutomationService+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Navigation.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
-		41A33447B37F67A78232C185 /* MCPInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MCPInstaller.swift"; sourceTree = "<group>"; };
-		D3E9484326A2618FE04B2B12 /* SecretRedactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecretRedactor.swift"; sourceTree = "<group>"; };
-		36F91F429CF5F0CFBF5DF8D9 /* MCPOAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MCPOAuth.swift"; sourceTree = "<group>"; };
-		0927C13DA4204264570A050E /* TheRouterProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TheRouterProviderTests.swift"; sourceTree = "<group>"; };
-		497D797D93109F47164E36AF /* UserAuthGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserAuthGate.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -985,8 +985,8 @@
 				4186E2C0AE9CAF82B1B1F92A /* ActivityLogTabCacheTests.swift */,
 				D06FF7974D444A53866B44F9 /* ContextOverflowDetectionTests.swift */,
 				6F1EA9AEA14A0CC1B69CD575 /* AvatarControllerTests.swift */,
-							0927C13DA4204264570A050E /* TheRouterProviderTests.swift */,
-);
+				0927C13DA4204264570A050E /* TheRouterProviderTests.swift */,
+			);
 			path = AgentTests;
 			sourceTree = "<group>";
 		};
@@ -1049,8 +1049,8 @@
 				B73CC1C22C23AAC6CD8E7BD5 /* ToolErrorClassifier.swift */,
 				8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */,
 				34C10699E27F443F76A01246 /* MuseCodeAuth.swift */,
-							497D797D93109F47164E36AF /* UserAuthGate.swift */,
-);
+				497D797D93109F47164E36AF /* UserAuthGate.swift */,
+			);
 			path = Services;
 			sourceTree = "<group>";
 		};
@@ -1077,10 +1077,10 @@
 				AA10000000000000000058 /* MCPConfig.swift */,
 				MCPP000000000000000002 /* MCPPresets.swift */,
 				AA1000000000000000005A /* MCPServersView.swift */,
-							41A33447B37F67A78232C185 /* MCPInstaller.swift */,
+				41A33447B37F67A78232C185 /* MCPInstaller.swift */,
 				D3E9484326A2618FE04B2B12 /* SecretRedactor.swift */,
 				36F91F429CF5F0CFBF5DF8D9 /* MCPOAuth.swift */,
-);
+			);
 			path = MCP;
 			sourceTree = "<group>";
 		};
@@ -1292,7 +1292,7 @@
 				EAA08AAA2F7D549300D5998A /* XCRemoteSwiftPackageReference "AgentLLM" */,
 				EAE1E7242F7C02000079432C /* XCRemoteSwiftPackageReference "AgentAccess" */,
 				AUK0000000000000000000001 /* XCRemoteSwiftPackageReference "AutoUpdateKit" */,
-				TSK0000000000000000004 /* XCLocalSwiftPackageReference "TypeSafeKit" */,
+				TSK0000000000000000004 /* XCRemoteSwiftPackageReference "TypeSafeKit" */,
 			);
 			productRefGroup = AA10000000000000000042 /* Products */;
 			projectDirPath = "";
@@ -1564,11 +1564,11 @@
 				AAAB78FFAB5CB1D752D58DD6 /* Views/Avatar/AvatarPaneView.swift in Sources */,
 				E09A4851FAEBEBC6CDAB2156 /* AutoPilotRegistry.swift in Sources */,
 				133436F0824C64E5C82F9C0B /* ReadableStatusColor.swift in Sources */,
-							1A2F23D79108AD66D00CDAF0 /* MCPInstaller.swift in Sources */,
+				1A2F23D79108AD66D00CDAF0 /* MCPInstaller.swift in Sources */,
 				66131FE40C785966C1AFB095 /* SecretRedactor.swift in Sources */,
 				7566283B78B1361784AC0FFE /* MCPOAuth.swift in Sources */,
 				8BA89B9E806769987A9E3D87 /* UserAuthGate.swift in Sources */,
-);
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BB10000000000000000050 /* Sources */ = {
@@ -2032,14 +2032,16 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		TSK0000000000000000004 /* XCLocalSwiftPackageReference "TypeSafeKit" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = TypeSafeKit;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
+		AUK0000000000000000000001 /* XCRemoteSwiftPackageReference "AutoUpdateKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AgentiLoop/AutoUpdateKit.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 10.0.0;
+				minimumVersion = 1.0.1;
+			};
+		};
 		EAA08AAA2F7D549300D5998A /* XCRemoteSwiftPackageReference "AgentLLM" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AgentiLoop/AgentLLM.git";
@@ -2130,11 +2132,12 @@
 				minimumVersion = 2.10.25;
 			};
 		};
-		AUK0000000000000000000001 /* XCRemoteSwiftPackageReference "AutoUpdateKit" */ = {
+		TSK0000000000000000004 /* XCRemoteSwiftPackageReference "TypeSafeKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AgentiLoop/AutoUpdateKit.git";
+			repositoryURL = "https://github.com/AgentiLoop/TypeSafeKit.git";
 			requirement = {
-				kind = upToNextMajorVersion;
+				kind = versionRange;
+				maximumVersion = 10.0.0;
 				minimumVersion = 1.0.0;
 			};
 		};
@@ -2212,12 +2215,12 @@
 		};
 		TSK0000000000000000000 /* TypeSafeKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = TSK0000000000000000004 /* XCLocalSwiftPackageReference "TypeSafeKit" */;
+			package = TSK0000000000000000004 /* XCRemoteSwiftPackageReference "TypeSafeKit" */;
 			productName = TypeSafeKit;
 		};
 		TSK0000000000000000002 /* TypeSafeMiddleware */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = TSK0000000000000000004 /* XCLocalSwiftPackageReference "TypeSafeKit" */;
+			package = TSK0000000000000000004 /* XCRemoteSwiftPackageReference "TypeSafeKit" */;
 			productName = TypeSafeMiddleware;
 		};
 /* End XCSwiftPackageProductDependency section */

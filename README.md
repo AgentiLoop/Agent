@@ -345,7 +345,7 @@ Deleted scripts go to `~/Documents/AgentScript/agents/.Trash/` (`agent_script(ac
 - **Tunable cut-off.** Settings → LLM Common Settings → **Reject at … % destructive**, 0–100% in 10% steps. Default **70%**.
 - **Fail-open by design.** No API key, the **Consult Jev before tools** toggle off, or a TypeSafe outage means "no opinion" — the command proceeds and the failure is logged, never silently treated as a safe verdict. Cancelling a task during a Jev check stops the command.
 - **Visible.** Every check logs the destructive-risk percentage, the allowed/refused verdict, the answering model, and input/output token counts.
-- **Configuration.** API key (stored in the Keychain), model picker with catalog refresh, and the advisory toggle all live in LLM Common Settings. The client lives in the bundled `TypeSafeKit` / `TypeSafeMiddleware` Swift package.
+- **Configuration.** API key (stored in the Keychain), model picker with catalog refresh, and the advisory toggle all live in LLM Common Settings. The client lives in the [`TypeSafeKit` / `TypeSafeMiddleware`](https://github.com/AgentiLoop/TypeSafeKit) Swift package.
 
 ## Privacy & Safety
 

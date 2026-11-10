@@ -1,5 +1,5 @@
 {
-  "originHash" : "e4d61adff8edd1352e6934a87ca52df5afae20bee4e885328b6bebcc594ecdb8",
+  "originHash" : "7fcbb0afb9c1cc20c5de2045349d133c254385c30bc1187f0219236ff087d499",
   "pins" : [
     {
       "identity" : "agentaccess",
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AutoUpdateKit.git",
       "state" : {
-        "revision" : "fc2517491bc35c8a16c202f1d0bddb8d38e76f02",
-        "version" : "1.0.0"
+        "revision" : "bbfd846423e5c4e6b2f33c242c42fc90da62cd16",
+        "version" : "1.0.1"
       }
     },
     {
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/steipete/AXorcist.git",
       "state" : {
-        "revision" : "c3838bfa47358202331c4cd4b71a783893825fd9",
-        "version" : "0.2.0"
+        "revision" : "56b7913b90de6d1514fc7df1670983b2d57f4b93",
+        "version" : "0.2.3"
       }
     },
     {
@@ -123,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "9c6fb14227f55d8f711ce3847dc2f419fb0ecacb",
-        "version" : "1.15.1"
+        "revision" : "e3da04078777e6a1b72ce19981fbd6539b0847d8",
+        "version" : "1.17.0"
       }
     },
     {
@@ -134,6 +134,15 @@
       "state" : {
         "revision" : "050f1a346fbbac0ca2cfb15a95274f7bd1cf0ccf",
         "version" : "604.0.0"
+      }
+    },
+    {
+      "identity" : "typesafekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AgentiLoop/TypeSafeKit.git",
+      "state" : {
+        "revision" : "ec1c1a81c3181411aa1887ccf2309b23b63ddb34",
+        "version" : "1.0.0"
       }
     }
   ],
