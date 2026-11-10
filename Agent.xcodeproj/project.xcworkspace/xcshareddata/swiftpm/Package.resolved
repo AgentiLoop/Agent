@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AutoUpdateKit.git",
       "state" : {
-        "revision" : "bbfd846423e5c4e6b2f33c242c42fc90da62cd16",
-        "version" : "1.0.1"
+        "revision" : "fb49db3d10fc025774dfc2d0dfb0a660958cc2c8",
+        "version" : "1.0.2"
       }
     },
     {
@@ -141,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/TypeSafeKit.git",
       "state" : {
-        "revision" : "ec1c1a81c3181411aa1887ccf2309b23b63ddb34",
-        "version" : "1.0.0"
+        "revision" : "dff168b96401531cd527ec05e1e20937093e3190",
+        "version" : "1.0.1"
       }
     }
   ],
