@@ -1,5 +1,5 @@
 {
-  "originHash" : "9c6813c435023293b78b24e8c6a1f817139f41d54c8f9c1417c29aff360cb9a3",
+  "originHash" : "e4d61adff8edd1352e6934a87ca52df5afae20bee4e885328b6bebcc594ecdb8",
   "pins" : [
     {
       "identity" : "agentaccess",
@@ -89,6 +89,15 @@
       "state" : {
         "revision" : "be11f38b58bb6189f8a9489f96ea99d5b4ecb65a",
         "version" : "2.53.35"
+      }
+    },
+    {
+      "identity" : "autoupdatekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AgentiLoop/AutoUpdateKit.git",
+      "state" : {
+        "revision" : "fc2517491bc35c8a16c202f1d0bddb8d38e76f02",
+        "version" : "1.0.0"
       }
     },
     {

@@ -124,6 +124,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
+        // Auto-update from GitHub releases (AutoUpdateKit)
+        UpdateChecker.shared.start()
+
         // Insert 🦾 Agents menu; re-insert on didBecomeActive to survive SwiftUI menu rebuilds
         insertAgentsMenu()
         NotificationCenter.default.addObserver(
