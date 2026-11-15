@@ -78,6 +78,7 @@ extension AgentViewModel {
         if task.lowercased() == "/clear" {
             tab.taskInput = ""
             tab.activityLog = ""
+            tab.llmMessages = []
             tab.logBuffer = ""
             tab.logFlushTask?.cancel()
             tab.logFlushTask = nil
@@ -157,7 +158,6 @@ extension AgentViewModel {
         tab.isLLMRunning = true
         tab.lastTaskCompletionSummary = ""
         tab.lastTaskError = ""
-        tab.llmMessages = [] // Fresh conversation for each task
         tab.tabInputTokens = 0
         tab.tabOutputTokens = 0
         tab.tabLastInputTokens = 0
@@ -258,6 +258,9 @@ extension AgentViewModel {
             projectFolder: projectFolder,
             directCommandContext: directCommandContext
         )
+        // Carry this task's conversation into the tab's next task (same as the
+        // main tab's lastTaskMessages), however the task ends.
+        defer { tab.llmMessages = messages; tab.llmMessagesDate = Date() }
 
         // No mode filtering — every user-enabled tool is sent on every turn.
         // ToolPreferencesService is the only tool filter.
@@ -470,6 +473,16 @@ extension AgentViewModel {
                 case .complete(let summary):
                     completionSummary = summary
                     tab.lastTaskCompletionSummary = summary
+                    // Keep the final turn (reply text + done summary) in the transcript
+                    // carried into the tab's next task — same as the main tab.
+                    let closing: [[String: Any]] = response.content.compactMap { block in
+                        guard block["type"] as? String == "tool_use", let id = block["id"] as? String else { return nil }
+                        return ["type": "tool_result", "tool_use_id": id, "content": "Task ended."]
+                    }
+                    if !closing.isEmpty {
+                        messages.append(["role": "assistant", "content": response.content])
+                        messages.append(["role": "user", "content": closing])
+                    }
                     tab.llmMessages = messages
                     // Save task history for tab
                     let formatter = DateFormatter()

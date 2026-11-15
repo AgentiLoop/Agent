@@ -136,6 +136,8 @@ final class ScriptTab: Identifiable {
     var isBusy: Bool { isRunning || isLLMRunning || isLLMThinking }
     var runningLLMTask: Task<Void, Never>?
     var llmMessages: [[String: Any]] = []
+    /// When `llmMessages` was last written (task end). Drives the time-based microcompact on the tab's next task.
+    var llmMessagesDate: Date?
     var taskQueue: [String] = []
     var currentTaskPrompt: String = ""
     var currentAppleAIPrompt: String = ""

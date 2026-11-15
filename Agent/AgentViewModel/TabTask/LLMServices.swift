@@ -83,13 +83,13 @@ extension AgentViewModel {
         projectFolder: String,
         directCommandContext: String?
     ) -> [[String: Any]] {
-        // Build on existing conversation or start fresh
-        var messages: [[String: Any]] = tab.llmMessages
-
-        // Remove trailing assistant messages — Ollama requires the last message to be user or tool role. Strip any
-        // assistant messages at the end (orphaned tool calls or plain text from a previous session/restart).
-        while let last = messages.last, last["role"] as? String == "assistant" {
-            messages.removeLast()
+        // Build on the tab's previous conversation or start fresh. The sanitizer drops orphaned tool_use
+        // blocks (Escape mid-turn) and trailing assistant turns — Anthropic rejects the former, Ollama
+        // requires the last message to be user or tool role.
+        var messages: [[String: Any]] = Self.sanitizeMessagesForContinuation(tab.llmMessages)
+        // Tier 7.6: a transcript idle for over an hour has a cold prompt cache — clear old tool results up front.
+        if Self.microcompactIfStale(&messages, lastActivity: tab.llmMessagesDate) {
+            tab.appendLog("🗜️ Continuation idle >60 min — cleared old tool results before first request")
         }
 
         let promptPrefix = Self.newTaskPrefix(projectFolder: projectFolder, prompt: prompt)
