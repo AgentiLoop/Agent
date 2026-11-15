@@ -361,7 +361,12 @@ final class ChatHistoryStore {
             sortBy: [SortDescriptor(\.startTime, order: .reverse)]
         )
 
-        guard let allTasks = try? context.fetch(descriptor), !allTasks.isEmpty else { return "" }
+        // startNewTask has already stored the task that is starting now. Skip it —
+        // otherwise it takes the "recent task" slot with nothing but its own prompt
+        // and the task before it drops to a one-line summary.
+        guard let fetched = try? context.fetch(descriptor) else { return "" }
+        let allTasks = fetched.filter { $0.id != currentTask?.id }
+        guard !allTasks.isEmpty else { return "" }
 
         var result = "\n\nChat history (most recent last):\n"
 
@@ -403,8 +408,11 @@ final class ChatHistoryStore {
             result += "--- Recent Task ---\n"
             result += "Task: \(task.prompt.prefix(LogLimits.historyLineChars))\n"
             result += body
-            if let summary = task.summary {
-                result += "Result: \(summary.prefix(LogLimits.historyLineChars))\n"
+            // Whole summary, not a 500-char line — after a relaunch this block is all
+            // the next task has of the previous answer. Normally the log above already
+            // ends with it (the "Completed:" line); don't send it twice.
+            if let summary = task.summary, !body.contains(summary) {
+                result += "Result: \(summary)\n"
             }
         }
 
