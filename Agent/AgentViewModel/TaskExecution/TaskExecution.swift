@@ -403,7 +403,20 @@ extension AgentViewModel {
                     filesEditedThisTask: &filesEditedThisTask,
                     completionSummary: &completionSummary
                 )
-                if parseResult.taskCompleted { return }
+                if parseResult.taskCompleted {
+                    // Keep the final turn (reply text + done summary) in the transcript
+                    // carried into the next task. Without it the next task only saw the
+                    // first 500 chars of this answer (history line in the system prompt).
+                    let closing: [[String: Any]] = response.content.compactMap { block in
+                        guard block["type"] as? String == "tool_use", let id = block["id"] as? String else { return nil }
+                        return ["type": "tool_result", "tool_use_id": id, "content": "Task ended."]
+                    }
+                    if !closing.isEmpty {
+                        messages.append(["role": "assistant", "content": response.content])
+                        messages.append(["role": "user", "content": closing])
+                    }
+                    return
+                }
                 // Completion gates refused this task_complete — hand the refusal back
                 // as its tool_result so the model fixes the gap and tries again.
                 if let blocked = parseResult.blockedCompletion {
