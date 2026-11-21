@@ -110,11 +110,33 @@ struct HeaderToolbarButtons: View {
         return jevConfigured ? .green : .secondary
     }
 
-    /// Web search icon color: green once any search key is set, gray when
-    /// search falls back to keyless DuckDuckGo.
+    /// Web search icon color: orange when any backend has recorded errors,
+    /// green once any search key is set, gray when search falls back to
+    /// keyless DuckDuckGo.
     private var webSearchIconColor: Color {
+        let stats = WebSearchStatsStore.shared
+        if stats.backendStats.values.contains(where: { $0.errorCount > 0 }) {
+            return .orange
+        }
         let configured = !viewModel.specStreamAPIKey.isEmpty || !viewModel.exaAPIKey.isEmpty || !viewModel.tavilyAPIKey.isEmpty
         return configured ? .green : .secondary
+    }
+
+    /// Toolbar tooltip: which backend last served a search, how many searches
+    /// have run, and the most recent error, if any.
+    private var webSearchHelpText: String {
+        let stats = WebSearchStatsStore.shared
+        guard let last = stats.lastBackend else {
+            return "Web Search: no searches run yet"
+        }
+        var text = "Web Search: last used \(last.displayName), \(stats.totalSearches) total search\(stats.totalSearches == 1 ? "" : "es")"
+        if let date = stats.lastSearchDate {
+            text += " — \(date.formatted(.relative(presentation: .named)))"
+        }
+        if let error = stats.backendStats[last]?.lastError, !error.isEmpty {
+            text += ". Last error: \(error)"
+        }
+        return text
     }
 
     var body: some View {
@@ -144,8 +166,9 @@ struct HeaderToolbarButtons: View {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(webSearchIconColor)
         }
-        .help("Web Search: SpecStream, Exa, Tavily")
+        .help(webSearchHelpText)
         .accessibilityLabel("Web Search")
+        .accessibilityValue(webSearchHelpText)
         .popover(isPresented: $showWebSearch, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
             WebSearchSettingsView(viewModel: viewModel)
         }

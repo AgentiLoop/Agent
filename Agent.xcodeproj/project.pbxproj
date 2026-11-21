@@ -265,6 +265,7 @@
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
 		82BC600665F18A6238A79B59 /* WebSearchSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B74A1150D0566CBDF5CD31E /* WebSearchSettingsView.swift */; };
+		AC980D9D4292071FF1F97B65 /* WebSearchStatsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBBD204017DE8382B6417B7 /* WebSearchStatsStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -562,6 +563,7 @@
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
 		2B74A1150D0566CBDF5CD31E /* WebSearchSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebSearchSettingsView.swift"; sourceTree = "<group>"; };
+		0CBBD204017DE8382B6417B7 /* WebSearchStatsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebSearchStatsStore.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1053,7 +1055,8 @@
 				8E3E4963F88D06A0DD7CE08F /* FMServeService.swift */,
 				34C10699E27F443F76A01246 /* MuseCodeAuth.swift */,
 				497D797D93109F47164E36AF /* UserAuthGate.swift */,
-			);
+							0CBBD204017DE8382B6417B7 /* WebSearchStatsStore.swift */,
+);
 			path = Services;
 			sourceTree = "<group>";
 		};
@@ -1572,6 +1575,7 @@
 				7566283B78B1361784AC0FFE /* MCPOAuth.swift in Sources */,
 				8BA89B9E806769987A9E3D87 /* UserAuthGate.swift in Sources */,
 							82BC600665F18A6238A79B59 /* WebSearchSettingsView.swift in Sources */,
+				AC980D9D4292071FF1F97B65 /* WebSearchStatsStore.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
