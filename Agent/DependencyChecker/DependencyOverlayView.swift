@@ -32,7 +32,7 @@ struct DependencyOverlay: View {
                     .ignoresSafeArea()
 
                 VStack(spacing: 12) {
-                    Image("AgentIcon")
+                    Image(nsImage: NSApp.applicationIconImage)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 80, height: 80)
