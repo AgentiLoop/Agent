@@ -217,7 +217,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ## AgentScript — 完全な TCC を持つ Swift スクリプト
 
-AgentScript は `~/Documents/AgentScript/agents/Sources/Scripts/` にある普通の Swift ファイルです。Agent! はそれぞれを SwiftPM で `.dylib` にコンパイルし（`Package.swift` はすべてのスクリプトと 51 の ScriptingBridge アプリブリッジを列挙）、Agent! 自身の TCC 許可 — アクセシビリティ、オートメーション、カレンダー、連絡先、メール、写真など — で `dlopen` します。LLM は `agent_script`（`create` / `edit` / `run` / `delete` / `restore` / `pull`）で管理します。フォルダには約 35 の例が同梱されています（`Hello`、`TodayEvents`、`NowPlaying`、`CheckMail`、`CreateDmg`、`ArchiveXcode`、…）。
+AgentScript は `~/Documents/AgentScript/agents/Sources/Scripts/` にある普通の Swift ファイルです。Agent! はそれぞれを SwiftPM で `.dylib` にコンパイルし（`Package.swift` はすべてのスクリプトと 51 の ScriptingBridge アプリブリッジを列挙）、Agent! 自身の TCC 許可 — アクセシビリティ、オートメーション、カレンダー、連絡先、メール、写真など — で `dlopen` します。LLM は `agent_script`（`create` / `edit` / `run` / `delete` / `restore` / `pull`）で管理します。フォルダには約 70 の例が同梱されています（`Hello`、`TodayEvents`、`NowPlaying`、`CheckMail`、`CreateDmg`、`ArchiveXcode`、…）。
 
 **エントリーポイント** — トップレベルコードなし、`exit()` なし。`stdout` は LLM に返され、戻り値が終了ステータスです：
 
