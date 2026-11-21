@@ -159,6 +159,35 @@ final class ClaudeService {
         }
     }
 
+    /// A malformed model turn can record a garbage tool_use name (e.g. JSON or
+    /// prose run together). Anthropic 400s on any history name over 200 chars,
+    /// which bricks the whole conversation — replace such names so it replays.
+    nonisolated static func sanitizingToolUseNames(_ messages: [[String: Any]]) -> [[String: Any]] {
+        messages.map { message in
+            guard let blocks = message["content"] as? [[String: Any]],
+                  blocks.contains(where: { ($0["type"] as? String) == "tool_use" })
+            else { return message }
+            var changed = false
+            let fixed = blocks.map { block -> [String: Any] in
+                guard (block["type"] as? String) == "tool_use" else { return block }
+                let name = block["name"] as? String ?? ""
+                let valid = !name.isEmpty && name.count <= 200
+                    && name.unicodeScalars.allSatisfy { $0.isASCII && (CharacterSet.alphanumerics.contains($0) || $0 == "_" || $0 == "-") }
+                guard !valid else { return block }
+                changed = true
+                var b = block
+                b["name"] = "invalid_tool_name"
+                return b
+            }
+            guard changed else { return message }
+            var cleaned = message
+            cleaned["content"] = fixed
+            return cleaned
+        }
+    }
+
+    /// 
+
     /// Strip orphan `tool_result` blocks (no matching `tool_use` in the prior
     /// assistant message). Anthropic returns 400 on these. Also drop user messages
     /// that become empty after stripping. Mirrors the logic in MessageSanitizer
@@ -338,7 +367,7 @@ final class ClaudeService {
             // No "temperature" — newer Claude models reject it (400 "deprecated"),
             // and sendStreaming() already omits it.
             "system": systemBlock,
-            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(Self.removingUnsignedThinking(messages))))
+            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(Self.sanitizingToolUseNames(Self.removingUnsignedThinking(messages)))))
         ]
         // Skip tools only for actual localhost servers (LM Studio's Claude-compat
         // mode often mis-handles native Anthropic tool format). Remote
@@ -530,7 +559,7 @@ final class ClaudeService {
             "model": model,
             "max_tokens": maxTokens > 0 ? maxTokens : 16384,
             "system": systemBlock,
-            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(Self.removingUnsignedThinking(messages)))),
+            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(Self.sanitizingToolUseNames(Self.removingUnsignedThinking(messages))))),
             "stream": true
         ]
         if !isLocalhostEndpoint {
