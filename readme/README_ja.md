@@ -1,5 +1,3 @@
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a> -->
-
 <!-- <img src="../docs/table-video.gif" width="900" alt="Agent! demo" /> -->
 <img width="1628" height="1152" alt="image" src="https://github.com/user-attachments/assets/5184c93a-9255-4404-98ce-44a319de109a" />
 
@@ -12,7 +10,6 @@
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 14.6+](https://img.shields.io/badge/macOS-14.6+-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.4](https://img.shields.io/badge/Swift-6.4-orange?style=for-the-badge)](https://www.swift.org)
-<a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
 <a href="https://launchnest.io/p/agentiloop-agent" target="_blank"><img src="https://launchnest.io/badge/agentiloop-agent.svg?variant=featured" alt="AgentiLoop Agent! on LaunchNest" width="220" height="56" /></a>
 
@@ -154,49 +151,34 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **🗂 タブ、履歴、メモリ、計画、スキル** — 各タブは独自のプロジェクトフォルダとログを持ちます。永続的なユーザーメモリ。すべてのプロンプトに表示されるマルチプラン チェックリスト。
 - **🔄 フォールバックチェーン** — 429/タイムアウト/ネットワーク障害時に次に設定されたプロバイダーへ自動切り替え。
 
-### スポンサー
-
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a> -->
-
-<!--
-| Logo | スポンサー | &nbsp;&nbsp;&nbsp;レベル&nbsp;&nbsp;&nbsp; | |
-|:---:|---|:---:|---|
-| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | GPT、Claude などの主要 AI モデルをひとつの API で。[登録して $3 分の API クレジットを獲得](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP)（プロモコード `SDRAGENTLOOP`）。 |
--->
-
-## スポンサーシップ
-
-プロジェクトを支援したい企業や LLM プロバイダーの方は、[docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md)（レベル、掲載場所）と [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md)（LLM プロバイダー連携）をご覧いただくか、[GitHub Sponsors](https://github.com/sponsors/AgentiLoop) から直接スポンサーになってください。請求はすべて GitHub Sponsors 経由です。
-
 ## 🤖 27 の LLM プロバイダー
 
-| プロバイダー | &nbsp;&nbsp;&nbsp;スポンサー&nbsp;&nbsp;&nbsp; | コスト | 最適な用途 |
-|---|:---:|---|---|
-| **A2Agent** | | 安価 | 一つの OpenAI 互換キーで公式価格の一部で DeepSeek、GLM、Kimi、MiniMax、Qwen |
-| **Alibaba DashScope** | | 安価 | DashScope 経由の Qwen 3.8。Model Studio `sk-` および QwenCloud `sk-ws-` キー |
-| **Apple Intelligence** | | 無料、オンデバイス | トリアージ、要約、トークン圧縮（脳アイコン、プロバイダーピッカーにはなし） |
-| **Claude** | | トークン単位（API キー）またはサブスクリプション（OAuth） | 長い自律タスク、拡張思考、プロンプトキャッシング |
-| **Codex** | | ChatGPT サブスクリプション | ChatGPT OAuth 経由の OpenAI モデル — API キー不要、トークン課金なし |
-| **DeepSeek** | | 安価 | 低予算コーディング、キャッシュヒット報告 |
-| **Fluxion AI** | | 有料 | OpenAI 互換ゲートウェイ、`sk-fx-` キー |
-| **Google Gemini** | | 有料（無料枠あり） | 長いコンテキスト、ビジョン |
-| **Grok**（xAI） | | 有料 | リアルタイム情報 |
-| **Hugging Face** | | さまざま | オープンモデル、サーバーレスまたは専用エンドポイント |
-| **ローカル Ollama** / **vLLM** / **LM Studio** | | 無料 + ハードウェア | 完全オフライン。モデルごとの実際のコンテキストウィンドウを検出 |
-| **Meta Muse** | | 有料 | Meta Model API（`api.meta.ai`）経由の Muse Spark。OpenAI 互換の `LLM_…` キー |
-| **Muse Code** | | サブスクリプション | Muse Code プラン — `muse login` のキーを再利用 |
-| **MiniMax** | | 安価 | 1M トークンコンテキスト |
-| **Mistral** / **Mistral Vibe** | | 有料 | オープンウェイトクラウド、コード、エージェント製品 |
-| **Ollama**（クラウド） | | 無料枠 | ホスト型オープンモデル |
-| **OpenAI** | | 有料 | 汎用、ツール呼び出し、ビジョン、`reasoning_effort` |
-| **OpenRouter** | | 有料 | 200 以上のモデル、一つのキー。Claude は Anthropic プロトコル経由でルーティング |
-| **OrcaRouter** | | 有料 | 一つの OpenAI 互換キーでプロバイダー原価の 190 以上のモデル。auto/fusion/fallback ルーティング |
-| **Qwen**（qwen.ai Token Plan） | | サブスクリプション | QwenCloud Token Plan（`sk-sp-` キー、`token-plan.*.maas.aliyuncs.com`）：qwen3.8-max、qwen3.7-plus、GLM-5.2、DeepSeek V4 |
-| **Qwen Code** | | サブスクリプション | Alibaba Coding Plan（`sk-sp-` キー）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
-| **Requesty** | | 有料 | 一つの OpenAI 互換キーで 300 以上のモデル。モデルごとの価格と機能メタデータ |
-| **TheRouter** | | 有料 | OpenAI 互換ゲートウェイ（`api.therouter.ai`）、vendor/model ID |
-| **Z.ai** / **BigModel** | | 安価 | GLM-5.3 — 推奨の出発点 |
-<!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 有料（API クレジット） | GPT、Claude などの主要 AI モデルをひとつの API で。プロモコード `SDRAGENTLOOP` で $3 クレジット | -->
+| プロバイダー | コスト | 最適な用途 |
+|---|---|---|
+| **A2Agent** | 安価 | 一つの OpenAI 互換キーで公式価格の一部で DeepSeek、GLM、Kimi、MiniMax、Qwen |
+| **Alibaba DashScope** | 安価 | DashScope 経由の Qwen 3.8。Model Studio `sk-` および QwenCloud `sk-ws-` キー |
+| **Apple Intelligence** | 無料、オンデバイス | トリアージ、要約、トークン圧縮（脳アイコン、プロバイダーピッカーにはなし） |
+| **Claude** | トークン単位（API キー）またはサブスクリプション（OAuth） | 長い自律タスク、拡張思考、プロンプトキャッシング |
+| **Codex** | ChatGPT サブスクリプション | ChatGPT OAuth 経由の OpenAI モデル — API キー不要、トークン課金なし |
+| **DeepSeek** | 安価 | 低予算コーディング、キャッシュヒット報告 |
+| **Fluxion AI** | 有料 | OpenAI 互換ゲートウェイ、`sk-fx-` キー |
+| **Google Gemini** | 有料（無料枠あり） | 長いコンテキスト、ビジョン |
+| **Grok**（xAI） | 有料 | リアルタイム情報 |
+| **Hugging Face** | さまざま | オープンモデル、サーバーレスまたは専用エンドポイント |
+| **ローカル Ollama** / **vLLM** / **LM Studio** | 無料 + ハードウェア | 完全オフライン。モデルごとの実際のコンテキストウィンドウを検出 |
+| **Meta Muse** | 有料 | Meta Model API（`api.meta.ai`）経由の Muse Spark。OpenAI 互換の `LLM_…` キー |
+| **Muse Code** | サブスクリプション | Muse Code プラン — `muse login` のキーを再利用 |
+| **MiniMax** | 安価 | 1M トークンコンテキスト |
+| **Mistral** / **Mistral Vibe** | 有料 | オープンウェイトクラウド、コード、エージェント製品 |
+| **Ollama**（クラウド） | 無料枠 | ホスト型オープンモデル |
+| **OpenAI** | 有料 | 汎用、ツール呼び出し、ビジョン、`reasoning_effort` |
+| **OpenRouter** | 有料 | 200 以上のモデル、一つのキー。Claude は Anthropic プロトコル経由でルーティング |
+| **OrcaRouter** | 有料 | 一つの OpenAI 互換キーでプロバイダー原価の 190 以上のモデル。auto/fusion/fallback ルーティング |
+| **Qwen**（qwen.ai Token Plan） | サブスクリプション | QwenCloud Token Plan（`sk-sp-` キー、`token-plan.*.maas.aliyuncs.com`）：qwen3.8-max、qwen3.7-plus、GLM-5.2、DeepSeek V4 |
+| **Qwen Code** | サブスクリプション | Alibaba Coding Plan（`sk-sp-` キー）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
+| **Requesty** | 有料 | 一つの OpenAI 互換キーで 300 以上のモデル。モデルごとの価格と機能メタデータ |
+| **TheRouter** | 有料 | OpenAI 互換ゲートウェイ（`api.therouter.ai`）、vendor/model ID |
+| **Z.ai** / **BigModel** | 安価 | GLM-5.3 — 推奨の出発点 |
 
 > 💡 セルフホストのプロバイダーは API 料金の意味でのみ無料です — 実用的な 30B+ モデルには M2/M3/M4 Ultra の Mac Studio（64〜128GB）が必要です。そのハードウェアがなければ、上の安価なクラウド経路のほうが圧倒的に安くなります。
 
@@ -515,4 +497,3 @@ Star History
 
 ---
 
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ja.svg" width="900" alt="Sidrune AI（シルバースポンサー）： GPT、Claude などの主要 AI モデルをひとつの API で。 登録して $3 分の API クレジットを獲得。" /></a> -->

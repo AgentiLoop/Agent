@@ -1,5 +1,3 @@
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_fr.svg" width="900" alt="Sidrune AI, sponsor Silver : Une seule API pour GPT, Claude et d’autres modèles d’IA de pointe. Inscrivez-vous et recevez 3 $ de crédits API." /></a> -->
-
 <!-- <img src="../docs/table-video.gif" width="900" alt="Agent! demo" /> -->
 <img width="1628" height="1152" alt="image" src="https://github.com/user-attachments/assets/5184c93a-9255-4404-98ce-44a319de109a" />
 
@@ -12,7 +10,6 @@
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 14.6+](https://img.shields.io/badge/macOS-14.6+-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.4](https://img.shields.io/badge/Swift-6.4-orange?style=for-the-badge)](https://www.swift.org)
-<a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
 <a href="https://launchnest.io/p/agentiloop-agent" target="_blank"><img src="https://launchnest.io/badge/agentiloop-agent.svg?variant=featured" alt="AgentiLoop Agent! on LaunchNest" width="220" height="56" /></a>
 
@@ -154,49 +151,34 @@ Tapez simplement ce que vous voulez. Agent! trouve comment et le réalise.
 - **🗂 Onglets, historique, mémoire, plans, skills** — chaque onglet a son propre dossier de projet et son journal ; mémoire utilisateur persistante ; checklists multi-plans dans chaque prompt.
 - **🔄 Chaîne de repli** — bascule automatique vers le fournisseur suivant configuré en cas de 429/timeout/panne réseau.
 
-### Sponsors
-
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_fr.svg" width="900" alt="Sidrune AI, sponsor Silver : Une seule API pour GPT, Claude et d’autres modèles d’IA de pointe. Inscrivez-vous et recevez 3 $ de crédits API." /></a> -->
-
-<!--
-| Logo | Sponsor | &nbsp;&nbsp;&nbsp;Niveau&nbsp;&nbsp;&nbsp; | |
-|:---:|---|:---:|---|
-| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | Une seule API pour GPT, Claude et d’autres modèles d’IA de pointe. [Inscrivez-vous et recevez 3 $ de crédits API](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP) (Code promo `SDRAGENTLOOP`). |
--->
-
-## Parrainage
-
-Entreprises et fournisseurs de LLM souhaitant soutenir le projet : consultez [docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md) (niveaux, emplacements) et [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md) (intégration des fournisseurs de LLM), ou parrainez directement via [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). Toute la facturation passe par GitHub Sponsors.
-
 ## 🤖 27 fournisseurs de LLM
 
-| Fournisseur | &nbsp;&nbsp;&nbsp;Sponsor&nbsp;&nbsp;&nbsp; | Coût | Idéal pour |
-|---|:---:|---|---|
-| **A2Agent** | | Bon marché | DeepSeek, GLM, Kimi, MiniMax et Qwen avec une seule clé compatible OpenAI à une fraction du prix officiel |
-| **Alibaba DashScope** | | Bon marché | Qwen 3.8 via DashScope |
-| **Apple Intelligence** | | Gratuit, sur l'appareil | Triage, résumés, compression de tokens (icône cerveau, non disponible dans le sélecteur de fournisseur) |
-| **Claude** | | Au token (clé API) ou abonnement (OAuth) | Longues tâches autonomes, réflexion étendue, cache de prompts |
-| **Codex** | | Abonnement ChatGPT | Modèles OpenAI via OAuth ChatGPT — pas de clé API, pas de facturation au token |
-| **DeepSeek** | | Bon marché | Codage économique, rapport de hits de cache |
-| **Fluxion AI** | | Payant | Passerelle compatible OpenAI, clés `sk-fx-` |
-| **Google Gemini** | | Payant (offre gratuite) | Contexte long, vision |
-| **Grok** (xAI) | | Payant | Infos en temps réel |
-| **Hugging Face** | | Variable | Modèles ouverts, serverless ou endpoints dédiés |
-| **Meta Muse** | | Payant | Muse Spark via la Meta Model API (`api.meta.ai`), clé `LLM_…` compatible OpenAI |
-| **Muse Code** | | Abonnement | Forfait Muse Code — réutilise votre clé `muse login` |
-| **MiniMax** | | Bon marché | Contexte de 1M tokens |
-| **Mistral** / **Mistral Vibe** | | Payant | Cloud open-weight, code, produit agent |
-| **Ollama** (cloud) | | Offre gratuite | Modèles ouverts hébergés |
-| **Ollama local** / **vLLM** / **LM Studio** | | Gratuit + matériel | Entièrement hors ligne ; vraie fenêtre de contexte par modèle détectée |
-| **OpenAI** | | Payant | Usage général, appels d'outils, vision, `reasoning_effort` |
-| **OpenRouter** | | Payant | 200+ modèles, une clé ; Claude routé via le protocole Anthropic |
-| **OrcaRouter** | | Payant | 190+ modèles avec une seule clé compatible OpenAI au prix du fournisseur ; routage auto/fusion/fallback |
-| **Qwen** (qwen.ai Token Plan) | | Abonnement | QwenCloud Token Plan (clé `sk-sp-`) : qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
-| **Qwen Code** | | Abonnement | Alibaba Coding Plan (clé `sk-sp-`) : qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
-| **Requesty** | | Payant | 300+ modèles avec une seule clé compatible OpenAI ; tarifs et capacités par modèle |
-| **TheRouter** | | Payant | Passerelle compatible OpenAI (`api.therouter.ai`), ids vendor/model |
-| **Z.ai** / **BigModel** | | Bon marché | GLM-5.3 — point de départ recommandé |
-<!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | Payant (crédits API) | Une seule API pour GPT, Claude et d’autres modèles d’IA de pointe; 3 $ de crédit avec le code `SDRAGENTLOOP` | -->
+| Fournisseur | Coût | Idéal pour |
+|---|---|---|
+| **A2Agent** | Bon marché | DeepSeek, GLM, Kimi, MiniMax et Qwen avec une seule clé compatible OpenAI à une fraction du prix officiel |
+| **Alibaba DashScope** | Bon marché | Qwen 3.8 via DashScope |
+| **Apple Intelligence** | Gratuit, sur l'appareil | Triage, résumés, compression de tokens (icône cerveau, non disponible dans le sélecteur de fournisseur) |
+| **Claude** | Au token (clé API) ou abonnement (OAuth) | Longues tâches autonomes, réflexion étendue, cache de prompts |
+| **Codex** | Abonnement ChatGPT | Modèles OpenAI via OAuth ChatGPT — pas de clé API, pas de facturation au token |
+| **DeepSeek** | Bon marché | Codage économique, rapport de hits de cache |
+| **Fluxion AI** | Payant | Passerelle compatible OpenAI, clés `sk-fx-` |
+| **Google Gemini** | Payant (offre gratuite) | Contexte long, vision |
+| **Grok** (xAI) | Payant | Infos en temps réel |
+| **Hugging Face** | Variable | Modèles ouverts, serverless ou endpoints dédiés |
+| **Meta Muse** | Payant | Muse Spark via la Meta Model API (`api.meta.ai`), clé `LLM_…` compatible OpenAI |
+| **Muse Code** | Abonnement | Forfait Muse Code — réutilise votre clé `muse login` |
+| **MiniMax** | Bon marché | Contexte de 1M tokens |
+| **Mistral** / **Mistral Vibe** | Payant | Cloud open-weight, code, produit agent |
+| **Ollama** (cloud) | Offre gratuite | Modèles ouverts hébergés |
+| **Ollama local** / **vLLM** / **LM Studio** | Gratuit + matériel | Entièrement hors ligne ; vraie fenêtre de contexte par modèle détectée |
+| **OpenAI** | Payant | Usage général, appels d'outils, vision, `reasoning_effort` |
+| **OpenRouter** | Payant | 200+ modèles, une clé ; Claude routé via le protocole Anthropic |
+| **OrcaRouter** | Payant | 190+ modèles avec une seule clé compatible OpenAI au prix du fournisseur ; routage auto/fusion/fallback |
+| **Qwen** (qwen.ai Token Plan) | Abonnement | QwenCloud Token Plan (clé `sk-sp-`) : qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
+| **Qwen Code** | Abonnement | Alibaba Coding Plan (clé `sk-sp-`) : qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
+| **Requesty** | Payant | 300+ modèles avec une seule clé compatible OpenAI ; tarifs et capacités par modèle |
+| **TheRouter** | Payant | Passerelle compatible OpenAI (`api.therouter.ai`), ids vendor/model |
+| **Z.ai** / **BigModel** | Bon marché | GLM-5.3 — point de départ recommandé |
 
 > 💡 Les fournisseurs auto-hébergés ne sont gratuits qu'au sens des frais d'API — un modèle 30B+ utilisable exige un Mac Studio M2/M3/M4 Ultra (64–128 Go). Sans ce matériel, les voies cloud bon marché ci-dessus reviennent bien moins cher.
 
@@ -515,4 +497,3 @@ Voir [CONTRIBUTING.md](../.github/CONTRIBUTING.md) — compilez depuis les sourc
 
 ---
 
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_fr.svg" width="900" alt="Sidrune AI, sponsor Silver : Une seule API pour GPT, Claude et d’autres modèles d’IA de pointe. Inscrivez-vous et recevez 3 $ de crédits API." /></a> -->

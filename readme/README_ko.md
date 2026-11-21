@@ -1,5 +1,3 @@
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ko.svg" width="900" alt="Sidrune AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 하나의 API로. 가입하고 $3 API 크레딧 받기." /></a> -->
-
 <!-- <img src="../docs/table-video.gif" width="900" alt="Agent! demo" /> -->
 <img width="1628" height="1152" alt="image" src="https://github.com/user-attachments/assets/5184c93a-9255-4404-98ce-44a319de109a" />
 
@@ -12,7 +10,6 @@
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 14.6+](https://img.shields.io/badge/macOS-14.6+-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.4](https://img.shields.io/badge/Swift-6.4-orange?style=for-the-badge)](https://www.swift.org)
-<a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
 <a href="https://launchnest.io/p/agentiloop-agent" target="_blank"><img src="https://launchnest.io/badge/agentiloop-agent.svg?variant=featured" alt="AgentiLoop Agent! on LaunchNest" width="220" height="56" /></a>
 
@@ -154,49 +151,34 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **🗂 탭, 기록, 메모리, 계획, 스킬** — 각 탭은 자체 프로젝트 폴더와 로그를 가짐; 영구 사용자 메모리; 모든 프롬프트에 표시되는 다중 계획 체크리스트.
 - **🔄 폴백 체인** — 429/타임아웃/네트워크 실패 시 다음 구성된 제공자로 자동 전환.
 
-### 스폰서
-
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ko.svg" width="900" alt="Sidrune AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 하나의 API로. 가입하고 $3 API 크레딧 받기." /></a> -->
-
-<!--
-| Logo | 스폰서 | &nbsp;&nbsp;&nbsp;등급&nbsp;&nbsp;&nbsp; | |
-|:---:|---|:---:|---|
-| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | GPT, Claude 및 기타 주요 AI 모델을 하나의 API로. [가입하고 $3 API 크레딧 받기](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP) (프로모션 코드 `SDRAGENTLOOP`). |
--->
-
-## 후원
-
-프로젝트를 후원하고 싶은 기업 및 LLM 제공업체: [docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md)(등급, 노출 위치)와 [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md)(LLM 제공업체 연동)를 참고하거나 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop)로 직접 후원해 주세요. 모든 결제는 GitHub Sponsors를 통해 이루어집니다.
-
 ## 🤖 27개 LLM 제공자
 
-| 제공자 | &nbsp;&nbsp;&nbsp;스폰서&nbsp;&nbsp;&nbsp; | 비용 | 최적 용도 |
-|---|:---:|---|---|
-| **A2Agent** | | 저렴 | 공식 가격의 일부로 하나의 OpenAI 호환 키를 통해 DeepSeek, GLM, Kimi, MiniMax, Qwen |
-| **Alibaba DashScope** | | 저렴 | DashScope를 통한 Qwen 3.8; Model Studio `sk-` 및 QwenCloud `sk-ws-` 키 |
-| **Apple Intelligence** | | 무료, 온디바이스 | 분류, 요약, 토큰 압축(두뇌 아이콘, 제공자 선택기에는 없음) |
-| **Claude** | | 토큰당(API 키) 또는 구독(OAuth) | 긴 자율 작업, 확장 사고, 프롬프트 캐싱 |
-| **Codex** | | ChatGPT 구독 | ChatGPT OAuth를 통한 OpenAI 모델 — API 키 없음, 토큰당 요금 없음 |
-| **DeepSeek** | | 저렴 | 저예산 코딩, 캐시 히트 보고 |
-| **Fluxion AI** | | 유료 | OpenAI 호환 게이트웨이, `sk-fx-` 키 |
-| **Google Gemini** | | 유료(무료 티어 있음) | 긴 컨텍스트, 비전 |
-| **Grok** (xAI) | | 유료 | 실시간 정보 |
-| **Hugging Face** | | 다양 | 오픈 모델, 서버리스 또는 전용 엔드포인트 |
-| **로컬 Ollama** / **vLLM** / **LM Studio** | | 무료 + 하드웨어 | 완전 오프라인; 모델별 실제 컨텍스트 윈도우 감지 |
-| **Meta Muse** | | 유료 | Meta Model API(`api.meta.ai`)를 통한 Muse Spark, OpenAI 호환 `LLM_…` 키 |
-| **Muse Code** | | 구독 | Muse Code 플랜 — `muse login` 키를 재사용 |
-| **MiniMax** | | 저렴 | 1M 토큰 컨텍스트 |
-| **Mistral** / **Mistral Vibe** | | 유료 | 오픈 웨이트 클라우드, 코드, 에이전트 제품 |
-| **Ollama** (클라우드) | | 무료 티어 | 호스팅된 오픈 모델 |
-| **OpenAI** | | 유료 | 범용, 도구 호출, 비전, `reasoning_effort` |
-| **OpenRouter** | | 유료 | 200개 이상 모델, 하나의 키; Claude는 Anthropic 프로토콜로 라우팅 |
-| **OrcaRouter** | | 유료 | 하나의 OpenAI 호환 키로 제공자 원가에 190개 이상 모델; auto/fusion/fallback 라우팅 |
-| **Qwen** (qwen.ai Token Plan) | | 구독 | QwenCloud Token Plan(`sk-sp-` 키, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
-| **Qwen Code** | | 구독 | Alibaba Coding Plan(`sk-sp-` 키): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
-| **Requesty** | | 유료 | 하나의 OpenAI 호환 키로 300개 이상 모델; 모델별 가격 및 기능 메타데이터 |
-| **TheRouter** | | 유료 | OpenAI 호환 게이트웨이(`api.therouter.ai`), vendor/model ID |
-| **Z.ai** / **BigModel** | | 저렴 | GLM-5.3 — 추천 시작점 |
-<!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 유료(API 크레딧) | GPT, Claude 및 기타 주요 AI 모델을 하나의 API로; 프로모 코드 `SDRAGENTLOOP`로 $3 크레딧 | -->
+| 제공자 | 비용 | 최적 용도 |
+|---|---|---|
+| **A2Agent** | 저렴 | 공식 가격의 일부로 하나의 OpenAI 호환 키를 통해 DeepSeek, GLM, Kimi, MiniMax, Qwen |
+| **Alibaba DashScope** | 저렴 | DashScope를 통한 Qwen 3.8; Model Studio `sk-` 및 QwenCloud `sk-ws-` 키 |
+| **Apple Intelligence** | 무료, 온디바이스 | 분류, 요약, 토큰 압축(두뇌 아이콘, 제공자 선택기에는 없음) |
+| **Claude** | 토큰당(API 키) 또는 구독(OAuth) | 긴 자율 작업, 확장 사고, 프롬프트 캐싱 |
+| **Codex** | ChatGPT 구독 | ChatGPT OAuth를 통한 OpenAI 모델 — API 키 없음, 토큰당 요금 없음 |
+| **DeepSeek** | 저렴 | 저예산 코딩, 캐시 히트 보고 |
+| **Fluxion AI** | 유료 | OpenAI 호환 게이트웨이, `sk-fx-` 키 |
+| **Google Gemini** | 유료(무료 티어 있음) | 긴 컨텍스트, 비전 |
+| **Grok** (xAI) | 유료 | 실시간 정보 |
+| **Hugging Face** | 다양 | 오픈 모델, 서버리스 또는 전용 엔드포인트 |
+| **로컬 Ollama** / **vLLM** / **LM Studio** | 무료 + 하드웨어 | 완전 오프라인; 모델별 실제 컨텍스트 윈도우 감지 |
+| **Meta Muse** | 유료 | Meta Model API(`api.meta.ai`)를 통한 Muse Spark, OpenAI 호환 `LLM_…` 키 |
+| **Muse Code** | 구독 | Muse Code 플랜 — `muse login` 키를 재사용 |
+| **MiniMax** | 저렴 | 1M 토큰 컨텍스트 |
+| **Mistral** / **Mistral Vibe** | 유료 | 오픈 웨이트 클라우드, 코드, 에이전트 제품 |
+| **Ollama** (클라우드) | 무료 티어 | 호스팅된 오픈 모델 |
+| **OpenAI** | 유료 | 범용, 도구 호출, 비전, `reasoning_effort` |
+| **OpenRouter** | 유료 | 200개 이상 모델, 하나의 키; Claude는 Anthropic 프로토콜로 라우팅 |
+| **OrcaRouter** | 유료 | 하나의 OpenAI 호환 키로 제공자 원가에 190개 이상 모델; auto/fusion/fallback 라우팅 |
+| **Qwen** (qwen.ai Token Plan) | 구독 | QwenCloud Token Plan(`sk-sp-` 키, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
+| **Qwen Code** | 구독 | Alibaba Coding Plan(`sk-sp-` 키): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
+| **Requesty** | 유료 | 하나의 OpenAI 호환 키로 300개 이상 모델; 모델별 가격 및 기능 메타데이터 |
+| **TheRouter** | 유료 | OpenAI 호환 게이트웨이(`api.therouter.ai`), vendor/model ID |
+| **Z.ai** / **BigModel** | 저렴 | GLM-5.3 — 추천 시작점 |
 
 > 💡 자체 호스팅 제공자는 API 요금 측면에서만 무료입니다 — 쓸 만한 30B+ 모델에는 M2/M3/M4 Ultra Mac Studio(64–128GB)가 필요합니다. 그런 하드웨어가 없다면 위의 저렴한 클라우드 경로가 훨씬 더 저렴합니다.
 
@@ -515,4 +497,3 @@ Star History
 
 ---
 
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_ko.svg" width="900" alt="Sidrune AI, 실버 스폰서: GPT, Claude 및 기타 주요 AI 모델을 하나의 API로. 가입하고 $3 API 크레딧 받기." /></a> -->

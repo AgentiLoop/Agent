@@ -1,5 +1,3 @@
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a> -->
-
 <!-- <img src="../docs/table-video.gif" width="900" alt="Agent! demo" /> -->
 <img width="1628" height="1152" alt="image" src="https://github.com/user-attachments/assets/5184c93a-9255-4404-98ce-44a319de109a" />
 
@@ -12,7 +10,6 @@
 [![GitHub Forks](https://img.shields.io/github/forks/AgentiLoop/Agent?style=for-the-badge&logo=github&label=Forks&color=white)](https://github.com/AgentiLoop/Agent/fork)
 [![macOS 14.6+](https://img.shields.io/badge/macOS-14.6+-green?style=for-the-badge)](https://github.com/apple)
 [![Swift 6.4](https://img.shields.io/badge/Swift-6.4-orange?style=for-the-badge)](https://www.swift.org)
-<a href="https://github.com/sponsors/AgentiLoop"><img src="https://img.shields.io/badge/Sponsor-AgentiLoop-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor AgentiLoop" /></a>
 
 <a href="https://launchnest.io/p/agentiloop-agent" target="_blank"><img src="https://launchnest.io/badge/agentiloop-agent.svg?variant=featured" alt="AgentiLoop Agent! on LaunchNest" width="220" height="56" /></a>
 
@@ -154,48 +151,33 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 - **🗂 标签页、历史、记忆、计划、技能** —— 每个标签页有独立的项目文件夹和日志；持久化用户记忆；多计划清单出现在每个提示词中。
 - **🔄 回退链** —— 遇到 429/超时/网络故障时自动切换到下一个已配置的提供商。
 
-### 赞助商
-
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a> -->
-
-<!--
-| Logo | 赞助商 | &nbsp;&nbsp;&nbsp;等级&nbsp;&nbsp;&nbsp; | |
-|:---:|---|:---:|---|
-| <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="200" alt="Sidrune AI logo" /></picture></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <img src="../docs/badges/sponsor-silver-offset.svg" width="66" height="29" alt="Silver" /> | 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。[注册即得 $3 API 额度](https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP)（优惠码 `SDRAGENTLOOP`）。 |
--->
-
-## 赞助
-
-希望支持本项目的企业和 LLM 提供商：请参阅 [docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md)（赞助等级、展示位置）和 [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md)（LLM 提供商集成），或直接通过 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) 赞助。所有费用均通过 GitHub Sponsors 结算。
-
 ## 🤖 27 家 LLM 提供商
 
-| 提供商 | &nbsp;&nbsp;&nbsp;赞助&nbsp;&nbsp;&nbsp; | 费用 | 适合 |
-|---|:---:|---|---|
-| **A2Agent** | | 便宜 | 一把 OpenAI 兼容密钥即可使用 DeepSeek、GLM、Kimi、MiniMax 和 Qwen，价格远低于官方 |
-| **阿里巴巴**（qwen.ai / 百炼） | | 便宜 | 通过 DashScope 使用 Qwen 3.8 |
-| **Apple Intelligence** | | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，提供商选择器中不可用） |
-| **Claude** | | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
-| **Codex** | | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
-| **DeepSeek** | | 便宜 | 低成本编码、缓存命中报告 |
-| **Fluxion AI** | | 付费 | 兼容 OpenAI 的网关，`sk-fx-` 密钥 |
-| **Google Gemini** | | 付费（有免费额度） | 长上下文、视觉 |
-| **Grok** (xAI) | | 付费 | 实时信息 |
-| **Hugging Face** | | 不定 | 开源模型，serverless 或专用端点 |
-| **Meta Muse** | | 付费 | 通过 Meta Model API（`api.meta.ai`）使用 Muse Spark，兼容 OpenAI 的 `LLM_…` 密钥 |
-| **Muse Code** | | 订阅 | Muse Code 订阅——复用你的 `muse login` 密钥 |
-| **MiniMax** | | 便宜 | 1M token 上下文 |
-| **Mistral** / **Mistral Vibe** | | 付费 | 开放权重云端、代码、智能体产品 |
-| **Ollama**（云端） | | 免费额度 | 托管的开源模型 |
-| **本地 Ollama** / **vLLM** / **LM Studio** | | 免费 + 硬件 | 完全离线；自动检测各模型真实上下文窗口 |
-| **OpenAI** | | 付费 | 通用、工具调用、视觉、`reasoning_effort` |
-| **OpenRouter** | | 付费 | 200+ 模型，一把密钥；Claude 经 Anthropic 协议路由 |
-| **OrcaRouter** | | 付费 | 一把 OpenAI 兼容密钥即可访问 190+ 模型，按提供商原价计费；支持 auto/fusion/fallback 路由 |
-| **Qwen Coder** | | 订阅 | 阿里云 Coding Plan（`sk-sp-` 密钥）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
-| **Requesty** | | 付费 | 一把 OpenAI 兼容密钥即可访问 300+ 模型；按模型提供价格与能力信息 |
-| **TheRouter** | | 付费 | 兼容 OpenAI 的网关（`api.therouter.ai`），vendor/model 形式的 ID |
-| **Z.ai** / **BigModel** | | 便宜 | GLM-5.3 —— 推荐起点 |
-<!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 付费（API 额度） | 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型；使用优惠码 `SDRAGENTLOOP` 获得 $3 额度 | -->
+| 提供商 | 费用 | 适合 |
+|---|---|---|
+| **A2Agent** | 便宜 | 一把 OpenAI 兼容密钥即可使用 DeepSeek、GLM、Kimi、MiniMax 和 Qwen，价格远低于官方 |
+| **阿里巴巴**（qwen.ai / 百炼） | 便宜 | 通过 DashScope 使用 Qwen 3.8 |
+| **Apple Intelligence** | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，提供商选择器中不可用） |
+| **Claude** | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
+| **Codex** | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
+| **DeepSeek** | 便宜 | 低成本编码、缓存命中报告 |
+| **Fluxion AI** | 付费 | 兼容 OpenAI 的网关，`sk-fx-` 密钥 |
+| **Google Gemini** | 付费（有免费额度） | 长上下文、视觉 |
+| **Grok** (xAI) | 付费 | 实时信息 |
+| **Hugging Face** | 不定 | 开源模型，serverless 或专用端点 |
+| **Meta Muse** | 付费 | 通过 Meta Model API（`api.meta.ai`）使用 Muse Spark，兼容 OpenAI 的 `LLM_…` 密钥 |
+| **Muse Code** | 订阅 | Muse Code 订阅——复用你的 `muse login` 密钥 |
+| **MiniMax** | 便宜 | 1M token 上下文 |
+| **Mistral** / **Mistral Vibe** | 付费 | 开放权重云端、代码、智能体产品 |
+| **Ollama**（云端） | 免费额度 | 托管的开源模型 |
+| **本地 Ollama** / **vLLM** / **LM Studio** | 免费 + 硬件 | 完全离线；自动检测各模型真实上下文窗口 |
+| **OpenAI** | 付费 | 通用、工具调用、视觉、`reasoning_effort` |
+| **OpenRouter** | 付费 | 200+ 模型，一把密钥；Claude 经 Anthropic 协议路由 |
+| **OrcaRouter** | 付费 | 一把 OpenAI 兼容密钥即可访问 190+ 模型，按提供商原价计费；支持 auto/fusion/fallback 路由 |
+| **Qwen Coder** | 订阅 | 阿里云 Coding Plan（`sk-sp-` 密钥）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
+| **Requesty** | 付费 | 一把 OpenAI 兼容密钥即可访问 300+ 模型；按模型提供价格与能力信息 |
+| **TheRouter** | 付费 | 兼容 OpenAI 的网关（`api.therouter.ai`），vendor/model 形式的 ID |
+| **Z.ai** / **BigModel** | 便宜 | GLM-5.3 —— 推荐起点 |
 
 > 💡 自托管提供商只是在 API 费用意义上免费——要以可用速度运行 30B+ 模型，需要 M2/M3/M4 Ultra Mac Studio（64–128GB）。没有这类硬件的话，上面的低价云端方案要便宜得多。
 
@@ -514,4 +496,3 @@ Star History
 
 ---
 
-<!-- <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><img src="../docs/sponsors/sidrune-ai-silver-ad_zh.svg" width="900" alt="Sidrune AI，银牌赞助商： 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型。 注册即得 $3 API 额度。" /></a> -->
