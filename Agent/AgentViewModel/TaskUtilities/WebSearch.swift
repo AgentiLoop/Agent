@@ -17,14 +17,15 @@ extension AgentViewModel {
 
     /// Perform web search using the appropriate API based on provider.
     /// This delegates to the implementation in AgentViewModel+WebSearch.swift.
-    nonisolated static func performWebSearchForTask(query: String, apiKey: String, provider: APIProvider) async -> String {
+    nonisolated static func performWebSearchForTask(query: String, apiKey: String, provider: APIProvider) async -> (String, WebSearchBackend) {
         // Fallback chain — each step tries a more universal backend: 1. Ollama+key → Ollama Web Search 2.
         // Z.AI/BigModel+key → Z.AI search-prime 3. SpecStream key → SpecStream 4. Exa key → Exa /search 5. Tavily key → Tavily 6. DuckDuckGo HTML scrape (no key, always available)
         if provider == .ollama || provider == .localOllama {
             if let ollamaKey = KeychainService.shared.get(.ollama), !ollamaKey.isEmpty {
                 let ollamaResult = await performOllamaWebSearchInternal(query: query, apiKey: ollamaKey)
+                await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .ollama, result: ollamaResult, isFinal: !ollamaResult.hasPrefix("Error:")) }
                 if !ollamaResult.hasPrefix("Error:") {
-                    return ollamaResult
+                    return (ollamaResult, .ollama)
                 }
             }
         }
@@ -33,8 +34,9 @@ extension AgentViewModel {
         if provider == .zAI || provider == .bigModel {
             if let zKey = KeychainService.shared.get(.zAI), !zKey.isEmpty {
                 let zResult = await performZAIWebSearchInternal(query: query, apiKey: zKey)
+                await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .zAI, result: zResult, isFinal: !zResult.hasPrefix("Error:")) }
                 if !zResult.hasPrefix("Error:") {
-                    return zResult
+                    return (zResult, .zAI)
                 }
             }
         }
@@ -42,8 +44,9 @@ extension AgentViewModel {
         // error so Exa/Tavily/DuckDuckGo remain available.
         if let specKey = KeychainService.shared.get(.specStream), !specKey.isEmpty {
             let specResult = await performSpecStreamSearchInternal(query: query, apiKey: specKey)
+            await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .specStream, result: specResult, isFinal: !specResult.hasPrefix("Error:")) }
             if !specResult.hasPrefix("Error:") {
-                return specResult
+                return (specResult, .specStream)
             }
         }
         // Exa — neural/semantic web search via api.exa.ai. Pulled from
@@ -51,20 +54,24 @@ extension AgentViewModel {
         // through on error so Tavily/DuckDuckGo remain available.
         if let exaKey = KeychainService.shared.get(.exa), !exaKey.isEmpty {
             let exaResult = await performExaSearchInternal(query: query, apiKey: exaKey)
+            await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .exa, result: exaResult, isFinal: !exaResult.hasPrefix("Error:")) }
             if !exaResult.hasPrefix("Error:") {
-                return exaResult
+                return (exaResult, .exa)
             }
         }
         // Tavily — only attempt if a key is configured. Missing key → skip,
         // fall through to keyless DuckDuckGo instead of dead-ending.
         if !apiKey.isEmpty {
             let tavilyResult = await performTavilySearchForTask(query: query, apiKey: apiKey)
+            await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .tavily, result: tavilyResult, isFinal: !tavilyResult.hasPrefix("Error:")) }
             if !tavilyResult.hasPrefix("Error:") {
-                return tavilyResult
+                return (tavilyResult, .tavily)
             }
         }
         // Universal keyless fallback — always-on safety net.
-        return await performDuckDuckGoSearchInternal(query: query)
+        let ddgResult = await performDuckDuckGoSearchInternal(query: query)
+        await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .duckDuckGo, result: ddgResult, isFinal: true) }
+        return (ddgResult, .duckDuckGo)
     }
 
     /// Calls Z.AI's /web_search endpoint (search-prime engine). Returns structured

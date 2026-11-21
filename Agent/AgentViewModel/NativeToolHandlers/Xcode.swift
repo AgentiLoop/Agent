@@ -194,7 +194,9 @@ extension AgentViewModel {
         case "web_search":
             let query = input["query"] as? String ?? ""
             guard !query.isEmpty else { return "Error: query is required" }
-            return await Self.performWebSearchForTask(query: query, apiKey: tavilyAPIKey, provider: selectedProvider)
+            let (result, backend) = await Self.performWebSearchForTask(query: query, apiKey: tavilyAPIKey, provider: selectedProvider)
+            Task { @MainActor [weak self] in self?.appendLog("🌐 Web search backend: \(backend.displayName)") }
+            return result
         // lookup_sdef — supports single bundle ID, "list", or comma-separated / array of bundle IDs for batch lookup
         // (e.g. Safari + System Events in one call when scripting a multi-app workflow).
         case "lookup_sdef":

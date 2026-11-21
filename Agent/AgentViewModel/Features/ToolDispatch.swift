@@ -368,7 +368,8 @@ extension AgentViewModel {
     {
         let query = input["query"] as? String ?? ""
         vm.appendLog("Web search: \(query)"); vm.flushLog()
-        let output = await Self.performWebSearchForTask(query: query, apiKey: ctx.tavilyAPIKey, provider: ctx.selectedProvider)
+        let (output, backend) = await Self.performWebSearchForTask(query: query, apiKey: ctx.tavilyAPIKey, provider: ctx.selectedProvider)
+        vm.appendLog("🌐 Web search backend: \(backend.displayName)")
         vm.appendLog(Self.preview(output, lines: 5))
         return .handled(output)
     }
