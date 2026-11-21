@@ -15,6 +15,7 @@ final class KeychainService: Sendable {
     enum APIKey: String, CaseIterable, Sendable {
         case tavily = "agent.tavilyAPIKey"
         case exa = "com.agent.exa-api-key"
+        case specStream = "com.agent.specstream-api-key"
         case jev = "com.agent.jev-api-key"
     }
 

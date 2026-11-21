@@ -2,8 +2,9 @@ import SwiftUI
 import AgentTools
 import AgentLLM
 
-/// Settings that are shared by every LLM provider — web search keys, the Jev
-/// decision layer and the system prompts. They used to sit at the bottom of
+/// Settings that are shared by every LLM provider — the Jev decision layer
+/// and the system prompts. Web search keys have their own toolbar icon
+/// (`WebSearchSettingsView`). They used to sit at the bottom of
 /// `SettingsView`, below the per-provider key/model/temperature controls, where
 /// they read as if they belonged to the selected provider. They don't.
 struct LLMCommonSettingsView: View {
@@ -11,29 +12,6 @@ struct LLMCommonSettingsView: View {
     @Environment(\.colorSchemeContrast) private var contrast
 
     private var captionStyle: HierarchicalShapeStyle { contrast == .increased ? .primary : .secondary }
-
-    /// Web Search — available for all providers. Exa is preferred when
-    /// configured, then Tavily, with DuckDuckGo as the keyless fallback.
-    @ViewBuilder
-    private var webSearchSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Web Search")
-                .font(.headline)
-                .accessibilityAddTraits(.isHeader)
-            Text("Exa or Tavily provides web search for all LLM providers. DuckDuckGo is used when neither key is set.")
-                .font(.caption)
-                .foregroundStyle(captionStyle)
-                .fixedSize(horizontal: false, vertical: true)
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Exa API Key").font(.caption).foregroundStyle(captionStyle).accessibilityHidden(true)
-                LockedSecureField(text: $viewModel.exaAPIKey, placeholder: "exa-...", lockKey: "lock.exaAPIKey", label: "Exa API Key")
-            }
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Tavily API Key").font(.caption).foregroundStyle(captionStyle).accessibilityHidden(true)
-                LockedSecureField(text: $viewModel.tavilyAPIKey, placeholder: "tvly-...", lockKey: "lock.tavilyAPIKey", label: "Tavily API Key")
-            }
-        }
-    }
 
     /// Jev (TypeSafe System One) — a decision layer, not an LLM provider, so it
     /// lives here rather than in the provider picker. Jev returns typed
@@ -155,10 +133,6 @@ struct LLMCommonSettingsView: View {
                     .foregroundStyle(captionStyle)
                     .fixedSize(horizontal: false, vertical: true)
             }
-
-            Divider()
-
-            webSearchSection
 
             Divider()
 

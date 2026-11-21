@@ -19,7 +19,7 @@ extension AgentViewModel {
     /// This delegates to the implementation in AgentViewModel+WebSearch.swift.
     nonisolated static func performWebSearchForTask(query: String, apiKey: String, provider: APIProvider) async -> String {
         // Fallback chain — each step tries a more universal backend: 1. Ollama+key → Ollama Web Search 2.
-        // Z.AI/BigModel+key → Z.AI search-prime 3. Exa key → Exa /search 4. Tavily key → Tavily 5. DuckDuckGo HTML scrape (no key, always available)
+        // Z.AI/BigModel+key → Z.AI search-prime 3. SpecStream key → SpecStream 4. Exa key → Exa /search 5. Tavily key → Tavily 6. DuckDuckGo HTML scrape (no key, always available)
         if provider == .ollama || provider == .localOllama {
             if let ollamaKey = KeychainService.shared.get(.ollama), !ollamaKey.isEmpty {
                 let ollamaResult = await performOllamaWebSearchInternal(query: query, apiKey: ollamaKey)
@@ -36,6 +36,14 @@ extension AgentViewModel {
                 if !zResult.hasPrefix("Error:") {
                     return zResult
                 }
+            }
+        }
+        // SpecStream — api.specstream.ai/v1/web-search. Falls through on
+        // error so Exa/Tavily/DuckDuckGo remain available.
+        if let specKey = KeychainService.shared.get(.specStream), !specKey.isEmpty {
+            let specResult = await performSpecStreamSearchInternal(query: query, apiKey: specKey)
+            if !specResult.hasPrefix("Error:") {
+                return specResult
             }
         }
         // Exa — neural/semantic web search via api.exa.ai. Pulled from
@@ -365,6 +373,52 @@ extension AgentViewModel {
             return text
         }
         return ""
+    }
+
+    /// Calls SpecStream's Search API (GET https://api.specstream.ai/v1/web-search?q=…
+    /// with a Bearer key). Results are in `data.sources` (title, url, snippet,
+    /// published); `data.answer`, when present, is listed first.
+    nonisolated static func performSpecStreamSearchInternal(query: String, apiKey: String) async -> String {
+        guard !apiKey.isEmpty else { return "Error: SpecStream API key not set. Add it in Web Search settings." }
+        var comps = URLComponents(string: "https://api.specstream.ai/v1/web-search")
+        comps?.queryItems = [URLQueryItem(name: "q", value: query)]
+        guard let url = comps?.url else { return "Error: Invalid SpecStream URL" }
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.timeoutInterval = llmAPITimeout
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse else { return "Error: Invalid response from SpecStream" }
+            guard httpResponse.statusCode == 200 else {
+                let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
+                return "Error: SpecStream API returned \(httpResponse.statusCode): \(errorBody)"
+            }
+            return formatSpecStreamResponse(data: data, query: query)
+        } catch { return "Error: SpecStream web search failed: \(error.localizedDescription)" }
+    }
+
+    /// Render a SpecStream response in the same numbered format as the other providers.
+    nonisolated static func formatSpecStreamResponse(data: Data, query: String) -> String {
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return "Error: Failed to parse SpecStream response"
+        }
+        let payload = json["data"] as? [String: Any] ?? json
+        let sources = payload["sources"] as? [[String: Any]] ?? []
+        let answer = (payload["answer"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if sources.isEmpty && answer.isEmpty { return "No search results found for '\(query)'" }
+        var output = answer.isEmpty ? "" : "Answer: \(answer)\n\n"
+        for (i, source) in sources.enumerated() {
+            let title = source["title"] as? String ?? "Untitled"
+            let resultUrl = source["url"] as? String ?? ""
+            let snippet = source["snippet"] as? String ?? ""
+            let published = source["published"] as? String ?? ""
+            output += "\(i + 1). \(title)\n   \(resultUrl)\n"
+            if !published.isEmpty { output += "   [\(published)]\n" }
+            if !snippet.isEmpty { output += "   \(snippet)\n" }
+            output += "\n"
+        }
+        return output.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     nonisolated private static func performTavilySearchForTask(query: String, apiKey: String) async -> String {

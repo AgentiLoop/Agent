@@ -315,6 +315,11 @@ final class AgentViewModel {
         didSet { KeychainService.shared.set(.exa, exaAPIKey) }
     }
 
+    // SpecStream web search API key (available for all providers)
+    var specStreamAPIKey: String = KeychainService.shared.get(.specStream) ?? "" {
+        didSet { KeychainService.shared.set(.specStream, specStreamAPIKey) }
+    }
+
     // MARK: - Jev (TypeSafe System One) decision layer
     // Not an APIProvider — Jev returns typed Choice/Score/Noul answers, not text,
     // so it advises the existing loop instead of driving it. The endpoint and key

@@ -264,6 +264,7 @@
 		WEB1000000000000000003 /* WebAutomationService+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000004 /* WebAutomationService+Navigation.swift */; };
 		WEB1000000000000000005 /* WebAutomationService+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000006 /* WebAutomationService+Utilities.swift */; };
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
+		82BC600665F18A6238A79B59 /* WebSearchSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B74A1150D0566CBDF5CD31E /* WebSearchSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -560,6 +561,7 @@
 		WEB1000000000000000004 /* WebAutomationService+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Navigation.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000006 /* WebAutomationService+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Utilities.swift"; sourceTree = "<group>"; };
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
+		2B74A1150D0566CBDF5CD31E /* WebSearchSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebSearchSettingsView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -854,7 +856,8 @@
 				DFHUDA001556805C0F5ABC260 /* HUDOptionsView.swift */,
 				EASP000000000000000004 /* SystemPromptEditor.swift */,
 				6B225C0DDD4D3AA4B62D1112 /* LLMCommonSettingsView.swift */,
-			);
+							2B74A1150D0566CBDF5CD31E /* WebSearchSettingsView.swift */,
+);
 			path = Settings;
 			sourceTree = "<group>";
 		};
@@ -1568,7 +1571,8 @@
 				66131FE40C785966C1AFB095 /* SecretRedactor.swift in Sources */,
 				7566283B78B1361784AC0FFE /* MCPOAuth.swift in Sources */,
 				8BA89B9E806769987A9E3D87 /* UserAuthGate.swift in Sources */,
-			);
+							82BC600665F18A6238A79B59 /* WebSearchSettingsView.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BB10000000000000000050 /* Sources */ = {

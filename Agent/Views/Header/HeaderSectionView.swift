@@ -68,6 +68,7 @@ struct HeaderToolbarButtons: View {
     @Binding var showClearConfirm: Bool
     @State private var showLLMUsage = false
     @State private var showLLMCommon = false
+    @State private var showWebSearch = false
     @State private var showCodingPrefs = false
     @State private var showFallbackChain = false
     @State private var showHUDOptions = false
@@ -102,12 +103,18 @@ struct HeaderToolbarButtons: View {
         isLLMActive ? .cyan : viewModel.llmStatusColor
     }
 
-    /// Common-settings icon color: green once anything shared is configured
-    /// (a web search key or the Jev gate), gray when it's all defaults.
+    /// Common-settings icon color: green once the Jev gate is configured,
+    /// gray when it's all defaults.
     private var llmCommonIconColor: Color {
-        let searchConfigured = !viewModel.exaAPIKey.isEmpty || !viewModel.tavilyAPIKey.isEmpty
         let jevConfigured = !viewModel.jevAPIKey.isEmpty && viewModel.jevAdvisoryEnabled
-        return searchConfigured || jevConfigured ? .green : .secondary
+        return jevConfigured ? .green : .secondary
+    }
+
+    /// Web search icon color: green once any search key is set, gray when
+    /// search falls back to keyless DuckDuckGo.
+    private var webSearchIconColor: Color {
+        let configured = !viewModel.specStreamAPIKey.isEmpty || !viewModel.exaAPIKey.isEmpty || !viewModel.tavilyAPIKey.isEmpty
+        return configured ? .green : .secondary
     }
 
     var body: some View {
@@ -127,10 +134,20 @@ struct HeaderToolbarButtons: View {
             Image(systemName: "switch.2")
                 .foregroundStyle(llmCommonIconColor)
         }
-        .help("LLM Common Settings: Web Search, Jev, System Prompts")
+        .help("LLM Common Settings: Jev, System Prompts")
         .accessibilityLabel("LLM Common Settings")
         .popover(isPresented: $showLLMCommon, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
             LLMCommonSettingsView(viewModel: viewModel)
+        }
+
+        Button { showWebSearch.toggle() } label: {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(webSearchIconColor)
+        }
+        .help("Web Search: SpecStream, Exa, Tavily")
+        .accessibilityLabel("Web Search")
+        .popover(isPresented: $showWebSearch, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
+            WebSearchSettingsView(viewModel: viewModel)
         }
 
         Button { showLLMUsage.toggle() } label: {
