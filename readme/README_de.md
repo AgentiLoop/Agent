@@ -93,6 +93,24 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 
+### Was Agent! wirklich kann
+
+* **🪄 Automatisiert jede App, spontan** — AppleScript- und Accessibility-Automatisierung sind eingebaut. Agent! liest das Scripting-Wörterbuch einer App (`lookup_sdef`), findet Buttons, Felder und Menüs per Name und klickt, tippt und liest sich dann durch. Kein Plugin, keine Einrichtung, keine App, die es vorher kennen muss.
+* **📜 Schreibt seinen eigenen wiederverwendbaren Code** — mit [AgentScript](#agentscript--swift-skripte-mit-vollem-tcc) schreibt Agent! Swift-Skripte, kompiliert sie zur Laufzeit und führt sie mit den Berechtigungen der App aus. Die Skripte bleiben in deiner Bibliothek, um sie bei der nächsten Aufgabe wiederzuverwenden, zu bearbeiten oder zu kombinieren.
+* **♾️ `/auto`-Zielmodus** — gib ein Ziel vor und geh weg. Jeder Zyklus liest das Fortschrittsprotokoll, wählt den wertvollsten nächsten Schritt, baut, behebt Fehler und committet, dann startet der nächste Zyklus. Es hört erst auf, wenn das Ziel erreicht und geprüft ist oder du auf Stop All drückst.
+* **🎮 Baut komplexe Spiele** — 3D-Rennspiele, einen Multiplayer-Dungeon-Crawler, ein Kampfspiel, bei dem jedes Pixel aus Code gezeichnet wird, und Brettspiele wie Go und Schach:
+
+| Spiel | Was es ist | Spielen / Quellcode |
+|---|---|---|
+| **Umbravault** | Neu: Online-Dungeon-Crawler aus der Ego-Perspektive für 1–8 Spieler, sechs Klassen, alle drei Ebenen ein Boss. Three.js auf Cloudflare Workers | [Spielen](https://umbravault.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Umbravault) |
+| **Batman v Superman** | Kampfspiel im Street-Fighter-Stil in 3D, bei dem jedes Pixel aus Code gezeichnet wird: keine Modelldateien, Texturen oder Audio-Samples | [Spielen](https://bvs.agentiloop.ai/) · [GitHub](https://github.com/AgentiLoop/bvs) |
+| **GoKart.games** | Arcade-Kartrennspiel mit Godot 4 für macOS, Windows und Linux | [Spielen](https://gokart.games) · [GitHub](https://github.com/AgentiLoop/GoKart) |
+| **AgentiLoop Racing F1** | F1 im Browser: 18 echte Strecken, Boxenstopps, Reifen, ERS und DRS mit 240-Hz-Physik | [Spielen](https://f1.gokart.games) · [GitHub](https://github.com/AgentiLoop/F1) |
+| **CrazyTaxi** | three.js-Nachbau von *Crazy Taxi* für die Dreamcast | [Spielen](https://ct.gokart.games) · [GitHub](https://github.com/AgentiLoop/CrazyTaxi) |
+| **MarioKart64JS** | MarioKart64, mit Auto-Pilot nach JavaScript portiert | [Spielen](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
+| **Go** | Natives SwiftUI-Go für den Mac: 9×9 bis 19×19, Ko, Vorgaben, japanische oder chinesische Wertung, Computergegner | — |
+| **Schach** | Spielt Schach direkt im Ausgabebereich ([oben](#schach-in-agent)); baute auch AgenticChess, eine SwiftUI-Schach-App mit Apple Intelligence als Gegner | — |
+
 ---
 
 ## Hauptfunktionen

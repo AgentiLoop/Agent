@@ -93,6 +93,24 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 やりたいことを入力するだけ。Agent! が方法を見つけて実現します。
 
+### Agent! が本当にできること
+
+* **🪄 どんなアプリでもその場で自動化** — AppleScript とアクセシビリティによる自動化を内蔵。Agent! はアプリのスクリプト辞書を読み（`lookup_sdef`）、ボタン・フィールド・メニューを名前で見つけて、クリック・入力・読み取りをこなします。プラグインも設定も不要で、事前にアプリを知っている必要もありません。
+* **📜 再利用できるコードを自分で書く** — [AgentScript](#agentscript--完全な-tcc-を持つ-swift-スクリプト) を使い、Agent! は Swift スクリプトを書き、実行時にコンパイルし、アプリ自身の権限で実行します。スクリプトはライブラリに残り、次のタスクで再利用・編集・組み合わせができます。
+* **♾️ `/auto` ゴールモード** — ゴールを与えたら任せてください。各サイクルで進捗ログを読み、次に最も価値のあるステップを選び、ビルド・修正・コミットしてから次のサイクルへ進みます。ゴールが達成され検証されるか、Stop All を押すまで止まりません。
+* **🎮 複雑なゲームを作る** — 3D レースゲーム、マルチプレイヤーのダンジョンクローラー、すべてのピクセルをコードで描く格闘ゲーム、そして囲碁やチェスのようなボードゲーム：
+
+| ゲーム | 内容 | プレイ / ソース |
+|---|---|---|
+| **Umbravault** | 新作：1〜8 人で遊べるオンラインの一人称ダンジョンクローラー。6 つのクラス、3 階ごとにボス。Cloudflare Workers 上の Three.js | [プレイ](https://umbravault.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Umbravault) |
+| **Batman v Superman** | すべてのピクセルをコードで描くストリートファイター風の 3D 格闘ゲーム。モデルファイル・テクスチャ・音声サンプルなし | [プレイ](https://bvs.agentiloop.ai/) · [GitHub](https://github.com/AgentiLoop/bvs) |
+| **GoKart.games** | Godot 4 で作った macOS・Windows・Linux 向けアーケードカートレース | [プレイ](https://gokart.games) · [GitHub](https://github.com/AgentiLoop/GoKart) |
+| **AgentiLoop Racing F1** | ブラウザで F1：18 の実在サーキット、ピットストップ、タイヤ、ERS と DRS を 240 Hz の物理演算で | [プレイ](https://f1.gokart.games) · [GitHub](https://github.com/AgentiLoop/F1) |
+| **CrazyTaxi** | ドリームキャストの *Crazy Taxi* を three.js で再構築 | [プレイ](https://ct.gokart.games) · [GitHub](https://github.com/AgentiLoop/CrazyTaxi) |
+| **MarioKart64JS** | MarioKart64 を Auto-Pilot で JavaScript に移植 | [プレイ](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
+| **囲碁** | Mac 向けネイティブ SwiftUI の囲碁：9×9〜19×19、コウ、置き碁、日本式または中国式の計算、コンピューター対戦 | — |
+| **チェス** | 出力パネルでそのままチェスを指す（[上記](#agent-の中でチェス)）。Apple Intelligence が対戦相手の SwiftUI チェスアプリ AgenticChess も作成 | — |
+
 ---
 
 ## 主な機能
