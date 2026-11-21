@@ -42,7 +42,7 @@ Agent! 패밀리의 최신 멤버를 ᄆ�
 
 **하나의 앱. 어떤 AI든. Mac에 대한 완전한 통제.**
 
-Agent!는 100% 네이티브 Swift 6.2 / SwiftUI 앱으로, **23개 LLM 제공자** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, Meta Muse, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama(클라우드 및 로컬), vLLM, LM Studio — 에 온디바이스 **Apple Intelligence**까지 더해, 실제로 *일을 해내는* 자율 작업 루프로 연결합니다: 코드베이스를 읽고, 버그를 고치고, Xcode 프로젝트를 빌드하고, diff를 커밋하고, 손쉬운 사용 API로 모든 Mac 앱을 조작하고, 사용자 또는 root 권한으로 셸 명령을 실행하고, iMessage로 결과를 보내고, 음성 *"Agent!"* 호출에 응답합니다.
+Agent!는 100% 네이티브 Swift 6.2 / SwiftUI 앱으로, **27개 LLM 제공자** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, Meta Muse, Muse Code, MiniMax, OpenRouter, Requesty, TheRouter, A2Agent, OrcaRouter, Fluxion AI, Ollama(클라우드 및 로컬), vLLM, LM Studio — 에 온디바이스 **Apple Intelligence**까지 더해, 실제로 *일을 해내는* 자율 작업 루프로 연결합니다: 코드베이스를 읽고, 버그를 고치고, Xcode 프로젝트를 빌드하고, diff를 커밋하고, 손쉬운 사용 API로 모든 Mac 앱을 조작하고, 사용자 또는 root 권한으로 셸 명령을 실행하고, iMessage로 결과를 보내고, 음성 *"Agent!"* 호출에 응답합니다.
 
 NPM도, Electron도, 구독도, 텔레메트리도 없습니다. 직접 API 키를 가져오거나, 완전히 로컬로 실행하거나, Apple Intelligence로 무료로 실행하세요. 의존하는 모든 Swift 패키지는 같은 저자가 작성했습니다. 아래 [비하인드 스토리](#비하인드-스토리)를 참고하세요.
 
@@ -150,7 +150,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 프로젝트를 후원하고 싶은 기업 및 LLM 제공업체: [docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md)(등급, 노출 위치)와 [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md)(LLM 제공업체 연동)를 참고하거나 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop)로 직접 후원해 주세요. 모든 결제는 GitHub Sponsors를 통해 이루어집니다.
 
-## 🤖 23개 LLM 제공자
+## 🤖 27개 LLM 제공자
 
 | 제공자 | &nbsp;&nbsp;&nbsp;스폰서&nbsp;&nbsp;&nbsp; | 비용 | 최적 용도 |
 |---|:---:|---|---|
@@ -159,11 +159,13 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Claude** | | 토큰당(API 키) 또는 구독(OAuth) | 긴 자율 작업, 확장 사고, 프롬프트 캐싱 |
 | **Codex** | | ChatGPT 구독 | ChatGPT OAuth를 통한 OpenAI 모델 — API 키 없음, 토큰당 요금 없음 |
 | **DeepSeek** | | 저렴 | 저예산 코딩, 캐시 히트 보고 |
+| **Fluxion AI** | | 유료 | OpenAI 호환 게이트웨이, `sk-fx-` 키 |
 | **Google Gemini** | | 유료(무료 티어 있음) | 긴 컨텍스트, 비전 |
 | **Grok** (xAI) | | 유료 | 실시간 정보 |
 | **Hugging Face** | | 다양 | 오픈 모델, 서버리스 또는 전용 엔드포인트 |
 | **로컬 Ollama** / **vLLM** / **LM Studio** | | 무료 + 하드웨어 | 완전 오프라인; 모델별 실제 컨텍스트 윈도우 감지 |
 | **Meta Muse** | | 유료 | Meta Model API(`api.meta.ai`)를 통한 Muse Spark, OpenAI 호환 `LLM_…` 키 |
+| **Muse Code** | | 구독 | Muse Code 플랜 — `muse login` 키를 재사용 |
 | **MiniMax** | | 저렴 | 1M 토큰 컨텍스트 |
 | **Mistral** / **Mistral Vibe** | | 유료 | 오픈 웨이트 클라우드, 코드, 에이전트 제품 |
 | **Ollama** (클라우드) | | 무료 티어 | 호스팅된 오픈 모델 |
@@ -174,6 +176,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Qwen** (qwen.ai Token Plan) | | 구독 | QwenCloud Token Plan(`sk-sp-` 키, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
 | **Qwen Code** | | 구독 | Alibaba Coding Plan(`sk-sp-` 키): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
 | **Requesty** | | 유료 | 하나의 OpenAI 호환 키로 300개 이상 모델; 모델별 가격 및 기능 메타데이터 |
+| **TheRouter** | | 유료 | OpenAI 호환 게이트웨이(`api.therouter.ai`), vendor/model ID |
 | **Z.ai** / **BigModel** | | 저렴 | GLM-5.3 — 추천 시작점 |
 <!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 유료(API 크레딧) | GPT, Claude 및 기타 주요 AI 모델을 하나의 API로; 프로모 코드 `SDRAGENTLOOP`로 $3 크레딧 | -->
 

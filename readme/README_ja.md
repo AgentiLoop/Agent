@@ -42,7 +42,7 @@ Agent! ファミリーの新メンバーを紹介します。**まったく�
 
 **一つのアプリ。どんな AI でも。Mac を完全に掌握。**
 
-Agent! は 100% ネイティブの Swift 6.2 / SwiftUI アプリで、**23 の LLM プロバイダー** — Claude、Codex、OpenAI、Gemini、Grok、Mistral、Mistral Vibe、DeepSeek、Hugging Face、Z.ai、BigModel、Alibaba DashScope、Qwen、Qwen Code、Meta Muse、MiniMax、OpenRouter、Requesty、A2Agent、OrcaRouter、Ollama（クラウドおよびローカル）、vLLM、LM Studio — に加えてオンデバイスの **Apple Intelligence** を、実際に*物事を成し遂げる*自律タスクループへとつなぎます：コードベースを読み、バグを修正し、Xcode プロジェクトをビルドし、diff をコミットし、アクセシビリティ API であらゆる Mac アプリを操作し、あなたまたは root としてシェルコマンドを実行し、iMessage で結果を送り、話しかけた*「Agent!」*に応答します。
+Agent! は 100% ネイティブの Swift 6.2 / SwiftUI アプリで、**27 の LLM プロバイダー** — Claude、Codex、OpenAI、Gemini、Grok、Mistral、Mistral Vibe、DeepSeek、Hugging Face、Z.ai、BigModel、Alibaba DashScope、Qwen、Qwen Code、Meta Muse、Muse Code、MiniMax、OpenRouter、Requesty、TheRouter、A2Agent、OrcaRouter、Fluxion AI、Ollama（クラウドおよびローカル）、vLLM、LM Studio — に加えてオンデバイスの **Apple Intelligence** を、実際に*物事を成し遂げる*自律タスクループへとつなぎます：コードベースを読み、バグを修正し、Xcode プロジェクトをビルドし、diff をコミットし、アクセシビリティ API であらゆる Mac アプリを操作し、あなたまたは root としてシェルコマンドを実行し、iMessage で結果を送り、話しかけた*「Agent!」*に応答します。
 
 NPM も Electron もサブスクリプションもテレメトリもありません。自分の API キーを使うか、完全にローカルで実行するか、Apple Intelligence で無料で実行してください。依存するすべての Swift パッケージは同じ作者が書きました。下の[背景](#背景)をご覧ください。
 
@@ -150,7 +150,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 プロジェクトを支援したい企業や LLM プロバイダーの方は、[docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md)（レベル、掲載場所）と [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md)（LLM プロバイダー連携）をご覧いただくか、[GitHub Sponsors](https://github.com/sponsors/AgentiLoop) から直接スポンサーになってください。請求はすべて GitHub Sponsors 経由です。
 
-## 🤖 23 の LLM プロバイダー
+## 🤖 27 の LLM プロバイダー
 
 | プロバイダー | &nbsp;&nbsp;&nbsp;スポンサー&nbsp;&nbsp;&nbsp; | コスト | 最適な用途 |
 |---|:---:|---|---|
@@ -159,11 +159,13 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Claude** | | トークン単位（API キー）またはサブスクリプション（OAuth） | 長い自律タスク、拡張思考、プロンプトキャッシング |
 | **Codex** | | ChatGPT サブスクリプション | ChatGPT OAuth 経由の OpenAI モデル — API キー不要、トークン課金なし |
 | **DeepSeek** | | 安価 | 低予算コーディング、キャッシュヒット報告 |
+| **Fluxion AI** | | 有料 | OpenAI 互換ゲートウェイ、`sk-fx-` キー |
 | **Google Gemini** | | 有料（無料枠あり） | 長いコンテキスト、ビジョン |
 | **Grok**（xAI） | | 有料 | リアルタイム情報 |
 | **Hugging Face** | | さまざま | オープンモデル、サーバーレスまたは専用エンドポイント |
 | **ローカル Ollama** / **vLLM** / **LM Studio** | | 無料 + ハードウェア | 完全オフライン。モデルごとの実際のコンテキストウィンドウを検出 |
 | **Meta Muse** | | 有料 | Meta Model API（`api.meta.ai`）経由の Muse Spark。OpenAI 互換の `LLM_…` キー |
+| **Muse Code** | | サブスクリプション | Muse Code プラン — `muse login` のキーを再利用 |
 | **MiniMax** | | 安価 | 1M トークンコンテキスト |
 | **Mistral** / **Mistral Vibe** | | 有料 | オープンウェイトクラウド、コード、エージェント製品 |
 | **Ollama**（クラウド） | | 無料枠 | ホスト型オープンモデル |
@@ -174,6 +176,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Qwen**（qwen.ai Token Plan） | | サブスクリプション | QwenCloud Token Plan（`sk-sp-` キー、`token-plan.*.maas.aliyuncs.com`）：qwen3.8-max、qwen3.7-plus、GLM-5.2、DeepSeek V4 |
 | **Qwen Code** | | サブスクリプション | Alibaba Coding Plan（`sk-sp-` キー）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
 | **Requesty** | | 有料 | 一つの OpenAI 互換キーで 300 以上のモデル。モデルごとの価格と機能メタデータ |
+| **TheRouter** | | 有料 | OpenAI 互換ゲートウェイ（`api.therouter.ai`）、vendor/model ID |
 | **Z.ai** / **BigModel** | | 安価 | GLM-5.3 — 推奨の出発点 |
 <!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 有料（API クレジット） | GPT、Claude などの主要 AI モデルをひとつの API で。プロモコード `SDRAGENTLOOP` で $3 クレジット | -->
 

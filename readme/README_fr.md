@@ -42,7 +42,7 @@ Découvrez les nouveaux membres de la famille Agent! : deux CLI multiplateforme
 
 **Une app. N'importe quelle IA. Le contrôle total de votre Mac.**
 
-Agent! est une app 100 % native Swift 6.2 / SwiftUI qui relie **23 fournisseurs de LLM** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, Meta Muse, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (cloud et local), vLLM et LM Studio — plus **Apple Intelligence** sur l'appareil — à une boucle de tâches autonome qui *agit vraiment* : elle lit votre code, corrige le bug, compile le projet Xcode, committe le diff, pilote n'importe quelle app Mac via l'API d'Accessibilité, exécute des commandes shell en votre nom ou en root, vous envoie les résultats par iMessage et répond à un *« Agent! »* prononcé à voix haute.
+Agent! est une app 100 % native Swift 6.2 / SwiftUI qui relie **27 fournisseurs de LLM** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, Meta Muse, Muse Code, MiniMax, OpenRouter, Requesty, TheRouter, A2Agent, OrcaRouter, Fluxion AI, Ollama (cloud et local), vLLM et LM Studio — plus **Apple Intelligence** sur l'appareil — à une boucle de tâches autonome qui *agit vraiment* : elle lit votre code, corrige le bug, compile le projet Xcode, committe le diff, pilote n'importe quelle app Mac via l'API d'Accessibilité, exécute des commandes shell en votre nom ou en root, vous envoie les résultats par iMessage et répond à un *« Agent! »* prononcé à voix haute.
 
 Pas de NPM, pas d'Electron, pas d'abonnement, pas de télémétrie. Apportez votre propre clé API, tournez entièrement en local, ou gratuitement avec Apple Intelligence. Chaque package Swift dont l'app dépend a été écrit par le même auteur. Voir l'[Histoire](#histoire) ci-dessous.
 
@@ -150,7 +150,7 @@ Tapez simplement ce que vous voulez. Agent! trouve comment et le réalise.
 
 Entreprises et fournisseurs de LLM souhaitant soutenir le projet : consultez [docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md) (niveaux, emplacements) et [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md) (intégration des fournisseurs de LLM), ou parrainez directement via [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). Toute la facturation passe par GitHub Sponsors.
 
-## 🤖 23 fournisseurs de LLM
+## 🤖 27 fournisseurs de LLM
 
 | Fournisseur | &nbsp;&nbsp;&nbsp;Sponsor&nbsp;&nbsp;&nbsp; | Coût | Idéal pour |
 |---|:---:|---|---|
@@ -159,10 +159,12 @@ Entreprises et fournisseurs de LLM souhaitant soutenir le projet : consultez [do
 | **Claude** | | Au token (clé API) ou abonnement (OAuth) | Longues tâches autonomes, réflexion étendue, cache de prompts |
 | **Codex** | | Abonnement ChatGPT | Modèles OpenAI via OAuth ChatGPT — pas de clé API, pas de facturation au token |
 | **DeepSeek** | | Bon marché | Codage économique, rapport de hits de cache |
+| **Fluxion AI** | | Payant | Passerelle compatible OpenAI, clés `sk-fx-` |
 | **Google Gemini** | | Payant (offre gratuite) | Contexte long, vision |
 | **Grok** (xAI) | | Payant | Infos en temps réel |
 | **Hugging Face** | | Variable | Modèles ouverts, serverless ou endpoints dédiés |
 | **Meta Muse** | | Payant | Muse Spark via la Meta Model API (`api.meta.ai`), clé `LLM_…` compatible OpenAI |
+| **Muse Code** | | Abonnement | Forfait Muse Code — réutilise votre clé `muse login` |
 | **MiniMax** | | Bon marché | Contexte de 1M tokens |
 | **Mistral** / **Mistral Vibe** | | Payant | Cloud open-weight, code, produit agent |
 | **Ollama** (cloud) | | Offre gratuite | Modèles ouverts hébergés |
@@ -174,6 +176,7 @@ Entreprises et fournisseurs de LLM souhaitant soutenir le projet : consultez [do
 | **Qwen** (qwen.ai Token Plan) | | Abonnement | QwenCloud Token Plan (clé `sk-sp-`) : qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
 | **Qwen Code** | | Abonnement | Alibaba Coding Plan (clé `sk-sp-`) : qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
 | **Requesty** | | Payant | 300+ modèles avec une seule clé compatible OpenAI ; tarifs et capacités par modèle |
+| **TheRouter** | | Payant | Passerelle compatible OpenAI (`api.therouter.ai`), ids vendor/model |
 | **Z.ai** / **BigModel** | | Bon marché | GLM-5.3 — point de départ recommandé |
 <!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | Payant (crédits API) | Une seule API pour GPT, Claude et d’autres modèles d’IA de pointe; 3 $ de crédit avec le code `SDRAGENTLOOP` | -->
 

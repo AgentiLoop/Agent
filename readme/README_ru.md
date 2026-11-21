@@ -42,7 +42,7 @@
 
 **Одно приложение. Любой ИИ. Полный контроль над вашим Mac.**
 
-Agent! — это 100 % нативное приложение на Swift 6.2 / SwiftUI, которое объединяет **23 LLM-провайдера** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, Meta Muse, MiniMax, OpenRouter, Requesty, A2Agent, OrcaRouter, Ollama (облако и локально), vLLM и LM Studio — плюс встроенный **Apple Intelligence** — в автономный цикл задач, который действительно *делает дела*: читает вашу кодовую базу, исправляет баг, собирает Xcode-проект, коммитит diff, управляет любым Mac-приложением через API универсального доступа, выполняет shell-команды от вашего имени или от root, отправляет результаты по iMessage и отзывается на произнесённое *«Agent!»*.
+Agent! — это 100 % нативное приложение на Swift 6.2 / SwiftUI, которое объединяет **27 LLM-провайдера** — Claude, Codex, OpenAI, Gemini, Grok, Mistral, Mistral Vibe, DeepSeek, Hugging Face, Z.ai, BigModel, Alibaba DashScope, Qwen, Qwen Code, Meta Muse, Muse Code, MiniMax, OpenRouter, Requesty, TheRouter, A2Agent, OrcaRouter, Fluxion AI, Ollama (облако и локально), vLLM и LM Studio — плюс встроенный **Apple Intelligence** — в автономный цикл задач, который действительно *делает дела*: читает вашу кодовую базу, исправляет баг, собирает Xcode-проект, коммитит diff, управляет любым Mac-приложением через API универсального доступа, выполняет shell-команды от вашего имени или от root, отправляет результаты по iMessage и отзывается на произнесённое *«Agent!»*.
 
 Никакого NPM, Electron, подписок и телеметрии. Используйте свой API-ключ, работайте полностью локально или бесплатно на Apple Intelligence. Каждый Swift-пакет, от которого зависит приложение, написан тем же автором. См. раздел [Предыстория](#предыстория) ниже.
 
@@ -150,7 +150,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 Компаниям и LLM-провайдерам, которые хотят поддержать проект: см. [docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md) (уровни, размещения) и [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md) (интеграция LLM-провайдеров) или станьте спонсором напрямую через [GitHub Sponsors](https://github.com/sponsors/AgentiLoop). Все платежи проходят через GitHub Sponsors.
 
-## 🤖 23 LLM-провайдера
+## 🤖 27 LLM-провайдеров
 
 | Провайдер | &nbsp;&nbsp;&nbsp;Спонсор&nbsp;&nbsp;&nbsp; | Стоимость | Лучше всего для |
 |---|:---:|---|---|
@@ -159,11 +159,13 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Claude** | | За токены (API-ключ) или подписка (OAuth) | Длинные автономные задачи, расширенное мышление, кэширование промптов |
 | **Codex** | | Подписка ChatGPT | Модели OpenAI через ChatGPT OAuth — без API-ключа, без оплаты за токены |
 | **DeepSeek** | | Дёшево | Бюджетное программирование, отчёт о cache-hit |
+| **Fluxion AI** | | Платно | OpenAI-совместимый шлюз, ключи `sk-fx-` |
 | **Google Gemini** | | Платно (есть бесплатный уровень) | Длинный контекст, зрение |
 | **Grok** (xAI) | | Платно | Информация в реальном времени |
 | **Hugging Face** | | По-разному | Открытые модели, serverless или выделенные эндпоинты |
 | **Локальные Ollama** / **vLLM** / **LM Studio** | | Бесплатно + железо | Полностью офлайн; определяется реальное контекстное окно каждой модели |
 | **Meta Muse** | | Платно | Muse Spark через Meta Model API (`api.meta.ai`), OpenAI-совместимый ключ `LLM_…` |
+| **Muse Code** | | Подписка | Тариф Muse Code — использует ключ из `muse login` |
 | **MiniMax** | | Дёшево | Контекст 1M токенов |
 | **Mistral** / **Mistral Vibe** | | Платно | Open-weight облако, код, агентный продукт |
 | **Ollama** (облако) | | Бесплатный уровень | Хостинг открытых моделей |
@@ -174,6 +176,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Qwen** (qwen.ai Token Plan) | | Подписка | QwenCloud Token Plan (ключ `sk-sp-`, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
 | **Qwen Code** | | Подписка | Alibaba Coding Plan (ключ `sk-sp-`): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
 | **Requesty** | | Платно | 300+ моделей через один OpenAI-совместимый ключ; цены и метаданные возможностей по каждой модели |
+| **TheRouter** | | Платно | OpenAI-совместимый шлюз (`api.therouter.ai`), идентификаторы vendor/model |
 | **Z.ai** / **BigModel** | | Дёшево | GLM-5.3 — рекомендуемая отправная точка |
 <!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | Платно (API-кредиты) | Один API для GPT, Claude и других ведущих моделей ИИ; $3 кредита по промокоду `SDRAGENTLOOP` | -->
 

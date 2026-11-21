@@ -42,7 +42,7 @@
 
 **一个应用。任意 AI。完全掌控你的 Mac。**
 
-Agent! 是一款 100% 原生的 Swift 6.2 / SwiftUI 应用，将 **23 家 LLM 提供商**——Claude、Codex、OpenAI、Gemini、Grok、Mistral、Mistral Vibe、DeepSeek、Hugging Face、Z.ai、BigModel、阿里巴巴、Qwen Coder、Meta Muse、MiniMax、OpenRouter、Requesty、A2Agent、OrcaRouter、Ollama（云端和本地）、vLLM、LM Studio，以及设备端的 **Apple Intelligence**——接入一个真正*会做事*的自主任务循环：读取你的代码库、修复 bug、构建 Xcode 项目、提交 diff、通过辅助功能 API 驱动任何 Mac 应用、以你的身份或 root 运行 shell 命令、通过 iMessage 把结果发给你，并响应你说出的 *「Agent!」*。
+Agent! 是一款 100% 原生的 Swift 6.2 / SwiftUI 应用，将 **27 家 LLM 提供商**——Claude、Codex、OpenAI、Gemini、Grok、Mistral、Mistral Vibe、DeepSeek、Hugging Face、Z.ai、BigModel、阿里巴巴、Qwen Coder、Meta Muse、Muse Code、MiniMax、OpenRouter、Requesty、TheRouter、A2Agent、OrcaRouter、Fluxion AI、Ollama（云端和本地）、vLLM、LM Studio，以及设备端的 **Apple Intelligence**——接入一个真正*会做事*的自主任务循环：读取你的代码库、修复 bug、构建 Xcode 项目、提交 diff、通过辅助功能 API 驱动任何 Mac 应用、以你的身份或 root 运行 shell 命令、通过 iMessage 把结果发给你，并响应你说出的 *「Agent!」*。
 
 没有 NPM，没有 Electron，没有订阅，没有遥测。使用你自己的 API 密钥，完全本地运行，或用 Apple Intelligence 免费运行。它依赖的每个 Swift 包都出自同一位作者之手。详见下方的[项目背景](#项目背景)。
 
@@ -150,7 +150,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 希望支持本项目的企业和 LLM 提供商：请参阅 [docs/SPONSORSHIP.md](../docs/SPONSORSHIP.md)（赞助等级、展示位置）和 [docs/PROVIDER_PROGRAM.md](../docs/PROVIDER_PROGRAM.md)（LLM 提供商集成），或直接通过 [GitHub Sponsors](https://github.com/sponsors/AgentiLoop) 赞助。所有费用均通过 GitHub Sponsors 结算。
 
-## 🤖 23 家 LLM 提供商
+## 🤖 27 家 LLM 提供商
 
 | 提供商 | &nbsp;&nbsp;&nbsp;赞助&nbsp;&nbsp;&nbsp; | 费用 | 适合 |
 |---|:---:|---|---|
@@ -159,10 +159,12 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Claude** | | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
 | **Codex** | | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
 | **DeepSeek** | | 便宜 | 低成本编码、缓存命中报告 |
+| **Fluxion AI** | | 付费 | 兼容 OpenAI 的网关，`sk-fx-` 密钥 |
 | **Google Gemini** | | 付费（有免费额度） | 长上下文、视觉 |
 | **Grok** (xAI) | | 付费 | 实时信息 |
 | **Hugging Face** | | 不定 | 开源模型，serverless 或专用端点 |
 | **Meta Muse** | | 付费 | 通过 Meta Model API（`api.meta.ai`）使用 Muse Spark，兼容 OpenAI 的 `LLM_…` 密钥 |
+| **Muse Code** | | 订阅 | Muse Code 订阅——复用你的 `muse login` 密钥 |
 | **MiniMax** | | 便宜 | 1M token 上下文 |
 | **Mistral** / **Mistral Vibe** | | 付费 | 开放权重云端、代码、智能体产品 |
 | **Ollama**（云端） | | 免费额度 | 托管的开源模型 |
@@ -173,6 +175,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **阿里巴巴**（qwen.ai / 百炼） | | 便宜 | 通过 DashScope 使用 Qwen 3.8 |
 | **Qwen Coder** | | 订阅 | 阿里云 Coding Plan（`sk-sp-` 密钥）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
 | **Requesty** | | 付费 | 一把 OpenAI 兼容密钥即可访问 300+ 模型；按模型提供价格与能力信息 |
+| **TheRouter** | | 付费 | 兼容 OpenAI 的网关（`api.therouter.ai`），vendor/model 形式的 ID |
 | **Z.ai** / **BigModel** | | 便宜 | GLM-5.3 —— 推荐起点 |
 <!-- | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><b>Sidrune&nbsp;AI</b></a> | <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-agentiloop-agent&promo=SDRAGENTLOOP"><picture><source media="(prefers-color-scheme: dark)" srcset="../docs/sponsors/sidrune-logo-white.svg"><img src="../docs/sponsors/sidrune-logo.svg" width="110" alt="Sidrune AI logo" /></picture></a> | 付费（API 额度） | 一个 API 即可使用 GPT、Claude 及其他领先 AI 模型；使用优惠码 `SDRAGENTLOOP` 获得 $3 额度 | -->
 
