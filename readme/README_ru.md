@@ -26,7 +26,7 @@
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-cli-ad-v2_ru.svg" width="900" alt="AgentiLoop CLI: две версии, Rust и Go, с абсолютно одинаковыми возможностями. macOS, Windows, Linux." /></a>
 
-*Создано с помощью AgentiLoop Agent! для Mac. Да, агент сам написал своих младших братьев.* 🤖✨ **Вышла v0.0.5:** больше инструментов: поиск glob/grep, web_fetch, списки задач, AGENTS.md, /undo, собственные слэш-команды и --json. Скачайте сегодня!
+*Создано с помощью AgentiLoop Agent! для Mac. Да, агент сам написал своих младших братьев.* 🤖✨ **Вышла v0.0.10:** больше инструментов: поиск glob/grep, web_fetch, списки задач, AGENTS.md, /undo, собственные слэш-команды и --json. Скачайте сегодня!
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-rust-cli-button_ru.svg" width="211" height="44" alt="Rust CLI на GitHub" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="../docs/agentiloop-go-cli-button_ru.svg" width="194" height="44" alt="Go CLI на GitHub" /></a>
@@ -173,6 +173,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | Провайдер | &nbsp;&nbsp;&nbsp;Спонсор&nbsp;&nbsp;&nbsp; | Стоимость | Лучше всего для |
 |---|:---:|---|---|
 | **A2Agent** | | Дёшево | DeepSeek, GLM, Kimi, MiniMax и Qwen через один OpenAI-совместимый ключ за долю официальной цены |
+| **Alibaba DashScope** | | Дёшево | Qwen 3.8 через DashScope; ключи Model Studio `sk-` и QwenCloud `sk-ws-` |
 | **Apple Intelligence** | | Бесплатно, на устройстве | Триаж, резюме, сжатие токенов (иконка мозга, нет в списке провайдеров) |
 | **Claude** | | За токены (API-ключ) или подписка (OAuth) | Длинные автономные задачи, расширенное мышление, кэширование промптов |
 | **Codex** | | Подписка ChatGPT | Модели OpenAI через ChatGPT OAuth — без API-ключа, без оплаты за токены |
@@ -190,7 +191,6 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **OpenAI** | | Платно | Общего назначения, вызов инструментов, зрение, `reasoning_effort` |
 | **OpenRouter** | | Платно | 200+ моделей, один ключ; Claude маршрутизируется через протокол Anthropic |
 | **OrcaRouter** | | Платно | 190+ моделей через один OpenAI-совместимый ключ по цене провайдера; маршрутизация auto/fusion/fallback |
-| **Alibaba DashScope** | | Дёшево | Qwen 3.8 через DashScope; ключи Model Studio `sk-` и QwenCloud `sk-ws-` |
 | **Qwen** (qwen.ai Token Plan) | | Подписка | QwenCloud Token Plan (ключ `sk-sp-`, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
 | **Qwen Code** | | Подписка | Alibaba Coding Plan (ключ `sk-sp-`): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
 | **Requesty** | | Платно | 300+ моделей через один OpenAI-совместимый ключ; цены и метаданные возможностей по каждой модели |
@@ -206,10 +206,10 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 | Группа | Инструменты |
 |---|---|
-| **Core** | `done` · `list_tools` · `search` · `web_search` · `fetch` · `chat` · `memory` · `plan` · `goal_state` · `restore_tool_result` · `directory` · `skill` · `ask_user` · `index` |
+| **Core** | `done` · `list_tools` · `search` · `web_search` · `fetch` · `chat` · `memory` · `plan` · `goal_state` · `restore_tool_result` · `directory` · `skill` · `ask_user` · `index` · `mcp` |
 | **Код / сборка** | `file` (read/write/edit/diff_apply/undo/list/search/mkdir/…) · `git` · `xcode` (build/run/analyze/snippet/code_review/add_file/bump_version/…) · `agent_script` |
 | **Shell** | `user_shell` (Launch Agent) · `root_shell` (Launch Daemon) · `shell` (in-process запасной) · `batch` · `multi` |
-| **Автоматизация macOS** | `accessibility` (25 действий на основе элементов) · `applescript` (с `lookup_sdef`) · `javascript` (JXA) |
+| **Автоматизация macOS** | `accessibility` (35 действий на основе элементов) · `applescript` (с `lookup_sdef`) · `javascript` (JXA) |
 | **Веб** | `safari` · `selenium` · `mcp_playwright_browser_*` (опционально) |
 | **Суб-агенты** | `spawn_agent` · `tell_agent` |
 
@@ -217,7 +217,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ## AgentScript — Swift-скрипты с полным TCC
 
-AgentScript — это обычные Swift-файлы в `~/Documents/AgentScript/agents/Sources/Scripts/`. Agent! компилирует каждый в `.dylib` через SwiftPM (`Package.swift` перечисляет все скрипты плюс 51 мост ScriptingBridge), затем загружает его через `dlopen` с собственными TCC-разрешениями Agent! — универсальный доступ, автоматизация, Календарь, Контакты, Почта, Фото и т. д. LLM управляет ими через `agent_script` (`create` / `edit` / `run` / `delete` / `restore` / `pull`); в папке поставляется ~35 примеров (`Hello`, `TodayEvents`, `NowPlaying`, `CheckMail`, `CreateDmg`, `ArchiveXcode`, …).
+AgentScript — это обычные Swift-файлы в `~/Documents/AgentScript/agents/Sources/Scripts/`. Agent! компилирует каждый в `.dylib` через SwiftPM (`Package.swift` перечисляет все скрипты плюс 51 мост ScriptingBridge), затем загружает его через `dlopen` с собственными TCC-разрешениями Agent! — универсальный доступ, автоматизация, Календарь, Контакты, Почта, Фото и т. д. LLM управляет ими через `agent_script` (`create` / `edit` / `run` / `delete` / `restore` / `pull`); в папке поставляется ~70 примеров (`Hello`, `TodayEvents`, `NowPlaying`, `CheckMail`, `CreateDmg`, `ArchiveXcode`, …).
 
 **Точка входа** — без кода верхнего уровня, без `exit()`; `stdout` возвращается LLM, возвращаемое значение — код выхода:
 
@@ -405,6 +405,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 |---|---|
 | `/auto <goal>` | Работает над целью, пока LLM не сообщит, что она достигнута |
 | `/auto 4h <goal>` | То же, но остановка через 4 часа (`30m` и `1.5h` тоже работают) |
+| `/auto --worktree <goal>` | Работает в изолированном git worktree и ветке (`-w`); `--shared` принудительно использует общий checkout. По умолчанию worktree используется, только если другая вкладка уже запустила `/auto` в том же проекте |
 | `/auto` | Сначала изучает проект, затем спрашивает цель через `ask_user` |
 | `/auto history` | Показывает прежние цели автопилота |
 | `/auto last` / `/auto #N` | Перезапускает последнюю / N-ю цель из истории |
@@ -412,7 +413,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 | `/auto remove <folder>` | Удаляет папку синхронизации |
 | `/auto status` / `/auto stop` | Показывает сессию / завершает её после текущего цикла (сразу, если между циклами) |
 
-Каждый цикл — обычная задача; её итог добавляется в `.agent/autopilot/progress.md` и передаётся в промпт следующего цикла. LLM завершает сессию, начиная итоговое резюме с `AUTOPILOT: GOAL REACHED`. Циклы, завершившиеся без итога (ошибки, отмены), никогда не завершают сессию: следующий цикл просто ждёт дольше (15 с, 30 с, 60 с… до 5 мин). Команды `/auto` сохраняются в истории промптов (стрелка вверх), а цели — в списке `/auto history`. Активные сессии переживают перезапуск приложения: выход (или сбой) ставит их на паузу, а при следующем запуске каждая продолжается на своей вкладке со следующего цикла.
+Каждый цикл — обычная задача; её итог добавляется в `.agent/tabs/<key>/progress.md` и передаётся в промпт следующего цикла. LLM завершает сессию, начиная итоговое резюме с `AUTOPILOT: GOAL REACHED`. Циклы, завершившиеся без итога (ошибки, отмены), никогда не завершают сессию: следующий цикл просто ждёт дольше (15 с, 30 с, 60 с… до 5 мин). Команды `/auto` сохраняются в истории промптов (стрелка вверх), а цели — в списке `/auto history`. Активные сессии переживают перезапуск приложения: выход (или сбой) ставит их на паузу, а при следующем запуске каждая продолжается на своей вкладке со следующего цикла. Сессия также завершается, когда LLM начинает итог с `AUTOPILOT: BLOCKED` (нужны вы: ответ, ручная проверка или ваши незакоммиченные изменения), или после 3 завершённых циклов подряд без нового git-коммита, чтобы он никогда не крутился вхолостую, когда «делать нечего».
 
 ## FAQ
 
@@ -425,7 +426,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 ## Предыстория
 
-Agent! — результат трёх лет создания агентных ИИ-приложений: ANIE, Game Changer, BattleScript, XCF MCP Server и Client, D1F и около восьми оригинальных Swift-пакетов. Недостающим звеном был интеллектуальный автономный цикл; как только он появился, лучшее из этих проектов объединилось в Agent!. Он писал видеоигры ([Boss-Man](https://github.com/AgentiLoop/bossman)), создавал приложения, писал стихи в Pages через AppleScript, генерировал образы дисков и прикреплял их к релизам GitHub. Там, где Claude Code опирается на ~65 сторонних NPM-пакетов, Agent! на 100 % нативен, потребляет очень мало ОЗУ и из коробки поставляет автоматизацию Xcode, анализ Swift Syntax 6.2, универсальный доступ, AppleScript, AgentScript/ScriptingBridge, автоматизацию Safari и поддержку MCP.
+Agent! — результат трёх лет создания агентных ИИ-приложений: ANIE, Game Changer, BattleScript, XCF MCP Server и Client, D1F и около восьми оригинальных Swift-пакетов. Недостающим звеном был интеллектуальный автономный цикл; как только он появился, лучшее из этих проектов объединилось в Agent!. Он писал видеоигры ([Boss-Man](https://github.com/AgentiLoop/bossman) · [Umbravault](https://github.com/AgentiLoop/Umbravault) · [BvS](https://github.com/AgentiLoop/bvs) · Go · Шахматы), создавал приложения, писал стихи в Pages через AppleScript, генерировал образы дисков и прикреплял их к релизам GitHub. Там, где Claude Code опирается на ~65 сторонних NPM-пакетов, Agent! на 100 % нативен, потребляет очень мало ОЗУ и из коробки поставляет автоматизацию Xcode, анализ Swift Syntax 6.2, универсальный доступ, AppleScript, AgentScript/ScriptingBridge, автоматизацию Safari и поддержку MCP.
 
 ## Реверс-инжиниринг с Agent!
 

@@ -26,7 +26,7 @@ Agent! ファミリーの新メンバーを紹介します。**まったく�
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-cli-ad-v2_ja.svg" width="900" alt="AgentiLoop CLI：Rust 版と Go 版の 2 バージョン、機能はまったく同じ。macOS、Windows、Linux。" /></a>
 
-*AgentiLoop Agent! for Mac で作られました。そう、エージェントが自分の弟分を書き上げたのです。* 🤖✨ **v0.0.5 リリース：**ツールが充実。glob/grep 検索、web_fetch、ToDo、AGENTS.md、/undo、カスタムスラッシュコマンド、--json。今すぐダウンロード！
+*AgentiLoop Agent! for Mac で作られました。そう、エージェントが自分の弟分を書き上げたのです。* 🤖✨ **v0.0.10 リリース：**ツールが充実。glob/grep 検索、web_fetch、ToDo、AGENTS.md、/undo、カスタムスラッシュコマンド、--json。今すぐダウンロード！
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-rust-cli-button_ja.svg" width="246" height="44" alt="Rust CLI を GitHub で" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="../docs/agentiloop-go-cli-button_ja.svg" width="229" height="44" alt="Go CLI を GitHub で" /></a>
@@ -173,6 +173,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | プロバイダー | &nbsp;&nbsp;&nbsp;スポンサー&nbsp;&nbsp;&nbsp; | コスト | 最適な用途 |
 |---|:---:|---|---|
 | **A2Agent** | | 安価 | 一つの OpenAI 互換キーで公式価格の一部で DeepSeek、GLM、Kimi、MiniMax、Qwen |
+| **Alibaba DashScope** | | 安価 | DashScope 経由の Qwen 3.8。Model Studio `sk-` および QwenCloud `sk-ws-` キー |
 | **Apple Intelligence** | | 無料、オンデバイス | トリアージ、要約、トークン圧縮（脳アイコン、プロバイダーピッカーにはなし） |
 | **Claude** | | トークン単位（API キー）またはサブスクリプション（OAuth） | 長い自律タスク、拡張思考、プロンプトキャッシング |
 | **Codex** | | ChatGPT サブスクリプション | ChatGPT OAuth 経由の OpenAI モデル — API キー不要、トークン課金なし |
@@ -190,7 +191,6 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **OpenAI** | | 有料 | 汎用、ツール呼び出し、ビジョン、`reasoning_effort` |
 | **OpenRouter** | | 有料 | 200 以上のモデル、一つのキー。Claude は Anthropic プロトコル経由でルーティング |
 | **OrcaRouter** | | 有料 | 一つの OpenAI 互換キーでプロバイダー原価の 190 以上のモデル。auto/fusion/fallback ルーティング |
-| **Alibaba DashScope** | | 安価 | DashScope 経由の Qwen 3.8。Model Studio `sk-` および QwenCloud `sk-ws-` キー |
 | **Qwen**（qwen.ai Token Plan） | | サブスクリプション | QwenCloud Token Plan（`sk-sp-` キー、`token-plan.*.maas.aliyuncs.com`）：qwen3.8-max、qwen3.7-plus、GLM-5.2、DeepSeek V4 |
 | **Qwen Code** | | サブスクリプション | Alibaba Coding Plan（`sk-sp-` キー）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
 | **Requesty** | | 有料 | 一つの OpenAI 互換キーで 300 以上のモデル。モデルごとの価格と機能メタデータ |
@@ -206,10 +206,10 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 | グループ | ツール |
 |---|---|
-| **Core** | `done` · `list_tools` · `search` · `web_search` · `fetch` · `chat` · `memory` · `plan` · `goal_state` · `restore_tool_result` · `directory` · `skill` · `ask_user` · `index` |
+| **Core** | `done` · `list_tools` · `search` · `web_search` · `fetch` · `chat` · `memory` · `plan` · `goal_state` · `restore_tool_result` · `directory` · `skill` · `ask_user` · `index` · `mcp` |
 | **コード / ビルド** | `file`（read/write/edit/diff_apply/undo/list/search/mkdir/…）· `git` · `xcode`（build/run/analyze/snippet/code_review/add_file/bump_version/…）· `agent_script` |
 | **シェル** | `user_shell`（Launch Agent）· `root_shell`（Launch Daemon）· `shell`（インプロセスのフォールバック）· `batch` · `multi` |
-| **macOS 自動化** | `accessibility`（25 の要素ベースのアクション）· `applescript`（`lookup_sdef` 付き）· `javascript`（JXA） |
+| **macOS 自動化** | `accessibility`（35 の要素ベースのアクション）· `applescript`（`lookup_sdef` 付き）· `javascript`（JXA） |
 | **Web** | `safari` · `selenium` · `mcp_playwright_browser_*`（オプション） |
 | **サブエージェント** | `spawn_agent` · `tell_agent` |
 
@@ -405,6 +405,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 |---|---|
 | `/auto <goal>` | LLM が目標到達を報告するまで目標に向けて作業 |
 | `/auto 4h <goal>` | 同じだが 4 時間で停止（`30m`、`1.5h` も可） |
+| `/auto --worktree <goal>` | 分離された git worktree とブランチで作業（`-w`）。`--shared` は共有チェックアウトを強制。既定では、別のタブが同じプロジェクトで `/auto` を実行中のときだけ worktree を使います |
 | `/auto` | まずプロジェクトを確認し、`ask_user` で目標を尋ねる |
 | `/auto history` | 過去のオートパイロット目標を一覧表示 |
 | `/auto last` / `/auto #N` | 履歴の最新 / N 番目の目標を再開 |
@@ -412,7 +413,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 | `/auto remove <folder>` | 同期フォルダーを削除 |
 | `/auto status` / `/auto stop` | セッションを表示 / 現在のサイクル後に終了（サイクル間ならすぐに） |
 
-各サイクルは通常のタスクです。その要約は `.agent/autopilot/progress.md` に追記され、次のサイクルのプロンプトに渡されます。LLM は最終要約を `AUTOPILOT: GOAL REACHED` で始めることでセッションを終えます。要約なしで終わったサイクル（エラー、キャンセル）はセッションを終わらせず、次のサイクルが長めに待つだけです（15 秒、30 秒、60 秒…最大 5 分）。`/auto` コマンドはプロンプト履歴（上矢印）に、目標は `/auto history` リストに保存されます。アクティブなセッションはアプリを再起動しても残ります。終了（またはクラッシュ）すると一時停止し、次回起動時にそれぞれのタブで次のサイクルから再開します。
+各サイクルは通常のタスクです。その要約は `.agent/tabs/<key>/progress.md` に追記され、次のサイクルのプロンプトに渡されます。LLM は最終要約を `AUTOPILOT: GOAL REACHED` で始めることでセッションを終えます。要約なしで終わったサイクル（エラー、キャンセル）はセッションを終わらせず、次のサイクルが長めに待つだけです（15 秒、30 秒、60 秒…最大 5 分）。`/auto` コマンドはプロンプト履歴（上矢印）に、目標は `/auto history` リストに保存されます。アクティブなセッションはアプリを再起動しても残ります。終了（またはクラッシュ）すると一時停止し、次回起動時にそれぞれのタブで次のサイクルから再開します。 LLM が要約を `AUTOPILOT: BLOCKED` で始めたとき（入力、実機テスト、未コミットの変更など、あなたが必要なとき）、または新しい git コミットのないサイクルが 3 回連続で完了したときにもセッションは終わるので、「やることがない」まま回り続けることはありません。
 
 ## FAQ
 
@@ -425,7 +426,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 ## 背景
 
-Agent! は 3 年間にわたるエージェント型 AI アプリ開発の成果です — ANIE、Game Changer、BattleScript、XCF MCP Server と Client、D1F、そして約 8 つのオリジナル Swift パッケージ。欠けていたピースはインテリジェントな自律ループでした。それが実現すると、これらのプロジェクトの最良の部分が Agent! に結集しました。ビデオゲーム（[Boss-Man](https://github.com/AgentiLoop/bossman)）を書き、アプリを作り、AppleScript で Pages に詩を書き、ディスクイメージを生成して GitHub リリースに添付してきました。Claude Code が約 65 のサードパーティ NPM パッケージに依存するのに対し、Agent! は 100% ネイティブで、RAM をほとんど使わず、Xcode 自動化、Swift Syntax 6.2 解析、アクセシビリティ、AppleScript、AgentScript/ScriptingBridge、Safari 自動化、MCP サポートを標準で備えています。
+Agent! は 3 年間にわたるエージェント型 AI アプリ開発の成果です — ANIE、Game Changer、BattleScript、XCF MCP Server と Client、D1F、そして約 8 つのオリジナル Swift パッケージ。欠けていたピースはインテリジェントな自律ループでした。それが実現すると、これらのプロジェクトの最良の部分が Agent! に結集しました。ビデオゲーム（[Boss-Man](https://github.com/AgentiLoop/bossman) · [Umbravault](https://github.com/AgentiLoop/Umbravault) · [BvS](https://github.com/AgentiLoop/bvs) · Go · チェス）を書き、アプリを作り、AppleScript で Pages に詩を書き、ディスクイメージを生成して GitHub リリースに添付してきました。Claude Code が約 65 のサードパーティ NPM パッケージに依存するのに対し、Agent! は 100% ネイティブで、RAM をほとんど使わず、Xcode 自動化、Swift Syntax 6.2 解析、アクセシビリティ、AppleScript、AgentScript/ScriptingBridge、Safari 自動化、MCP サポートを標準で備えています。
 
 ## Agent! でリバースエンジニアリング
 

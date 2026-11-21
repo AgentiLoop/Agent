@@ -26,7 +26,7 @@ Meet the Agent! family's newest members: two cross-platform CLIs with the **exac
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-cli-ad-v2.svg" width="900" alt="AgentiLoop CLI: two versions, Rust and Go, with the exact same capabilities. macOS, Windows, Linux." /></a>
 
-*Built by AgentiLoop Agent! for Mac. Yes, the agent wrote its own little siblings.* 🤖✨ **v0.0.5 is out:** a bigger toolbox — glob/grep search, web_fetch, todos, AGENTS.md, /undo, custom slash commands and --json. Download it today!
+*Built by AgentiLoop Agent! for Mac. Yes, the agent wrote its own little siblings.* 🤖✨ **v0.0.10 is out:** a bigger toolbox — glob/grep search, web_fetch, todos, AGENTS.md, /undo, custom slash commands and --json. Download it today!
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="docs/agentiloop-rust-cli-button.svg" width="222" height="44" alt="Rust CLI on GitHub" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="docs/agentiloop-go-cli-button.svg" width="212" height="44" alt="Go CLI on GitHub" /></a>
@@ -173,6 +173,7 @@ Companies and LLM providers who want to support the project: see [docs/SPONSORSH
 | Provider | &nbsp;&nbsp;&nbsp;Sponsor&nbsp;&nbsp;&nbsp; | Cost | Best for |
 |---|:---:|---|---|
 | **A2Agent** | | Cheap | DeepSeek, GLM, Kimi, MiniMax and Qwen via one OpenAI-compatible key at a fraction of official pricing |
+| **Alibaba DashScope** | | Cheap | Qwen 3.8 via DashScope; Model Studio `sk-` and QwenCloud `sk-ws-` keys |
 | **Apple Intelligence** | | Free, on-device | Triage, summaries, token compression (brain icon, not available on the provider picker) |
 | **Claude** | | Per-token (API key) or subscription (OAuth) | Long autonomous tasks, extended thinking, prompt caching |
 | **Codex** | | ChatGPT subscription | OpenAI models via ChatGPT OAuth — no API key, no per-token charges |
@@ -190,7 +191,6 @@ Companies and LLM providers who want to support the project: see [docs/SPONSORSH
 | **OpenAI** | | Paid | General purpose, tool calling, vision, `reasoning_effort` |
 | **OpenRouter** | | Paid | 200+ models, one key; Claude routed via Anthropic protocol |
 | **OrcaRouter** | | Paid | 190+ models via one OpenAI-compatible key at provider cost; auto/fusion/fallback routing |
-| **Alibaba DashScope** | | Cheap | Qwen 3.8 via DashScope; Model Studio `sk-` and QwenCloud `sk-ws-` keys |
 | **Qwen** (qwen.ai Token Plan) | | Subscription | QwenCloud Token Plan (`sk-sp-` key, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
 | **Qwen Code** | | Subscription | Alibaba Coding Plan (`sk-sp-` key): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
 | **Requesty** | | Paid | 300+ models via one OpenAI-compatible key; per-model pricing and capability metadata |
@@ -206,10 +206,10 @@ Canonical names come from `AgentTools.Name.*` (source of truth: the [AgentTools]
 
 | Group | Tools |
 |---|---|
-| **Core** | `done` · `list_tools` · `search` · `web_search` · `fetch` · `chat` · `memory` · `plan` · `goal_state` · `restore_tool_result` · `directory` · `skill` · `ask_user` · `index` |
+| **Core** | `done` · `list_tools` · `search` · `web_search` · `fetch` · `chat` · `memory` · `plan` · `goal_state` · `restore_tool_result` · `directory` · `skill` · `ask_user` · `index` · `mcp` |
 | **Code / build** | `file` (read/write/edit/diff_apply/undo/list/search/mkdir/…) · `git` · `xcode` (build/run/analyze/snippet/code_review/add_file/bump_version/…) · `agent_script` |
 | **Shell** | `user_shell` (Launch Agent) · `root_shell` (Launch Daemon) · `shell` (in-process fallback) · `batch` · `multi` |
-| **macOS automation** | `accessibility` (25 element-based actions) · `applescript` (with `lookup_sdef`) · `javascript` (JXA) |
+| **macOS automation** | `accessibility` (35 element-based actions) · `applescript` (with `lookup_sdef`) · `javascript` (JXA) |
 | **Web** | `safari` · `selenium` · `mcp_playwright_browser_*` (optional) |
 | **Sub-agents** | `spawn_agent` · `tell_agent` |
 
@@ -217,7 +217,7 @@ Full per-action reference: [docs/TECHNICAL.md](docs/TECHNICAL.md).
 
 ## AgentScript — Swift scripts with full TCC
 
-AgentScripts are plain Swift files in `~/Documents/AgentScript/agents/Sources/Scripts/`. Agent! compiles each one to a `.dylib` with SwiftPM (`Package.swift` lists every script plus the 51 ScriptingBridge app bridges), then `dlopen`s it with Agent!'s own TCC grants — Accessibility, Automation, Calendar, Contacts, Mail, Photos, etc. The LLM manages them with `agent_script` (`create` / `edit` / `run` / `delete` / `restore` / `pull`); ~35 examples ship in the folder (`Hello`, `TodayEvents`, `NowPlaying`, `CheckMail`, `CreateDmg`, `ArchiveXcode`, …).
+AgentScripts are plain Swift files in `~/Documents/AgentScript/agents/Sources/Scripts/`. Agent! compiles each one to a `.dylib` with SwiftPM (`Package.swift` lists every script plus the 51 ScriptingBridge app bridges), then `dlopen`s it with Agent!'s own TCC grants — Accessibility, Automation, Calendar, Contacts, Mail, Photos, etc. The LLM manages them with `agent_script` (`create` / `edit` / `run` / `delete` / `restore` / `pull`); ~70 examples ship in the folder (`Hello`, `TodayEvents`, `NowPlaying`, `CheckMail`, `CreateDmg`, `ArchiveXcode`, …).
 
 **Entry point** — no top-level code, no `exit()`; `stdout` is returned to the LLM, the return value is the exit status:
 
@@ -405,6 +405,7 @@ Runs the task loop in unattended cycles — on the main tab or any LLM tab — u
 |---|---|
 | `/auto <goal>` | Work toward the goal until the LLM reports it reached |
 | `/auto 4h <goal>` | Same, but stop after 4 hours (`30m`, `1.5h` also work) |
+| `/auto --worktree <goal>` | Work in an isolated git worktree and branch (`-w`); `--shared` forces the shared checkout. By default a worktree is used only when another tab is already running `/auto` on the same project |
 | `/auto` | Review the project first, then ask you for the goal via `ask_user` |
 | `/auto history` | List previous auto-pilot goals |
 | `/auto last` / `/auto #N` | Restart the most recent / Nth goal from history |
@@ -412,7 +413,7 @@ Runs the task loop in unattended cycles — on the main tab or any LLM tab — u
 | `/auto remove <folder>` | Remove a parity folder |
 | `/auto status` / `/auto stop` | Show the session / end it after the current cycle (immediately if between cycles) |
 
-Each cycle is a normal task; its summary is appended to `.agent/autopilot/progress.md` and fed into the next cycle's prompt. The LLM ends the session by starting its final summary with `AUTOPILOT: GOAL REACHED`. Cycles that end with no summary (errors, cancellations) never end the session — the next cycle just waits longer (15s, 30s, 60s… up to 5 min). `/auto` commands are recorded in prompt history (arrow-up) and goals are saved to the `/auto history` list. Active sessions survive app restarts: quitting (or a crash) pauses them, and on the next launch each one resumes on its tab with the next cycle.
+Each cycle is a normal task; its summary is appended to `.agent/tabs/<key>/progress.md` and fed into the next cycle's prompt. The LLM ends the session by starting its final summary with `AUTOPILOT: GOAL REACHED`. Cycles that end with no summary (errors, cancellations) never end the session — the next cycle just waits longer (15s, 30s, 60s… up to 5 min). `/auto` commands are recorded in prompt history (arrow-up) and goals are saved to the `/auto history` list. Active sessions survive app restarts: quitting (or a crash) pauses them, and on the next launch each one resumes on its tab with the next cycle. The session also ends when the LLM starts its summary with `AUTOPILOT: BLOCKED` (it needs you: input, a hands-on test, or your uncommitted changes), or after 3 completed cycles in a row with no new git commit, so it never loops on "nothing to do".
 
 ## FAQ
 
@@ -425,7 +426,7 @@ More: [docs/FAQ.md](docs/FAQ.md) · [Technical Architecture](docs/TECHNICAL.md) 
 
 ## Backstory
 
-Agent! is the result of three years of building agentic AI apps — ANIE, Game Changer, BattleScript, XCF MCP Server and Client, D1F, and about eight original Swift packages. The missing piece was an intelligent autonomous loop; once achieved, the best of those projects came together into Agent!. It has written video games ([Boss-Man](https://github.com/AgentiLoop/bossman)), created apps, written poetry into Pages via AppleScript, generated disk images and attached them to GitHub releases. Where Claude Code relies on ~65 third-party NPM packages, Agent! is 100% native, uses very little RAM, and ships Xcode automation, Swift Syntax 6.2 analysis, Accessibility, AppleScript, AgentScript/ScriptingBridge, Safari automation and MCP support out of the box.
+Agent! is the result of three years of building agentic AI apps — ANIE, Game Changer, BattleScript, XCF MCP Server and Client, D1F, and about eight original Swift packages. The missing piece was an intelligent autonomous loop; once achieved, the best of those projects came together into Agent!. It has written video games ([Boss-Man](https://github.com/AgentiLoop/bossman) · [Umbravault](https://github.com/AgentiLoop/Umbravault) · [BvS](https://github.com/AgentiLoop/bvs) · Go · Chess), created apps, written poetry into Pages via AppleScript, generated disk images and attached them to GitHub releases. Where Claude Code relies on ~65 third-party NPM packages, Agent! is 100% native, uses very little RAM, and ships Xcode automation, Swift Syntax 6.2 analysis, Accessibility, AppleScript, AgentScript/ScriptingBridge, Safari automation and MCP support out of the box.
 
 ## Reverse Engineering with Agent!
 

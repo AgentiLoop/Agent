@@ -26,7 +26,7 @@ Agent! 패밀리의 최신 멤버를 ᄆ�
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-cli-ad-v2_ko.svg" width="900" alt="AgentiLoop CLI: Rust와 Go 두 가지 버전, 완전히 동일한 기능. macOS, Windows, Linux." /></a>
 
-*AgentiLoop Agent! for Mac으로 제작. 네, 에이전트가 직접 자기 동생들을 만들었습니다.* 🤖✨ **v0.0.5 출시:** 더 커진 도구 상자: glob/grep 검색, web_fetch, 할 일 목록, AGENTS.md, /undo, 사용자 정의 슬래시 명령, --json. 지금 다운로드하세요!
+*AgentiLoop Agent! for Mac으로 제작. 네, 에이전트가 직접 자기 동생들을 만들었습니다.* 🤖✨ **v0.0.10 출시:** 더 커진 도구 상자: glob/grep 검색, web_fetch, 할 일 목록, AGENTS.md, /undo, 사용자 정의 슬래시 명령, --json. 지금 다운로드하세요!
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-rust-cli-button_ko.svg" width="238" height="44" alt="GitHub에서 Rust CLI" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="../docs/agentiloop-go-cli-button_ko.svg" width="221" height="44" alt="GitHub에서 Go CLI" /></a>
@@ -173,6 +173,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | 제공자 | &nbsp;&nbsp;&nbsp;스폰서&nbsp;&nbsp;&nbsp; | 비용 | 최적 용도 |
 |---|:---:|---|---|
 | **A2Agent** | | 저렴 | 공식 가격의 일부로 하나의 OpenAI 호환 키를 통해 DeepSeek, GLM, Kimi, MiniMax, Qwen |
+| **Alibaba DashScope** | | 저렴 | DashScope를 통한 Qwen 3.8; Model Studio `sk-` 및 QwenCloud `sk-ws-` 키 |
 | **Apple Intelligence** | | 무료, 온디바이스 | 분류, 요약, 토큰 압축(두뇌 아이콘, 제공자 선택기에는 없음) |
 | **Claude** | | 토큰당(API 키) 또는 구독(OAuth) | 긴 자율 작업, 확장 사고, 프롬프트 캐싱 |
 | **Codex** | | ChatGPT 구독 | ChatGPT OAuth를 통한 OpenAI 모델 — API 키 없음, 토큰당 요금 없음 |
@@ -190,7 +191,6 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **OpenAI** | | 유료 | 범용, 도구 호출, 비전, `reasoning_effort` |
 | **OpenRouter** | | 유료 | 200개 이상 모델, 하나의 키; Claude는 Anthropic 프로토콜로 라우팅 |
 | **OrcaRouter** | | 유료 | 하나의 OpenAI 호환 키로 제공자 원가에 190개 이상 모델; auto/fusion/fallback 라우팅 |
-| **Alibaba DashScope** | | 저렴 | DashScope를 통한 Qwen 3.8; Model Studio `sk-` 및 QwenCloud `sk-ws-` 키 |
 | **Qwen** (qwen.ai Token Plan) | | 구독 | QwenCloud Token Plan(`sk-sp-` 키, `token-plan.*.maas.aliyuncs.com`): qwen3.8-max, qwen3.7-plus, GLM-5.2, DeepSeek V4 |
 | **Qwen Code** | | 구독 | Alibaba Coding Plan(`sk-sp-` 키): qwen3-coder-plus, qwen3.7-plus, GLM-5, Kimi K2.5, MiniMax-M2.5 |
 | **Requesty** | | 유료 | 하나의 OpenAI 호환 키로 300개 이상 모델; 모델별 가격 및 기능 메타데이터 |
@@ -206,10 +206,10 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 | 그룹 | 도구 |
 |---|---|
-| **Core** | `done` · `list_tools` · `search` · `web_search` · `fetch` · `chat` · `memory` · `plan` · `goal_state` · `restore_tool_result` · `directory` · `skill` · `ask_user` · `index` |
+| **Core** | `done` · `list_tools` · `search` · `web_search` · `fetch` · `chat` · `memory` · `plan` · `goal_state` · `restore_tool_result` · `directory` · `skill` · `ask_user` · `index` · `mcp` |
 | **코드 / 빌드** | `file` (read/write/edit/diff_apply/undo/list/search/mkdir/…) · `git` · `xcode` (build/run/analyze/snippet/code_review/add_file/bump_version/…) · `agent_script` |
 | **셸** | `user_shell` (Launch Agent) · `root_shell` (Launch Daemon) · `shell` (인프로세스 폴백) · `batch` · `multi` |
-| **macOS 자동화** | `accessibility` (25개 요소 기반 액션) · `applescript` (`lookup_sdef` 포함) · `javascript` (JXA) |
+| **macOS 자동화** | `accessibility` (35개 요소 기반 액션) · `applescript` (`lookup_sdef` 포함) · `javascript` (JXA) |
 | **웹** | `safari` · `selenium` · `mcp_playwright_browser_*` (선택) |
 | **서브 에이전트** | `spawn_agent` · `tell_agent` |
 
@@ -217,7 +217,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ## AgentScript — 전체 TCC를 가진 Swift 스크립트
 
-AgentScript는 `~/Documents/AgentScript/agents/Sources/Scripts/`에 있는 평범한 Swift 파일입니다. Agent!는 각각을 SwiftPM으로 `.dylib`로 컴파일한 뒤(`Package.swift`는 모든 스크립트와 51개 ScriptingBridge 앱 브리지를 나열), Agent! 자체의 TCC 권한 — 손쉬운 사용, 자동화, 캘린더, 연락처, Mail, 사진 등 — 으로 `dlopen`합니다. LLM은 `agent_script`(`create` / `edit` / `run` / `delete` / `restore` / `pull`)로 관리하며, 폴더에 ~35개 예제가 포함됩니다(`Hello`, `TodayEvents`, `NowPlaying`, `CheckMail`, `CreateDmg`, `ArchiveXcode`, …).
+AgentScript는 `~/Documents/AgentScript/agents/Sources/Scripts/`에 있는 평범한 Swift 파일입니다. Agent!는 각각을 SwiftPM으로 `.dylib`로 컴파일한 뒤(`Package.swift`는 모든 스크립트와 51개 ScriptingBridge 앱 브리지를 나열), Agent! 자체의 TCC 권한 — 손쉬운 사용, 자동화, 캘린더, 연락처, Mail, 사진 등 — 으로 `dlopen`합니다. LLM은 `agent_script`(`create` / `edit` / `run` / `delete` / `restore` / `pull`)로 관리하며, 폴더에 ~70개 예제가 포함됩니다(`Hello`, `TodayEvents`, `NowPlaying`, `CheckMail`, `CreateDmg`, `ArchiveXcode`, …).
 
 **진입점** — 최상위 코드 없음, `exit()` 없음; `stdout`은 LLM에 반환되고, 반환값은 종료 상태입니다:
 
@@ -405,6 +405,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 |---|---|
 | `/auto <goal>` | LLM이 목표 도달을 보고할 때까지 목표를 향해 작업 |
 | `/auto 4h <goal>` | 같지만 4시간 후 중지(`30m`, `1.5h`도 가능) |
+| `/auto --worktree <goal>` | 격리된 git worktree와 브랜치에서 작업(`-w`); `--shared`는 공유 체크아웃을 강제합니다. 기본적으로 다른 탭이 같은 프로젝트에서 이미 `/auto`를 실행 중일 때만 worktree를 씁니다 |
 | `/auto` | 먼저 프로젝트를 검토한 뒤 `ask_user`로 목표를 물음 |
 | `/auto history` | 이전 자동 조종 목표 목록 표시 |
 | `/auto last` / `/auto #N` | 기록에서 가장 최근 / N번째 목표를 다시 시작 |
@@ -412,7 +413,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 | `/auto remove <folder>` | 동기화 폴더 제거 |
 | `/auto status` / `/auto stop` | 세션 표시 / 현재 사이클 후 종료(사이클 사이라면 즉시) |
 
-각 사이클은 일반 작업이며, 그 요약은 `.agent/autopilot/progress.md`에 추가되어 다음 사이클의 프롬프트에 전달됩니다. LLM은 최종 요약을 `AUTOPILOT: GOAL REACHED`로 시작해 세션을 끝냅니다. 요약 없이 끝난 사이클(오류, 취소)은 세션을 끝내지 않으며, 다음 사이클이 더 오래 기다릴 뿐입니다(15초, 30초, 60초… 최대 5분). `/auto` 명령은 프롬프트 기록(위쪽 화살표)에, 목표는 `/auto history` 목록에 저장됩니다. 활성 세션은 앱을 다시 시작해도 유지됩니다. 종료(또는 충돌)하면 일시 중지되고, 다음 실행 때 각 세션이 자기 탭에서 다음 사이클로 재개됩니다.
+각 사이클은 일반 작업이며, 그 요약은 `.agent/tabs/<key>/progress.md`에 추가되어 다음 사이클의 프롬프트에 전달됩니다. LLM은 최종 요약을 `AUTOPILOT: GOAL REACHED`로 시작해 세션을 끝냅니다. 요약 없이 끝난 사이클(오류, 취소)은 세션을 끝내지 않으며, 다음 사이클이 더 오래 기다릴 뿐입니다(15초, 30초, 60초… 최대 5분). `/auto` 명령은 프롬프트 기록(위쪽 화살표)에, 목표는 `/auto history` 목록에 저장됩니다. 활성 세션은 앱을 다시 시작해도 유지됩니다. 종료(또는 충돌)하면 일시 중지되고, 다음 실행 때 각 세션이 자기 탭에서 다음 사이클로 재개됩니다. LLM이 요약을 `AUTOPILOT: BLOCKED`로 시작할 때(입력, 직접 테스트, 커밋되지 않은 변경 등 여러분이 필요할 때), 또는 새 git 커밋 없이 사이클이 3번 연속 완료됐을 때도 세션이 끝나므로, "할 일이 없는" 상태로 계속 돌지 않습니다.
 
 ## FAQ
 
@@ -425,7 +426,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 ## 비하인드 스토리
 
-Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game Changer, BattleScript, XCF MCP Server와 Client, D1F, 그리고 약 8개의 독창적인 Swift 패키지. 빠진 조각은 지능적인 자율 루프였고, 이를 달성하자 그 프로젝트들의 정수가 Agent!로 모였습니다. 비디오 게임([Boss-Man](https://github.com/AgentiLoop/bossman))을 작성하고, 앱을 만들고, AppleScript로 Pages에 시를 쓰고, 디스크 이미지를 생성해 GitHub 릴리스에 첨부했습니다. Claude Code가 ~65개의 서드파티 NPM 패키지에 의존하는 반면, Agent!는 100% 네이티브이고, RAM을 거의 사용하지 않으며, Xcode 자동화, Swift Syntax 6.2 분석, 손쉬운 사용, AppleScript, AgentScript/ScriptingBridge, Safari 자동화, MCP 지원을 기본으로 제공합니다.
+Agent!는 3년간 에이전틱 AI 앱을 만든 결과입니다 — ANIE, Game Changer, BattleScript, XCF MCP Server와 Client, D1F, 그리고 약 8개의 독창적인 Swift 패키지. 빠진 조각은 지능적인 자율 루프였고, 이를 달성하자 그 프로젝트들의 정수가 Agent!로 모였습니다. 비디오 게임([Boss-Man](https://github.com/AgentiLoop/bossman) · [Umbravault](https://github.com/AgentiLoop/Umbravault) · [BvS](https://github.com/AgentiLoop/bvs) · Go · 체스)을 작성하고, 앱을 만들고, AppleScript로 Pages에 시를 쓰고, 디스크 이미지를 생성해 GitHub 릴리스에 첨부했습니다. Claude Code가 ~65개의 서드파티 NPM 패키지에 의존하는 반면, Agent!는 100% 네이티브이고, RAM을 거의 사용하지 않으며, Xcode 자동화, Swift Syntax 6.2 분석, 손쉬운 사용, AppleScript, AgentScript/ScriptingBridge, Safari 자동화, MCP 지원을 기본으로 제공합니다.
 
 ## Agent!로 하는 리버스 엔지니어링
 

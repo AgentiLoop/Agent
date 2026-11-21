@@ -26,7 +26,7 @@
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-cli-ad-v2_zh.svg" width="900" alt="AgentiLoop CLI：Rust 与 Go 两个版本，功能完全相同。macOS、Windows、Linux。" /></a>
 
-*由 AgentiLoop Agent! for Mac 打造。没错，这个智能体亲手写出了自己的小弟弟。* 🤖✨ **v0.0.5 已发布：**更大的工具箱，包括 glob/grep 搜索、web_fetch、待办事项、AGENTS.md、/undo、自定义斜杠命令和 --json。立即下载！
+*由 AgentiLoop Agent! for Mac 打造。没错，这个智能体亲手写出了自己的小弟弟。* 🤖✨ **v0.0.10 已发布：**更大的工具箱，包括 glob/grep 搜索、web_fetch、待办事项、AGENTS.md、/undo、自定义斜杠命令和 --json。立即下载！
 
 <a href="https://github.com/AgentiLoop/AgentiLoopCLI"><img src="../docs/agentiloop-rust-cli-button_zh.svg" width="246" height="44" alt="在 GitHub 查看 Rust CLI" /></a>
 <a href="https://github.com/AgentiLoop/AgentiLoopGo"><img src="../docs/agentiloop-go-cli-button_zh.svg" width="229" height="44" alt="在 GitHub 查看 Go CLI" /></a>
@@ -173,6 +173,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | 提供商 | &nbsp;&nbsp;&nbsp;赞助&nbsp;&nbsp;&nbsp; | 费用 | 适合 |
 |---|:---:|---|---|
 | **A2Agent** | | 便宜 | 一把 OpenAI 兼容密钥即可使用 DeepSeek、GLM、Kimi、MiniMax 和 Qwen，价格远低于官方 |
+| **阿里巴巴**（qwen.ai / 百炼） | | 便宜 | 通过 DashScope 使用 Qwen 3.8 |
 | **Apple Intelligence** | | 免费，设备端 | 分流、摘要、token 压缩（大脑图标，提供商选择器中不可用） |
 | **Claude** | | 按 token 计费（API 密钥）或订阅（OAuth） | 长时间自主任务、扩展思考、提示词缓存 |
 | **Codex** | | ChatGPT 订阅 | 通过 ChatGPT OAuth 使用 OpenAI 模型——无需 API 密钥，不按 token 计费 |
@@ -190,7 +191,6 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **OpenAI** | | 付费 | 通用、工具调用、视觉、`reasoning_effort` |
 | **OpenRouter** | | 付费 | 200+ 模型，一把密钥；Claude 经 Anthropic 协议路由 |
 | **OrcaRouter** | | 付费 | 一把 OpenAI 兼容密钥即可访问 190+ 模型，按提供商原价计费；支持 auto/fusion/fallback 路由 |
-| **阿里巴巴**（qwen.ai / 百炼） | | 便宜 | 通过 DashScope 使用 Qwen 3.8 |
 | **Qwen Coder** | | 订阅 | 阿里云 Coding Plan（`sk-sp-` 密钥）：qwen3-coder-plus、qwen3.7-plus、GLM-5、Kimi K2.5、MiniMax-M2.5 |
 | **Requesty** | | 付费 | 一把 OpenAI 兼容密钥即可访问 300+ 模型；按模型提供价格与能力信息 |
 | **TheRouter** | | 付费 | 兼容 OpenAI 的网关（`api.therouter.ai`），vendor/model 形式的 ID |
@@ -205,10 +205,10 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 | 分组 | 工具 |
 |---|---|
-| **Core** | `done` · `list_tools` · `search` · `web_search` · `fetch` · `chat` · `memory` · `plan` · `goal_state` · `restore_tool_result` · `directory` · `skill` · `ask_user` · `index` |
+| **Core** | `done` · `list_tools` · `search` · `web_search` · `fetch` · `chat` · `memory` · `plan` · `goal_state` · `restore_tool_result` · `directory` · `skill` · `ask_user` · `index` · `mcp` |
 | **代码 / 构建** | `file`（read/write/edit/diff_apply/undo/list/search/mkdir/…）· `git` · `xcode`（build/run/analyze/snippet/code_review/add_file/bump_version/…）· `agent_script` |
 | **Shell** | `user_shell`（Launch Agent）· `root_shell`（Launch Daemon）· `shell`（进程内回退）· `batch` · `multi` |
-| **macOS 自动化** | `accessibility`（25 个基于元素的操作）· `applescript`（含 `lookup_sdef`）· `javascript`（JXA） |
+| **macOS 自动化** | `accessibility`（35 个基于元素的操作）· `applescript`（含 `lookup_sdef`）· `javascript`（JXA） |
 | **Web** | `safari` · `selenium` · `mcp_playwright_browser_*`（可选） |
 | **子代理** | `spawn_agent` · `tell_agent` |
 
@@ -216,7 +216,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 
 ## AgentScript —— 拥有完整 TCC 的 Swift 脚本
 
-AgentScript 就是位于 `~/Documents/AgentScript/agents/Sources/Scripts/` 的普通 Swift 文件。Agent! 用 SwiftPM 将每个脚本编译为 `.dylib`（`Package.swift` 列出了所有脚本以及 51 个 ScriptingBridge 应用桥接），再以 `dlopen` 加载，并使用 Agent! 自身的 TCC 授权——辅助功能、自动化、日历、通讯录、邮件、照片等。LLM 通过 `agent_script`（`create` / `edit` / `run` / `delete` / `restore` / `pull`）管理它们；文件夹内自带约 35 个示例（`Hello`、`TodayEvents`、`NowPlaying`、`CheckMail`、`CreateDmg`、`ArchiveXcode`……）。
+AgentScript 就是位于 `~/Documents/AgentScript/agents/Sources/Scripts/` 的普通 Swift 文件。Agent! 用 SwiftPM 将每个脚本编译为 `.dylib`（`Package.swift` 列出了所有脚本以及 51 个 ScriptingBridge 应用桥接），再以 `dlopen` 加载，并使用 Agent! 自身的 TCC 授权——辅助功能、自动化、日历、通讯录、邮件、照片等。LLM 通过 `agent_script`（`create` / `edit` / `run` / `delete` / `restore` / `pull`）管理它们；文件夹内自带约 70 个示例（`Hello`、`TodayEvents`、`NowPlaying`、`CheckMail`、`CreateDmg`、`ArchiveXcode`……）。
 
 **入口点** —— 没有顶层代码，不调用 `exit()`；`stdout` 会返回给 LLM，返回值即退出状态：
 
@@ -404,6 +404,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 |---|---|
 | `/auto <goal>` | 朝目标工作，直到 LLM 报告已达成 |
 | `/auto 4h <goal>` | 同上，但 4 小时后停止（`30m`、`1.5h` 也可用） |
+| `/auto --worktree <goal>` | 在隔离的 git worktree 和分支中工作（`-w`）；`--shared` 强制使用共享检出。默认只有当另一个标签页已在同一项目上运行 `/auto` 时才使用 worktree |
 | `/auto` | 先审查项目，再通过 `ask_user` 询问你的目标 |
 | `/auto history` | 列出以往的自动驾驶目标 |
 | `/auto last` / `/auto #N` | 重新开始历史中最近的 / 第 N 个目标 |
@@ -411,7 +412,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 | `/auto remove <folder>` | 移除一个同步文件夹 |
 | `/auto status` / `/auto stop` | 显示会话 / 在当前循环结束后终止（若处于循环之间则立即终止） |
 
-每个循环都是一个普通任务；其摘要会追加到 `.agent/autopilot/progress.md`，并传入下一个循环的提示词。LLM 以 `AUTOPILOT: GOAL REACHED` 开头写最终摘要来结束会话。没有摘要就结束的循环（错误、取消）永远不会结束会话，下一个循环只会等待更久（15 秒、30 秒、60 秒……最长 5 分钟）。`/auto` 命令会记入提示词历史（上方向键），目标会保存到 `/auto history` 列表。活动会话在应用重启后依然保留：退出（或崩溃）会暂停它们，下次启动时每个会话会在其标签页中以下一个循环继续。
+每个循环都是一个普通任务；其摘要会追加到 `.agent/tabs/<key>/progress.md`，并传入下一个循环的提示词。LLM 以 `AUTOPILOT: GOAL REACHED` 开头写最终摘要来结束会话。没有摘要就结束的循环（错误、取消）永远不会结束会话，下一个循环只会等待更久（15 秒、30 秒、60 秒……最长 5 分钟）。`/auto` 命令会记入提示词历史（上方向键），目标会保存到 `/auto history` 列表。活动会话在应用重启后依然保留：退出（或崩溃）会暂停它们，下次启动时每个会话会在其标签页中以下一个循环继续。 当 LLM 以 `AUTOPILOT: BLOCKED` 开头写摘要（需要你：输入、实机测试或你未提交的更改），或连续 3 个已完成的循环都没有新的 git 提交时，会话也会结束，因此它绝不会在“无事可做”时空转。
 
 ## 常见问题
 
@@ -424,7 +425,7 @@ func writeTodayEventsOutput(_ path: String, success: Bool, error: String? = nil,
 
 ## 项目背景
 
-Agent! 是三年智能体 AI 应用开发的结晶——ANIE、Game Changer、BattleScript、XCF MCP Server and Client、D1F 以及约八个原创 Swift 包。缺失的一环是智能的自主循环；一旦实现，这些项目的精华便汇聚成了 Agent!。它写过电子游戏（[Boss-Man](https://github.com/AgentiLoop/bossman)）、创建过应用、通过 AppleScript 在 Pages 中写诗、生成磁盘映像并附加到 GitHub Release。Claude Code 依赖约 65 个第三方 NPM 包，而 Agent! 100% 原生、内存占用极低，开箱即带 Xcode 自动化、Swift Syntax 6.2 分析、辅助功能、AppleScript、AgentScript/ScriptingBridge、Safari 自动化和 MCP 支持。
+Agent! 是三年智能体 AI 应用开发的结晶——ANIE、Game Changer、BattleScript、XCF MCP Server and Client、D1F 以及约八个原创 Swift 包。缺失的一环是智能的自主循环；一旦实现，这些项目的精华便汇聚成了 Agent!。它写过电子游戏（[Boss-Man](https://github.com/AgentiLoop/bossman) · [Umbravault](https://github.com/AgentiLoop/Umbravault) · [BvS](https://github.com/AgentiLoop/bvs) · Go · 国际象棋）、创建过应用、通过 AppleScript 在 Pages 中写诗、生成磁盘映像并附加到 GitHub Release。Claude Code 依赖约 65 个第三方 NPM 包，而 Agent! 100% 原生、内存占用极低，开箱即带 Xcode 自动化、Swift Syntax 6.2 分析、辅助功能、AppleScript、AgentScript/ScriptingBridge、Safari 自动化和 MCP 支持。
 
 ## 用 Agent! 做逆向工程
 
