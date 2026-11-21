@@ -105,8 +105,8 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 | **AgentiLoop Racing F1** | F1 im Browser: 18 echte Strecken, Boxenstopps, Reifen, ERS und DRS mit 240-Hz-Physik | [Spielen](https://f1.gokart.games) · [GitHub](https://github.com/AgentiLoop/F1) |
 | **CrazyTaxi** | three.js-Nachbau von *Crazy Taxi* für die Dreamcast | [Spielen](https://ct.gokart.games) · [GitHub](https://github.com/AgentiLoop/CrazyTaxi) |
 | **MarioKart64JS** | MarioKart64, mit Auto-Pilot nach JavaScript portiert | [Spielen](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
-| **Go** | Natives SwiftUI-Go für den Mac: 9×9 bis 19×19, Ko, Vorgaben, japanische oder chinesische Wertung, Computergegner | — |
-| **Schach** | Spielt Schach direkt im Ausgabebereich ([oben](#schach-in-agent)); baute auch AgenticChess, eine SwiftUI-Schach-App mit Apple Intelligence als Gegner | — |
+| **Go** | Natives SwiftUI-Go für den Mac: 9×9 bis 19×19, Ko, Vorgaben, japanische oder chinesische Wertung, Computergegner | [Spielen](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
+| **Schach** | Spielt Schach direkt im Ausgabebereich ([oben](#schach-in-agent)); baute auch AgenticChess, eine SwiftUI-Schach-App mit Apple Intelligence als Gegner | [Spielen](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
 
 ---
 

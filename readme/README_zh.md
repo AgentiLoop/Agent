@@ -105,8 +105,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **AgentiLoop Racing F1** | 浏览器里的 F1：18 条真实赛道、进站、轮胎、ERS 和 DRS，240 Hz 物理 | [开玩](https://f1.gokart.games) · [GitHub](https://github.com/AgentiLoop/F1) |
 | **CrazyTaxi** | 用 three.js 重建的 Dreamcast 版 *Crazy Taxi* | [开玩](https://ct.gokart.games) · [GitHub](https://github.com/AgentiLoop/CrazyTaxi) |
 | **MarioKart64JS** | 借助 Auto-Pilot 移植到 JavaScript 的 MarioKart64 | [开玩](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
-| **围棋** | Mac 原生 SwiftUI 围棋：9×9 到 19×19、劫、让子、日本或中国规则计分、电脑对手 | — |
-| **国际象棋** | 直接在输出面板里下国际象棋（[见上方](#在-agent-中下棋)）；还做了 AgenticChess，一款以 Apple Intelligence 为对手的 SwiftUI 国际象棋应用 | — |
+| **围棋** | Mac 原生 SwiftUI 围棋：9×9 到 19×19、劫、让子、日本或中国规则计分、电脑对手 | [开玩](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
+| **国际象棋** | 直接在输出面板里下国际象棋（[见上方](#在-agent-中下棋)）；还做了 AgenticChess，一款以 Apple Intelligence 为对手的 SwiftUI 国际象棋应用 | [开玩](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
 
 ---
 

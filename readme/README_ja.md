@@ -105,8 +105,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **AgentiLoop Racing F1** | ブラウザで F1：18 の実在サーキット、ピットストップ、タイヤ、ERS と DRS を 240 Hz の物理演算で | [プレイ](https://f1.gokart.games) · [GitHub](https://github.com/AgentiLoop/F1) |
 | **CrazyTaxi** | ドリームキャストの *Crazy Taxi* を three.js で再構築 | [プレイ](https://ct.gokart.games) · [GitHub](https://github.com/AgentiLoop/CrazyTaxi) |
 | **MarioKart64JS** | MarioKart64 を Auto-Pilot で JavaScript に移植 | [プレイ](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
-| **囲碁** | Mac 向けネイティブ SwiftUI の囲碁：9×9〜19×19、コウ、置き碁、日本式または中国式の計算、コンピューター対戦 | — |
-| **チェス** | 出力パネルでそのままチェスを指す（[上記](#agent-の中でチェス)）。Apple Intelligence が対戦相手の SwiftUI チェスアプリ AgenticChess も作成 | — |
+| **囲碁** | Mac 向けネイティブ SwiftUI の囲碁：9×9〜19×19、コウ、置き碁、日本式または中国式の計算、コンピューター対戦 | [プレイ](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
+| **チェス** | 出力パネルでそのままチェスを指す（[上記](#agent-の中でチェス)）。Apple Intelligence が対戦相手の SwiftUI チェスアプリ AgenticChess も作成 | [プレイ](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
 
 ---
 

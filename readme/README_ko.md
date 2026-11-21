@@ -105,8 +105,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **AgentiLoop Racing F1** | 브라우저에서 즐기는 F1: 실제 서킷 18곳, 피트 스톱, 타이어, ERS와 DRS를 240 Hz 물리로 | [플레이](https://f1.gokart.games) · [GitHub](https://github.com/AgentiLoop/F1) |
 | **CrazyTaxi** | 드림캐스트 *Crazy Taxi*를 three.js로 재구성 | [플레이](https://ct.gokart.games) · [GitHub](https://github.com/AgentiLoop/CrazyTaxi) |
 | **MarioKart64JS** | Auto-Pilot으로 JavaScript에 이식한 MarioKart64 | [플레이](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
-| **바둑** | Mac용 네이티브 SwiftUI 바둑: 9×9부터 19×19, 패, 접바둑, 일본식 또는 중국식 계가, 컴퓨터 상대 | — |
-| **체스** | 출력 패널에서 바로 체스를 둡니다([위](#agent-안의-체스)). Apple Intelligence가 상대인 SwiftUI 체스 앱 AgenticChess도 만들었습니다 | — |
+| **바둑** | Mac용 네이티브 SwiftUI 바둑: 9×9부터 19×19, 패, 접바둑, 일본식 또는 중국식 계가, 컴퓨터 상대 | [플레이](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
+| **체스** | 출력 패널에서 바로 체스를 둡니다([위](#agent-안의-체스)). Apple Intelligence가 상대인 SwiftUI 체스 앱 AgenticChess도 만들었습니다 | [플레이](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
 
 ---
 

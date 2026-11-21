@@ -105,8 +105,8 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 | **AgentiLoop Racing F1** | F1 en el navegador: 18 circuitos reales, paradas en boxes, neumáticos, ERS y DRS con física a 240 Hz | [Jugar](https://f1.gokart.games) · [GitHub](https://github.com/AgentiLoop/F1) |
 | **CrazyTaxi** | Reconstrucción en three.js de *Crazy Taxi* de Dreamcast | [Jugar](https://ct.gokart.games) · [GitHub](https://github.com/AgentiLoop/CrazyTaxi) |
 | **MarioKart64JS** | MarioKart64 portado a JavaScript con Auto-Pilot | [Jugar](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
-| **Go** | Go nativo en SwiftUI para Mac: de 9×9 a 19×19, ko, hándicaps, puntuación japonesa o china y rival controlado por el ordenador | — |
-| **Ajedrez** | Juega al ajedrez en su propio panel de salida ([arriba](#ajedrez-dentro-de-agent)); también creó AgenticChess, una app de ajedrez en SwiftUI con Apple Intelligence como rival | — |
+| **Go** | Go nativo en SwiftUI para Mac: de 9×9 a 19×19, ko, hándicaps, puntuación japonesa o china y rival controlado por el ordenador | [Jugar](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
+| **Ajedrez** | Juega al ajedrez en su propio panel de salida ([arriba](#ajedrez-dentro-de-agent)); también creó AgenticChess, una app de ajedrez en SwiftUI con Apple Intelligence como rival | [Jugar](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
 
 ---
 

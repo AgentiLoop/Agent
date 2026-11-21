@@ -105,8 +105,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **AgentiLoop Racing F1** | F1 в браузере: 18 реальных трасс, пит-стопы, шины, ERS и DRS на физике 240 Гц | [Играть](https://f1.gokart.games) · [GitHub](https://github.com/AgentiLoop/F1) |
 | **CrazyTaxi** | Воссоздание *Crazy Taxi* с Dreamcast на three.js | [Играть](https://ct.gokart.games) · [GitHub](https://github.com/AgentiLoop/CrazyTaxi) |
 | **MarioKart64JS** | MarioKart64, перенесённый на JavaScript с помощью Auto-Pilot | [Играть](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
-| **Го** | Нативное го на SwiftUI для Mac: от 9×9 до 19×19, ко, фора, японский или китайский подсчёт, компьютерный соперник | — |
-| **Шахматы** | Играет в шахматы прямо в панели вывода ([выше](#шахматы-внутри-agent)); также создал AgenticChess — шахматное приложение на SwiftUI, где соперник — Apple Intelligence | — |
+| **Го** | Нативное го на SwiftUI для Mac: от 9×9 до 19×19, ко, фора, японский или китайский подсчёт, компьютерный соперник | [Играть](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
+| **Шахматы** | Играет в шахматы прямо в панели вывода ([выше](#шахматы-внутри-agent)); также создал AgenticChess — шахматное приложение на SwiftUI, где соперник — Apple Intelligence | [Играть](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
 
 ---
 
