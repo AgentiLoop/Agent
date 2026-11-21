@@ -42,7 +42,7 @@ struct DependencyOverlay: View {
                         .accessibilityHidden(true)
 
                     Text("Agent!")
-                        .font(.system(size: 22, weight: .black, design: .monospaced))
+                        .font(.system(size: 22, weight: .medium, design: .monospaced))
                         .opacity(showIcon ? 1 : 0)
 
                     Text("Agentic AI for your \u{F8FF} Mac Desktop")
