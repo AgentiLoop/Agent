@@ -2,8 +2,8 @@
 <svg width="497.99" height="497.99" viewBox="0 0 497.99 497.99" version="1.1" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <radialGradient id="bg" cx="35%" cy="30%" r="75%">
-<stop offset="0%" stop-color="#1E3A8A"/>
-<stop offset="100%" stop-color="#0B1A47"/>
+<stop offset="0%" stop-color="#214098"/>
+<stop offset="100%" stop-color="#0C1D4E"/>
 </radialGradient>
 <linearGradient id="dot" x1="15%" y1="15%" x2="85%" y2="85%">
 <stop offset="0%" stop-color="#FFFFFF"/>
@@ -12,9 +12,9 @@
 </defs>
 <circle cx="248.995" cy="248.995" r="248.995" fill="url(#bg)"/>
 <g fill="url(#dot)">
-<circle cx="248.995" cy="248.995" r="73"/>
-<circle cx="248.995" cy="111.995" r="27.4"/>
-<circle cx="130.351" cy="317.495" r="27.4"/>
-<circle cx="367.639" cy="317.495" r="27.4"/>
+<circle cx="248.995" cy="248.995" r="83.95"/>
+<circle cx="248.995" cy="111.995" r="31.51"/>
+<circle cx="130.351" cy="317.495" r="31.51"/>
+<circle cx="367.639" cy="317.495" r="31.51"/>
 </g>
 </svg>
