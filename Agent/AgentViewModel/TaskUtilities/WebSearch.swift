@@ -381,7 +381,8 @@ extension AgentViewModel {
     nonisolated static func performSpecStreamSearchInternal(query: String, apiKey: String) async -> String {
         guard !apiKey.isEmpty else { return "Error: SpecStream API key not set. Add it in Web Search settings." }
         var comps = URLComponents(string: "https://api.specstream.ai/v1/web-search")
-        comps?.queryItems = [URLQueryItem(name: "q", value: query)]
+        // speed=fast is SpecStream's $1-per-1,000 tier (the default tier is $5).
+        comps?.queryItems = [URLQueryItem(name: "q", value: query), URLQueryItem(name: "speed", value: "fast")]
         guard let url = comps?.url else { return "Error: Invalid SpecStream URL" }
         var request = URLRequest(url: url)
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
@@ -405,7 +406,12 @@ extension AgentViewModel {
         }
         let payload = json["data"] as? [String: Any] ?? json
         let sources = payload["sources"] as? [[String: Any]] ?? []
-        let answer = (payload["answer"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        // answer is an object {value, page, seen_at}; null when the API isn't confident.
+        let answerObj = payload["answer"] as? [String: Any]
+        let answerValue = answerObj.flatMap { $0["value"] }.map { "\($0)" }?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let answerPage = answerObj?["page"] as? String ?? ""
+        let answer = answerPage.isEmpty || answerValue.isEmpty ? answerValue : "\(answerValue) (\(answerPage))"
         if sources.isEmpty && answer.isEmpty { return "No search results found for '\(query)'" }
         var output = answer.isEmpty ? "" : "Answer: \(answer)\n\n"
         for (i, source) in sources.enumerated() {
