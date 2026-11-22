@@ -108,6 +108,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **囲碁** | Mac 向けネイティブ SwiftUI の囲碁：9×9〜19×19、コウ、置き碁、日本式または中国式の計算、コンピューター対戦 | [プレイ](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
 | **チェス** | 出力パネルでそのままチェスを指す（[上記](#agent-の中でチェス)）。Apple Intelligence が対戦相手の SwiftUI チェスアプリ AgenticChess も作成 | [プレイ](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
 | **StarPlayrX** | Xtra 音楽チャンネル向けのネイティブ iOS・Mac アプリ。Mac ではメニューバーに常駐し、自身の音声で動くラバランプ風イコライザー、切り離せるウィンドウシェード、Liquid Glass、完全な AppleScript 辞書を備えています | [Web サイト](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
+| **Wazy** | 自分の Disney+ サブスクリプション用のネイティブ SwiftUI Mac プレーヤー。ブラウズ、検索、ライブチャンネル、AVPlayer での FairPlay 再生 | [Web サイト](https://wazy.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Wazy) |
+| **Wazu** | 自分の Hulu サブスクリプション用のネイティブ SwiftUI Mac TV プレーヤー。ブラウズ、ライブ TV 番組表、AVPlayer での FairPlay 再生 | [Web サイト](https://wazu.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Wazu) |
 
 ---
 

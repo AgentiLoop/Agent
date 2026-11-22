@@ -108,6 +108,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **Го** | Нативное го на SwiftUI для Mac: от 9×9 до 19×19, ко, фора, японский или китайский подсчёт, компьютерный соперник | [Играть](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
 | **Шахматы** | Играет в шахматы прямо в панели вывода ([выше](#шахматы-внутри-agent)); также создал AgenticChess — шахматное приложение на SwiftUI, где соперник — Apple Intelligence | [Играть](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
 | **StarPlayrX** | Нативное приложение для iOS и Mac с музыкальными каналами Xtra; на Mac оно живёт в строке меню: эквалайзер-лавовая лампа, работающий от собственного звука, отрывное окно-штора, Liquid Glass и полный словарь AppleScript | [Сайт](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
+| **Wazy** | Нативный плеер для Mac на SwiftUI для вашей подписки Disney+: просмотр, поиск и прямые каналы с воспроизведением FairPlay в AVPlayer | [Сайт](https://wazy.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Wazy) |
+| **Wazu** | Нативный ТВ-плеер для Mac на SwiftUI для вашей подписки Hulu: просмотр каталога, телегид прямого эфира и воспроизведение FairPlay в AVPlayer | [Сайт](https://wazu.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Wazu) |
 
 ---
 

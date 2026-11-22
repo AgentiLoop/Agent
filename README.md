@@ -108,6 +108,8 @@ Just type what you want. Agent! figures out how and makes it happen.
 | **Go** | Native SwiftUI Go for the Mac: 9×9 to 19×19, ko, handicaps, Japanese or Chinese scoring, computer opponent | [Play](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
 | **Chess** | Plays chess right in its output panel ([above](#chess-within-agent)); also built AgenticChess, a SwiftUI chess app with Apple Intelligence as the opponent | [Play](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
 | **StarPlayrX** | Native iOS and Mac app for Xtra music channels; on the Mac it lives in the menu bar, with a lava-lamp equalizer driven by its own audio, a tear-off window shade, Liquid Glass and a full AppleScript dictionary | [Website](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
+| **Wazy** | Native SwiftUI Mac player for your own Disney+ subscription: browsing, search and live channels, with FairPlay playback in AVPlayer | [Website](https://wazy.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Wazy) |
+| **Wazu** | Native SwiftUI Mac TV player for your own Hulu subscription: browsing, a live TV guide and FairPlay playback in AVPlayer | [Website](https://wazu.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Wazu) |
 
 ---
 

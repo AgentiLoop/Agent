@@ -108,6 +108,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **바둑** | Mac용 네이티브 SwiftUI 바둑: 9×9부터 19×19, 패, 접바둑, 일본식 또는 중국식 계가, 컴퓨터 상대 | [플레이](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
 | **체스** | 출력 패널에서 바로 체스를 둡니다([위](#agent-안의-체스)). Apple Intelligence가 상대인 SwiftUI 체스 앱 AgenticChess도 만들었습니다 | [플레이](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
 | **StarPlayrX** | Xtra 음악 채널을 위한 네이티브 iOS·Mac 앱. Mac에서는 메뉴 막대에 자리하며, 자체 오디오로 움직이는 라바 램프 이퀄라이저, 떼어 낼 수 있는 윈도 셰이드, Liquid Glass, 완전한 AppleScript 사전을 갖췄습니다 | [웹사이트](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
+| **Wazy** | 내 Disney+ 구독을 위한 네이티브 SwiftUI Mac 플레이어. 탐색, 검색, 라이브 채널, AVPlayer의 FairPlay 재생 | [웹사이트](https://wazy.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Wazy) |
+| **Wazu** | 내 Hulu 구독을 위한 네이티브 SwiftUI Mac TV 플레이어. 탐색, 라이브 TV 편성표, AVPlayer의 FairPlay 재생 | [웹사이트](https://wazu.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Wazu) |
 
 ---
 

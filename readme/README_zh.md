@@ -108,6 +108,8 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **围棋** | Mac 原生 SwiftUI 围棋：9×9 到 19×19、劫、让子、日本或中国规则计分、电脑对手 | [开玩](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
 | **国际象棋** | 直接在输出面板里下国际象棋（[见上方](#在-agent-中下棋)）；还做了 AgenticChess，一款以 Apple Intelligence 为对手的 SwiftUI 国际象棋应用 | [开玩](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
 | **StarPlayrX** | 面向 Xtra 音乐频道的原生 iOS 和 Mac 应用，在 Mac 上常驻菜单栏，带有由自身音频驱动的熔岩灯均衡器、可撕下的窗口卷帘、Liquid Glass 以及完整的 AppleScript 词典 | [官网](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
+| **Wazy** | 面向你自己的 Disney+ 订阅的原生 SwiftUI Mac 播放器：浏览、搜索和直播频道，通过 AVPlayer 进行 FairPlay 播放 | [官网](https://wazy.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Wazy) |
+| **Wazu** | 面向你自己的 Hulu 订阅的原生 SwiftUI Mac 电视播放器：浏览内容、直播电视节目单，通过 AVPlayer 进行 FairPlay 播放 | [官网](https://wazu.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Wazu) |
 
 ---
 
