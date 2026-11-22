@@ -82,6 +82,7 @@ struct WebSearchSettingsView: View {
         case .tavily: return !viewModel.tavilyAPIKey.isEmpty
         case .ollama, .zAI: return !(backend.storedKey ?? "").isEmpty
         case .duckDuckGo: return true
+        case .claude: return false
         }
     }
 
@@ -118,7 +119,7 @@ struct WebSearchSettingsView: View {
                 }
             }
             .listStyle(.bordered)
-            .frame(height: CGFloat(WebSearchBackend.allCases.count) * 24 + 8)
+            .frame(height: CGFloat(WebSearchBackend.defaultOrder.count) * 24 + 8)
         }
     }
 

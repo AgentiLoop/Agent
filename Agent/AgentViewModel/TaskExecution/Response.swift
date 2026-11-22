@@ -34,6 +34,8 @@ extension AgentViewModel {
         var hasToolUse = false
         var pendingTools: [(toolId: String, name: String, input: [String: Any])] = []
         var blockedCompletion: (toolId: String, message: String)?
+        // Query of the last server-side web search, paired with its result block.
+        var nativeSearchQuery = ""
 
         for block in responseContent {
             guard let type = block["type"] as? String else { continue }
@@ -46,9 +48,12 @@ extension AgentViewModel {
                 if let input = block["input"] as? [String: Any],
                    let query = input["query"] as? String
                 {
+                    nativeSearchQuery = query
                     appendLog("Web search: \(query)")
                 }
             } else if type == "web_search_tool_result" {
+                appendLog("🌐 Web search backend: \(WebSearchBackend.claude.displayName)")
+                WebSearchStatsStore.shared.recordClaudeSearch(query: nativeSearchQuery, resultBlock: block)
                 // Display search results summary
                 if let content = block["content"] as? [[String: Any]] {
                     let results = content.compactMap { result -> String? in

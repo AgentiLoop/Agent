@@ -42,6 +42,9 @@ extension AgentViewModel {
             ($0["text"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
         }
 
+        // Query of the last server-side web search, paired with its result block.
+        var nativeSearchQuery = ""
+
         for block in content {
             guard let type = block["type"] as? String else { continue }
 
@@ -50,10 +53,13 @@ extension AgentViewModel {
             } else if type == "server_tool_use" {
                 // Server-side web search — executed by the API, just log it (mirrors parseLLMResponseContent)
                 if let query = (block["input"] as? [String: Any])?["query"] as? String {
+                    nativeSearchQuery = query
                     tab.appendLog("🔍 Web search: \(query)")
                     tab.flush()
                 }
             } else if type == "web_search_tool_result" {
+                tab.appendLog("🌐 Web search backend: \(WebSearchBackend.claude.displayName)")
+                WebSearchStatsStore.shared.recordClaudeSearch(query: nativeSearchQuery, resultBlock: block)
                 if let results = block["content"] as? [[String: Any]] {
                     let lines = results.compactMap { result -> String? in
                         guard result["type"] as? String == "web_search_result",

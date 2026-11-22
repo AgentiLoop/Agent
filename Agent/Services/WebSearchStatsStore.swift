@@ -6,6 +6,8 @@ import Observation
 /// The backend that actually served a web search. performWebSearchForTask
 /// tries backends in the user's drag-and-drop order (`order`, top =
 /// preferred), skipping any without a key. DuckDuckGo needs no key.
+/// `claude` is Anthropic's server-side web search: it runs inside the
+/// Claude API call, so it is recorded but never part of the order.
 enum WebSearchBackend: String, Codable, CaseIterable {
     case ollama
     case zAI
@@ -13,6 +15,7 @@ enum WebSearchBackend: String, Codable, CaseIterable {
     case exa
     case tavily
     case duckDuckGo
+    case claude
 
     var displayName: String {
         switch self {
@@ -22,6 +25,7 @@ enum WebSearchBackend: String, Codable, CaseIterable {
         case .exa: return "Exa"
         case .tavily: return "Tavily"
         case .duckDuckGo: return "DuckDuckGo"
+        case .claude: return "Claude Web Search"
         }
     }
 
@@ -31,12 +35,13 @@ enum WebSearchBackend: String, Codable, CaseIterable {
     /// Order used before the user rearranges anything.
     nonisolated static let defaultOrder: [WebSearchBackend] = [.specStream, .exa, .tavily, .ollama, .zAI, .duckDuckGo]
 
-    /// Parse a stored order string; unknown names are dropped and any
-    /// missing backends are appended in default order.
+    /// Parse a stored order string; unknown names (and the non-orderable
+    /// Claude search) are dropped and any missing backends are appended in
+    /// default order.
     nonisolated static func order(from raw: String) -> [WebSearchBackend] {
         var result: [WebSearchBackend] = []
         for name in raw.split(separator: ",") {
-            if let b = WebSearchBackend(rawValue: String(name)), !result.contains(b) { result.append(b) }
+            if let b = WebSearchBackend(rawValue: String(name)), defaultOrder.contains(b), !result.contains(b) { result.append(b) }
         }
         return result + defaultOrder.filter { !result.contains($0) }
     }
@@ -46,7 +51,7 @@ enum WebSearchBackend: String, Codable, CaseIterable {
         order(from: UserDefaults.standard.string(forKey: orderDefaultsKey) ?? "")
     }
 
-    /// Keychain key for this backend; nil for keyless DuckDuckGo.
+    /// Keychain key for this backend; nil for keyless DuckDuckGo and Claude.
     nonisolated var storedKey: String? {
         switch self {
         case .ollama: return KeychainService.shared.get(.ollama)
@@ -54,7 +59,7 @@ enum WebSearchBackend: String, Codable, CaseIterable {
         case .specStream: return KeychainService.shared.get(.specStream)
         case .exa: return KeychainService.shared.get(.exa)
         case .tavily: return KeychainService.shared.get(.tavily)
-        case .duckDuckGo: return nil
+        case .duckDuckGo, .claude: return nil
         }
     }
 }
@@ -144,6 +149,29 @@ final class WebSearchStatsStore {
             }
         }
         save()
+    }
+
+    /// Record Claude's server-side web search from a `web_search_tool_result`
+    /// block. Results are rendered in the same numbered format as the other
+    /// backends; an error object becomes an "Error:" result.
+    func recordClaudeSearch(query: String, resultBlock: [String: Any]) {
+        let result: String
+        if let results = resultBlock["content"] as? [[String: Any]] {
+            let hits = results.filter { $0["type"] as? String == "web_search_result" }
+            result = hits.isEmpty
+                ? "No results found for: \(query)"
+                : hits.enumerated().map { i, hit in
+                    let title = hit["title"] as? String ?? "Untitled"
+                    let url = hit["url"] as? String ?? ""
+                    let age = hit["page_age"] as? String ?? ""
+                    return "\(i + 1). \(title)\n   \(url)" + (age.isEmpty ? "" : "\n   [\(age)]")
+                }.joined(separator: "\n\n")
+        } else if let error = resultBlock["content"] as? [String: Any] {
+            result = "Error: \(error["error_code"] as? String ?? "unknown error")"
+        } else {
+            return
+        }
+        record(query: query, backend: .claude, result: result, isFinal: true)
     }
 
     // MARK: - Persistence

@@ -34,6 +34,7 @@ extension AgentViewModel {
             case .exa: result = await performExaSearchInternal(query: query, apiKey: key)
             case .tavily: result = await performTavilySearchForTask(query: query, apiKey: key)
             case .duckDuckGo: result = await performDuckDuckGoSearchInternal(query: query)
+            case .claude: result = "Error: Claude web search runs inside the Claude API"
             }
             let isFinal = !result.hasPrefix("Error:") || i == chain.count - 1
             await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: backend, result: result, isFinal: isFinal) }
