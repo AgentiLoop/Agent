@@ -95,7 +95,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 * **🪄 어떤 앱이든 즉석에서 자동화** — AppleScript와 손쉬운 사용(Accessibility) 자동화가 내장되어 있습니다. Agent!는 앱의 스크립팅 사전을 읽고(`lookup_sdef`), 버튼·필드·메뉴를 이름으로 찾아 클릭하고 입력하고 읽어 냅니다. 플러그인도, 설정도, 앱을 미리 알 필요도 없습니다.
 * **📜 재사용 가능한 코드를 직접 작성** — [AgentScript](#agentscript--전체-tcc를-가진-swift-스크립트)로 Agent!는 Swift 스크립트를 작성하고, 런타임에 컴파일해 앱 자체 권한으로 실행합니다. 스크립트는 라이브러리에 남아 다음 작업에서 재사용·수정·결합할 수 있습니다.
 * **♾️ `/auto` 목표 모드** — 목표를 주고 자리를 비우세요. 각 사이클은 진행 로그를 읽고, 가장 가치 있는 다음 단계를 골라 빌드·수정·커밋한 뒤 다음 사이클을 시작합니다. 목표가 달성되고 검증되거나 Stop All을 누를 때까지 멈추지 않습니다.
-* **🛠️ AgentiLoop Agent!로 만든 것들** — 게임, 웹 앱, Mac 앱: 3D 레이싱 게임, 멀티플레이어 던전 크롤러, 모든 픽셀을 코드로 그리는 격투 게임, 바둑과 체스 같은 보드게임, 그리고 Mac 앱 StarPlayrX:
+* **🛠️ AgentiLoop Agent!로 만든 것들** — 게임, 웹 앱, Mac 앱: 3D 레이싱 게임, 멀티플레이어 던전 크롤러, 모든 픽셀을 코드로 그리는 격투 게임, 바둑과 체스 같은 보드게임, 그리고 iOS·Mac 앱 StarPlayrX:
 
 | 프로젝트 | 설명 | 써 보기 / 소스 |
 |---|---|---|
@@ -107,7 +107,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **MarioKart64JS** | Auto-Pilot으로 JavaScript에 이식한 MarioKart64 | [플레이](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
 | **바둑** | Mac용 네이티브 SwiftUI 바둑: 9×9부터 19×19, 패, 접바둑, 일본식 또는 중국식 계가, 컴퓨터 상대 | [플레이](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
 | **체스** | 출력 패널에서 바로 체스를 둡니다([위](#agent-안의-체스)). Apple Intelligence가 상대인 SwiftUI 체스 앱 AgenticChess도 만들었습니다 | [플레이](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
-| **StarPlayrX** | Xtra 음악 채널을 위한 네이티브 Mac 메뉴 막대 앱. 자체 오디오로 움직이는 라바 램프 이퀄라이저, 떼어 낼 수 있는 윈도 셰이드, Liquid Glass, 완전한 AppleScript 사전을 갖췄습니다 | [웹사이트](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
+| **StarPlayrX** | Xtra 음악 채널을 위한 네이티브 iOS·Mac 앱. Mac에서는 메뉴 막대에 자리하며, 자체 오디오로 움직이는 라바 램프 이퀄라이저, 떼어 낼 수 있는 윈도 셰이드, Liquid Glass, 완전한 AppleScript 사전을 갖췄습니다 | [웹사이트](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
 
 ---
 

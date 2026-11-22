@@ -95,7 +95,7 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 * **🪄 Automatisiert jede App, spontan** — AppleScript- und Accessibility-Automatisierung sind eingebaut. Agent! liest das Scripting-Wörterbuch einer App (`lookup_sdef`), findet Buttons, Felder und Menüs per Name und klickt, tippt und liest sich dann durch. Kein Plugin, keine Einrichtung, keine App, die es vorher kennen muss.
 * **📜 Schreibt seinen eigenen wiederverwendbaren Code** — mit [AgentScript](#agentscript--swift-skripte-mit-vollem-tcc) schreibt Agent! Swift-Skripte, kompiliert sie zur Laufzeit und führt sie mit den Berechtigungen der App aus. Die Skripte bleiben in deiner Bibliothek, um sie bei der nächsten Aufgabe wiederzuverwenden, zu bearbeiten oder zu kombinieren.
 * **♾️ `/auto`-Zielmodus** — gib ein Ziel vor und geh weg. Jeder Zyklus liest das Fortschrittsprotokoll, wählt den wertvollsten nächsten Schritt, baut, behebt Fehler und committet, dann startet der nächste Zyklus. Es hört erst auf, wenn das Ziel erreicht und geprüft ist oder du auf Stop All drückst.
-* **🛠️ Gemacht mit AgentiLoop Agent!** — Spiele, Web-Apps und Mac-Apps: 3D-Rennspiele, ein Multiplayer-Dungeon-Crawler, ein Kampfspiel, bei dem jedes Pixel aus Code gezeichnet wird, Brettspiele wie Go und Schach und die Mac-App StarPlayrX:
+* **🛠️ Gemacht mit AgentiLoop Agent!** — Spiele, Web-Apps und Mac-Apps: 3D-Rennspiele, ein Multiplayer-Dungeon-Crawler, ein Kampfspiel, bei dem jedes Pixel aus Code gezeichnet wird, Brettspiele wie Go und Schach und die App StarPlayrX für iOS und Mac:
 
 | Projekt | Was es ist | Ausprobieren / Quellcode |
 |---|---|---|
@@ -107,7 +107,7 @@ Tipp einfach, was du willst. Agent! findet heraus wie und setzt es um.
 | **MarioKart64JS** | MarioKart64, mit Auto-Pilot nach JavaScript portiert | [Spielen](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
 | **Go** | Natives SwiftUI-Go für den Mac: 9×9 bis 19×19, Ko, Vorgaben, japanische oder chinesische Wertung, Computergegner | [Spielen](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
 | **Schach** | Spielt Schach direkt im Ausgabebereich ([oben](#schach-in-agent)); baute auch AgenticChess, eine SwiftUI-Schach-App mit Apple Intelligence als Gegner | [Spielen](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
-| **StarPlayrX** | Native Mac-Menüleisten-App für Xtra-Musikkanäle, mit einem Lavalampen-Equalizer, der vom eigenen Audio gesteuert wird, einem abreißbaren Fensterrollo, Liquid Glass und einem vollständigen AppleScript-Wörterbuch | [Website](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
+| **StarPlayrX** | Native iOS- und Mac-App für Xtra-Musikkanäle; auf dem Mac sitzt sie in der Menüleiste, mit einem Lavalampen-Equalizer, der vom eigenen Audio gesteuert wird, einem abreißbaren Fensterrollo, Liquid Glass und einem vollständigen AppleScript-Wörterbuch | [Website](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
 
 ---
 

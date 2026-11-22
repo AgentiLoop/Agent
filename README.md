@@ -95,7 +95,7 @@ Just type what you want. Agent! figures out how and makes it happen.
 * **🪄 Automates any app, on the fly** — AppleScript and Accessibility automation are built in. Agent! reads an app's scripting dictionary (`lookup_sdef`), finds buttons, fields and menus by name, then clicks, types and reads its way through. No plugin, no setup, no app it has to know in advance.
 * **📜 Writes its own reusable code** — with [AgentScript](#agentscript--swift-scripts-with-full-tcc), Agent! writes Swift scripts, compiles them at runtime and runs them with the app's own permissions. Scripts stay in your library to reuse, edit or combine on the next task.
 * **♾️ `/auto` goal mode** — give it a goal and walk away. Each cycle reads the progress log, picks the next most valuable step, builds, fixes and commits, then starts the next cycle. It doesn't stop until the goal is reached and verified, or you press Stop All.
-* **🛠️ Made with AgentiLoop Agent!** — games, web apps and Mac apps: 3D racers, a multiplayer dungeon crawler, a fighting game drawn pixel by pixel from code, board games like Go and Chess, and the StarPlayrX Mac app:
+* **🛠️ Made with AgentiLoop Agent!** — games, web apps and Mac apps: 3D racers, a multiplayer dungeon crawler, a fighting game drawn pixel by pixel from code, board games like Go and Chess, and the StarPlayrX app for iOS and Mac:
 
 | Project | What it is | Try it / source |
 |---|---|---|
@@ -107,7 +107,7 @@ Just type what you want. Agent! figures out how and makes it happen.
 | **MarioKart64JS** | MarioKart64 ported to JavaScript with Auto-Pilot | [Play](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
 | **Go** | Native SwiftUI Go for the Mac: 9×9 to 19×19, ko, handicaps, Japanese or Chinese scoring, computer opponent | [Play](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
 | **Chess** | Plays chess right in its output panel ([above](#chess-within-agent)); also built AgenticChess, a SwiftUI chess app with Apple Intelligence as the opponent | [Play](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
-| **StarPlayrX** | Native Mac menu bar app for Xtra music channels, with a lava-lamp equalizer driven by its own audio, a tear-off window shade, Liquid Glass and a full AppleScript dictionary | [Website](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
+| **StarPlayrX** | Native iOS and Mac app for Xtra music channels; on the Mac it lives in the menu bar, with a lava-lamp equalizer driven by its own audio, a tear-off window shade, Liquid Glass and a full AppleScript dictionary | [Website](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
 
 ---
 
