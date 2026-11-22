@@ -74,6 +74,11 @@ struct WebSearchSettingsView: View {
 
     private var order: [WebSearchBackend] { WebSearchBackend.order(from: orderRaw) }
 
+    /// True when the current tab's LLM is Claude.
+    private var isClaudeTab: Bool {
+        (viewModel.selectedTab?.llmConfig?.provider ?? viewModel.selectedProvider) == .claude
+    }
+
     /// Whether a backend can run: it has a key, or is keyless DuckDuckGo.
     private func isAvailable(_ backend: WebSearchBackend) -> Bool {
         switch backend {
@@ -93,6 +98,23 @@ struct WebSearchSettingsView: View {
         return VStack(alignment: .leading, spacing: 4) {
             Text("Search Tool Order").font(.caption).foregroundStyle(captionStyle)
             List {
+                // Fixed, non-draggable row: Claude's own search runs inside the
+                // Claude API, so it only appears when this tab's LLM is Claude.
+                if isClaudeTab {
+                    HStack(spacing: 6) {
+                        Image(systemName: "lock.fill")
+                            .font(.caption2)
+                            .foregroundStyle(captionStyle)
+                            .accessibilityHidden(true)
+                        Text(WebSearchBackend.claude.displayName)
+                            .font(.caption)
+                        Spacer()
+                        Text("Built in").font(.caption2).foregroundStyle(captionStyle)
+                    }
+                    .help("Claude's built-in search")
+                    .accessibilityElement(children: .combine)
+                    .moveDisabled(true)
+                }
                 ForEach(Array(order.enumerated()), id: \.element) { index, backend in
                     let available = isAvailable(backend)
                     HStack(spacing: 6) {
@@ -119,7 +141,7 @@ struct WebSearchSettingsView: View {
                 }
             }
             .listStyle(.bordered)
-            .frame(height: CGFloat(WebSearchBackend.defaultOrder.count) * 24 + 8)
+            .frame(height: CGFloat(WebSearchBackend.defaultOrder.count + (isClaudeTab ? 1 : 0)) * 24 + 8)
         }
     }
 
