@@ -111,7 +111,6 @@ struct WebSearchSettingsView: View {
                         Spacer()
                         Text("Built in").font(.caption2).foregroundStyle(captionStyle)
                     }
-                    .help("Claude's built-in search")
                     .accessibilityElement(children: .combine)
                     .moveDisabled(true)
                 }
