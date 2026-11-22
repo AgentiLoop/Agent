@@ -15,63 +15,31 @@ extension AgentViewModel {
 
     // MARK: - Web Search (forwarding to WebSearch extension)
 
-    /// Perform web search using the appropriate API based on provider.
-    /// This delegates to the implementation in AgentViewModel+WebSearch.swift.
+    /// Perform a web search, trying backends in the user's drag-and-drop
+    /// order from the Web Search popover (top = preferred). Backends with no
+    /// key are skipped; on error the next one is tried. The last backend
+    /// attempted is returned even if it errored.
     nonisolated static func performWebSearchForTask(query: String, apiKey: String, provider: APIProvider) async -> (String, WebSearchBackend) {
-        // Fallback chain — each step tries a more universal backend: 1. Ollama+key → Ollama Web Search 2.
-        // Z.AI/BigModel+key → Z.AI search-prime 3. SpecStream key → SpecStream 4. Exa key → Exa /search 5. Tavily key → Tavily 6. DuckDuckGo HTML scrape (no key, always available)
-        if provider == .ollama || provider == .localOllama {
-            if let ollamaKey = KeychainService.shared.get(.ollama), !ollamaKey.isEmpty {
-                let ollamaResult = await performOllamaWebSearchInternal(query: query, apiKey: ollamaKey)
-                await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .ollama, result: ollamaResult, isFinal: !ollamaResult.hasPrefix("Error:")) }
-                if !ollamaResult.hasPrefix("Error:") {
-                    return (ollamaResult, .ollama)
-                }
-            }
+        let chain: [(WebSearchBackend, String)] = WebSearchBackend.order.compactMap { backend in
+            if backend == .duckDuckGo { return (backend, "") }
+            let key = backend == .tavily && !apiKey.isEmpty ? apiKey : (backend.storedKey ?? "")
+            return key.isEmpty ? nil : (backend, key)
         }
-        // Z.AI / BigModel providers: try native web_search API first. Returns structured results like Tavily. Not all
-        // accounts include it, so fall through on error.
-        if provider == .zAI || provider == .bigModel {
-            if let zKey = KeychainService.shared.get(.zAI), !zKey.isEmpty {
-                let zResult = await performZAIWebSearchInternal(query: query, apiKey: zKey)
-                await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .zAI, result: zResult, isFinal: !zResult.hasPrefix("Error:")) }
-                if !zResult.hasPrefix("Error:") {
-                    return (zResult, .zAI)
-                }
+        for (i, (backend, key)) in chain.enumerated() {
+            let result: String
+            switch backend {
+            case .ollama: result = await performOllamaWebSearchInternal(query: query, apiKey: key)
+            case .zAI: result = await performZAIWebSearchInternal(query: query, apiKey: key)
+            case .specStream: result = await performSpecStreamSearchInternal(query: query, apiKey: key)
+            case .exa: result = await performExaSearchInternal(query: query, apiKey: key)
+            case .tavily: result = await performTavilySearchForTask(query: query, apiKey: key)
+            case .duckDuckGo: result = await performDuckDuckGoSearchInternal(query: query)
             }
+            let isFinal = !result.hasPrefix("Error:") || i == chain.count - 1
+            await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: backend, result: result, isFinal: isFinal) }
+            if isFinal { return (result, backend) }
         }
-        // SpecStream — api.specstream.ai/v1/web-search. Falls through on
-        // error so Exa/Tavily/DuckDuckGo remain available.
-        if let specKey = KeychainService.shared.get(.specStream), !specKey.isEmpty {
-            let specResult = await performSpecStreamSearchInternal(query: query, apiKey: specKey)
-            await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .specStream, result: specResult, isFinal: !specResult.hasPrefix("Error:")) }
-            if !specResult.hasPrefix("Error:") {
-                return (specResult, .specStream)
-            }
-        }
-        // Exa — neural/semantic web search via api.exa.ai. Pulled from
-        // Keychain inside the function (matches Z.AI/Ollama pattern). Falls
-        // through on error so Tavily/DuckDuckGo remain available.
-        if let exaKey = KeychainService.shared.get(.exa), !exaKey.isEmpty {
-            let exaResult = await performExaSearchInternal(query: query, apiKey: exaKey)
-            await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .exa, result: exaResult, isFinal: !exaResult.hasPrefix("Error:")) }
-            if !exaResult.hasPrefix("Error:") {
-                return (exaResult, .exa)
-            }
-        }
-        // Tavily — only attempt if a key is configured. Missing key → skip,
-        // fall through to keyless DuckDuckGo instead of dead-ending.
-        if !apiKey.isEmpty {
-            let tavilyResult = await performTavilySearchForTask(query: query, apiKey: apiKey)
-            await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .tavily, result: tavilyResult, isFinal: !tavilyResult.hasPrefix("Error:")) }
-            if !tavilyResult.hasPrefix("Error:") {
-                return (tavilyResult, .tavily)
-            }
-        }
-        // Universal keyless fallback — always-on safety net.
-        let ddgResult = await performDuckDuckGoSearchInternal(query: query)
-        await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: .duckDuckGo, result: ddgResult, isFinal: true) }
-        return (ddgResult, .duckDuckGo)
+        return ("Error: no web search backend available", .duckDuckGo)
     }
 
     /// Calls Z.AI's /web_search endpoint (search-prime engine). Returns structured

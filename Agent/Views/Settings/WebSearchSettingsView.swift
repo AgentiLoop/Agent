@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// Web Search keys — available for every LLM provider. Users supply their own
-/// keys. SpecStream is tried first when set, then Exa, then Tavily, with
-/// DuckDuckGo as the keyless fallback. Below the keys: live stats from
+/// keys, then drag the search tools into order (top = preferred); tools
+/// without a key are skipped. Below the order: live stats from
 /// WebSearchStatsStore — which backend served the last search, per-backend
 /// usage and errors, and recent search/result history.
 struct WebSearchSettingsView: View {
@@ -23,7 +23,7 @@ struct WebSearchSettingsView: View {
             Text("Web Search")
                 .font(.headline)
                 .accessibilityAddTraits(.isHeader)
-            Text("SpecStream, Exa or Tavily provides web search for all LLM providers, tried in that order. Ollama and Z.AI use their own web search first when their key is set. DuckDuckGo is used when no key is set.")
+            Text("Web search works with every LLM provider. Drag the search tools below into the order you want. The top one is preferred and the rest are tried in order if it fails. Tools without a key are skipped.")
                 .font(.caption)
                 .foregroundStyle(captionStyle)
                 .fixedSize(horizontal: false, vertical: true)
@@ -39,6 +39,10 @@ struct WebSearchSettingsView: View {
                 Text("Tavily API Key").font(.caption).foregroundStyle(captionStyle).accessibilityHidden(true)
                 LockedSecureField(text: $viewModel.tavilyAPIKey, placeholder: "tvly-...", lockKey: "lock.tavilyAPIKey", label: "Tavily API Key")
             }
+
+            Divider()
+
+            orderSection
 
             Divider()
 
@@ -61,6 +65,61 @@ struct WebSearchSettingsView: View {
         }
         .padding(16)
         .frame(width: 360)
+    }
+
+    // MARK: - Search Order
+
+    /// Saved drag-and-drop order (comma-separated backend raw values).
+    @AppStorage(WebSearchBackend.orderDefaultsKey) private var orderRaw = ""
+
+    private var order: [WebSearchBackend] { WebSearchBackend.order(from: orderRaw) }
+
+    /// Whether a backend can run: it has a key, or is keyless DuckDuckGo.
+    private func isAvailable(_ backend: WebSearchBackend) -> Bool {
+        switch backend {
+        case .specStream: return !viewModel.specStreamAPIKey.isEmpty
+        case .exa: return !viewModel.exaAPIKey.isEmpty
+        case .tavily: return !viewModel.tavilyAPIKey.isEmpty
+        case .ollama, .zAI: return !(backend.storedKey ?? "").isEmpty
+        case .duckDuckGo: return true
+        }
+    }
+
+    /// Drag-and-drop list of every search tool. Top available row is the
+    /// preferred tool; the rest are the fallback order.
+    private var orderSection: some View {
+        let preferred = order.first(where: isAvailable)
+        return VStack(alignment: .leading, spacing: 4) {
+            Text("Search Tool Order").font(.caption).foregroundStyle(captionStyle)
+            List {
+                ForEach(Array(order.enumerated()), id: \.element) { index, backend in
+                    let available = isAvailable(backend)
+                    HStack(spacing: 6) {
+                        Image(systemName: "line.3.horizontal")
+                            .font(.caption2)
+                            .foregroundStyle(captionStyle)
+                            .accessibilityHidden(true)
+                        Text("\(index + 1). \(backend.displayName)")
+                            .font(.caption)
+                            .foregroundStyle(available ? AnyShapeStyle(.primary) : AnyShapeStyle(captionStyle))
+                        Spacer()
+                        if backend == preferred {
+                            Text("Preferred").font(.caption2).foregroundStyle(Color.green)
+                        } else if !available {
+                            Text("No key — skipped").font(.caption2).foregroundStyle(captionStyle)
+                        }
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+                .onMove { from, to in
+                    var newOrder = order
+                    newOrder.move(fromOffsets: from, toOffset: to)
+                    orderRaw = newOrder.map(\.rawValue).joined(separator: ",")
+                }
+            }
+            .listStyle(.bordered)
+            .frame(height: CGFloat(WebSearchBackend.allCases.count) * 24 + 8)
+        }
     }
 
     // MARK: - Stats & Errors

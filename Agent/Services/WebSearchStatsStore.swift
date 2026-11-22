@@ -3,9 +3,9 @@ import Observation
 
 // MARK: - Web Search Backend Identity & Stats
 
-/// The backend that actually served a web search. Case order matches the
-/// fallback chain in performWebSearchForTask: Ollama → Z.AI → SpecStream →
-/// Exa → Tavily → DuckDuckGo (keyless, always last).
+/// The backend that actually served a web search. performWebSearchForTask
+/// tries backends in the user's drag-and-drop order (`order`, top =
+/// preferred), skipping any without a key. DuckDuckGo needs no key.
 enum WebSearchBackend: String, Codable, CaseIterable {
     case ollama
     case zAI
@@ -24,7 +24,41 @@ enum WebSearchBackend: String, Codable, CaseIterable {
         case .duckDuckGo: return "DuckDuckGo"
         }
     }
+
+    /// UserDefaults key holding the comma-separated search order.
+    nonisolated static let orderDefaultsKey = "webSearchOrder"
+
+    /// Order used before the user rearranges anything.
+    nonisolated static let defaultOrder: [WebSearchBackend] = [.specStream, .exa, .tavily, .ollama, .zAI, .duckDuckGo]
+
+    /// Parse a stored order string; unknown names are dropped and any
+    /// missing backends are appended in default order.
+    nonisolated static func order(from raw: String) -> [WebSearchBackend] {
+        var result: [WebSearchBackend] = []
+        for name in raw.split(separator: ",") {
+            if let b = WebSearchBackend(rawValue: String(name)), !result.contains(b) { result.append(b) }
+        }
+        return result + defaultOrder.filter { !result.contains($0) }
+    }
+
+    /// The user's saved search order, top = preferred.
+    nonisolated static var order: [WebSearchBackend] {
+        order(from: UserDefaults.standard.string(forKey: orderDefaultsKey) ?? "")
+    }
+
+    /// Keychain key for this backend; nil for keyless DuckDuckGo.
+    nonisolated var storedKey: String? {
+        switch self {
+        case .ollama: return KeychainService.shared.get(.ollama)
+        case .zAI: return KeychainService.shared.get(.zAI)
+        case .specStream: return KeychainService.shared.get(.specStream)
+        case .exa: return KeychainService.shared.get(.exa)
+        case .tavily: return KeychainService.shared.get(.tavily)
+        case .duckDuckGo: return nil
+        }
+    }
 }
+
 
 /// One completed search: the query, the backend that served it, whether it
 /// succeeded, and a short preview of the result.
