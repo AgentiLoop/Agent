@@ -95,9 +95,9 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 * **🪄 随时自动化任何应用** —— 内置 AppleScript 和辅助功能（Accessibility）自动化。Agent! 会读取应用的脚本字典（`lookup_sdef`），按名称找到按钮、输入框和菜单，然后点击、输入并读取内容。无需插件，无需设置，也不必事先了解这个应用。
 * **📜 编写自己的可复用代码** —— 借助 [AgentScript](#agentscript--拥有完整-tcc-的-swift-脚本)，Agent! 编写 Swift 脚本，在运行时编译，并以应用自身的权限运行。脚本会保留在你的脚本库中，下次任务可以直接复用、修改或组合。
 * **♾️ `/auto` 目标模式** —— 给它一个目标，然后放手。每个周期都会读取进度日志，挑选最有价值的下一步，构建、修复并提交，然后开始下一个周期。直到目标达成并经过验证，或你按下 Stop All，它才会停下。
-* **🎮 制作复杂的游戏** —— 3D 赛车游戏、多人地牢探索游戏、每个像素都由代码绘制的格斗游戏，以及围棋和国际象棋等棋类游戏：
+* **🛠️ 用 AgentiLoop Agent! 打造** —— 游戏、网页应用和 Mac 应用：3D 赛车游戏、多人地牢探索游戏、每个像素都由代码绘制的格斗游戏、围棋和国际象棋等棋类游戏，以及 Mac 应用 StarPlayrX：
 
-| 游戏 | 简介 | 开玩 / 源码 |
+| 项目 | 简介 | 体验 / 源码 |
 |---|---|---|
 | **Umbravault** | 新作：支持 1–8 名玩家的在线第一人称地牢探索游戏，六种职业，每三层一个首领。运行在 Cloudflare Workers 上的 Three.js | [开玩](https://umbravault.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Umbravault) |
 | **Batman v Superman** | 街霸风格的 3D 格斗游戏，每个像素都由代码绘制：没有模型文件、贴图或音频采样 | [开玩](https://bvs.agentiloop.ai/) · [GitHub](https://github.com/AgentiLoop/bvs) |
@@ -107,6 +107,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **MarioKart64JS** | 借助 Auto-Pilot 移植到 JavaScript 的 MarioKart64 | [开玩](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
 | **围棋** | Mac 原生 SwiftUI 围棋：9×9 到 19×19、劫、让子、日本或中国规则计分、电脑对手 | [开玩](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
 | **国际象棋** | 直接在输出面板里下国际象棋（[见上方](#在-agent-中下棋)）；还做了 AgenticChess，一款以 Apple Intelligence 为对手的 SwiftUI 国际象棋应用 | [开玩](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
+| **StarPlayrX** | 面向 Xtra 音乐频道的原生 Mac 菜单栏应用，带有由自身音频驱动的熔岩灯均衡器、可撕下的窗口卷帘、Liquid Glass 以及完整的 AppleScript 词典 | [官网](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
 
 ---
 

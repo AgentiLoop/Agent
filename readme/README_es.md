@@ -95,9 +95,9 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 * **🪄 Automatiza cualquier app, sobre la marcha** — la automatización con AppleScript y Accesibilidad viene integrada. Agent! lee el diccionario de scripting de una app (`lookup_sdef`), encuentra botones, campos y menús por su nombre y después hace clic, escribe y lee. Sin plugins, sin configuración, sin tener que conocer la app de antemano.
 * **📜 Escribe su propio código reutilizable** — con [AgentScript](#agentscript--scripts-swift-con-tcc-completo), Agent! escribe scripts en Swift, los compila en tiempo de ejecución y los ejecuta con los permisos de la propia app. Los scripts se quedan en tu biblioteca para reutilizarlos, editarlos o combinarlos en la siguiente tarea.
 * **♾️ Modo objetivo `/auto`** — dale un objetivo y vete. Cada ciclo lee el registro de progreso, elige el siguiente paso más valioso, compila, corrige y hace commit, y luego empieza el siguiente ciclo. No para hasta alcanzar y verificar el objetivo, o hasta que pulses Stop All.
-* **🎮 Crea juegos complejos** — juegos de carreras en 3D, un dungeon crawler multijugador, un juego de lucha dibujado píxel a píxel desde código y juegos de mesa como Go y ajedrez:
+* **🛠️ Hecho con AgentiLoop Agent!** — juegos, aplicaciones web y apps para Mac: juegos de carreras en 3D, un dungeon crawler multijugador, un juego de lucha dibujado píxel a píxel desde código, juegos de mesa como Go y ajedrez, y la app para Mac StarPlayrX:
 
-| Juego | Qué es | Jugar / código |
+| Proyecto | Qué es | Probar / código |
 |---|---|---|
 | **Umbravault** | Nuevo: dungeon crawler en línea en primera persona para 1–8 jugadores, seis clases y un jefe cada tres pisos. Three.js sobre Cloudflare Workers | [Jugar](https://umbravault.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Umbravault) |
 | **Batman v Superman** | Juego de lucha en 3D al estilo Street Fighter donde cada píxel se dibuja desde código: sin archivos de modelos, texturas ni muestras de audio | [Jugar](https://bvs.agentiloop.ai/) · [GitHub](https://github.com/AgentiLoop/bvs) |
@@ -107,6 +107,7 @@ Solo escribe lo que quieres. Agent! averigua cómo y lo hace realidad.
 | **MarioKart64JS** | MarioKart64 portado a JavaScript con Auto-Pilot | [Jugar](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
 | **Go** | Go nativo en SwiftUI para Mac: de 9×9 a 19×19, ko, hándicaps, puntuación japonesa o china y rival controlado por el ordenador | [Jugar](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
 | **Ajedrez** | Juega al ajedrez en su propio panel de salida ([arriba](#ajedrez-dentro-de-agent)); también creó AgenticChess, una app de ajedrez en SwiftUI con Apple Intelligence como rival | [Jugar](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
+| **StarPlayrX** | App nativa de la barra de menús del Mac para los canales de música Xtra, con un ecualizador tipo lámpara de lava impulsado por su propio audio, una persiana de ventana desprendible, Liquid Glass y un diccionario AppleScript completo | [Web](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
 
 ---
 

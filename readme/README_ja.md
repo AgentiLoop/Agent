@@ -95,9 +95,9 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 * **🪄 どんなアプリでもその場で自動化** — AppleScript とアクセシビリティによる自動化を内蔵。Agent! はアプリのスクリプト辞書を読み（`lookup_sdef`）、ボタン・フィールド・メニューを名前で見つけて、クリック・入力・読み取りをこなします。プラグインも設定も不要で、事前にアプリを知っている必要もありません。
 * **📜 再利用できるコードを自分で書く** — [AgentScript](#agentscript--完全な-tcc-を持つ-swift-スクリプト) を使い、Agent! は Swift スクリプトを書き、実行時にコンパイルし、アプリ自身の権限で実行します。スクリプトはライブラリに残り、次のタスクで再利用・編集・組み合わせができます。
 * **♾️ `/auto` ゴールモード** — ゴールを与えたら任せてください。各サイクルで進捗ログを読み、次に最も価値のあるステップを選び、ビルド・修正・コミットしてから次のサイクルへ進みます。ゴールが達成され検証されるか、Stop All を押すまで止まりません。
-* **🎮 複雑なゲームを作る** — 3D レースゲーム、マルチプレイヤーのダンジョンクローラー、すべてのピクセルをコードで描く格闘ゲーム、そして囲碁やチェスのようなボードゲーム：
+* **🛠️ AgentiLoop Agent! で作ったもの** — ゲーム、Web アプリ、Mac アプリ：3D レースゲーム、マルチプレイヤーのダンジョンクローラー、すべてのピクセルをコードで描く格闘ゲーム、囲碁やチェスのようなボードゲーム、そして Mac アプリ StarPlayrX：
 
-| ゲーム | 内容 | プレイ / ソース |
+| プロジェクト | 内容 | 試す / ソース |
 |---|---|---|
 | **Umbravault** | 新作：1〜8 人で遊べるオンラインの一人称ダンジョンクローラー。6 つのクラス、3 階ごとにボス。Cloudflare Workers 上の Three.js | [プレイ](https://umbravault.xcf.ai) · [GitHub](https://github.com/AgentiLoop/Umbravault) |
 | **Batman v Superman** | すべてのピクセルをコードで描くストリートファイター風の 3D 格闘ゲーム。モデルファイル・テクスチャ・音声サンプルなし | [プレイ](https://bvs.agentiloop.ai/) · [GitHub](https://github.com/AgentiLoop/bvs) |
@@ -107,6 +107,7 @@ open "build/DerivedData/Build/Products/Debug/Agent!.app"
 | **MarioKart64JS** | MarioKart64 を Auto-Pilot で JavaScript に移植 | [プレイ](https://mk64js.gokart.games) · [GitHub](https://github.com/AgentiLoop/MarioKart64JS) |
 | **囲碁** | Mac 向けネイティブ SwiftUI の囲碁：9×9〜19×19、コウ、置き碁、日本式または中国式の計算、コンピューター対戦 | [プレイ](https://go.xcf.ai) · [GitHub](https://github.com/AgentiLoop/go.xcf.ai) |
 | **チェス** | 出力パネルでそのままチェスを指す（[上記](#agent-の中でチェス)）。Apple Intelligence が対戦相手の SwiftUI チェスアプリ AgenticChess も作成 | [プレイ](https://chess.xcf.ai) · [GitHub](https://github.com/AgentiLoop/chess.xcf.ai) |
+| **StarPlayrX** | Xtra 音楽チャンネル向けのネイティブ Mac メニューバーアプリ。自身の音声で動くラバランプ風イコライザー、切り離せるウィンドウシェード、Liquid Glass、完全な AppleScript 辞書を備えています | [Web サイト](https://starplayrx.com) · [GitHub](https://github.com/AgentiLoop/StarPlayrX) |
 
 ---
 
