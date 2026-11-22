@@ -23,7 +23,7 @@ struct WebSearchSettingsView: View {
             Text("Web Search")
                 .font(.headline)
                 .accessibilityAddTraits(.isHeader)
-            Text("SpecStream, Exa or Tavily provides web search for all LLM providers, tried in that order. DuckDuckGo is used when no key is set.")
+            Text("SpecStream, Exa or Tavily provides web search for all LLM providers, tried in that order. Ollama and Z.AI use their own web search first when their key is set. DuckDuckGo is used when no key is set.")
                 .font(.caption)
                 .foregroundStyle(captionStyle)
                 .fixedSize(horizontal: false, vertical: true)

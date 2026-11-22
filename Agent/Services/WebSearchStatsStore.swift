@@ -16,8 +16,8 @@ enum WebSearchBackend: String, Codable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .ollama: return "Ollama"
-        case .zAI: return "Z.AI"
+        case .ollama: return "Ollama Web Search"
+        case .zAI: return "Z.AI Web Search"
         case .specStream: return "SpecStream"
         case .exa: return "Exa"
         case .tavily: return "Tavily"

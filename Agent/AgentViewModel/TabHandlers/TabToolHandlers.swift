@@ -62,6 +62,14 @@ extension AgentViewModel {
         // Selenium (prefix match)
         case let n where n.hasPrefix("selenium_"):
             return await handleTabSeleniumTool(tab: tab, name: name, input: input, toolId: toolId)
+        // Web search — log which backend served it on THIS tab, before the results
+        case "web_search":
+            let query = input["query"] as? String ?? ""
+            guard !query.isEmpty else { return tabResult("Error: query is required", toolId: toolId) }
+            let (output, backend) = await Self.performWebSearchForTask(query: query, apiKey: tavilyAPIKey, provider: selectedProvider)
+            tab.appendLog("🌐 Web search backend: \(backend.displayName)")
+            tab.appendLog(output); tab.flush()
+            return tabResult(output, toolId: toolId)
         // Xcode (prefix match)
         case let n where n.hasPrefix("xcode_"):
             let output = await executeNativeTool(name, input: input)
