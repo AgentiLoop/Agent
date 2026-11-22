@@ -122,13 +122,19 @@ final class ClaudeService {
                 "required": ["tool_use_id"]
             ]
         ])
-        // Only add native web_search for real Anthropic API — remove Tavily duplicate first
+        // Real Anthropic API: Claude's native web_search is the ONLY web search.
+        // Remove the app's own search tool (sent as "search", or "web_search" on
+        // some paths) so Claude can't pick it, and steer Safari away from plain searches.
         if !isLocalEndpoint {
-            t.removeAll { ($0["name"] as? String) == "web_search" }
+            t.removeAll { ["web_search", "search"].contains($0["name"] as? String) }
+            t = WebSearchBackend.steeringSafari(t, searchTool: "web_search")
             t.append([
                 "type": "web_search_20250305",
                 "name": "web_search"
             ])
+        } else {
+            t = WebSearchBackend.describingSearchTool(t)
+            t = WebSearchBackend.steeringSafari(t, searchTool: "search")
         }
         // Persistent goal state + self-verification (app-local tool).
         t.append(contentsOf: AgentTools.localToolSchemas())

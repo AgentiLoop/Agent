@@ -51,6 +51,45 @@ enum WebSearchBackend: String, Codable, CaseIterable {
         order(from: UserDefaults.standard.string(forKey: orderDefaultsKey) ?? "")
     }
 
+    // MARK: - Tool schema fixes (AgentTools is a remote package)
+
+    /// Accurate description for the app's own `search` tool — the package
+    /// still calls it "Web search via Tavily", which misleads the model.
+    nonisolated static let searchToolDescription =
+        "Web search. Use this for any request to search or look something up on the web. "
+        + "The app picks the search service (the user's Search Tool Order) — do not use Safari for this."
+
+    /// Apply `edit` to the description of the tool named `name`, for both
+    /// Claude-format ({name, description}) and OpenAI-format
+    /// ({function: {name, description}}) tool schemas.
+    nonisolated private static func editingDescription(
+        _ tools: [[String: Any]], of name: String, _ edit: (String) -> String
+    ) -> [[String: Any]] {
+        tools.map { tool in
+            var tool = tool
+            if tool["name"] as? String == name {
+                tool["description"] = edit(tool["description"] as? String ?? "")
+            } else if var fn = tool["function"] as? [String: Any], fn["name"] as? String == name {
+                fn["description"] = edit(fn["description"] as? String ?? "")
+                tool["function"] = fn
+            }
+            return tool
+        }
+    }
+
+    /// Replace the stale "via Tavily" description on the `search` tool.
+    nonisolated static func describingSearchTool(_ tools: [[String: Any]]) -> [[String: Any]] {
+        editingDescription(tools, of: "search") { _ in searchToolDescription }
+    }
+
+    /// Tell the model Safari is not for plain web searches.
+    nonisolated static func steeringSafari(_ tools: [[String: Any]], searchTool: String) -> [[String: Any]] {
+        editingDescription(tools, of: "safari") {
+            "Only use Safari when the user explicitly asks for Safari or a browser. "
+                + "For a plain web search use the \(searchTool) tool instead. " + $0
+        }
+    }
+
     /// Keychain key for this backend; nil for keyless DuckDuckGo and Claude.
     nonisolated var storedKey: String? {
         switch self {
