@@ -90,7 +90,7 @@ final class WebSearchStatsStore {
     /// Cap on retained search history entries.
     static let historyLimit = 50
     /// Characters of result kept per history entry.
-    static let previewLength = 240
+    static let previewLength = 600
 
     private(set) var backendStats: [WebSearchBackend: WebSearchBackendStats] = [:]
     private(set) var lastBackend: WebSearchBackend?

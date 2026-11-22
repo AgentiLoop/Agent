@@ -174,26 +174,116 @@ struct WebSearchSettingsView: View {
 
     // MARK: - History
 
-    /// One recent search: status icon, query, backend + time, result preview.
+    /// One recent search: status icon, query, backend + time, then the top
+    /// result laid out as title, clickable URL and a flowing snippet.
     private func historyRow(_ record: WebSearchRecord) -> some View {
-        VStack(alignment: .leading, spacing: 1) {
+        VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 4) {
                 Image(systemName: record.success ? "checkmark.circle.fill" : "xmark.circle.fill")
                     .font(.caption2)
                     .foregroundStyle(record.success ? Color.green : Color.red)
+                    .accessibilityLabel(record.success ? "Succeeded" : "Failed")
                 Text(record.query)
-                    .font(.caption)
+                    .font(.caption.weight(.semibold))
                     .lineLimit(1)
-                Spacer()
+                Spacer(minLength: 8)
                 Text("\(record.backend.displayName) · \(record.timestamp.formatted(date: .omitted, time: .shortened))")
                     .font(.caption2)
                     .foregroundStyle(captionStyle)
+                    .lineLimit(1)
             }
-            Text(record.resultPreview)
+            historyDetail(record)
+                .padding(.leading, 14)
+        }
+        .padding(.vertical, 2)
+    }
+
+    /// Body of a history row: the error for failed searches, the parsed top
+    /// result for successful ones, or the flattened preview if it can't be parsed.
+    @ViewBuilder
+    private func historyDetail(_ record: WebSearchRecord) -> some View {
+        if !record.success {
+            Text(Self.flattened(record.resultPreview.replacingOccurrences(of: "Error:", with: "")))
+                .font(.caption2)
+                .foregroundStyle(Color.red)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+        } else if let top = Self.topResult(from: record.resultPreview) {
+            VStack(alignment: .leading, spacing: 1) {
+                if !top.title.isEmpty {
+                    Text(top.title)
+                        .font(.caption)
+                        .lineLimit(1)
+                }
+                if let url = URL(string: top.url), url.scheme != nil {
+                    Link(destination: url) {
+                        Text(Self.displayURL(top.url))
+                            .font(.caption2)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                    }
+                    .help(top.url)
+                }
+                if !top.snippet.isEmpty {
+                    Text(top.snippet)
+                        .font(.caption2)
+                        .foregroundStyle(captionStyle)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        } else {
+            Text(Self.flattened(record.resultPreview))
                 .font(.caption2)
                 .foregroundStyle(captionStyle)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    /// Top result pulled from a backend's numbered output
+    /// ("1. Title" / "   url" / "   [meta]" / "   snippet"). A SpecStream
+    /// "Answer:" line, when present, is used as the snippet.
+    private static func topResult(from preview: String) -> (title: String, url: String, snippet: String)? {
+        let lines = preview.components(separatedBy: .newlines)
+        var answer = ""
+        var title: String?
+        var url = ""
+        var snippetParts: [String] = []
+        for raw in lines {
+            let line = raw.trimmingCharacters(in: .whitespaces)
+            if title == nil {
+                if line.hasPrefix("Answer:") {
+                    answer = String(line.dropFirst("Answer:".count)).trimmingCharacters(in: .whitespaces)
+                } else if let range = line.range(of: #"^\d+\.\s+"#, options: .regularExpression) {
+                    title = String(line[range.upperBound...])
+                }
+                continue
+            }
+            // Stop at the end of the first result.
+            if line.isEmpty || line.range(of: #"^\d+\.\s+"#, options: .regularExpression) != nil { break }
+            if url.isEmpty, line.hasPrefix("http") {
+                url = line
+            } else if !(line.hasPrefix("[") && line.hasSuffix("]")) {
+                snippetParts.append(line)
+            }
+        }
+        guard let title else { return nil }
+        let snippet = answer.isEmpty ? flattened(snippetParts.joined(separator: " ")) : answer
+        return (title, url, snippet == title ? "" : snippet)
+    }
+
+    /// URL without scheme or "www." for compact display.
+    private static func displayURL(_ url: String) -> String {
+        var s = url
+        for prefix in ["https://", "http://", "www."] where s.hasPrefix(prefix) {
+            s.removeFirst(prefix.count)
+        }
+        return s.hasSuffix("/") ? String(s.dropLast()) : s
+    }
+
+    /// Collapse line breaks and runs of whitespace into single spaces.
+    private static func flattened(_ text: String) -> String {
+        text.split(whereSeparator: \.isWhitespace).joined(separator: " ")
     }
 }
