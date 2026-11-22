@@ -265,9 +265,10 @@ struct AgentApp: App {
                 Button("Actual Size Text") { ActivityLogTextSize.set(NSFont.systemFontSize) }
                     .keyboardShortcut("0", modifiers: .command)
             }
-            CommandMenu("Sponsors") {
-                SponsorsMenu()
-            }
+            // Sponsors menu hidden — uncomment to restore.
+            // CommandMenu("Sponsors") {
+            //     SponsorsMenu()
+            // }
             CommandGroup(after: .windowArrangement) {
                 Button("System Prompts") {
                     SystemPromptWindow.shared.show()
