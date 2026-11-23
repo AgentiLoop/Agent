@@ -112,7 +112,8 @@ extension AgentViewModel {
         if !tabImages.isEmpty {
             tab.appendLog("(\(tabImages.count) screenshot(s) attached, \(tabImages.map(\.count).reduce(0,+)) bytes)")
             tab.flush()
-            var contentBlocks: [[String: Any]] = tabImages.map { base64 in
+            var contentBlocks: [[String: Any]] = [["type": "text", "text": prompt]]
+            contentBlocks += tabImages.map { base64 in
                 [
                     "type": "image",
                     "source": [
@@ -122,7 +123,6 @@ extension AgentViewModel {
                     ] as [String: Any]
                 ]
             }
-            contentBlocks.append(["type": "text", "text": prompt])
             messages.append(["role": "user", "content": contentBlocks])
             tab.attachedImages.removeAll()
             tab.attachedImagesBase64.removeAll()

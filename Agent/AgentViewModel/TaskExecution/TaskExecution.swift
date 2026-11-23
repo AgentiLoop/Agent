@@ -124,7 +124,8 @@ extension AgentViewModel {
         taskScopeImages = attachedImages
         if hadAttachments {
             appendLog("(\(attachedImagesBase64.count) screenshot(s) attached)")
-            var contentBlocks: [[String: Any]] = attachedImagesBase64.map { base64 in
+            var contentBlocks: [[String: Any]] = [["type": "text", "text": effectivePrompt]]
+            contentBlocks += attachedImagesBase64.map { base64 in
                 [
                     "type": "image",
                     "source": [
@@ -134,7 +135,6 @@ extension AgentViewModel {
                     ] as [String: Any]
                 ]
             }
-            contentBlocks.append(["type": "text", "text": effectivePrompt])
             messages.append(["role": "user", "content": contentBlocks])
             // Clear attachments after use
             attachedImages.removeAll()
