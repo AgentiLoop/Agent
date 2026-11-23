@@ -304,16 +304,16 @@ extension AgentViewModel {
         persistScriptTabs()
     }
 
-    /// Compose the final prompt by prepending each pasted-text attachment as a
-    /// fenced block, followed by the typed prompt. If there are no attachments,
+    /// Compose the final prompt: the typed prompt first, followed by each
+    /// pasted-text attachment as a labelled block. If there are no attachments,
     /// returns `typed` unchanged.
     static func mergePastedTexts(_ attachments: [PastedText], into typed: String) -> String {
         guard !attachments.isEmpty else { return typed }
         var parts: [String] = []
+        if !typed.isEmpty { parts.append(typed) }
         for (idx, att) in attachments.enumerated() {
             parts.append("[Pasted text #\(idx + 1)]\n\(att.text)")
         }
-        if !typed.isEmpty { parts.append(typed) }
         return parts.joined(separator: "\n\n")
     }
 }
