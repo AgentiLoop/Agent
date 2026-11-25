@@ -74,9 +74,15 @@ struct WebSearchSettingsView: View {
 
     private var order: [WebSearchBackend] { WebSearchBackend.order(from: orderRaw) }
 
-    /// True when the current tab's LLM is Claude.
-    private var isClaudeTab: Bool {
-        (viewModel.selectedTab?.llmConfig?.provider ?? viewModel.selectedProvider) == .claude
+    /// The provider-hosted search for the current tab's LLM, if any: Claude's
+    /// for Claude, OpenAI's for Codex. It runs inside the provider's API, so
+    /// it replaces the app's own search tool and can't be reordered.
+    private var builtInBackend: WebSearchBackend? {
+        switch viewModel.selectedTab?.llmConfig?.provider ?? viewModel.selectedProvider {
+        case .claude: return .claude
+        case .codex: return .openAI
+        default: return nil
+        }
     }
 
     /// Whether a backend can run: it has a key, or is keyless DuckDuckGo.
@@ -87,7 +93,7 @@ struct WebSearchSettingsView: View {
         case .tavily: return !viewModel.tavilyAPIKey.isEmpty
         case .ollama, .zAI: return !(backend.storedKey ?? "").isEmpty
         case .duckDuckGo: return true
-        case .claude: return false
+        case .claude, .openAI: return false
         }
     }
 
@@ -98,15 +104,15 @@ struct WebSearchSettingsView: View {
         return VStack(alignment: .leading, spacing: 4) {
             Text("Search Tool Order").font(.caption).foregroundStyle(captionStyle)
             List {
-                // Fixed, non-draggable row: Claude's own search runs inside the
-                // Claude API, so it only appears when this tab's LLM is Claude.
-                if isClaudeTab {
+                // Fixed, non-draggable row: the provider's own search runs
+                // inside its API, so it only appears when this tab's LLM has one.
+                if let builtInBackend {
                     HStack(spacing: 6) {
                         Image(systemName: "lock.fill")
                             .font(.caption2)
                             .foregroundStyle(captionStyle)
                             .accessibilityHidden(true)
-                        Text(WebSearchBackend.claude.displayName)
+                        Text(builtInBackend.displayName)
                             .font(.caption)
                         Spacer()
                         Text("Built in").font(.caption2).foregroundStyle(captionStyle)
@@ -140,7 +146,7 @@ struct WebSearchSettingsView: View {
                 }
             }
             .listStyle(.bordered)
-            .frame(height: CGFloat(WebSearchBackend.defaultOrder.count + (isClaudeTab ? 1 : 0)) * 24 + 8)
+            .frame(height: CGFloat(WebSearchBackend.defaultOrder.count + (builtInBackend == nil ? 0 : 1)) * 24 + 8)
         }
     }
 

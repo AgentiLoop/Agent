@@ -558,6 +558,17 @@ final class CodexService {
             case "response.web_search_call.completed":
                 await MainActor.run { onDelta(" done\n") }
 
+            case "response.output_item.done":
+                // The finished web_search_call item carries the query — record
+                // it so hosted searches show up in the Web Search stats.
+                guard let item = obj["item"] as? [String: Any],
+                      item["type"] as? String == "web_search_call",
+                      let itemData = try? JSONSerialization.data(withJSONObject: item) else { continue }
+                await MainActor.run {
+                    guard let item = (try? JSONSerialization.jsonObject(with: itemData)) as? [String: Any] else { return }
+                    WebSearchStatsStore.shared.recordOpenAISearch(item: item)
+                }
+
             case "response.completed":
                 stopReason = "end_turn"
                 if let resp = obj["response"] as? [String: Any],

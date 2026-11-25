@@ -8,6 +8,7 @@ import Observation
 /// preferred), skipping any without a key. DuckDuckGo needs no key.
 /// `claude` is Anthropic's server-side web search: it runs inside the
 /// Claude API call, so it is recorded but never part of the order.
+/// `openAI` is the same for OpenAI's hosted web search (Codex provider).
 enum WebSearchBackend: String, Codable, CaseIterable {
     case ollama
     case zAI
@@ -16,6 +17,7 @@ enum WebSearchBackend: String, Codable, CaseIterable {
     case tavily
     case duckDuckGo
     case claude
+    case openAI
 
     var displayName: String {
         switch self {
@@ -26,6 +28,7 @@ enum WebSearchBackend: String, Codable, CaseIterable {
         case .tavily: return "Tavily"
         case .duckDuckGo: return "DuckDuckGo"
         case .claude: return "Claude Web Search"
+        case .openAI: return "OpenAI Web Search"
         }
     }
 
@@ -98,7 +101,7 @@ enum WebSearchBackend: String, Codable, CaseIterable {
         case .specStream: return KeychainService.shared.get(.specStream)
         case .exa: return KeychainService.shared.get(.exa)
         case .tavily: return KeychainService.shared.get(.tavily)
-        case .duckDuckGo, .claude: return nil
+        case .duckDuckGo, .claude, .openAI: return nil
         }
     }
 }
@@ -211,6 +214,26 @@ final class WebSearchStatsStore {
             return
         }
         record(query: query, backend: .claude, result: result, isFinal: true)
+    }
+
+    /// Record OpenAI's hosted web search from a finished `web_search_call`
+    /// output item (Responses API). Only `search` actions are recorded — page
+    /// opens and in-page finds are not searches. The item carries the queries
+    /// but no result list; results are cited in the model's reply.
+    func recordOpenAISearch(item: [String: Any]) {
+        guard let action = item["action"] as? [String: Any],
+              action["type"] as? String == "search" else { return }
+        let queries = (action["queries"] as? [String] ?? []).filter { !$0.isEmpty }
+        guard let query = (action["query"] as? String).flatMap({ $0.isEmpty ? nil : $0 }) ?? queries.first else { return }
+        let result: String
+        if item["status"] as? String == "failed" {
+            result = "Error: search failed"
+        } else if queries.count > 1 {
+            result = "Also searched: " + queries.filter { $0 != query }.joined(separator: "; ")
+        } else {
+            result = "Results are cited in the reply"
+        }
+        record(query: query, backend: .openAI, result: result, isFinal: true)
     }
 
     // MARK: - Persistence

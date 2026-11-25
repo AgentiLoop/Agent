@@ -35,6 +35,7 @@ extension AgentViewModel {
             case .tavily: result = await performTavilySearchForTask(query: query, apiKey: key)
             case .duckDuckGo: result = await performDuckDuckGoSearchInternal(query: query)
             case .claude: result = "Error: Claude web search runs inside the Claude API"
+            case .openAI: result = "Error: OpenAI web search runs inside the OpenAI API"
             }
             let isFinal = !result.hasPrefix("Error:") || i == chain.count - 1
             await MainActor.run { WebSearchStatsStore.shared.record(query: query, backend: backend, result: result, isFinal: isFinal) }
