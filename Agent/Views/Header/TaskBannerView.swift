@@ -42,12 +42,15 @@ struct TaskBannerView: View {
                 .accessibilityLabel("User prompt")
                 .accessibilityHint(appleAIPrompt != nil ? "Shows or hides the Apple Intelligence prompt" : "")
 
-                Text(prompt)
+                // Collapse newlines/whitespace: a prompt that starts with a blank line
+                // would otherwise show an empty banner under lineLimit(1).
+                let oneLine = prompt.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+                Text(oneLine)
                     .font(.caption)
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .foregroundStyle(.white)
-                    .accessibilityLabel("Current task: \(prompt)")
+                    .accessibilityLabel("Current task: \(oneLine)")
 
                 Spacer()
 
