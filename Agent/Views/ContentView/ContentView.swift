@@ -793,30 +793,30 @@ struct ContentView: View {
 
     /// The prompt of the currently running task (main or selected tab).
     private var activeTaskPrompt: String? {
-        // A selected tab shows ONLY its own task — never another tab's.
-        if let selId = viewModel.selectedTabId,
-           let tab = viewModel.tab(for: selId)
-        {
-            if tab.isLLMRunning { return tab.currentTaskPrompt }
-            if tab.isRunning { return "Running: \(tab.scriptName)" }
-            return nil
-        }
-        // Main tab selected
-        if viewModel.isRunning { return viewModel.currentTaskPrompt }
-        return nil
+        Self.bannerPrompt(selectedTab: viewModel.selectedTabId.flatMap { viewModel.tab(for: $0) },
+                          mainIsRunning: viewModel.isRunning, mainPrompt: viewModel.currentTaskPrompt)
     }
 
     /// The Apple AI annotation for the currently running task.
     private var activeAppleAIPrompt: String? {
-        // A selected tab shows ONLY its own annotation — never another tab's.
-        if let selId = viewModel.selectedTabId,
-           let tab = viewModel.tab(for: selId)
-        {
-            let p = tab.currentAppleAIPrompt
-            return p.isEmpty ? nil : p
+        Self.bannerAppleAIPrompt(selectedTab: viewModel.selectedTabId.flatMap { viewModel.tab(for: $0) },
+                                 mainPrompt: viewModel.currentAppleAIPrompt)
+    }
+
+    /// Banner prompt for the visible tab. A selected tab shows ONLY its own task —
+    /// never another tab's; `selectedTab == nil` means the main tab is selected.
+    static func bannerPrompt(selectedTab tab: ScriptTab?, mainIsRunning: Bool, mainPrompt: String) -> String? {
+        if let tab {
+            if tab.isLLMRunning { return tab.currentTaskPrompt }
+            if tab.isRunning { return "Running: \(tab.scriptName)" }
+            return nil
         }
-        // Main tab selected
-        let p = viewModel.currentAppleAIPrompt
+        return mainIsRunning ? mainPrompt : nil
+    }
+
+    /// Apple AI annotation for the visible tab — never another tab's.
+    static func bannerAppleAIPrompt(selectedTab tab: ScriptTab?, mainPrompt: String) -> String? {
+        let p = tab?.currentAppleAIPrompt ?? mainPrompt
         return p.isEmpty ? nil : p
     }
 

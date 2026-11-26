@@ -266,6 +266,7 @@
 		WEB1000000000000000007 /* WebAutomationService+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = WEB1000000000000000008 /* WebAutomationService+Search.swift */; };
 		82BC600665F18A6238A79B59 /* WebSearchSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B74A1150D0566CBDF5CD31E /* WebSearchSettingsView.swift */; };
 		AC980D9D4292071FF1F97B65 /* WebSearchStatsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBBD204017DE8382B6417B7 /* WebSearchStatsStore.swift */; };
+		17EE0F95381AB4E56BB4888A /* TaskBannerTabIsolationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BE602E5EB893662EE62ACD9 /* TaskBannerTabIsolationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -564,6 +565,7 @@
 		WEB1000000000000000008 /* WebAutomationService+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebAutomationService+Search.swift"; sourceTree = "<group>"; };
 		2B74A1150D0566CBDF5CD31E /* WebSearchSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebSearchSettingsView.swift"; sourceTree = "<group>"; };
 		0CBBD204017DE8382B6417B7 /* WebSearchStatsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebSearchStatsStore.swift"; sourceTree = "<group>"; };
+		1BE602E5EB893662EE62ACD9 /* TaskBannerTabIsolationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskBannerTabIsolationTests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -991,7 +993,8 @@
 				D06FF7974D444A53866B44F9 /* ContextOverflowDetectionTests.swift */,
 				6F1EA9AEA14A0CC1B69CD575 /* AvatarControllerTests.swift */,
 				0927C13DA4204264570A050E /* TheRouterProviderTests.swift */,
-			);
+							1BE602E5EB893662EE62ACD9 /* TaskBannerTabIsolationTests.swift */,
+);
 			path = AgentTests;
 			sourceTree = "<group>";
 		};
@@ -1626,6 +1629,7 @@
 				AB11223344556677889900AA /* ShellSafetyServiceTests.swift in Sources */,
 				AB112233445566778899030A /* CodeBlockHighlighterTests.swift in Sources */,
 				1EBCF4BDAECFE598FEC3B400 /* ActivityLogTabCacheTests.swift in Sources */,
+				17EE0F95381AB4E56BB4888A /* TaskBannerTabIsolationTests.swift in Sources */,
 				AB112233445566778899050A /* PackageAutoDiscoveryTests.swift in Sources */,
 				AB112233445566778899060A /* PackageGenerationTests.swift in Sources */,
 				AB112233445566778899070A /* ScriptServiceTests.swift in Sources */,

@@ -22,6 +22,12 @@ struct TaskBannerView: View {
     /// Non-nil only while Auto-Pilot is active — shown in a blue bar below the green one.
     var autoPilotGoal: String? = nil
 
+    /// Collapse newlines/whitespace: a prompt that starts with a blank line
+    /// would otherwise show an empty banner under lineLimit(1).
+    static func singleLine(_ prompt: String) -> String {
+        prompt.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 6) {
@@ -42,9 +48,7 @@ struct TaskBannerView: View {
                 .accessibilityLabel("User prompt")
                 .accessibilityHint(appleAIPrompt != nil ? "Shows or hides the Apple Intelligence prompt" : "")
 
-                // Collapse newlines/whitespace: a prompt that starts with a blank line
-                // would otherwise show an empty banner under lineLimit(1).
-                let oneLine = prompt.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+                let oneLine = Self.singleLine(prompt)
                 Text(oneLine)
                     .font(.caption)
                     .lineLimit(1)
