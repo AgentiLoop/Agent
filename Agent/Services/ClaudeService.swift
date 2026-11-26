@@ -143,13 +143,15 @@ final class ClaudeService {
 
     /// Old or cross-provider history can contain unsigned reasoning. It cannot
     /// be replayed as Claude thinking; preserve valid signed blocks unchanged.
-    nonisolated static func removingUnsignedThinking(_ messages: [[String: Any]]) -> [[String: Any]] {
+    /// `dropSigned` removes signed and redacted thinking too.
+    nonisolated static func removingUnsignedThinking(_ messages: [[String: Any]], dropSigned: Bool = false) -> [[String: Any]] {
         messages.compactMap { message in
             guard let blocks = message["content"] as? [[String: Any]] else { return message }
             let hasForeignKeys = blocks.contains { $0["reasoning_content"] != nil }
             let filtered = blocks.filter { block in
+                if dropSigned, block["type"] as? String == "redacted_thinking" { return false }
                 guard block["type"] as? String == "thinking" else { return true }
-                guard let signature = block["signature"] as? String else { return false }
+                guard !dropSigned, let signature = block["signature"] as? String else { return false }
                 return !signature.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             }.map { block in
                 // DeepSeek stashes reasoning_content on blocks; Anthropic rejects extra keys.
@@ -346,10 +348,38 @@ final class ClaudeService {
     /// max_tokens floor above the budget.
     private func applyThinking(to body: inout [String: Any]) {
         guard thinkingBudget > 0, !isLocalhostEndpoint else { return }
-        body["thinking"] = ["type": "enabled", "budget_tokens": thinkingBudget]
+        var thinking: [String: Any] = ["type": "enabled", "budget_tokens": thinkingBudget]
+        if usesBindingControls {
+            thinking["block_binding"] = ["prefix_mismatch_behavior": "drop_block"]
+        }
+        body["thinking"] = thinking
         body.removeValue(forKey: "temperature")
         let mt = body["max_tokens"] as? Int ?? 16384
         body["max_tokens"] = max(mt, thinkingBudget + 8192)
+    }
+
+    /// Models that returned the thinking prefix-check 400 ("The block is bound
+    /// to a different conversation"). The system prompt's per-task suffix
+    /// changes between tasks, so thinking blocks replayed from an earlier task
+    /// no longer match it. Once a model reports that, the request is retried
+    /// and mismatched blocks are dropped from then on instead of failing.
+    private static var bindingMismatchModels: Set<String> = []
+
+    private var dropsMismatchedThinking: Bool { Self.bindingMismatchModels.contains(model) }
+
+    /// Server-side drop (`thinking.block_binding`) needs thinking on plus the
+    /// beta header, which OpenRouter keys don't get; without it the thinking
+    /// blocks are stripped client-side (see removingUnsignedThinking).
+    private var usesBindingControls: Bool {
+        dropsMismatchedThinking && thinkingBudget > 0 && !isLocalhostEndpoint
+            && !Self.sanitizedCredential(apiKey).hasPrefix("sk-or-")
+    }
+
+    nonisolated static func isThinkingBindingError(_ error: Error) -> Bool {
+        guard let agentError = error as? AgentError,
+              case .apiError(let statusCode, let message) = agentError
+        else { return false }
+        return statusCode == 400 && message.contains("prefix_mismatch_behavior")
     }
 
     func send(
@@ -373,7 +403,7 @@ final class ClaudeService {
             // No "temperature" — newer Claude models reject it (400 "deprecated"),
             // and sendStreaming() already omits it.
             "system": systemBlock,
-            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(Self.sanitizingToolUseNames(Self.removingUnsignedThinking(messages)))))
+            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(Self.sanitizingToolUseNames(Self.removingUnsignedThinking(messages, dropSigned: dropsMismatchedThinking && !usesBindingControls)))))
         ]
         // Skip tools only for actual localhost servers (LM Studio's Claude-compat
         // mode often mis-handles native Anthropic tool format). Remote
@@ -390,13 +420,19 @@ final class ClaudeService {
 
         // Serialize on main actor, then offload network I/O + parsing. .sortedKeys produces byte-stable JSON regardless of dict iteration order — required for prefix caching to hit.
         let bodyData = try JSONSerialization.data(withJSONObject: body, options: [.sortedKeys])
-        return try await Self.performRequest(
-            bodyData: bodyData,
-            apiKey: apiKey,
-            apiVersion: Self.apiVersion,
-            url: endpointURL,
-            thinkingEnabled: thinkingBudget > 0 && !isLocalhostEndpoint
-        )
+        do {
+            return try await Self.performRequest(
+                bodyData: bodyData,
+                apiKey: apiKey,
+                apiVersion: Self.apiVersion,
+                url: endpointURL,
+                thinkingEnabled: thinkingBudget > 0 && !isLocalhostEndpoint,
+                bindingControls: usesBindingControls
+            )
+        } catch let error where Self.isThinkingBindingError(error) && !dropsMismatchedThinking {
+            Self.bindingMismatchModels.insert(model)
+            return try await send(messages: messages, activeGroups: activeGroups)
+        }
     }
 
     /// Strip every whitespace / control character from a pasted credential.
@@ -466,13 +502,14 @@ final class ClaudeService {
         on request: inout URLRequest,
         credential: String,
         apiVersion: String,
-        thinkingEnabled: Bool = false
+        thinkingEnabled: Bool = false, bindingControls: Bool = false
     ) {
         let clean = sanitizedCredential(credential)
         request.setValue(apiVersion, forHTTPHeaderField: "anthropic-version")
         request.setValue("application/json", forHTTPHeaderField: "content-type")
         // Interleaved thinking lets Claude 4+ models think between tool calls.
-        let thinkingFlag = thinkingEnabled ? ",interleaved-thinking-2025-05-14" : ""
+        let thinkingFlag = (thinkingEnabled ? ",interleaved-thinking-2025-05-14" : "")
+            + (bindingControls ? ",thinking-binding-controls-2026-08-01" : "")
         if clean.hasPrefix("sk-ant-oat01-") {
             request.setValue("Bearer \(clean)", forHTTPHeaderField: "Authorization")
             // Fixed Claude Code client profile for OAuth compatibility testing.
@@ -496,11 +533,11 @@ final class ClaudeService {
 
     /// Network I/O and response parsing off the main thread
     nonisolated private static func performRequest(
-        bodyData: Data, apiKey: String, apiVersion: String, url: URL, thinkingEnabled: Bool = false
+        bodyData: Data, apiKey: String, apiVersion: String, url: URL, thinkingEnabled: Bool = false, bindingControls: Bool = false
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        applyAuthHeaders(on: &request, credential: apiKey, apiVersion: apiVersion, thinkingEnabled: thinkingEnabled)
+        applyAuthHeaders(on: &request, credential: apiKey, apiVersion: apiVersion, thinkingEnabled: thinkingEnabled, bindingControls: bindingControls)
         request.httpBody = bodyData
         request.timeoutInterval = llmAPITimeout
 
@@ -565,7 +602,7 @@ final class ClaudeService {
             "model": model,
             "max_tokens": maxTokens > 0 ? maxTokens : 16384,
             "system": systemBlock,
-            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(Self.sanitizingToolUseNames(Self.removingUnsignedThinking(messages))))),
+            "messages": withMessageCacheBreakpoint(repairOrphanToolUse(stripOrphanToolResults(Self.sanitizingToolUseNames(Self.removingUnsignedThinking(messages, dropSigned: dropsMismatchedThinking && !usesBindingControls))))),
             "stream": true
         ]
         if !isLocalhostEndpoint {
@@ -579,16 +616,29 @@ final class ClaudeService {
 
         // .sortedKeys for byte-stable prefix caching — see send() for rationale.
         let bodyData = try JSONSerialization.data(withJSONObject: body, options: [.sortedKeys])
-        return try await Self.performStreamingRequest(
-            bodyData: bodyData,
-            apiKey: apiKey,
-            apiVersion: Self.apiVersion,
-            url: endpointURL,
-            thinkingEnabled: thinkingBudget > 0 && !isLocalhostEndpoint,
-            onToolUse: onToolUse,
-            onDoneSummary: onDoneSummary,
-            onTextDelta: onTextDelta
-        )
+        do {
+            return try await Self.performStreamingRequest(
+                bodyData: bodyData,
+                apiKey: apiKey,
+                apiVersion: Self.apiVersion,
+                url: endpointURL,
+                thinkingEnabled: thinkingBudget > 0 && !isLocalhostEndpoint,
+                bindingControls: usesBindingControls,
+                onToolUse: onToolUse,
+                onDoneSummary: onDoneSummary,
+                onTextDelta: onTextDelta
+            )
+        } catch let error where Self.isThinkingBindingError(error) && !dropsMismatchedThinking {
+            // The 400 arrives before any stream event, so nothing was emitted yet.
+            Self.bindingMismatchModels.insert(model)
+            return try await sendStreaming(
+                messages: messages,
+                activeGroups: activeGroups,
+                onToolUse: onToolUse,
+                onDoneSummary: onDoneSummary,
+                onTextDelta: onTextDelta
+            )
+        }
     }
 
     /// The `summary` string so far in a still-streaming `done` input JSON, unescaped; nil before it starts.
@@ -610,14 +660,14 @@ final class ClaudeService {
 
     nonisolated private static func performStreamingRequest(
         bodyData: Data, apiKey: String, apiVersion: String, url: URL,
-        thinkingEnabled: Bool = false,
+        thinkingEnabled: Bool = false, bindingControls: Bool = false,
         onToolUse: ToolUseHook? = nil,
         onDoneSummary: (@Sendable (String, Bool) -> Void)? = nil,
         onTextDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: [[String: Any]], stopReason: String, inputTokens: Int, outputTokens: Int) {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        applyAuthHeaders(on: &request, credential: apiKey, apiVersion: apiVersion, thinkingEnabled: thinkingEnabled)
+        applyAuthHeaders(on: &request, credential: apiKey, apiVersion: apiVersion, thinkingEnabled: thinkingEnabled, bindingControls: bindingControls)
         request.httpBody = bodyData
         request.timeoutInterval = llmAPITimeout
 
