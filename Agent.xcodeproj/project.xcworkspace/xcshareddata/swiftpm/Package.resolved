@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AgentiLoop/AutoUpdateKit.git",
       "state" : {
-        "revision" : "fb49db3d10fc025774dfc2d0dfb0a660958cc2c8",
-        "version" : "1.0.2"
+        "revision" : "694c9274f3de6c54109d30891ac0d7bf0f78f7f7",
+        "version" : "1.1.0"
       }
     },
     {

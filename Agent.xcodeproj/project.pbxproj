@@ -1798,7 +1798,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 300;
+				CURRENT_PROJECT_VERSION = 301;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
@@ -1827,7 +1827,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.1.100;
+				MARKETING_VERSION = 1.1.101;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				PRODUCT_MODULE_NAME = Agent_;
 				PRODUCT_NAME = "$(APP_PRODUCT_NAME)";
@@ -1853,7 +1853,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 300;
+				CURRENT_PROJECT_VERSION = 301;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
@@ -1882,7 +1882,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.1.100;
+				MARKETING_VERSION = 1.1.101;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				PRODUCT_MODULE_NAME = Agent_;
 				PRODUCT_NAME = "$(APP_PRODUCT_NAME)";
@@ -2051,7 +2051,7 @@
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 10.0.0;
-				minimumVersion = 1.0.1;
+				minimumVersion = 1.1.0;
 			};
 		};
 		EAA08AAA2F7D549300D5998A /* XCRemoteSwiftPackageReference "AgentLLM" */ = {
